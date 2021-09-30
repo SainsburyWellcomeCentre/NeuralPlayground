@@ -30,3 +30,10 @@
 *.exe
 *.out
 *.app
+
+# Editor
+.idea
+
+# Jupyter stuff
+*.ipynb_checkpoints*
+*__pycache__*
