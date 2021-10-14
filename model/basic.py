@@ -25,8 +25,8 @@ class ExcitInhibitoryplastic(NeurResponseModel):
     def reset(self):
         self.global_steps = 0
         self.history = []
-        self.wi = np.ones((self.D,self.Ne)) #what is the mu and why do we have the 1 and not2
-        self.we = np.ones((self.D,self.Ni))
+        self.wi = np.ones((self.D,self.Ni)) #what is the mu and why do we have the 1 and not2
+        self.we = np.ones((self.D,self.Ne))
         rout = np.zeros((self.D,1))
  
     def act(self, observation):
@@ -37,11 +37,15 @@ class ExcitInhibitoryplastic(NeurResponseModel):
     def update(self, x):
         self.global_steps += 1
         self.get_rates_exc= self.alpha_exc*np.exp((x/self.sigma_exc)**2)
+        self.get_rates_exc_dup = np.tile(self.get_rates_exc,(self.Ne,1))
         self.get_rates_inh= self.alpha_inh*np.exp((x/self.sigma_inh)**2)
-        self.rout = (np.dot(self.we,self.get_rates_exc)- np.dot(self.wi,self.get_rates_inh))
-    
-        self.we = self.we + self.etaexc * self.get_rates_exc(x)* rout    # Weight update inh
-        self.wi = self.wi +  self.etainh * self.get_rates_inh(x) * rout  # Weight update exc
+        self.get_rates_inh_dup = np.tile(self.get_rates_inh,(self.Ni,1))
+        self.rout = (np.dot(self.we,self.get_rates_exc_dup)- np.dot(self.wi,self.get_rates_inh_dup))
+        print(self.we.shape)
+        print(self.get_rates_exc_dup.shape)
+        print(self.rout.shape)
+        self.we = self.we + self.etaexc @ self.get_rates_exc_dup @ self.rout    # Weight update inh
+        self.wi = self.wi +  self.etainh @  self.get_rates_inh_dup @ self.rout  # Weight update exc
         transition = {"wi": self.wi , "we": self.we, "r_out": rout,}
         self.history.append(transition)
         return rout
