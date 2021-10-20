@@ -4,6 +4,7 @@ import numpy as np
 import random
 from model.core import NeuralResponseModel as NeurResponseModel
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 import numpy as np
 
 class ExcitInhibitoryplastic(NeurResponseModel):
@@ -49,6 +50,38 @@ class ExcitInhibitoryplastic(NeurResponseModel):
         self.history.append(transition)
         
         return self.rout
+        
+    def plot_rate(self,colormap='viridis',number_of_different_colors=30,):
+        output_rates =
+        linspace = np.linspace(-0.5 , 0.5, 51)
+        X, Y = np.meshgrid(linspace, linspace)
+        distance = np.sqrt(X*X + Y*Y)
+        print(output_rates.shape)
+        title = 'Plot of rate'
+        plt.title(title, fontsize=12)
+        cm = getattr(mpl.cm, colormap)
+        cm.set_over('y', 1.0) # Set the color for values higher than maximum
+        cm.set_bad('white', alpha=0.0)
+        maximal_rate = int(np.ceil(np.amax(output_rates)))
+        V = np.linspace(0, maximal_rate, number_of_different_colors)
+        # Hack to avoid error in case of vanishing output rate at every position
+        # If every entry in output_rates is 0, you define a norm and set
+        # one of the elements to a small value (such that it looks like zero)
+        if np.count_nonzero(output_rates) == 0:
+            color_norm = mpl.colors.Normalize(0., 100.)
+            output_rates[0][0] = 0.000001
+            V = np.linspace(0, 2.0, number_of_different_colors)
+            plt.contourf(X, Y, output_rates[...,0], V, norm=color_norm, cmap=cm, extend='max')
+        else:
+        a = output_rates[:, :, 28, 0]
+        plt.contourf(X, Y, a, V, cmap=cm)
+        plt.margins(0.01)
+        plt.axis('off')
+        ticks = np.linspace(0.0, maximal_rate, 2)
+        plt.colorbar(format='%.2f', ticks=ticks)
+        ax = plt.gca()
+        self.set_axis_settings_for_contour_plots(ax)
+        return
     
 
     
