@@ -85,7 +85,7 @@ class Sargolini2006(Simple2D):
         self.room_width, self.room_depth = np.abs(np.diff(self.arena_limits, axis=1))
         env_kwargs["room_width"] = self.room_width
         env_kwargs["room_depth"] = self.room_depth
-        env_kwargs["agent_step_size"] = None
+        env_kwargs["agent_step_size"] = 1/50  # In seconds
         super().__init__(environment_name, **env_kwargs)
         self.metadata["doi"] = "https://doi.org/10.1126/science.1125572"
 
@@ -94,6 +94,7 @@ class Sargolini2006(Simple2D):
     def reset(self):
         """ Start in a random position within the dimensions of the room """
         self.global_steps = 0
+        self.global_time = 0
         self.history = []
         self.pos, self.head_dir = self.data.position[0, :], self.data.head_direction[0, :]
         self.state = np.concatenate([self.pos, self.head_dir])
@@ -104,6 +105,7 @@ class Sargolini2006(Simple2D):
     def step(self, action):
         """ Action is ignored in this case """
         self.global_steps += 1
+        self.global_time = self.global_steps*self.agent_step_size
         reward = 0  # If you get reward, it should be coded here
         new_state = self.data.position[self.global_steps, :], self.data.head_direction[self.global_steps, :]
         new_state = np.concatenate(new_state)
