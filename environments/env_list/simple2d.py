@@ -51,13 +51,13 @@ class Simple2D(Environment):
             f, ax = plt.subplots(1, 1, figsize=(8, 6))
 
         ax.plot([-self.room_width/2, self.room_width/2],
-                [-self.room_depth/2, -self.room_depth/2], "k", lw=2)
+                [-self.room_depth/2, -self.room_depth/2], "r", lw=2)
         ax.plot([-self.room_width/2, self.room_width/2],
-                [self.room_depth/2, self.room_depth/2], "k", lw=2)
+                [self.room_depth/2, self.room_depth/2], "r", lw=2)
         ax.plot([-self.room_width/2, -self.room_width/2],
-                [-self.room_depth/2, self.room_depth/2], "k", lw=2)
+                [-self.room_depth/2, self.room_depth/2], "r", lw=2)
         ax.plot([self.room_width / 2, self.room_width / 2],
-                [-self.room_depth / 2, self.room_depth / 2], "k", lw=2)
+                [-self.room_depth / 2, self.room_depth / 2], "r", lw=2)
 
         state_history = [s["state"] for s in history_data]
         next_state_history = [s["next_state"] for s in history_data]
