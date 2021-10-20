@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 import numpy as np
 
+
 class Environment(object):
     """Main environment class"""
     def __init__(self, environment_name="default_env", **env_kwargs):
