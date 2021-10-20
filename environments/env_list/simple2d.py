@@ -3,6 +3,7 @@ sys.path.append("../")
 import matplotlib.pyplot as plt
 from environments.environment import Environment
 import numpy as np
+from environments.experiment_data.behavioral_data import BehavioralData
 
 
 class Simple2D(Environment):
@@ -11,7 +12,10 @@ class Simple2D(Environment):
         super().__init__(environment_name, **env_kwargs)
         self.metadata = {"env_kwargs": env_kwargs}
         self.room_width, self.room_depth = env_kwargs["room_width"], env_kwargs["room_depth"]
+        self.arena_limits = np.array([[-self.room_width/2, self.room_width/2],
+                                      [-self.room_depth/2, self.room_depth/2]])
         self.agent_step_size = env_kwargs["agent_step_size"]
+        self.state_dims_labels = ["x_pos", "y_pos"]
         self.reset()
 
     def reset(self):
@@ -69,3 +73,43 @@ class Simple2D(Environment):
         ax.plot(starting_point[0], starting_point[1], "C3*", ms=13, label="starting point")
         ax.plot(ending_point[0], ending_point[1], "C2*", ms=13, label="ending point")
         return ax
+
+
+class Sargolini2006(Simple2D):
+
+    def __init__(self, data_path="sargolini2006/", environment_name="Sargolini2006", **env_kwargs):
+        self.data_path = data_path
+        self.environment_name = environment_name
+        self.data = BehavioralData(data_path=self.data_path, experiment_name=self.environment_name)
+        self.arena_limits = self.data.arena_limits
+        self.room_width, self.room_depth = np.abs(np.diff(self.arena_limits, axis=1))
+        env_kwargs["room_width"] = self.room_width
+        env_kwargs["room_depth"] = self.room_depth
+        env_kwargs["agent_step_size"] = None
+        super().__init__(environment_name, **env_kwargs)
+        self.metadata["doi"] = "https://doi.org/10.1126/science.1125572"
+
+        self.state_dims_labels = ["x_pos", "y_pos", "head_direction_x", "head_direction_y"]
+
+    def reset(self):
+        """ Start in a random position within the dimensions of the room """
+        self.global_steps = 0
+        self.history = []
+        self.pos, self.head_dir = self.data.position[0, :], self.data.head_direction[0, :]
+        self.state = np.concatenate([self.pos, self.head_dir])
+        # Fully observable environment, make_observation returns the state
+        observation = self.make_observation()
+        return observation, self.state
+
+    def step(self, action):
+        """ Action is ignored in this case """
+        self.global_steps += 1
+        reward = 0  # If you get reward, it should be coded here
+        new_state = self.data.position[self.global_steps, :], self.data.head_direction[self.global_steps, :]
+        new_state = np.concatenate(new_state)
+        transition = {"action": action, "state": self.state, "next_state": new_state,
+                      "reward": reward, "step": self.global_steps}
+        self.history.append(transition)
+        self.state = new_state
+        observation = self.make_observation()
+        return observation, new_state, reward
