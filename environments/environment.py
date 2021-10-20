@@ -12,6 +12,7 @@ class Environment(object):
         self.state = np.array([])
         self.history = []
         self.global_steps = 0
+        self.global_time = 0
 
     def make_observation(self):
         """ Just take the state and returns and array of sensory information """
