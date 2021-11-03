@@ -6,6 +6,7 @@ from scipy.interpolate import interp1d
 import matplotlib.pyplot as plt
 import pandas as pd
 
+
 class SargoliniData(object):
 
     def __init__(self, data_path, experiment_name):
@@ -35,12 +36,19 @@ class SargoliniData(object):
 
 class FullSargoliniData(object):
 
-    def __init__(self, data_path, experiment_name = "FullSargoliniData"):
+    def __init__(self, data_path, experiment_name="FullSargoliniData", verbose=False):
         self.data_path = data_path
         self.experiment_name = experiment_name
         self._load_data()
+        if verbose == True:
+            self.show_readme()
+            self.show_keys()
+            self.plot_best_session()
 
     def _load_data(self):
+        self.best_session = {"rat": "11084", "sess": "10030502", "cell_id": "t1c1"}
+        self.arena_limits = np.array([[-50, 50], [-50, 50]])
+
         data_path_list = glob.glob(data_path + "*.mat")
         mice_ids = np.unique([dp.split("/")[-1][:5] for dp in data_path_list])
         self.data_per_animal = {}
@@ -57,17 +65,57 @@ class FullSargoliniData(object):
                     cleaned_data = clean_data(sio.loadmat(r_path[0]))
                     self.data_per_animal[m_id][sess][cell_id] = cleaned_data
 
+    def show_keys(self):
+        print("Rat ids", list(self.data_per_animal.keys()))
+        for rat_id, val in self.data_per_animal.items():
+            print("Sessions for " + rat_id)
+            print(list(self.data_per_animal[rat_id].keys()))
+            for sess in self.data_per_animal[rat_id].keys():
+                print("Cells recorded in session " + sess)
+                print(list(self.data_per_animal[rat_id][sess].keys()))
+
+    def show_readme(self):
+        readme_path = glob.glob(data_path + "readme" + "*.txt")[0]
+        with open(readme_path, 'r') as fin:
+            print(fin.read())
+
+    def plot_best_session(self):
+        # print(self.data_per_animal[self.best_session["rat"]][self.best_session["sess"]])
+        cell_data = self.data_per_animal[self.best_session["rat"]][self.best_session["sess"]]
+        first_cell_data = list(cell_data.values())[0]
+        x1, y1 = first_cell_data["x1"][:, 0], first_cell_data["y1"][:, 0]
+        x2, y2 = first_cell_data["x2"][:, 0], first_cell_data["y2"][:, 0]
+
+        # Selecting positional data
+        x = np.mean(np.stack([x1, x2], axis=1), axis=1)
+        y = np.mean(np.stack([y1, y2], axis=1), axis=1)
+        x = np.clip(x, a_min=self.arena_limits[0, 0], a_max=self.arena_limits[0, 1])
+        y = np.clip(y, a_min=self.arena_limits[1, 0], a_max=self.arena_limits[1, 1])
+
+        time_array = first_cell_data["t"][:, 0]
+        test_spikes = first_cell_data["ts"][:, 0]
+        f, ax = plt.subplots(2, 3, figsize=(15, 8))
+        ax = ax.flatten()
+        ax[0].plot(x, y)
+
+        for i, (key, single_cell_data) in enumerate(cell_data.items()):
+            test_spikes = single_cell_data["ts"][:, 0]
+            h, binx, biny = get_2D_ratemap(time_array, test_spikes, x, y)
+            ax[i+1].imshow(h)
+
+        plt.show()
+
 
 def clean_data(data, keep_headers=False):
     aux_dict = {}
     for key, val in data.items():
-        if isinstance(val, bytes) or isinstance(val, str) or key=="__globals__":
+        if isinstance(val, bytes) or isinstance(val, str) or key == "__globals__":
             if keep_headers:
                 aux_dict[key] = val
             continue
         else:
             # print(len(val))
-            if np.isnan(val).any():
+            if not np.isnan(val).any():
                 aux_dict[key] = val
             else:
                 # Interpolate nans
@@ -76,9 +124,21 @@ def clean_data(data, keep_headers=False):
                 clean_x = x_range[nan_indexes]
                 clean_val = np.array(val)[nan_indexes, 0]
                 # print(clean_x.shape, clean_val.shape)
-                f = interp1d(clean_x, clean_val, kind='cubic')
-                aux_dict[key] = f(x_range)
+                f = interp1d(clean_x, clean_val, kind='cubic', fill_value="extrapolate")
+                aux_dict[key] = f(x_range)[..., np.newaxis]
     return aux_dict
+
+
+def get_2D_ratemap(time_array, spikes, x, y, x_size=50, y_size=50):
+    x_spikes, y_spikes = [], []
+    for s in spikes:
+        array_pos = np.argmin(np.abs(time_array-s))
+        x_spikes.append(x[array_pos])
+        y_spikes.append(y[array_pos])
+    x_spikes = np.array(x_spikes)
+    y_spikes = np.array(y_spikes)
+    h, binx, biny = np.histogram2d(x_spikes, y_spikes, bins=(x_size, y_size))
+    return h.T, binx, biny
 
 
 if __name__ == "__main__":
@@ -89,5 +149,5 @@ if __name__ == "__main__":
     # print(data.head_direction.shape)
     # print(np.amin(data.position), np.amax(data.position))
 
-    data_path = "/home/rodrigo/HDisk/8F6BE356-3277-475C-87B1-C7A977632DA7_1/"
-    data = FullSargoliniData(data_path=data_path)
+    data_path = "/home/rodrigo/HDisk/8F6BE356-3277-475C-87B1-C7A977632DA7_1/all_data/"
+    data = FullSargoliniData(data_path=data_path, verbose=True)
