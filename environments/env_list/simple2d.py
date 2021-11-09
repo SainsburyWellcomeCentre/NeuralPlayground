@@ -3,7 +3,7 @@ sys.path.append("../")
 import matplotlib.pyplot as plt
 from environments.environment import Environment
 import numpy as np
-from environments.experiment_data.behavioral_data import BehavioralData
+from environments.experiment_data.behavioral_data import SargoliniData
 
 
 class Simple2D(Environment):
@@ -79,7 +79,7 @@ class Sargolini2006(Simple2D):
     def __init__(self, data_path="sargolini2006/", environment_name="Sargolini2006", **env_kwargs):
         self.data_path = data_path
         self.environment_name = environment_name
-        self.data = BehavioralData(data_path=self.data_path, experiment_name=self.environment_name)
+        self.data = SargoliniData(data_path=self.data_path, experiment_name=self.environment_name)
         self.arena_limits = self.data.arena_limits
         self.room_width, self.room_depth = np.abs(np.diff(self.arena_limits, axis=1))
         env_kwargs["room_width"] = self.room_width
