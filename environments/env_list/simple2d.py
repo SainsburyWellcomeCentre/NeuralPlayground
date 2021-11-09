@@ -22,8 +22,7 @@ class Simple2D(Environment):
         """ Start in a random position within the dimensions of the room """
         self.global_steps = 0
         self.history = []
-        self.state = [np.random.uniform(low=-self.room_width/2, high=self.room_width/2),
-                      np.random.uniform(low=-self.room_depth/2, high=self.room_depth/2)]
+        self.state = [0,0]
         self.state = np.array(self.state)
         # Fully observable environment, make_observation returns the state
         observation = self.make_observation()
