@@ -50,9 +50,10 @@ class ExcitInhibitoryplastic(NeurResponseModel):
             mean1 = np.random.randint(-A,A)*0.001
             mean2 = np.random.randint(-B, B) * 0.001
             mean=[mean1, mean2]
+            mean = [-0.75, -0.75]
             mean=np.array(mean)
             l_exc=(x-mean)
-            sig_exc=[self.sigma_exc_1,self.sigma_exc]
+            sig_exc=[1/(self.sigma_exc_1**2),1/(self.sigma_exc**2)]
             sigma=np.diag(np.array(sig_exc))
             rates_exc_i = self.alpha_exc * np.exp(l_exc.T @ sigma@ (l_exc))
             rates_exc_save[i] = rates_exc_i
@@ -66,15 +67,16 @@ class ExcitInhibitoryplastic(NeurResponseModel):
             mean1 = np.random.randint(-A, A) * 0.001
             mean2 = np.random.randint(-B, B) * 0.001
             mean = [mean1, mean2]
+            mean = [0.75, 0.75]
             mean = np.array(mean)
             l_inh = (x - mean)
-            sig_inh = [self.sigma_inh_1, self.sigma_inh]
+            sig_inh = [1/(self.sigma_inh_1**2), 1/(self.sigma_inh_1**2)]
             sigma_inh = np.diag(np.array(sig_inh))
             rates_inh_i = self.alpha_inh * np.exp(l_inh.T @ sigma_inh @ (l_inh))
             rates_inh_save[i] = rates_inh_i
         return rates_inh_save
 
-    def get_rates_exc_select(self, x, room_width, Number_to_select,room_depth):
+    def get_rates_exc_select(self, x, room_width, Number_to_select, room_depth,):
         rates_exc_save = np.zeros(( Number_to_select, 1))
         for i in range( Number_to_select):
             A = round((room_width / 2) * 1000)
@@ -82,9 +84,10 @@ class ExcitInhibitoryplastic(NeurResponseModel):
             mean1 = np.random.randint(-A, A) * 0.001
             mean2 = np.random.randint(-B, B) * 0.001
             mean=[mean1, mean2]
+            mean = [-0.75, -0.75]
             mean=np.array(mean)
             l_exc=(x-mean)
-            sig_exc=[self.sigma_exc_1,self.sigma_exc]
+            sig_exc=[1/(self.sigma_exc_1**2),1/(self.sigma_exc**2)]
             sigma=np.diag(np.array(sig_exc))
             rates_exc_i = self.alpha_exc * np.exp(l_exc.T @ sigma@ (l_exc))
             rates_exc_save[i] = rates_exc_i
@@ -98,9 +101,10 @@ class ExcitInhibitoryplastic(NeurResponseModel):
             mean1 = np.random.randint(-A, A) * 0.001
             mean2 = np.random.randint(-B, B) * 0.001
             mean = [mean1, mean2]
+            mean= [0.75, 0.75]
             mean = np.array(mean)
             l_inh = (x - mean)
-            sig_inh = [self.sigma_inh_1, self.sigma_inh]
+            sig_inh = [1/(self.sigma_inh_1**2), 1/(self.sigma_inh**2)]
             sigma_inh = np.diag(np.array(sig_inh))
             rates_inh_i = self.alpha_inh * np.exp(l_inh.T @ sigma_inh @ (l_inh))
             rates_inh_save[i] = rates_inh_i
@@ -118,10 +122,14 @@ class ExcitInhibitoryplastic(NeurResponseModel):
         return rout
 
     def output_rates_select(self,x,room_width, room_depth):
-        Number_to_select=1
-        self.get_rates_exc_dup_select = self.get_rates_exc(x, room_width, Number_to_select, room_depth)
-        self.get_rates_inh_dup_select = self.get_rates_inh(x, room_width, Number_to_select,  room_depth)
-        rout = (np.dot(self.we, self.get_rates_exc_dup) - np.dot(self.wi, self.get_rates_inh_dup))
+        Number_to_select_i=self.Ni
+        Number_to_select_e = self.Ne
+        self.get_rates_exc_dup_select = self.get_rates_exc_select(x, room_width, Number_to_select_e, room_depth)
+        self.get_rates_inh_dup_select = self.get_rates_inh_select(x, room_width, Number_to_select_i,  room_depth)
+        # I do this this way because I select the first one in the above get_rates_inh_dup_select
+        wi_select = self.wi[0:Number_to_select_i]
+        we_select=self.we[0:Number_to_select_e]
+        rout = (np.dot(we_select, self.get_rates_exc_dup_select) - np.dot(wi_select, self.get_rates_inh_dup_select))
         if rout < 0:
             rout = [0]
             rout = np.array(rout)
@@ -133,11 +141,12 @@ class ExcitInhibitoryplastic(NeurResponseModel):
         x= self.xprev + self.agent_step_size * action
         x = np.array([np.clip(x[0], a_min=-room_width / 2, a_max=room_width / 2),
                               np.clip(x[1], a_min=-room_depth / 2, a_max=room_depth / 2)])
-
         self.global_steps += 1
         rout = self.output_rates(x, room_width, room_depth)
         self.we = self.we + self.etaexc * self.get_rates_exc_dup @ rout  # Weight update inh
-        self.wi = self.wi + self.etainh * self.get_rates_inh_dup @ rout  # Weight update exc
+        rho=[1]
+        rho= np.array(rho)
+        self.wi = self.wi + (self.etainh * self.get_rates_inh_dup @ rout - self.etainh * self.get_rates_inh_dup@rho )  # Weight update exc
         l= (self.sumwe/sum((self.we))**2)
         self.we=self.we*l
         transition = {"wi": self.wi, "we": self.we, "self.rout": rout, }
@@ -158,7 +167,7 @@ class ExcitInhibitoryplastic(NeurResponseModel):
         for i in range(len(X)):
             for j in range(len(Y)):
                 U = np.array([X[i, j], Y[i, j]])
-                a[i,j] = self.output_rates(U, room_width, room_depth)
+                a[i,j] = self.output_rates_select(U, room_width, room_depth)
         title = 'Plot of rate'
         plt.title(title, fontsize=12)
         cm = getattr(mpl.cm, colormap)
