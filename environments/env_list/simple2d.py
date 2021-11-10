@@ -7,7 +7,6 @@ from environments.experiment_data.behavioral_data import SargoliniData
 
 
 class Simple2D(Environment):
-
     def __init__(self, environment_name="2DEnv", **env_kwargs):
         super().__init__(environment_name, **env_kwargs)
         self.metadata = {"env_kwargs": env_kwargs}
