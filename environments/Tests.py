@@ -2,7 +2,7 @@ import sys
 sys.path.append("../")
 import numpy as np
 import matplotlib.pyplot as plt
-from environments.env_list.simple2d import Simple2D, Sargolini2006
+from environments.env_list.simple2d import Simple2D
 from model.basic import ExcitInhibitoryplastic
 
 # Create an env
@@ -10,7 +10,7 @@ room_width = 1
 room_depth = 1
 env_name = "env_example"
 time_step_size = 1
-agent_step_size = 0.3
+agent_step_size = 0.2
 
 # Init environment
 env = Simple2D(environment_name=env_name,
@@ -18,6 +18,7 @@ env = Simple2D(environment_name=env_name,
                room_depth = room_depth,
                time_step_size = time_step_size,
                agent_step_size = agent_step_size)
+
 # Setting of the figure
 exc_eta_1 = 6.7e-5
 inh_eta_1 = 2.7e-4
@@ -38,7 +39,7 @@ agent = ExcitInhibitoryplastic(step=agent_step_size,model_name=model_name_1,
                                Ne=Ne_1, Ni=Ni_1,
                                alpha_inh=alpha_inh_1, alpha_exc=alpha_exc_1)
 
-n_steps = 1000
+n_steps = 5000
 agent.reset()
 # Initialize environment
 obs, state = env.reset()
@@ -48,7 +49,6 @@ for i in range(n_steps):
     rate =  agent.update(action,env.room_width, env.room_depth)
     # Run environment for given action
     obs, state, reward = env.step(action)
-
 
 ax = env.plot_trajectory()
 fontsize = 16

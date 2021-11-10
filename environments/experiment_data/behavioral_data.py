@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 
+
 class SargoliniData(object):
 
     def __init__(self, data_path, experiment_name):
