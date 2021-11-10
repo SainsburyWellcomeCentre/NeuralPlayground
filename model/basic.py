@@ -45,10 +45,10 @@ class ExcitInhibitoryplastic(NeurResponseModel):
     def get_rates_exc(self, x, room_width, room_depth):
         rates_exc_save = np.zeros((self.Ne, 1))
         for i in range(self.Ne):
-            A = round((room_width/2)*1000)
-            B = round((room_depth / 2) * 1000)
-            mean1 = np.random.randint(-A,A)*0.001
-            mean2 = np.random.randint(-B, B) * 0.001
+            min_max_width = round((room_width/2)*1000)
+            min_max_depth = round((room_depth / 2) * 1000)
+            mean1 = np.random.randint(-min_max_width,min_max_width)*0.001
+            mean2 = np.random.randint(-min_max_depth, min_max_depth) * 0.001
             mean=[mean1, mean2]
             mean = [-0.75, -0.75]
             mean=np.array(mean)
@@ -62,10 +62,10 @@ class ExcitInhibitoryplastic(NeurResponseModel):
     def get_rates_inh(self, x, room_width, room_depth, ):
         rates_inh_save = np.zeros((self.Ni, 1))
         for i in range(self.Ni):
-            A = round((room_width / 2) * 1000)
-            B = round((room_depth / 2) * 1000)
-            mean1 = np.random.randint(-A, A) * 0.001
-            mean2 = np.random.randint(-B, B) * 0.001
+            min_max_width = round((room_width / 2) * 1000)
+            min_max_depth = round((room_depth / 2) * 1000)
+            mean1 = np.random.randint(-min_max_width, min_max_width) * 0.001
+            mean2 = np.random.randint(-min_max_depth, min_max_depth) * 0.001
             mean = [mean1, mean2]
             mean = [0.75, 0.75]
             mean = np.array(mean)
@@ -79,10 +79,10 @@ class ExcitInhibitoryplastic(NeurResponseModel):
     def get_rates_exc_select(self, x, room_width, Number_to_select, room_depth,):
         rates_exc_save = np.zeros(( Number_to_select, 1))
         for i in range( Number_to_select):
-            A = round((room_width / 2) * 1000)
-            B = round((room_depth / 2) * 1000)
-            mean1 = np.random.randint(-A, A) * 0.001
-            mean2 = np.random.randint(-B, B) * 0.001
+            min_max_width= round((room_width / 2) * 1000)
+            min_max_depth = round((room_depth / 2) * 1000)
+            mean1 = np.random.randint(-min_max_width, min_max_width) * 0.001
+            mean2 = np.random.randint(-min_max_depth, min_max_depth) * 0.001
             mean=[mean1, mean2]
             mean = [-0.75, -0.75]
             mean=np.array(mean)
@@ -96,10 +96,10 @@ class ExcitInhibitoryplastic(NeurResponseModel):
     def get_rates_inh_select(self, x, room_width, Number_to_select, room_depth, ):
         rates_inh_save = np.zeros(( Number_to_select, 1))
         for i in range( Number_to_select):
-            A = round((room_width / 2) * 1000)
-            B = round((room_depth / 2) * 1000)
-            mean1 = np.random.randint(-A, A) * 0.001
-            mean2 = np.random.randint(-B, B) * 0.001
+            min_max_width = round((room_width / 2) * 1000)
+            min_max_depth = round((room_depth / 2) * 1000)
+            mean1 = np.random.randint(-min_max_width, min_max_width) * 0.001
+            mean2 = np.random.randint(-min_max_depth, min_max_depth) * 0.001
             mean = [mean1, mean2]
             mean= [0.75, 0.75]
             mean = np.array(mean)
