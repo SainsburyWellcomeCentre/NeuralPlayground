@@ -14,7 +14,7 @@ class ExcitInhibitoryplastic(NeurResponseModel):
 
     def __init__(self, model_name="ExcitInhibitoryplastic", **mod_kwargs):
         super().__init__(model_name, **mod_kwargs)
-        self.agent_step_size= mod_kwargs["step"]
+        self.agent_step_size= mod_kwargs["agent_step_size"]
         self.metadata = {"mod_kwargs": mod_kwargs}
         self.etaexc = mod_kwargs["exc_eta"]  # Learning rate.
         self.etainh = mod_kwargs["inh_eta"]
@@ -74,9 +74,9 @@ class ExcitInhibitoryplastic(NeurResponseModel):
             rates_inh_save[i] = rates_inh_i
         return rates_inh_save
 
-    def get_rates_exc_select(self, x, room_width, Number_to_select,room_depth):
-        rates_exc_save = np.zeros(( Number_to_select, 1))
-        for i in range( Number_to_select):
+    def get_rates_exc_select(self, x, room_width, number_to_select, room_depth):
+        rates_exc_save = np.zeros((number_to_select, 1))
+        for i in range(number_to_select):
             A = round((room_width / 2) * 1000)
             B = round((room_depth / 2) * 1000)
             mean1 = np.random.randint(-A, A) * 0.001
