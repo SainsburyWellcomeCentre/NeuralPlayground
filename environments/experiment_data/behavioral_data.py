@@ -57,7 +57,7 @@ class FullSargoliniData(object):
     def _load_data(self):
         self.best_session = {"rat_id": "11016", "sess": "31010502"}
         # self.best_session = {"rat_id": "10704", "sess": "20060402"}
-        self.arena_limits = np.array([[-50, 50], [-50, 50]])
+        self.arena_limits = np.array([[-50.0, 50.0], [-50.0, 50.0]])
 
         data_path_list = glob.glob(self.data_path + "*.mat")
         mice_ids = np.unique([dp.split("/")[-1][:5] for dp in data_path_list])
