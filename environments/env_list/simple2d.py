@@ -135,6 +135,8 @@ class Sargolini2006(Simple2D):
         self.data = FullSargoliniData(data_path=self.data_path, experiment_name=self.environment_name, verbose=verbose, session=session)
         self.arena_limits = self.data.arena_limits
         self.room_width, self.room_depth = np.abs(np.diff(self.arena_limits, axis=1))
+        self.room_width = self.room_width[0]
+        self.room_depth = self.room_depth[0]
         env_kwargs["room_width"] = self.room_width
         env_kwargs["room_depth"] = self.room_depth
         env_kwargs["agent_step_size"] = 1/50  # In seconds
@@ -157,6 +159,8 @@ class Sargolini2006(Simple2D):
     def step(self, action):
         """ Action is ignored in this case """
         self.global_steps += 1
+        if self.global_steps >= self.data.position.shape[0]-1:
+            self.global_steps = 0
         self.global_time = self.global_steps*self.agent_step_size
         reward = 0  # If you get reward, it should be coded here
         new_state = self.data.position[self.global_steps, :], self.data.head_direction[self.global_steps, :]
