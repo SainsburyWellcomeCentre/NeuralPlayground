@@ -3,7 +3,7 @@ sys.path.append("../")
 import matplotlib.pyplot as plt
 from environments.environment import Environment
 import numpy as np
-from environments.experiment_data.behavioral_data import SargoliniData
+from environments.experiment_data.behavioral_data import FullHaftingData
 
 
 class Simple2D(Environment):
@@ -75,7 +75,10 @@ class Simple2D(Environment):
 
 class Sargolini2006(Simple2D):
 
-    def __init__(self, data_path="sargolini2006/", environment_name="Sargolini2006", **env_kwargs):
+    def __init__(self, data_path="sargolini2006/", environment_name="Sargolini2006", session={"rat": "11015", "sess": "13120410", "cell_id": "t5c1"}, verbose=False, **env_kwargs):
+        self.data_path = data_path
+        self.environment_name = environment_name
+        self.session = session
         self.data_path = data_path
         self.environment_name = environment_name
         self.data = SargoliniData(data_path=self.data_path, experiment_name=self.environment_name)
@@ -87,6 +90,47 @@ class Sargolini2006(Simple2D):
         super().__init__(environment_name, **env_kwargs)
         self.metadata["doi"] = "https://doi.org/10.1126/science.1125572"
 
+        self.state_dims_labels = ["x_pos", "y_pos", "head_direction_x", "head_direction_y"]
+
+    def reset(self):
+        """ Start in a random position within the dimensions of the room """
+        self.global_steps = 0
+        self.global_time = 0
+        self.history = []
+        self.pos, self.head_dir = self.data.position[0, :], self.data.head_direction[0, :]
+        self.state = np.concatenate([self.pos, self.head_dir])
+        # Fully observable environment, make_observation returns the state
+        observation = self.make_observation()
+        return observation, self.state
+
+    def step(self, action):
+        """ Action is ignored in this case """
+        self.global_steps += 1
+        self.global_time = self.global_steps*self.agent_step_size
+        reward = 0  # If you get reward, it should be coded here
+        new_state = self.data.position[self.global_steps, :], self.data.head_direction[self.global_steps, :]
+        new_state = np.concatenate(new_state)
+        transition = {"action": action, "state": self.state, "next_state": new_state,
+                      "reward": reward, "step": self.global_steps}
+        self.history.append(transition)
+        self.state = new_state
+        observation = self.make_observation()
+        return observation, new_state, reward
+
+class Hafting2008(Simple2D):
+
+    def __init__(self, data_path="sargolini2006/", environment_name="Sargolini2006", session=None, verbose=False, **env_kwargs):
+        self.data_path = data_path
+        self.environment_name = environment_name
+        self.session = session
+        self.data = FullHaftingData(data_path=self.data_path, experiment_name=self.environment_name, verbose=verbose)
+        self.arena_limits = self.data.arena_limits
+        self.room_width, self.room_depth = np.abs(np.diff(self.arena_limits, axis=1))
+        env_kwargs["room_width"] = self.room_width
+        env_kwargs["room_depth"] = self.room_depth
+        env_kwargs["agent_step_size"] = 1/50  # In seconds
+        super().__init__(environment_name, **env_kwargs)
+        self.metadata["doi"] = "https://doi.org/10.1038/nature06957"
         self.state_dims_labels = ["x_pos", "y_pos", "head_direction_x", "head_direction_y"]
 
     def reset(self):
