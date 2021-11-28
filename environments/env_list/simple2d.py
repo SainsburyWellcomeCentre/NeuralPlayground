@@ -3,7 +3,8 @@ sys.path.append("../")
 import matplotlib.pyplot as plt
 from environments.environment import Environment
 import numpy as np
-from environments.experiment_data.behavioral_data import FullHaftingData
+from environments.experiment_data.behavioral_data import SargoliniData, FullSargoliniData,FullHaftingData
+
 
 
 class Simple2D(Environment):
@@ -63,22 +64,29 @@ class Simple2D(Environment):
         ending_point = next_state_history[-1]
         print(starting_point)
 
+        cmap = mpl.cm.get_cmap("plasma")
+        norm = plt.Normalize(0, len(state_history))
+
+        aux_x = []
+        aux_y = []
         for i, s in enumerate(state_history):
             x_ = [s[0], next_state_history[i][0]]
             y_ = [s[1], next_state_history[i][1]]
-            ax.plot(x_, y_, "C0-o", alpha=0.6)
+            aux_x.append(s[0])
+            aux_y.append(s[1])
+            ax.plot(x_, y_, "-", color=cmap(norm(i)), alpha=0.6)
 
-        ax.plot(starting_point[0], starting_point[1], "C3*", ms=13, label="starting point")
-        ax.plot(ending_point[0], ending_point[1], "C2*", ms=13, label="ending point")
+        sc = ax.scatter(aux_x, aux_y, c=np.arange(len(state_history)),
+                        vmin=0, vmax=len(state_history), cmap="plasma", alpha=0.6)
+
+        cbar = plt.colorbar(sc, ax=ax)
+        cbar.ax.set_ylabel('N steps', rotation=270)
         return ax
 
 
-class Sargolini2006(Simple2D):
+class BasicSargolini2006(Simple2D):
 
-    def __init__(self, data_path="sargolini2006/", environment_name="Sargolini2006", session={"rat": "11015", "sess": "13120410", "cell_id": "t5c1"}, verbose=False, **env_kwargs):
-        self.data_path = data_path
-        self.environment_name = environment_name
-        self.session = session
+    def __init__(self, data_path="sargolini2006/", environment_name="Sargolini2006", **env_kwargs):
         self.data_path = data_path
         self.environment_name = environment_name
         self.data = SargoliniData(data_path=self.data_path, experiment_name=self.environment_name)
@@ -117,9 +125,56 @@ class Sargolini2006(Simple2D):
         observation = self.make_observation()
         return observation, new_state, reward
 
-class Hafting2008(Simple2D):
+
+class Sargolini2006(Simple2D):
 
     def __init__(self, data_path="sargolini2006/", environment_name="Sargolini2006", session=None, verbose=False, **env_kwargs):
+        self.data_path = data_path
+        self.environment_name = environment_name
+        self.session = session
+        self.data = FullSargoliniData(data_path=self.data_path, experiment_name=self.environment_name, verbose=verbose, session=session)
+        self.arena_limits = self.data.arena_limits
+        self.room_width, self.room_depth = np.abs(np.diff(self.arena_limits, axis=1))
+        self.room_width = self.room_width[0]
+        self.room_depth = self.room_depth[0]
+        env_kwargs["room_width"] = self.room_width
+        env_kwargs["room_depth"] = self.room_depth
+        env_kwargs["agent_step_size"] = 1/50  # In seconds
+        super().__init__(environment_name, **env_kwargs)
+        self.metadata["doi"] = "https://doi.org/10.1126/science.1125572"
+
+        self.state_dims_labels = ["x_pos", "y_pos", "head_direction_x", "head_direction_y"]
+
+    def reset(self):
+        """ Start in a random position within the dimensions of the room """
+        self.global_steps = 0
+        self.global_time = 0
+        self.history = []
+        self.pos, self.head_dir = self.data.position[0, :], self.data.head_direction[0, :]
+        self.state = np.concatenate([self.pos, self.head_dir])
+        # Fully observable environment, make_observation returns the state
+        observation = self.make_observation()
+        return observation, self.state
+
+    def step(self, action):
+        """ Action is ignored in this case """
+        self.global_steps += 1
+        if self.global_steps >= self.data.position.shape[0]-1:
+            self.global_steps = 0
+        self.global_time = self.global_steps*self.agent_step_size
+        reward = 0  # If you get reward, it should be coded here
+        new_state = self.data.position[self.global_steps, :], self.data.head_direction[self.global_steps, :]
+        new_state = np.concatenate(new_state)
+        transition = {"action": action, "state": self.state, "next_state": new_state,
+                      "reward": reward, "step": self.global_steps}
+        self.history.append(transition)
+        self.state = new_state
+        observation = self.make_observation()
+        return observation, new_state, reward
+
+class Hafting2008(Simple2D):
+
+    def __init__(self, data_path="Hafting2008/C43035A4-5CC5-44F2-B207-126922523FD9_1/", environment_name="Hafting2008", session=None, verbose=False, **env_kwargs):
         self.data_path = data_path
         self.environment_name = environment_name
         self.session = session
@@ -157,3 +212,10 @@ class Hafting2008(Simple2D):
         self.state = new_state
         observation = self.make_observation()
         return observation, new_state, reward
+
+if __name__ == "__main__":
+    data_path = "/home/rodrigo/HDisk/8F6BE356-3277-475C-87B1-C7A977632DA7_1/all_data/"
+    env = Sargolini2006(data_path=data_path,
+                    time_step_size=None,
+                    agent_step_size=None)
+    env.step()

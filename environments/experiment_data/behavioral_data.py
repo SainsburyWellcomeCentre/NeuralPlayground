@@ -5,22 +5,28 @@ import glob
 from scipy.interpolate import interp1d
 import matplotlib.pyplot as plt
 import pandas as pd
-import sys
+from scipy.ndimage import gaussian_filter
 
 class FullHaftingData(object):
 
-    def __init__(self, data_path, experiment_name="FullHaftingData", verbose=False):
-        self.data_path = data_path
+    def __init__(self, data_path, experiment_name="FullHaftingData", verbose=False, session=None):
         self.experiment_name = experiment_name
+        self.data_path = data_path
         self._load_data()
-        if verbose == True:
+        
+        if session is None:
+            self.rat_id, self.sess = self.best_session["rat_id"], self.best_session["sess"]
+        else:
+            self.rat_id = session["rat_id"]
+            self.sess = session["sess"]
+        if verbose:
             self.show_readme()
             self.show_keys()
-            self.plot_best_session()
+            self.plot_session()
+        self.set_behavioral_data()
 
     def _load_data(self):
-        
-        self.best_session = {"rat": "11015", "sess": "13120410", "cell_id": "t5c1"}
+        self.best_session ={"rat_id": "11015", "sess": "13120410", "cell_id": "t5c1"}
         self.arena_limits = np.array([[-200, 200], [-20, 20]])
         data_path_list = glob.glob(self.data_path + "*.mat")
         mice_ids = np.unique([dp.split("/")[-1][:5] for dp in data_path_list])
@@ -34,9 +40,16 @@ class FullHaftingData(object):
                 cell_ids = np.unique([dp.split("/")[-1].split(".")[-2][-4:] for dp in s_paths_list]).astype(str)
                 self.data_per_animal[m_id][sess] = {}
                 for cell_id in cell_ids:
+                    if cell_id == "_POS":
+                        session_info = "position"
+                    elif cell_id in ["_EEG", "_EGF"]:
+                        continue
+                    else:
+                        session_info = cell_id
+                        print(cell_id)
                     r_path = glob.glob(self.data_path + m_id + "-" + sess + "*" + cell_id + "*.mat")
                     cleaned_data = clean_data(sio.loadmat(r_path[0]))
-                    self.data_per_animal[m_id][sess][cell_id] = cleaned_data
+                    self.data_per_animal[m_id][sess][session_info] = cleaned_data
 
     def show_keys(self):
         print("Rat ids", list(self.data_per_animal.keys()))
@@ -52,46 +65,60 @@ class FullHaftingData(object):
         with open(readme_path, 'r') as fin:
             print(fin.read())
 
-    def plot_best_session(self):
-        cell_data = self.data_per_animal[self.best_session["rat"]][self.best_session["sess"]]
-        first_cell_data = list(cell_data.values())[1]
-        x1, y1 = first_cell_data["posx"][:], first_cell_data["posy"][:]
+    def plot_session(self):
+        # print(self.data_per_animal[self.best_session["rat"]][self.best_session["sess"]])
+        cell_data = self.data_per_animal[self.rat_id][self.sess]
+        position_data = cell_data["position"]
+        x1, y1 = position_data["posx"][:], position_data["posy"][:]
         # Selecting positional data
         x = np.clip(x1, a_min=-200, a_max=200)
         y = np.clip(y1, a_min=-20, a_max=20)
-
-        time_array = first_cell_data["post"][:]
-        first_cell_data = list(cell_data.values())[2]
-
-        test_spikes = first_cell_data["ts"][:]
-
+        
+        # Selecting positional data
+        time_array = position_data["post"][:]
+        tetrode_data = cell_data["t5c1"]
+        test_spikes = tetrode_data["ts"][:]
+        test_spikes = test_spikes[:, 0]
+        time_array = time_array[:, 0]
+        x = x[:, 0]
+        y = y[:, 0]
+        
+        
         f, ax = plt.subplots(1, 2, figsize=(15, 8))
         ax = ax.flatten()
         ax[0].plot(x, y)
-        print(x)
-        print(y)
-        print(time_array)
-        print(test_spikes)
+        ax[0].set_title("position")
         h, binx, biny = get_2D_ratemap(time_array, test_spikes, x, y)
         ax[1].imshow(h)
         plt.show()
+        
+    def set_behavioral_data(self, rat_id=None, session=None):
+        arena_limits = np.array([[-50, 50], [-50, 50]])
+        if rat_id is None:
+            rat_id = self.rat_id
+            session = self.sess
 
-
+        cell_data = self.data_per_animal[rat_id][session]
+        position_data = cell_data["position"]
     
+        # Selecting positional data
+        x1, y1 = position_data["posx"][:], position_data["posy"][:]
+        # Selecting positional data
+        x = np.clip(x1, a_min=-200, a_max=200)
+        y = np.clip(y1, a_min=-20, a_max=20)
+        time_array = position_data["post"][:]
 
-def get_2D_ratemap(time_array, spikes, x, y, x_size=50, y_size=50):
-    x_spikes, y_spikes = [], []
-    for s in spikes:
-        array_pos = np.argmin(np.abs(time_array-s))
-        x_spikes.append(x[array_pos])
-        y_spikes.append(y[array_pos])
-    x_spikes = np.array(x_spikes)
-    y_spikes = np.array(y_spikes)
-    h, binx, biny = np.histogram2d(x_spikes, y_spikes, bins=(x_size, y_size))
-    return h.T, binx, biny
-         
+        position = np.stack([x, y], axis=1) # Convert to cm
+        head_direction = np.diff(position, axis=0)
+        head_direction = head_direction/np.sqrt(np.sum(head_direction**2, axis=1))[..., np.newaxis]
+        self.arena_limits = arena_limits
+        self.position = position
+        self.head_direction = head_direction
+        self.time = time_array
+               
 
 class SargoliniData(object):
+
     def __init__(self, data_path, experiment_name):
         self.data_path = data_path
         self.experiment_name = experiment_name
@@ -119,18 +146,26 @@ class SargoliniData(object):
 
 class FullSargoliniData(object):
 
-    def __init__(self, data_path, experiment_name="FullSargoliniData", verbose=False):
+    def __init__(self, data_path, experiment_name="FullSargoliniData", verbose=False, session=None):
         self.data_path = data_path
         self.experiment_name = experiment_name
         self._load_data()
-        if verbose == True:
+        if session is None:
+            self.rat_id, self.sess = self.best_session["rat_id"], self.best_session["sess"]
+        else:
+            self.rat_id = session["rat_id"]
+            self.sess = session["sess"]
+
+        if verbose:
             self.show_readme()
             self.show_keys()
-            self.plot_best_session()
+            self.plot_session()
+        self.set_behavioral_data()
 
     def _load_data(self):
-        self.best_session = {"rat": "11084", "sess": "10030502", "cell_id": "t1c1"}
-        self.arena_limits = np.array([[-50, 50], [-50, 50]])
+        self.best_session = {"rat_id": "11016", "sess": "31010502"}
+        # self.best_session = {"rat_id": "10704", "sess": "20060402"}
+        self.arena_limits = np.array([[-50.0, 50.0], [-50.0, 50.0]])
 
         data_path_list = glob.glob(self.data_path + "*.mat")
         mice_ids = np.unique([dp.split("/")[-1][:5] for dp in data_path_list])
@@ -144,9 +179,23 @@ class FullSargoliniData(object):
                 cell_ids = np.unique([dp.split("/")[-1].split(".")[-2][-4:] for dp in s_paths_list]).astype(str)
                 self.data_per_animal[m_id][sess] = {}
                 for cell_id in cell_ids:
+                    print(cell_id)
+                    if cell_id == "_POS":
+                        session_info = "position"
+                    elif cell_id in ["_EEG", "_EG2"]:
+                        continue
+                    else:
+                        session_info = cell_id
+                        print(cell_id)
                     r_path = glob.glob(self.data_path + m_id + "-" + sess + "*" + cell_id + "*.mat")
                     cleaned_data = clean_data(sio.loadmat(r_path[0]))
-                    self.data_per_animal[m_id][sess][cell_id] = cleaned_data
+                    if cell_id != "_POS":
+                        try:
+                            self.data_per_animal[m_id][sess][session_info] = cleaned_data["cellTS"]
+                        except:
+                            pass
+                    else:
+                        self.data_per_animal[m_id][sess][session_info] = cleaned_data
 
     def show_keys(self):
         print("Rat ids", list(self.data_per_animal.keys()))
@@ -162,12 +211,15 @@ class FullSargoliniData(object):
         with open(readme_path, 'r') as fin:
             print(fin.read())
 
-    def plot_best_session(self):
+    def plot_session(self):
         # print(self.data_per_animal[self.best_session["rat"]][self.best_session["sess"]])
-        cell_data = self.data_per_animal[self.best_session["rat"]][self.best_session["sess"]]
-        first_cell_data = list(cell_data.values())[0]
-        x1, y1 = first_cell_data["x1"][:, 0], first_cell_data["y1"][:, 0]
-        x2, y2 = first_cell_data["x2"][:, 0], first_cell_data["y2"][:, 0]
+        cell_data = self.data_per_animal[self.rat_id][self.sess]
+        position_data = cell_data["position"]
+        x1, y1 = position_data["posx"][:, 0], position_data["posy"][:, 0]
+        if len(position_data["posy2"]) != 0:
+            x2, y2 = position_data["posy2"][:, 0], position_data["posy2"][:, 0]
+        else:
+            x2, y2 = x1, y1
 
         # Selecting positional data
         x = np.mean(np.stack([x1, x2], axis=1), axis=1)
@@ -175,30 +227,65 @@ class FullSargoliniData(object):
         x = np.clip(x, a_min=self.arena_limits[0, 0], a_max=self.arena_limits[0, 1])
         y = np.clip(y, a_min=self.arena_limits[1, 0], a_max=self.arena_limits[1, 1])
 
-        time_array = first_cell_data["t"][:, 0]
-        test_spikes = first_cell_data["ts"][:, 0]
+        time_array = position_data["post"][:, 0]
         f, ax = plt.subplots(2, 3, figsize=(15, 8))
         ax = ax.flatten()
         ax[0].plot(x, y)
+        ax[0].set_title("position")
 
+        count_i = 0
         for i, (key, single_cell_data) in enumerate(cell_data.items()):
-            test_spikes = single_cell_data["ts"][:, 0]
-            h, binx, biny = get_2D_ratemap(time_array, test_spikes, x, y)
-            ax[i+1].imshow(h)
-
+            if key == "position":
+                continue
+            test_spikes = single_cell_data[:, 0]
+            h, binx, biny = get_2D_ratemap(time_array, test_spikes, x, y, filter_result=True)
+            ax[count_i + 1].imshow(h)
+            ax[count_i + 1].set_title(key)
+            count_i += 1
+            if count_i >= 5:
+                break
         plt.show()
+
+    def set_behavioral_data(self, rat_id=None, session=None):
+        arena_limits = np.array([[-50, 50], [-50, 50]])
+        if rat_id is None:
+            rat_id = self.rat_id
+            session = self.sess
+
+        cell_data = self.data_per_animal[rat_id][session]
+        position_data = cell_data["position"]
+        x1, y1 = position_data["posx"][:, 0], position_data["posy"][:, 0]
+        if len(position_data["posy2"]) != 0:
+            x2, y2 = position_data["posy2"][:, 0], position_data["posy2"][:, 0]
+        else:
+            x2, y2 = x1, y1
+
+        # Selecting positional data
+        x = np.mean(np.stack([x1, x2], axis=1), axis=1)
+        y = np.mean(np.stack([y1, y2], axis=1), axis=1)
+        x = np.clip(x, a_min=self.arena_limits[0, 0], a_max=self.arena_limits[0, 1])
+        y = np.clip(y, a_min=self.arena_limits[1, 0], a_max=self.arena_limits[1, 1])
+        time_array = position_data["post"][:, 0]
+
+        position = np.stack([x, y], axis=1) # Convert to cm
+        head_direction = np.diff(position, axis=0)
+        head_direction = head_direction/np.sqrt(np.sum(head_direction**2, axis=1))[..., np.newaxis]
+        self.arena_limits = arena_limits
+        self.position = position
+        self.head_direction = head_direction
+        self.time = time_array
 
 
 def clean_data(data, keep_headers=False):
-    # print(list(data.keys()))
     aux_dict = {}
     for key, val in data.items():
-        if isinstance(val, bytes) or isinstance(val, str) or key=="__globals__":
+        if isinstance(val, bytes) or isinstance(val, str) or key == "__globals__":
             if keep_headers:
                 aux_dict[key] = val
             continue
         else:
-            if np.isnan(val).any():
+            # print(len(val))
+            if not np.isnan(val).any():
                 aux_dict[key] = val
             else:
                 # Interpolate nans
@@ -206,12 +293,26 @@ def clean_data(data, keep_headers=False):
                 nan_indexes = np.logical_not(np.isnan(val))[:, 0]
                 clean_x = x_range[nan_indexes]
                 clean_val = np.array(val)[nan_indexes, 0]
-                f = interp1d(clean_x, clean_val, kind='cubic')
-                aux_dict[key] = f(x_range)
+                # print(clean_x.shape, clean_val.shape)
+                f = interp1d(clean_x, clean_val, kind='cubic', fill_value="extrapolate")
+                aux_dict[key] = f(x_range)[..., np.newaxis]
     return aux_dict
 
 
 
+def get_2D_ratemap(time_array, spikes, x, y, x_size=50, y_size=50, filter_result=False):
+    x_spikes, y_spikes = [], []
+    for s in spikes:
+        array_pos = np.argmin(np.abs(time_array-s))
+        x_spikes.append(x[array_pos])
+        y_spikes.append(y[array_pos])
+    x_spikes = np.array(x_spikes)
+    y_spikes = np.array(y_spikes)
+    h, binx, biny = np.histogram2d(x_spikes, y_spikes, bins=(x_size, y_size))
+    if filter_result:
+        h = gaussian_filter(h, sigma=2)
+
+    return h.T, binx, biny
 
 
 if __name__ == "__main__":
