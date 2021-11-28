@@ -5,11 +5,93 @@ import glob
 from scipy.interpolate import interp1d
 import matplotlib.pyplot as plt
 import pandas as pd
+import sys
+
+class FullHaftingData(object):
+
+    def __init__(self, data_path, experiment_name="FullHaftingData", verbose=False):
+        self.data_path = data_path
+        self.experiment_name = experiment_name
+        self._load_data()
+        if verbose == True:
+            self.show_readme()
+            self.show_keys()
+            self.plot_best_session()
+
+    def _load_data(self):
+        
+        self.best_session = {"rat": "11015", "sess": "13120410", "cell_id": "t5c1"}
+        self.arena_limits = np.array([[-200, 200], [-20, 20]])
+        data_path_list = glob.glob(self.data_path + "*.mat")
+        mice_ids = np.unique([dp.split("/")[-1][:5] for dp in data_path_list])
+        self.data_per_animal = {}
+        for m_id in mice_ids:
+            m_paths_list = glob.glob(self.data_path + m_id + "*.mat")
+            sessions = np.unique([dp.split("/")[-1].split("-")[1][:8] for dp in m_paths_list]).astype(str)
+            self.data_per_animal[m_id] = {}
+            for sess in sessions:
+                s_paths_list = glob.glob(self.data_path + m_id + "-" + sess + "*.mat")
+                cell_ids = np.unique([dp.split("/")[-1].split(".")[-2][-4:] for dp in s_paths_list]).astype(str)
+                self.data_per_animal[m_id][sess] = {}
+                for cell_id in cell_ids:
+                    r_path = glob.glob(self.data_path + m_id + "-" + sess + "*" + cell_id + "*.mat")
+                    cleaned_data = clean_data(sio.loadmat(r_path[0]))
+                    self.data_per_animal[m_id][sess][cell_id] = cleaned_data
+
+    def show_keys(self):
+        print("Rat ids", list(self.data_per_animal.keys()))
+        for rat_id, val in self.data_per_animal.items():
+            print("Sessions for " + rat_id)
+            print(list(self.data_per_animal[rat_id].keys()))
+            for sess in self.data_per_animal[rat_id].keys():
+                print("Cells recorded in session " + sess)
+                print(list(self.data_per_animal[rat_id][sess].keys()))
+
+    def show_readme(self):
+        readme_path = glob.glob(self.data_path + "readme" + "*.txt")[0]
+        with open(readme_path, 'r') as fin:
+            print(fin.read())
+
+    def plot_best_session(self):
+        cell_data = self.data_per_animal[self.best_session["rat"]][self.best_session["sess"]]
+        first_cell_data = list(cell_data.values())[1]
+        x1, y1 = first_cell_data["posx"][:], first_cell_data["posy"][:]
+        # Selecting positional data
+        x = np.clip(x1, a_min=-200, a_max=200)
+        y = np.clip(y1, a_min=-20, a_max=20)
+
+        time_array = first_cell_data["post"][:]
+        first_cell_data = list(cell_data.values())[2]
+
+        test_spikes = first_cell_data["ts"][:]
+
+        f, ax = plt.subplots(1, 2, figsize=(15, 8))
+        ax = ax.flatten()
+        ax[0].plot(x, y)
+        print(x)
+        print(y)
+        print(time_array)
+        print(test_spikes)
+        h, binx, biny = get_2D_ratemap(time_array, test_spikes, x, y)
+        ax[1].imshow(h)
+        plt.show()
 
 
+    
+
+def get_2D_ratemap(time_array, spikes, x, y, x_size=50, y_size=50):
+    x_spikes, y_spikes = [], []
+    for s in spikes:
+        array_pos = np.argmin(np.abs(time_array-s))
+        x_spikes.append(x[array_pos])
+        y_spikes.append(y[array_pos])
+    x_spikes = np.array(x_spikes)
+    y_spikes = np.array(y_spikes)
+    h, binx, biny = np.histogram2d(x_spikes, y_spikes, bins=(x_size, y_size))
+    return h.T, binx, biny
+         
 
 class SargoliniData(object):
-
     def __init__(self, data_path, experiment_name):
         self.data_path = data_path
         self.experiment_name = experiment_name
@@ -50,19 +132,19 @@ class FullSargoliniData(object):
         self.best_session = {"rat": "11084", "sess": "10030502", "cell_id": "t1c1"}
         self.arena_limits = np.array([[-50, 50], [-50, 50]])
 
-        data_path_list = glob.glob(data_path + "*.mat")
+        data_path_list = glob.glob(self.data_path + "*.mat")
         mice_ids = np.unique([dp.split("/")[-1][:5] for dp in data_path_list])
         self.data_per_animal = {}
         for m_id in mice_ids:
-            m_paths_list = glob.glob(data_path + m_id + "*.mat")
+            m_paths_list = glob.glob(self.data_path + m_id + "*.mat")
             sessions = np.unique([dp.split("/")[-1].split("-")[1][:8] for dp in m_paths_list]).astype(str)
             self.data_per_animal[m_id] = {}
             for sess in sessions:
-                s_paths_list = glob.glob(data_path + m_id + "-" + sess + "*.mat")
+                s_paths_list = glob.glob(self.data_path + m_id + "-" + sess + "*.mat")
                 cell_ids = np.unique([dp.split("/")[-1].split(".")[-2][-4:] for dp in s_paths_list]).astype(str)
                 self.data_per_animal[m_id][sess] = {}
                 for cell_id in cell_ids:
-                    r_path = glob.glob(data_path + m_id + "-" + sess + "*" + cell_id + "*.mat")
+                    r_path = glob.glob(self.data_path + m_id + "-" + sess + "*" + cell_id + "*.mat")
                     cleaned_data = clean_data(sio.loadmat(r_path[0]))
                     self.data_per_animal[m_id][sess][cell_id] = cleaned_data
 
@@ -76,7 +158,7 @@ class FullSargoliniData(object):
                 print(list(self.data_per_animal[rat_id][sess].keys()))
 
     def show_readme(self):
-        readme_path = glob.glob(data_path + "readme" + "*.txt")[0]
+        readme_path = glob.glob(self.data_path + "readme" + "*.txt")[0]
         with open(readme_path, 'r') as fin:
             print(fin.read())
 
@@ -108,15 +190,15 @@ class FullSargoliniData(object):
 
 
 def clean_data(data, keep_headers=False):
+    # print(list(data.keys()))
     aux_dict = {}
     for key, val in data.items():
-        if isinstance(val, bytes) or isinstance(val, str) or key == "__globals__":
+        if isinstance(val, bytes) or isinstance(val, str) or key=="__globals__":
             if keep_headers:
                 aux_dict[key] = val
             continue
         else:
-            # print(len(val))
-            if not np.isnan(val).any():
+            if np.isnan(val).any():
                 aux_dict[key] = val
             else:
                 # Interpolate nans
@@ -124,22 +206,12 @@ def clean_data(data, keep_headers=False):
                 nan_indexes = np.logical_not(np.isnan(val))[:, 0]
                 clean_x = x_range[nan_indexes]
                 clean_val = np.array(val)[nan_indexes, 0]
-                # print(clean_x.shape, clean_val.shape)
-                f = interp1d(clean_x, clean_val, kind='cubic', fill_value="extrapolate")
-                aux_dict[key] = f(x_range)[..., np.newaxis]
+                f = interp1d(clean_x, clean_val, kind='cubic')
+                aux_dict[key] = f(x_range)
     return aux_dict
 
 
-def get_2D_ratemap(time_array, spikes, x, y, x_size=50, y_size=50):
-    x_spikes, y_spikes = [], []
-    for s in spikes:
-        array_pos = np.argmin(np.abs(time_array-s))
-        x_spikes.append(x[array_pos])
-        y_spikes.append(y[array_pos])
-    x_spikes = np.array(x_spikes)
-    y_spikes = np.array(y_spikes)
-    h, binx, biny = np.histogram2d(x_spikes, y_spikes, bins=(x_size, y_size))
-    return h.T, binx, biny
+
 
 
 if __name__ == "__main__":
