@@ -1,5 +1,6 @@
 import sys
 sys.path.append("../")
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 from environments.environment import Environment
 import numpy as np
@@ -172,6 +173,7 @@ class Sargolini2006(Simple2D):
         observation = self.make_observation()
         return observation, new_state, reward
 
+
 class Hafting2008(Simple2D):
 
     def __init__(self, data_path="Hafting2008/C43035A4-5CC5-44F2-B207-126922523FD9_1/", environment_name="Hafting2008", session=None, verbose=False, **env_kwargs):
@@ -213,9 +215,11 @@ class Hafting2008(Simple2D):
         observation = self.make_observation()
         return observation, new_state, reward
 
+
 if __name__ == "__main__":
     data_path = "/home/rodrigo/HDisk/8F6BE356-3277-475C-87B1-C7A977632DA7_1/all_data/"
     env = Sargolini2006(data_path=data_path,
-                    time_step_size=None,
-                    agent_step_size=None)
+                        time_step_size=None,
+                        agent_step_size=None)
     env.step()
+
