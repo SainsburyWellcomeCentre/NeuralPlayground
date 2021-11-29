@@ -165,7 +165,8 @@ class FullSargoliniData(object):
     def _load_data(self):
         self.best_session = {"rat_id": "11016", "sess": "31010502"}
         # self.best_session = {"rat_id": "10704", "sess": "20060402"}
-        self.arena_limits = np.array([[-50.0, 50.0], [-50.0, 50.0]])
+        self.arena_limits = np.array([[-50, 50], [-50, 50]])
+
 
         data_path_list = glob.glob(self.data_path + "*.mat")
         mice_ids = np.unique([dp.split("/")[-1][:5] for dp in data_path_list])
@@ -179,14 +180,13 @@ class FullSargoliniData(object):
                 cell_ids = np.unique([dp.split("/")[-1].split(".")[-2][-4:] for dp in s_paths_list]).astype(str)
                 self.data_per_animal[m_id][sess] = {}
                 for cell_id in cell_ids:
-                    print(cell_id)
                     if cell_id == "_POS":
                         session_info = "position"
-                    elif cell_id in ["_EEG", "_EG2"]:
+                    elif cell_id in ["_EEG", "_EGF"]:
                         continue
                     else:
                         session_info = cell_id
-                        print(cell_id)
+
                     r_path = glob.glob(self.data_path + m_id + "-" + sess + "*" + cell_id + "*.mat")
                     cleaned_data = clean_data(sio.loadmat(r_path[0]))
                     if cell_id != "_POS":
@@ -297,7 +297,6 @@ def clean_data(data, keep_headers=False):
                 f = interp1d(clean_x, clean_val, kind='cubic', fill_value="extrapolate")
                 aux_dict[key] = f(x_range)[..., np.newaxis]
     return aux_dict
-
 
 
 def get_2D_ratemap(time_array, spikes, x, y, x_size=50, y_size=50, filter_result=False):
