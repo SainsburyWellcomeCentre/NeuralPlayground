@@ -7,7 +7,115 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from scipy.ndimage import gaussian_filter
 
+class FullHaftingData(object):
 
+    def __init__(self, data_path, experiment_name="FullHaftingData", verbose=False, session=None):
+        self.experiment_name = experiment_name
+        self.data_path = data_path
+        self._load_data()
+        
+        if session is None:
+            self.rat_id, self.sess = self.best_session["rat_id"], self.best_session["sess"]
+        else:
+            self.rat_id = session["rat_id"]
+            self.sess = session["sess"]
+        if verbose:
+            self.show_readme()
+            self.show_keys()
+            self.plot_session()
+        self.set_behavioral_data()
+
+    def _load_data(self):
+        self.best_session ={"rat_id": "11015", "sess": "13120410", "cell_id": "t5c1"}
+        self.arena_limits = np.array([[-200, 200], [-20, 20]])
+        data_path_list = glob.glob(self.data_path + "*.mat")
+        mice_ids = np.unique([dp.split("/")[-1][:5] for dp in data_path_list])
+        self.data_per_animal = {}
+        for m_id in mice_ids:
+            m_paths_list = glob.glob(self.data_path + m_id + "*.mat")
+            sessions = np.unique([dp.split("/")[-1].split("-")[1][:8] for dp in m_paths_list]).astype(str)
+            self.data_per_animal[m_id] = {}
+            for sess in sessions:
+                s_paths_list = glob.glob(self.data_path + m_id + "-" + sess + "*.mat")
+                cell_ids = np.unique([dp.split("/")[-1].split(".")[-2][-4:] for dp in s_paths_list]).astype(str)
+                self.data_per_animal[m_id][sess] = {}
+                for cell_id in cell_ids:
+                    if cell_id == "_POS":
+                        session_info = "position"
+                    elif cell_id in ["_EEG", "_EGF"]:
+                        continue
+                    else:
+                        session_info = cell_id
+                        print(cell_id)
+                    r_path = glob.glob(self.data_path + m_id + "-" + sess + "*" + cell_id + "*.mat")
+                    cleaned_data = clean_data(sio.loadmat(r_path[0]))
+                    self.data_per_animal[m_id][sess][session_info] = cleaned_data
+
+    def show_keys(self):
+        print("Rat ids", list(self.data_per_animal.keys()))
+        for rat_id, val in self.data_per_animal.items():
+            print("Sessions for " + rat_id)
+            print(list(self.data_per_animal[rat_id].keys()))
+            for sess in self.data_per_animal[rat_id].keys():
+                print("Cells recorded in session " + sess)
+                print(list(self.data_per_animal[rat_id][sess].keys()))
+
+    def show_readme(self):
+        readme_path = glob.glob(self.data_path + "readme" + "*.txt")[0]
+        with open(readme_path, 'r') as fin:
+            print(fin.read())
+
+    def plot_session(self):
+        # print(self.data_per_animal[self.best_session["rat"]][self.best_session["sess"]])
+        cell_data = self.data_per_animal[self.rat_id][self.sess]
+        position_data = cell_data["position"]
+        x1, y1 = position_data["posx"][:], position_data["posy"][:]
+        # Selecting positional data
+        x = np.clip(x1, a_min=-200, a_max=200)
+        y = np.clip(y1, a_min=-20, a_max=20)
+        
+        # Selecting positional data
+        time_array = position_data["post"][:]
+        tetrode_data = cell_data["t5c1"]
+        test_spikes = tetrode_data["ts"][:]
+        test_spikes = test_spikes[:, 0]
+        time_array = time_array[:, 0]
+        x = x[:, 0]
+        y = y[:, 0]
+        
+        
+        f, ax = plt.subplots(1, 2, figsize=(15, 8))
+        ax = ax.flatten()
+        ax[0].plot(x, y)
+        ax[0].set_title("position")
+        h, binx, biny = get_2D_ratemap(time_array, test_spikes, x, y)
+        ax[1].imshow(h)
+        plt.show()
+        
+    def set_behavioral_data(self, rat_id=None, session=None):
+        arena_limits = np.array([[-50, 50], [-50, 50]])
+        if rat_id is None:
+            rat_id = self.rat_id
+            session = self.sess
+
+        cell_data = self.data_per_animal[rat_id][session]
+        position_data = cell_data["position"]
+    
+        # Selecting positional data
+        x1, y1 = position_data["posx"][:], position_data["posy"][:]
+        # Selecting positional data
+        x = np.clip(x1, a_min=-200, a_max=200)
+        y = np.clip(y1, a_min=-20, a_max=20)
+        time_array = position_data["post"][:]
+
+        position = np.stack([x, y], axis=1) # Convert to cm
+        head_direction = np.diff(position, axis=0)
+        head_direction = head_direction/np.sqrt(np.sum(head_direction**2, axis=1))[..., np.newaxis]
+        self.arena_limits = arena_limits
+        self.position = position
+        self.head_direction = head_direction
+        self.time = time_array
+               
 
 class SargoliniData(object):
 
@@ -59,6 +167,7 @@ class FullSargoliniData(object):
         # self.best_session = {"rat_id": "10704", "sess": "20060402"}
         self.arena_limits = np.array([[-50.0, 50.0], [-50.0, 50.0]])
 
+
         data_path_list = glob.glob(self.data_path + "*.mat")
         mice_ids = np.unique([dp.split("/")[-1][:5] for dp in data_path_list])
         self.data_per_animal = {}
@@ -77,6 +186,7 @@ class FullSargoliniData(object):
                         continue
                     else:
                         session_info = cell_id
+
                     r_path = glob.glob(self.data_path + m_id + "-" + sess + "*" + cell_id + "*.mat")
                     cleaned_data = clean_data(sio.loadmat(r_path[0]))
                     if cell_id != "_POS":

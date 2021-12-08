@@ -212,3 +212,4 @@ if __name__ == "__main__":
 
     print("plotting results")
     agent.plot_rates()
+
