@@ -130,6 +130,7 @@ class Sargolini2006(Simple2D):
 
     def __init__(self, data_path="sargolini2006/", environment_name="Sargolini2006", session=None, verbose=False, **env_kwargs):
         self.data_path = data_path
+        self.verbose= verbose
         self.environment_name = environment_name
         self.session = session
         self.data = FullSargoliniData(data_path=self.data_path, experiment_name=self.environment_name, verbose=verbose, session=session)
@@ -145,8 +146,11 @@ class Sargolini2006(Simple2D):
 
         self.state_dims_labels = ["x_pos", "y_pos", "head_direction_x", "head_direction_y"]
 
-    def reset(self):
-        """ Start in a random position within the dimensions of the room """
+    def reset(self, sess=None):
+        if not sess is None:
+            self.data = FullSargoliniData(data_path=self.data_path, experiment_name=self.environment_name,
+                                          verbose=self.verbose, session=sess)
+
         self.global_steps = 0
         self.global_time = 0
         self.history = []

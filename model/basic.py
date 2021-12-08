@@ -69,14 +69,16 @@ class ExcInhPlasticity(NeurResponseModel):
                 mean = [mean1, mean2]
                 rv = multivariate_normal(mean, cov)
                 function_list.append([mean, cov])
+                normalization_constant = 2*np.pi*np.sqrt(np.linalg.det(cov))/10
                 cell_i += rv.pdf(self.xy_combinations)
             function_list.append(gauss_list)
-            norm_cell_i = (cell_i - np.amin(cell_i))/np.amax((cell_i - np.amin(cell_i)))
-            cell_list.append(norm_cell_i)
+            cell_list.append(cell_i*normalization_constant)
         return function_list, np.array(cell_list)
 
     def act(self, obs):
         self.obs_history.append(obs)
+        if len(self.obs_history) >= 1000:
+            self.obs_history = [obs, ]
         action = np.random.normal(scale=0.1, size=(2,))
         return action
 
@@ -121,7 +123,7 @@ class ExcInhPlasticity(NeurResponseModel):
         self.we = np.abs(self.we)
         self.wi = np.abs(self.wi)
 
-    def plot_rates(self):
+    def plot_rates(self, save_path=None):
         f, ax = plt.subplots(1, 3, figsize=(14, 5))
 
         r_out_im = self.get_full_output_rate()
@@ -135,7 +137,12 @@ class ExcInhPlasticity(NeurResponseModel):
         im = ax[2].imshow(r_out_im)
         ax[2].set_title("Out rate", fontsize=14)
         cbar = plt.colorbar(im, ax=ax[2])
-        plt.show()
+
+        if not save_path is None:
+            plt.savefig(save_path, bbox_inches="tight")
+            plt.close("all")
+        else:
+            plt.show()
 
 
 if __name__ == "__main__":
@@ -150,35 +157,58 @@ if __name__ == "__main__":
                         time_step_size=None,
                         agent_step_size=None)
 
-    exc_eta = 2e-5
-    inh_eta = 8e-5
+    exc_eta = 8e-6
+    inh_eta = 6e-5
     model_name = "model_example"
     sigma_exc = 0.05
     sigma_inh = 0.1
     Ne = 4900
     Ni = 1225
-    Nef = 100
-    Nif = 100
+    Nef = 1
+    Nif = 1
     agent_step_size = 0.1
 
     print("init cells")
     agent = ExcInhPlasticity(model_name=model_name, exc_eta=exc_eta, inh_eta=inh_eta, sigma_exc=sigma_exc,
                              sigma_inh=sigma_inh, Ne=Ne, Ni=Ni, agent_step_size=agent_step_size, ro=1,
                              Nef=Nef, Nif=Nif, room_width=env.room_width, room_depth=env.room_depth)
+
     print("Plotting rate")
-    agent.plot_rates()
+    agent.plot_rates("figures/init_rates.pdf")
 
     print("running updates")
     n_steps = 30000
     # Initialize environment
-    obs, state = env.reset()
-    for i in tqdm(range(n_steps)):
-        # Observe to choose an action
-        obs = obs[:2]
-        action = agent.act(obs)
-        rate = agent.update()
-        # Run environment for given action
-        obs, state, reward = env.step(action)
+
+    total_iters = 0
+
+    all_sessions = {"11016": ['02020502', '25010501', '28010501', '29010503', '31010502'], #5/6
+                    "10884": ['01080402', '02080405', '03080402', '03080405', '03080409', '04080402', '05080401',
+                               '08070402', '08070405', '09080404', '13070402', '14070405', '16070401', '19070401',
+                               '21070405', '24070401', '31070404'], # 22/6
+                    "10704": ['06070402', '07070402', '07070407', '08070402', '19070402', '20060402',
+                              '20070402', '23060402', '25060402', '26060402'], #32/6
+                    "11084": ['01030503', '02030502', '03020501', '08030506', '09030501', '09030503', '10030502',
+                              '23020502', '24020502', '28020501'], #42/6
+                    "11265": ['01020602', '02020601', '03020601', '06020601', '07020602', '09020601', '13020601',
+                              '16030601', '16030604', '31010601'], #52/6
+                    "11207": ['03060501', '04070501', '05070501', '06070501', '07070501', '08060501', '08070504',
+                              '09060501']} # 60/6
+
+    for rat_id, session_list in all_sessions.items():
+        for j, sess in enumerate(session_list):
+            session = {"rat_id": rat_id, "sess": sess}
+            obs, state = env.reset(sess=session)
+            print("Running sess", session)
+            for i in tqdm(range(n_steps)):
+                # Observe to choose an action
+                obs = obs[:2]
+                action = agent.act(obs)
+                rate = agent.update()
+                # Run environment for given action
+                obs, state, reward = env.step(action)
+                total_iters += 1
+            agent.plot_rates(save_path="figures/iter_"+str(total_iters)+".pdf")
 
     print("plotting results")
     agent.plot_rates()
