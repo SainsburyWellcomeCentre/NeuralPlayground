@@ -6,11 +6,11 @@ from environments.env_list.simple2d import Simple2D
 from model.basic import ExcitInhibitoryplastic
 
 # Create an env
-room_width = 1
-room_depth = 1
+room_width = 0.5
+room_depth = 0.5
 env_name = "env_example"
 time_step_size = 1
-agent_step_size = 0.2
+agent_step_size = 0.02
 
 # Init environment
 env = Simple2D(environment_name=env_name,
@@ -29,8 +29,8 @@ sigma_exc_2 = 0.05
 sigma_inh_2 =0.1
 Ne_1 = 4900
 Ni_1 = 1225
-alpha_inh_1 = 1
-alpha_exc_1 = 1
+alpha_inh_1 = 1e-260
+alpha_exc_1 = 1e-260
 
 agent = ExcitInhibitoryplastic(step=agent_step_size,model_name=model_name_1,
                                exc_eta=exc_eta_1, inh_eta=inh_eta_1,
@@ -39,7 +39,7 @@ agent = ExcitInhibitoryplastic(step=agent_step_size,model_name=model_name_1,
                                Ne=Ne_1, Ni=Ni_1,
                                alpha_inh=alpha_inh_1, alpha_exc=alpha_exc_1)
 
-n_steps = 5000
+n_steps = 100
 agent.reset()
 # Initialize environment
 obs, state = env.reset()
