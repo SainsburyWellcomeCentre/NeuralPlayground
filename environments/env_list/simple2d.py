@@ -7,7 +7,6 @@ import numpy as np
 from environments.experiment_data.behavioral_data import SargoliniData, FullSargoliniData,FullHaftingData
 
 
-
 class Simple2D(Environment):
     def __init__(self, environment_name="2DEnv", **env_kwargs):
         super().__init__(environment_name, **env_kwargs)
@@ -92,13 +91,15 @@ class BasicSargolini2006(Simple2D):
         self.environment_name = environment_name
         self.data = SargoliniData(data_path=self.data_path, experiment_name=self.environment_name)
         self.arena_limits = self.data.arena_limits
-        self.room_width, self.room_depth = np.abs(np.diff(self.arena_limits, axis=1))
+        limits = np.abs(np.diff(self.arena_limits, axis=1))
+        self.room_width = limits[0, 0]
+        self.room_depth = limits[1, 0]
         env_kwargs["room_width"] = self.room_width
         env_kwargs["room_depth"] = self.room_depth
         env_kwargs["agent_step_size"] = 1/50  # In seconds
         super().__init__(environment_name, **env_kwargs)
         self.metadata["doi"] = "https://doi.org/10.1126/science.1125572"
-
+        self.total_number_of_steps = self.data.position.shape[0]
         self.state_dims_labels = ["x_pos", "y_pos", "head_direction_x", "head_direction_y"]
 
     def reset(self):
@@ -114,7 +115,8 @@ class BasicSargolini2006(Simple2D):
 
     def step(self, action):
         """ Action is ignored in this case """
-        self.global_steps += 1
+        if self.global_steps >= self.data.position.shape[0] - 1:
+            self.global_steps = 0
         self.global_time = self.global_steps*self.agent_step_size
         reward = 0  # If you get reward, it should be coded here
         new_state = self.data.position[self.global_steps, :], self.data.head_direction[self.global_steps, :]
@@ -124,6 +126,7 @@ class BasicSargolini2006(Simple2D):
         self.history.append(transition)
         self.state = new_state
         observation = self.make_observation()
+        self.global_steps += 1
         return observation, new_state, reward
 
 
@@ -144,7 +147,7 @@ class Sargolini2006(Simple2D):
         env_kwargs["agent_step_size"] = 1/50  # In seconds
         super().__init__(environment_name, **env_kwargs)
         self.metadata["doi"] = "https://doi.org/10.1126/science.1125572"
-
+        self.total_number_of_steps = self.data.position.shape[0]
         self.state_dims_labels = ["x_pos", "y_pos", "head_direction_x", "head_direction_y"]
 
     def reset(self, sess=None):
@@ -163,7 +166,6 @@ class Sargolini2006(Simple2D):
 
     def step(self, action):
         """ Action is ignored in this case """
-        self.global_steps += 1
         if self.global_steps >= self.data.position.shape[0]-1:
             self.global_steps = 0
         self.global_time = self.global_steps*self.agent_step_size
@@ -175,6 +177,7 @@ class Sargolini2006(Simple2D):
         self.history.append(transition)
         self.state = new_state
         observation = self.make_observation()
+        self.global_steps += 1
         return observation, new_state, reward
 
 
@@ -208,8 +211,6 @@ class Hafting2008(Simple2D):
     def step(self, action):
         """ Action is ignored in this case """
         self.global_steps += 1
-
-
 
 
 if __name__ == "__main__":

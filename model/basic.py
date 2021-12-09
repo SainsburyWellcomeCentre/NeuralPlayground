@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 import numpy as np
 from scipy.stats import multivariate_normal
-from environments.env_list.simple2d import Simple2D, Sargolini2006
+from environments.env_list.simple2d import Simple2D, Sargolini2006, BasicSargolini2006
 from tqdm import tqdm
 
 
@@ -24,6 +24,8 @@ class ExcInhPlasticity(NeurResponseModel):
         self.Ni = mod_kwargs["Ni"]
         self.Nef = mod_kwargs["Nef"]
         self.Nif = mod_kwargs["Nif"]
+        self.alpha_i = mod_kwargs["alpha_i"]
+        self.alpha_e = mod_kwargs["alpha_e"]
 
         self.sigma_exc = mod_kwargs["sigma_exc"]
 
@@ -43,18 +45,20 @@ class ExcInhPlasticity(NeurResponseModel):
     def reset(self):
         self.global_steps = 0
         self.history = []
-        self.wi = np.random.normal(loc=1.52, scale=1.52*0.05, size=(self.Ni))  # what is the mu and why do we have the 1 and not2
+        self.wi = np.random.normal(loc=1.5, scale=1.5*0.05, size=(self.Ni))  # what is the mu and why do we have the 1 and not2
         self.we = np.random.normal(loc=1.0, scale=1.0*0.05, size=(self.Ne))
 
         self.inh_rates_functions, self.inh_cell_list = self.generate_tuning_curves(n_curves=self.Ni,
                                                                                    cov_scale=self.sigma_inh,
-                                                                                   Nf=self.Nif)
+                                                                                   Nf=self.Nif,
+                                                                                   alpha=self.alpha_i)
         self.exc_rates_functions, self.exc_cell_list = self.generate_tuning_curves(n_curves=self.Ne,
                                                                                    cov_scale=self.sigma_exc,
-                                                                                   Nf=self.Nef)
+                                                                                   Nf=self.Nef,
+                                                                                   alpha=self.alpha_e)
         self.init_we_sum = np.sum(self.we**2)
 
-    def generate_tuning_curves(self, n_curves, cov_scale, Nf):
+    def generate_tuning_curves(self, n_curves, cov_scale, Nf, alpha):
         width_limit = self.room_width / 2.0
         depth_limit = self.room_depth / 2.0
         cell_list = []
@@ -66,13 +70,13 @@ class ExcInhPlasticity(NeurResponseModel):
                 mean1 = np.random.uniform(-width_limit*(1+0.1), width_limit*(1+0.1))
                 mean2 = np.random.uniform(-depth_limit*(1+0.1), depth_limit*(1+0.1))
                 cov = np.diag([(self.room_width * cov_scale)**2, (self.room_depth * cov_scale)**2])
-                mean = [mean1, mean2]
+                mean = np.array([mean1, mean2])
                 rv = multivariate_normal(mean, cov)
                 function_list.append([mean, cov])
                 normalization_constant = 2*np.pi*np.sqrt(np.linalg.det(cov))/10
-                cell_i += rv.pdf(self.xy_combinations)
+                cell_i += rv.pdf(self.xy_combinations)*normalization_constant*alpha
             function_list.append(gauss_list)
-            cell_list.append(cell_i*normalization_constant)
+            cell_list.append(cell_i)
         return function_list, np.array(cell_list)
 
     def act(self, obs):
@@ -109,7 +113,7 @@ class ExcInhPlasticity(NeurResponseModel):
         pos = self.obs_history[-1]
         r_out = self.get_output_rates(pos)
 
-        delta_we = self.etaexc*self.get_rates(self.exc_cell_list, pos=pos)
+        delta_we = self.etaexc*self.get_rates(self.exc_cell_list, pos=pos)*r_out
         delta_wi = self.etainh*self.get_rates(self.inh_cell_list, pos=pos)*(r_out - self.ro)
 
         # print(delta_wi, delta_we)
@@ -146,70 +150,118 @@ class ExcInhPlasticity(NeurResponseModel):
 
 
 if __name__ == "__main__":
-    # Create an env
-    data_path = "/home/rodrigo/HDisk/8F6BE356-3277-475C-87B1-C7A977632DA7_1/all_data/"
 
-    session = {"rat_id": "11016", "sess": "31010502"}
+    run_raw_data = False
 
-    env = Sargolini2006(data_path=data_path,
-                        verbose=False,
-                        session=session,
-                        time_step_size=None,
-                        agent_step_size=None)
+    if run_raw_data:
+        data_path = "/home/rodrigo/HDisk/8F6BE356-3277-475C-87B1-C7A977632DA7_1/all_data/"
 
-    exc_eta = 8e-6
-    inh_eta = 6e-5
-    model_name = "model_example"
-    sigma_exc = 0.05
-    sigma_inh = 0.1
-    Ne = 4900
-    Ni = 1225
-    Nef = 1
-    Nif = 1
-    agent_step_size = 0.1
+        session = {"rat_id": "11016", "sess": "31010502"}
 
-    print("init cells")
-    agent = ExcInhPlasticity(model_name=model_name, exc_eta=exc_eta, inh_eta=inh_eta, sigma_exc=sigma_exc,
-                             sigma_inh=sigma_inh, Ne=Ne, Ni=Ni, agent_step_size=agent_step_size, ro=1,
-                             Nef=Nef, Nif=Nif, room_width=env.room_width, room_depth=env.room_depth)
+        env = Sargolini2006(data_path=data_path,
+                            verbose=False,
+                            session=session,
+                            time_step_size=None,
+                            agent_step_size=None)
 
-    print("Plotting rate")
-    agent.plot_rates("figures/init_rates.pdf")
+        exc_eta = 6.7e-5
+        inh_eta = 2.7e-4
+        model_name = "model_example"
+        sigma_exc = 0.05
+        sigma_inh = 0.1
+        Ne = 4900
+        Ni = 1225
+        Nef = 1
+        Nif = 1
+        agent_step_size = 0.1
+        alpha_i = 1
+        alpha_e = 1
 
-    print("running updates")
-    n_steps = 30000
-    # Initialize environment
+        print("init cells")
+        agent = ExcInhPlasticity(model_name=model_name, exc_eta=exc_eta, inh_eta=inh_eta, sigma_exc=sigma_exc,
+                                 sigma_inh=sigma_inh, Ne=Ne, Ni=Ni, agent_step_size=agent_step_size, ro=1,
+                                 Nef=Nef, Nif=Nif, room_width=env.room_width, room_depth=env.room_depth,
+                                 alpha_i=alpha_i, alpha_e=alpha_e)
 
-    total_iters = 0
+        print("Plotting rate")
+        agent.plot_rates("figures/init_rates.pdf")
 
-    all_sessions = {"11016": ['02020502', '25010501', '28010501', '29010503', '31010502'], #5/6
-                    "10884": ['01080402', '02080405', '03080402', '03080405', '03080409', '04080402', '05080401',
-                               '08070402', '08070405', '09080404', '13070402', '14070405', '16070401', '19070401',
-                               '21070405', '24070401', '31070404'], # 22/6
-                    "10704": ['06070402', '07070402', '07070407', '08070402', '19070402', '20060402',
-                              '20070402', '23060402', '25060402', '26060402'], #32/6
-                    "11084": ['01030503', '02030502', '03020501', '08030506', '09030501', '09030503', '10030502',
-                              '23020502', '24020502', '28020501'], #42/6
-                    "11265": ['01020602', '02020601', '03020601', '06020601', '07020602', '09020601', '13020601',
-                              '16030601', '16030604', '31010601'], #52/6
-                    "11207": ['03060501', '04070501', '05070501', '06070501', '07070501', '08060501', '08070504',
-                              '09060501']} # 60/6
+        print("running updates")
+        n_steps = 30000
+        # Initialize environment
 
-    for rat_id, session_list in all_sessions.items():
-        for j, sess in enumerate(session_list):
-            session = {"rat_id": rat_id, "sess": sess}
-            obs, state = env.reset(sess=session)
-            print("Running sess", session)
-            for i in tqdm(range(n_steps)):
-                # Observe to choose an action
-                obs = obs[:2]
-                action = agent.act(obs)
-                rate = agent.update()
-                # Run environment for given action
-                obs, state, reward = env.step(action)
-                total_iters += 1
-            agent.plot_rates(save_path="figures/iter_"+str(total_iters)+".pdf")
+        total_iters = 0
 
-    print("plotting results")
-    agent.plot_rates()
+        all_sessions = {"11016": ['02020502', '25010501', '28010501', '29010503', '31010502'],  # 5/6
+                        "10884": ['01080402', '02080405', '03080402', '03080405', '03080409', '04080402', '05080401',
+                                   '08070402', '08070405', '09080404', '13070402', '14070405', '16070401', '19070401',
+                                   '21070405', '24070401', '31070404'],  # 22/6
+                        "10704": ['06070402', '07070402', '07070407', '08070402', '19070402', '20060402',
+                                  '20070402', '23060402', '25060402', '26060402'],  # 32/6
+                        "11084": ['01030503', '02030502', '03020501', '08030506', '09030501', '09030503', '10030502',
+                                  '23020502', '24020502', '28020501'],  # 42/6
+                        "11265": ['01020602', '02020601', '03020601', '06020601', '07020602', '09020601', '13020601',
+                                  '16030601', '16030604', '31010601'],  # 52/6
+                        "11207": ['03060501', '04070501', '05070501', '06070501', '07070501', '08060501', '08070504',
+                                  '09060501']}  # 60/6
 
+        for rat_id, session_list in all_sessions.items():
+            for j, sess in enumerate(session_list):
+                session = {"rat_id": rat_id, "sess": sess}
+                obs, state = env.reset(sess=session)
+                print("Running sess", session)
+                for i in tqdm(range(n_steps)):
+                    # Observe to choose an action
+                    obs = obs[:2]
+                    action = agent.act(obs)
+                    rate = agent.update()
+                    # Run environment for given action
+                    obs, state, reward = env.step(action)
+                    total_iters += 1
+                agent.plot_rates(save_path="figures/iter_"+str(total_iters)+".pdf")
+
+        print("plotting results")
+        agent.plot_rates()
+
+    else:
+        data_path = "../environments/experiment_data/sargolini2006/"
+        env = BasicSargolini2006(data_path=data_path,
+                                 time_step_size=0.1,
+                                 agent_step_size=None)
+        exc_eta = 2e-4
+        inh_eta = 8e-4
+        model_name = "model_example"
+        sigma_exc = 0.05
+        sigma_inh = 0.1
+        Ne = 4900
+        Ni = 1225
+        Nef = 1
+        Nif = 1
+        agent_step_size = 0.1
+        alpha_i = 1
+        alpha_e = 1
+
+        print("init cells")
+        agent = ExcInhPlasticity(model_name=model_name, exc_eta=exc_eta, inh_eta=inh_eta, sigma_exc=sigma_exc,
+                                 sigma_inh=sigma_inh, Ne=Ne, Ni=Ni, agent_step_size=agent_step_size, ro=1,
+                                 Nef=Nef, Nif=Nif, room_width=env.room_width, room_depth=env.room_depth,
+                                 alpha_i=alpha_i, alpha_e=alpha_e)
+
+        agent.plot_rates()
+
+        print("debug")
+
+        plot_every = 30000
+        total_iters = 0
+
+        obs, state = env.reset()
+        for i in tqdm(range(env.total_number_of_steps)):
+            # Observe to choose an action
+            obs = obs[:2]
+            action = agent.act(obs)
+            rate = agent.update()
+            # Run environment for given action
+            obs, state, reward = env.step(action)
+            total_iters += 1
+            if i % plot_every == 0:
+                agent.plot_rates(save_path="figures/pre_processed_iter_"+str(i)+".pdf")
