@@ -10,6 +10,7 @@
 # Precompiled Headers
 *.gch
 *.pch
+environments/experiment_data/Hafting2008/
 
 # Compiled Dynamic libraries
 *.so
