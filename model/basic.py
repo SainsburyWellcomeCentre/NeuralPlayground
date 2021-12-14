@@ -34,9 +34,9 @@ class ExcInhPlasticity(NeurResponseModel):
         self.ro = mod_kwargs["ro"]
         self.obs_history = []
 
-        self.resolution = 50
+        self.resolution = 100
         self.x_array = np.linspace(-self.room_width/2, self.room_width/2, num=self.resolution)
-        self.y_array = np.linspace(-self.room_depth/2, self.room_depth/2, num=self.resolution)
+        self.y_array = np.linspace(self.room_depth/2, -self.room_depth/2, num=self.resolution)
         self.mesh = np.array(np.meshgrid(self.x_array, self.y_array))
         self.xy_combinations = self.mesh.T.reshape(-1, 2)
 
@@ -45,8 +45,11 @@ class ExcInhPlasticity(NeurResponseModel):
     def reset(self):
         self.global_steps = 0
         self.history = []
-        self.wi = np.random.normal(loc=1.5, scale=1.5*0.05, size=(self.Ni))  # what is the mu and why do we have the 1 and not2
-        self.we = np.random.normal(loc=1.0, scale=1.0*0.05, size=(self.Ne))
+        # TODO : add this as default or input to the function
+        self.wi = np.random.uniform(low=1.5-0.05*1.5, high=1.5+0.05*1.5, size=(self.Ni))
+        self.we = np.random.uniform(low=1-0.05*1, high=1+0.05*1, size=(self.Ne))
+        #self.wi = np.random.normal(loc=1.5, scale=1.5*0.05/3, size=(self.Ni))  # what is the mu and why do we have the 1 and not2
+        # self.we = np.random.normal(loc=1.0, scale=1.0*0.05/3, size=(self.Ne))
 
         self.inh_rates_functions, self.inh_cell_list = self.generate_tuning_curves(n_curves=self.Ni,
                                                                                    cov_scale=self.sigma_inh,
@@ -67,13 +70,13 @@ class ExcInhPlasticity(NeurResponseModel):
             gauss_list = []
             cell_i = 0
             for j in range(Nf):
-                mean1 = np.random.uniform(-width_limit*(1+0.1), width_limit*(1+0.1))
-                mean2 = np.random.uniform(-depth_limit*(1+0.1), depth_limit*(1+0.1))
+                mean1 = np.random.uniform(-width_limit*(1), width_limit*(1))
+                mean2 = np.random.uniform(-depth_limit*(1), depth_limit*(1))
                 cov = np.diag([(self.room_width * cov_scale)**2, (self.room_depth * cov_scale)**2])
                 mean = np.array([mean1, mean2])
                 rv = multivariate_normal(mean, cov)
-                function_list.append([mean, cov])
-                normalization_constant = 2*np.pi*np.sqrt(np.linalg.det(cov))/10
+                gauss_list.append([mean, cov])
+                normalization_constant = 2*np.pi*np.sqrt(np.linalg.det(cov))
                 cell_i += rv.pdf(self.xy_combinations)*normalization_constant*alpha
             function_list.append(gauss_list)
             cell_list.append(cell_i)
@@ -107,7 +110,7 @@ class ExcInhPlasticity(NeurResponseModel):
         r_out = self.we.T @ self.exc_cell_list - self.wi.T @ self.inh_cell_list
         r_out = r_out.reshape((self.resolution, self.resolution))
         r_out = np.abs(r_out)
-        return np.abs(r_out)
+        return r_out
 
     def update(self, exc_normalization=True):
         pos = self.obs_history[-1]
@@ -231,7 +234,8 @@ if __name__ == "__main__":
         exc_eta = 2e-4
         inh_eta = 8e-4
         model_name = "model_example"
-        sigma_exc = 0.05
+        # TODO: change to 2 dimentional inputs
+        sigma_exc = 0.05 
         sigma_inh = 0.1
         Ne = 4900
         Ni = 1225
