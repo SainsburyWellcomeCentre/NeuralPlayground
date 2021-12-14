@@ -1,0 +1,11 @@
+\contentsline {section}{\numberline {1}Introduction}{1}%
+\contentsline {subsection}{\numberline {1.1}Observation:}{1}%
+\contentsline {subsection}{\numberline {1.2}Inspiration:}{2}%
+\contentsline {subsection}{\numberline {1.3}Our Solution:}{2}%
+\contentsline {section}{\numberline {2}Outline of the model}{2}%
+\contentsline {subsection}{\numberline {2.1}The Agent}{3}%
+\contentsline {subsubsection}{\numberline {2.1.1}The models}{3}%
+\contentsline {subsection}{\numberline {2.2}The Environment}{4}%
+\contentsline {subsubsection}{\numberline {2.2.1}The Experiment}{4}%
+\contentsline {subsection}{\numberline {2.3}The Evidences}{4}%
+\contentsline {section}{\numberline {3}Masters Project Idea}{5}%
