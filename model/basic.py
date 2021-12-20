@@ -26,15 +26,17 @@ class ExcInhPlasticity(NeurResponseModel):
         self.Nif = mod_kwargs["Nif"]
         self.alpha_i = mod_kwargs["alpha_i"]
         self.alpha_e = mod_kwargs["alpha_e"]
+        self.we_init = mod_kwargs["we_init"]
+        self.wi_init = mod_kwargs["wi_init"]
 
         self.sigma_exc = mod_kwargs["sigma_exc"]
-
         self.sigma_inh = mod_kwargs["sigma_inh"]
+
         self.room_width, self.room_depth = mod_kwargs["room_width"], mod_kwargs["room_depth"]
         self.ro = mod_kwargs["ro"]
         self.obs_history = []
 
-        self.resolution = 100
+        self.resolution = 50
         self.x_array = np.linspace(-self.room_width/2, self.room_width/2, num=self.resolution)
         self.y_array = np.linspace(self.room_depth/2, -self.room_depth/2, num=self.resolution)
         self.mesh = np.array(np.meshgrid(self.x_array, self.y_array))
@@ -46,9 +48,9 @@ class ExcInhPlasticity(NeurResponseModel):
         self.global_steps = 0
         self.history = []
         # TODO : add this as default or input to the function
-        self.wi = np.random.uniform(low=1.5-0.05*1.5, high=1.5+0.05*1.5, size=(self.Ni))
-        self.we = np.random.uniform(low=1-0.05*1, high=1+0.05*1, size=(self.Ne))
-        #self.wi = np.random.normal(loc=1.5, scale=1.5*0.05/3, size=(self.Ni))  # what is the mu and why do we have the 1 and not2
+        self.wi = np.random.uniform(low=self.wi_init-0.05*self.wi_init, high=self.wi_init+0.05*self.wi_init, size=(self.Ni))
+        self.we = np.random.uniform(low=self.we_init-0.05*self.we_init, high=self.we_init+0.05*self.we_init, size=(self.Ne))
+        # self.wi = np.random.normal(loc=1.5, scale=1.5*0.05/3, size=(self.Ni))  # what is the mu and why do we have the 1 and not2
         # self.we = np.random.normal(loc=1.0, scale=1.0*0.05/3, size=(self.Ne))
 
         self.inh_rates_functions, self.inh_cell_list = self.generate_tuning_curves(n_curves=self.Ni,
@@ -59,7 +61,7 @@ class ExcInhPlasticity(NeurResponseModel):
                                                                                    cov_scale=self.sigma_exc,
                                                                                    Nf=self.Nef,
                                                                                    alpha=self.alpha_e)
-        self.init_we_sum = np.sum(self.we**2)
+        self.init_we_sum = np.sqrt(np.sum(self.we**2))
 
     def generate_tuning_curves(self, n_curves, cov_scale, Nf, alpha):
         width_limit = self.room_width / 2.0
@@ -70,9 +72,10 @@ class ExcInhPlasticity(NeurResponseModel):
             gauss_list = []
             cell_i = 0
             for j in range(Nf):
-                mean1 = np.random.uniform(-width_limit*(1), width_limit*(1))
-                mean2 = np.random.uniform(-depth_limit*(1), depth_limit*(1))
-                cov = np.diag([(self.room_width * cov_scale)**2, (self.room_depth * cov_scale)**2])
+                mean1 = np.random.uniform(-width_limit*(1+0.2), width_limit*(1+0.2))
+                mean2 = np.random.uniform(-depth_limit*(1+0.2), depth_limit*(1+0.2))
+                cov = np.diag(np.multiply(cov_scale, np.array([self.room_width, self.room_depth]))**2)
+                # cov = np.diag([(self.room_width * cov_scale)**2, (self.room_depth * cov_scale)**2])
                 mean = np.array([mean1, mean2])
                 rv = multivariate_normal(mean, cov)
                 gauss_list.append([mean, cov])
@@ -94,8 +97,7 @@ class ExcInhPlasticity(NeurResponseModel):
         inh_rates = self.get_rates(self.inh_cell_list, pos)
 
         r_out = self.we.T @ exc_rates - self.wi.T @ inh_rates
-        # print("debug")
-        return np.abs(r_out)
+        return np.clip(r_out, a_min=0, a_max=np.amax(r_out))
 
     def get_rates(self, cell_list, pos, get_n_cells=None):
         diff = self.xy_combinations - pos[np.newaxis, ...]
@@ -104,36 +106,58 @@ class ExcInhPlasticity(NeurResponseModel):
         rout = []
         for i in range(cell_list.shape[0]):
             rout.append(cell_list[i, index])
-        return np.abs(rout)
+        rout = np.array(rout)
+        return np.clip(rout, a_min=0, a_max=np.amax(rout))
 
     def get_full_output_rate(self):
         r_out = self.we.T @ self.exc_cell_list - self.wi.T @ self.inh_cell_list
-        r_out = r_out.reshape((self.resolution, self.resolution))
-        r_out = np.abs(r_out)
-        return r_out
+        return np.clip(r_out, a_min=0, a_max=np.amax(r_out))
 
-    def update(self, exc_normalization=True):
-        pos = self.obs_history[-1]
+    def update(self, exc_normalization=True, pos=None):
+        if pos is None:
+            pos = self.obs_history[-1]
         r_out = self.get_output_rates(pos)
 
         delta_we = self.etaexc*self.get_rates(self.exc_cell_list, pos=pos)*r_out
         delta_wi = self.etainh*self.get_rates(self.inh_cell_list, pos=pos)*(r_out - self.ro)
 
-        # print(delta_wi, delta_we)
-
         self.we = self.we + delta_we
         self.wi = self.wi + delta_wi
 
         if exc_normalization:
-            self.we = self.init_we_sum/np.sum(self.we**2)*self.we
+            self.we = self.init_we_sum/np.sqrt(np.sum(self.we**2))*self.we
 
-        self.we = np.abs(self.we)
-        self.wi = np.abs(self.wi)
+        self.we = np.clip(self.we, a_min=0, a_max=np.amax(self.we))
+        self.wi = np.clip(self.wi, a_min=0, a_max=np.amax(self.wi))
+
+    def full_average_update(self, exc_normalization=True):
+        r_out = self.get_full_output_rate()
+        # r_out = r_out.reshape(-1, 1)
+        r_out = r_out[..., np.newaxis]
+        delta_we = self.etaexc*(self.exc_cell_list @ r_out)/self.resolution**2
+        delta_wi = self.etainh*(self.inh_cell_list @ (r_out-self.ro))/self.resolution**2
+
+        self.we = self.we + delta_we[:, 0]
+        self.wi = self.wi + delta_wi[:, 0]
+
+        if exc_normalization:
+            self.we = self.init_we_sum/np.sqrt(np.sum(self.we**2))*self.we
+
+        self.we = np.clip(self.we, a_min=0, a_max=np.amax(self.we))
+        self.wi = np.clip(self.wi, a_min=0, a_max=np.amax(self.wi))
+
+    def full_update(self, exc_normalization=True):
+        random_permutation = np.arange(self.xy_combinations.shape[0])
+        xy_array = self.xy_combinations[random_permutation, :]
+        for i in range(self.xy_combinations.shape[0]):
+            self.update(exc_normalization=exc_normalization, pos=xy_array[i, :])
 
     def plot_rates(self, save_path=None):
         f, ax = plt.subplots(1, 3, figsize=(14, 5))
 
         r_out_im = self.get_full_output_rate()
+        r_out_im = r_out_im.reshape((self.resolution, self.resolution))
+
         exc_im = self.exc_cell_list[0, ...].reshape((self.resolution, self.resolution))
         inh_im = self.inh_cell_list[0, ...].reshape((self.resolution, self.resolution))
 
@@ -234,36 +258,39 @@ if __name__ == "__main__":
         exc_eta = 2e-4
         inh_eta = 8e-4
         model_name = "model_example"
-        # TODO: change to 2 dimentional inputs
-        sigma_exc = 0.05 
-        sigma_inh = 0.1
+        sigma_exc = np.array([0.05, 0.05])
+        sigma_inh = np.array([0.1, 0.1])
         Ne = 4900
         Ni = 1225
         Nef = 1
         Nif = 1
-        agent_step_size = 0.1
         alpha_i = 1
         alpha_e = 1
+        we_init = 1.0
+        wi_init = 1.5
 
-        print("init cells")
+        agent_step_size = 0.1
+
         agent = ExcInhPlasticity(model_name=model_name, exc_eta=exc_eta, inh_eta=inh_eta, sigma_exc=sigma_exc,
                                  sigma_inh=sigma_inh, Ne=Ne, Ni=Ni, agent_step_size=agent_step_size, ro=1,
                                  Nef=Nef, Nif=Nif, room_width=env.room_width, room_depth=env.room_depth,
-                                 alpha_i=alpha_i, alpha_e=alpha_e)
+                                 alpha_i=alpha_i, alpha_e=alpha_e, we_init=we_init, wi_init=wi_init)
 
         agent.plot_rates()
 
         print("debug")
 
-        plot_every = 30000
+        plot_every = 10
         total_iters = 0
 
         obs, state = env.reset()
-        for i in tqdm(range(env.total_number_of_steps)):
+        #for i in tqdm(range(env.total_number_of_steps)):
+        for i in tqdm(range(5000)):
             # Observe to choose an action
             obs = obs[:2]
             action = agent.act(obs)
-            rate = agent.update()
+            # rate = agent.update()
+            agent.full_update()
             # Run environment for given action
             obs, state, reward = env.step(action)
             total_iters += 1
