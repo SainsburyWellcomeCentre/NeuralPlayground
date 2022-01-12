@@ -25,3 +25,4 @@ The users of this software might only use a subset of the available experiments 
 2. Create a class to read/filter the data following the template shown in the [Behavior_data] and the [Style Guide](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/Documents).
 3. Cite the Data approrialty.
 4. Use the data to be compared to the model results.
+5. Record your contribution
