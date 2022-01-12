@@ -62,7 +62,7 @@ There are three main ways to contribute to the porject:
 Refere to the README.md files found in the files of intterest for further details on how to contibute to the project.
 We inspire the Organisation of the Project from the Turing Way Guide lines.
 
-Before Adding to the project, please make sure to check the Lisencing time line.
+Before Adding to the project, please make sure to check the Lisencing frameworks.
 
 Every Contibution will be recognised by the self recording.
 
