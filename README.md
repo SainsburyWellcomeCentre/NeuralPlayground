@@ -5,9 +5,9 @@
 
 
 * [1 Introduction](#1-Introduction)
-* [2 The Project](#1-TheProject)
+* [2 The Project](#1-Project)
 * [3 Installation ](#3-Installation)
-* [3 How to Contribute](#3-HowtoContribute)
+* [3 How to Contribute](#3Contribute)
 
 ## 1 Introduction
 
@@ -17,7 +17,7 @@ We create this framework with the perspective that the neuroscience community sh
 This new environment will revolutionize how the theoretical models are proposed in neuroscience and push for easy access and implementation of new ideas. 
 
 
-## 2 The Project
+## 2 Project
 
 ### 2.1 The ProjectMotivation:
 
@@ -49,7 +49,7 @@ This project will push for standardisation of neuroscience as a whole. Every hip
 ## 3 Installation
 
 
-## 4 How to Contribute
+## 4 Contribute
 
 There are three main ways to contribute to the porject: 
 
