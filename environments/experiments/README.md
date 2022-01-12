@@ -22,6 +22,6 @@ The users of this software might only use a subset of the available experiments 
 ## 2 Contribute
 
 1. Create a file that indicates where to download the data.
-2. Create a class to read/filter the data following the template shown in the 'core class' and the Style guide lines  [Style Guide](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/Documents).
+2. Create a class to read/filter the data following the template shown in the [Behavior_data] and the [Style Guide](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/Documents).
 3. Cite the Data approrialty.
 4. Use the data to be compared to the model results.
