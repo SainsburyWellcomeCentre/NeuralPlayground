@@ -1,4 +1,4 @@
-# The  standardised environment for the hippocampus and entorhinal cortex models. (AGENT )
+# Agent: The  standardised environment for the hippocampus and entorhinal cortex models.
 
 
 * [1 Introduction](#1-Introduction)
