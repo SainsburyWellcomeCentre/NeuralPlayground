@@ -1,0 +1,24 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "ClementineDomine",
+      "name": "Clementine Domine",
+      "avatar_url": "https://avatars.githubusercontent.com/u/18595111?v=4",
+      "profile": "https://github.com/ClementineDomine",
+      "contributions": [
+        "design"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "projectName": "EHC_model_comparison",
+  "projectOwner": "ClementineDomine",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "skipCi": true
+}
