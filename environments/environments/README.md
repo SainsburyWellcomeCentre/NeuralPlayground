@@ -11,6 +11,7 @@ The environment aims at replicating the experimental setting where behavioral da
 
 ## 3 How to Contribute
 
-Develope the environement 
-
+1. Create an environment class to following the template shown in the [] and the Style Guide.
+2. Cite the any resources approrialty
+3. Record your contribution
 
