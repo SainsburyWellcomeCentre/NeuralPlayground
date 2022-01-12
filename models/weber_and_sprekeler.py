@@ -3,12 +3,12 @@ import sys
 sys.path.append("../")
 import numpy as np
 import random
-from model.core import NeuralResponseModel as NeurResponseModel
+from models.core import NeuralResponseModel as NeurResponseModel
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import numpy as np
 from scipy.stats import multivariate_normal
-from environments.env_list.simple2d import Simple2D, Sargolini2006, BasicSargolini2006
+from environments.environments.simple2d import Simple2D, Sargolini2006, BasicSargolini2006
 from tqdm import tqdm
 
 
