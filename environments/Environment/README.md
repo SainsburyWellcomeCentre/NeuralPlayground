@@ -11,6 +11,6 @@ The environment aims at replicating the experimental setting where behavioral da
 
 ## 3 How to Contribute
 
-Develope the environement 
+1.  Create a class following the template shown in the '[Core Class](https://github.com/ClementineDomine/EHC_model_comparison/main/Environment). and the Style guide lines  [Style Guide](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/Documents).
 
 
