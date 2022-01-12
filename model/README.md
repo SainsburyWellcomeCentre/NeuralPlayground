@@ -2,8 +2,8 @@
 
 
 * [1 Introduction](#1-Introduction)
-* [2 Model Implemented  ](#2-Model Implemented )
-* [3 How to Contribute](#5-How to Contribute)
+* [2 Model Implemented  ](#2-ModelImplemented )
+* [3 How to Contribute](#5-HowtoContribute)
 
 ## 1 Introduction
 

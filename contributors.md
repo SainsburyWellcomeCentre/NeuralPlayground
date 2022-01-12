@@ -38,3 +38,20 @@ See this entry as an example by Kirstie Whitaker, the project lead:
 
 <!---A--->
 ## A
+
+* Role: 
+  * Project Member (2021-Present)
+  * Book Dash Participant 2021
+* GitHub id: [RaoOfPhysics](http://github.com/RaoOfPhysics)
+* ORCID: [0000-0002-1628-2618](https://orcid.org/0000-0002-1628-2618)
+* Short bio:
+> Achintya is the Community Manager for the _AI for Science and Government_ research programme at The Alan Turing Institute. He has a BSc in physics and an MA in science journalism. Prior to joining The Turing, he spent over a decade as a science communicator at CERN, the European Organization for Nuclear Research, in Geneva. He is also wrapping up a PhD in science communication from UWE Bristol.
+
+* Personal highlights:
+> It was a joy helping people who had never used GitHub before file their first issues and make their first pull requests. I also familiarised myself with the structure of the book and can hopefully help other members of the community make contributions to it in the future! It was a lot of fun co-working with so many wonderful people in a shared virtual space.
+
+* More information:
+> I love that the TTW repo is a place not just to contribute but also to learn, so I wasn't afraid of making mistakes in commits and pull requests. It’s helpful that so many knowledgeable members of the community are there to help!
+
+* Personal Quote:
+> _The Turing Way_ is an ideal place to gather collective knowledge from diverse experiences in data science and open research, and to learn by doing.
