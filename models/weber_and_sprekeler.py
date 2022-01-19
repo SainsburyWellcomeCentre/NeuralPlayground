@@ -16,11 +16,11 @@ import numpy as np
 from scipy.stats import multivariate_normal
 from tqdm import tqdm
 
-from models.core import NeuralResponseModel as NeurResponseModel
+from models.core import NeuralResponseModel
 from environments.environments.simple2d import Simple2D, Sargolini2006, BasicSargolini2006
 
 
-class ExcInhPlasticity(NeurResponseModel):
+class ExcInhPlasticity(NeuralResponseModel):
     """
     Implementation for Weber and Sprekeler 2018
     Learning place cells, grid cells and invariances with excitatory and inhibitory plasticity
