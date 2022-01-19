@@ -3,13 +3,14 @@ import numpy as np
 import math
 import random
 
+
 class NeuralResponseModel(object):
     """Abstract class for all models."""
     def __init__(self, model_name="default_model", **mod_kwargs):
         self.model_name = model_name
         self.mod_kwargs = mod_kwargs  # Variables to manipulate environment
         self.metadata = {"mod_kwargs": mod_kwargs}  # Define within each subclaspecificenvironments
-        self.history = []
+        self.obs_history = []
         self.global_steps = 0
  
     def reset(self):
@@ -28,18 +29,23 @@ class NeuralResponseModel(object):
         return: neural response() (This might go to update self (state) state but this is unsure still)"""
         pass
         
-    def act(self):
-        """Perform an action given current stimulus input
-        observation dictionanary with:
-        :param h: Head direction
-        :param x: Position
-        :param v: Velocity
-        :param s:  stimuli
-        :param t: timestep within trial
-        :param self: internal state
-        return: update/move(x,v,h,s) vector which will go to update the environment observation
+    def act(self, obs):
         """
-        pass
+        The base model executes a random action from a normal distribution
+        Parameters
+        ----------
+        obs
+            Whatever observation needed to choose the right action
+        Returns
+        -------
+        action: float
+            action value which in this case is random
+        """
+        self.obs_history.append(obs)
+        if len(self.obs_history) >= 1000:  # reset every 1000
+            self.obs_history = [obs, ]
+        action = np.random.normal(scale=0.1, size=(2,))
+        return action
 
 if __name__ == "__main__":
     exc_eta_1=2e-6
