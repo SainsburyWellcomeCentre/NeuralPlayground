@@ -1,32 +1,40 @@
-from abc import ABC, abstractmethod
+"""
+Base class for models that can interact with environments in this repo
+Any EHC model should inherit this class in order to interact with environments and compare against experimental results
+We expect to make profound changes in this module as we add mode EHC model to the repo
+"""
 import numpy as np
-import math
-import random
 
 
 class NeuralResponseModel(object):
-    """Abstract class for all models."""
+    """ Abstract class for all EHC models
+
+    Attributes
+    ----------
+    model_name : str
+        Name of the specific instantiation of the ExcInhPlasticity class
+    mod_kwargs: dict
+        To be used by children classes
+    metadata
+        Specific data structure which will contain specific description for each model
+    obs_history: list
+        List of past observations while interacting with the environment in the act method
+    global_steps: int
+        Record of number of updates done on the weights
+    """
     def __init__(self, model_name="default_model", **mod_kwargs):
         self.model_name = model_name
-        self.mod_kwargs = mod_kwargs  # Variables to manipulate environment
-        self.metadata = {"mod_kwargs": mod_kwargs}  # Define within each subclaspecificenvironments
+        self.mod_kwargs = mod_kwargs
+        self.metadata = {"mod_kwargs": mod_kwargs}
         self.obs_history = []
         self.global_steps = 0
  
     def reset(self):
-        """Erase all memory from the model."""
+        """Erase all memory from the model, initialize all relevant parameters and build from scratch """
         pass
 
-    def neuralresponse(self):
-        """Perform an action given current stimulus input
-        observation dictionanary with:
-        :param h: Head direction
-        :param x: Position
-        :param v: Velocity
-        :param s: stimuli
-        :param t: timestep within trial
-        :param self: internal state
-        return: neural response() (This might go to update self (state) state but this is unsure still)"""
+    def neural_response(self):
+        """ Function that returns some representation that will be compared against real experimental data """
         pass
         
     def act(self, obs):
@@ -35,32 +43,14 @@ class NeuralResponseModel(object):
         Parameters
         ----------
         obs
-            Whatever observation needed to choose the right action
+            Whatever observation from the environment class needed to choose the right action
         Returns
         -------
         action: float
-            action value which in this case is random
+            action value which in this case is random number draw from a Gaussian
         """
         self.obs_history.append(obs)
         if len(self.obs_history) >= 1000:  # reset every 1000
             self.obs_history = [obs, ]
         action = np.random.normal(scale=0.1, size=(2,))
         return action
-
-if __name__ == "__main__":
-    exc_eta_1=2e-6
-    inh_eta_1= 8e-6
-    model_name_1 = "model_example"
-    sigma_exc_1= [0.05, 0.05]
-    sigma_inh_1=[0.1, 0.1]
-    Ne_1= 4900
-    Ni_1= 1225
-    alpha_inh_1=1
-    alpha_exc_1=1
-        
-    agent=ExcitInhibitoryplastic(model_name= model_name_1,exc_eta=exc_eta_1,inh_eta=inh_eta_1, sigma_exc=sigma_exc_1, sigma_inh=sigma_inh_1, Ne=Ne_1, Ni= Ni_1, alpha_inh=alpha_inh_1,alpha_exc=alpha_exc_1)
-    print(env.__dict__)
-    print(env.__dir__())
-
-
-
