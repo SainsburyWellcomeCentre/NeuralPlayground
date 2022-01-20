@@ -1,13 +1,13 @@
 # The  standardised environment for the hippocampus and entorhinal cortex models. 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 
 * [1 Introduction](#1-Introduction)
-* [2 The Project](#1-TheProject)
+* [2 The Project](#1-Project)
 * [3 Installation ](#3-Installation)
-* [3 How to Contribute](#3-HowtoContribute)
+* [3 How to Contribute](#3Contribute)
 
 ## 1 Introduction
 
@@ -17,7 +17,7 @@ We create this framework with the perspective that the neuroscience community sh
 This new environment will revolutionize how the theoretical models are proposed in neuroscience and push for easy access and implementation of new ideas. 
 
 
-## 2 The Project
+## 2 Project
 
 ### 2.1 The ProjectMotivation:
 
@@ -49,7 +49,7 @@ This project will push for standardisation of neuroscience as a whole. Every hip
 ## 3 Installation
 
 
-## 4 How to Contribute
+## 4 Contribute
 
 There are three main ways to contribute to the porject: 
 
@@ -60,11 +60,9 @@ There are three main ways to contribute to the porject:
     3. Work on improving the environment
 
 Refere to the README.md files found in the files of intterest for further details on how to contibute to the project.
-We inspire the Organisation of the Project from the Turing Way Guide lines.
+We inspire the Organisation of the Project from the Turing Way Guide lines. Before Adding to the project, please make sure to check the Lisencing frameworks.
 
-Before Adding to the project, please make sure to check the Lisencing time line.
 
-Every Contibution will be recognised by the self recording.
 
 
 
@@ -77,7 +75,12 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <!-- markdownlint-disable -->
 <table>
   <tr>
+
     <td align="center"><a href="https://github.com/ClementineDomine"><img src="https://avatars.githubusercontent.com/u/18595111?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Clementine Domine</b></sub></a><br /><a href="#design-ClementineDomine" title="Design">🎨</a> <a href="#mentoring-ClementineDomine" title="Mentoring">🧑‍🏫</a></td>
+    <td align="center"><a href="https://github.com/rodrigcd"><img src="https://avatars.githubusercontent.com/u/22643681?v=4?s=100" width="100px;" alt=""/><br /><sub><b>rodrigcd</b></sub></a><br /><a href="#design-rodrigcd" title="Design">🎨</a><a href="#mentoring-ClementineDomine" title="Mentoring">🧑‍🏫</a></td>
+    <td align="center"><a href="https://github.com/LukeHollingsworth"><img src="https://avatars.githubusercontent.com/u/93782020?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Luke Hollingsworth</b></sub></a><br /><a href="https://github.com/ClementineDomine/EHC_model_comparison/commits?author=LukeHollingsworth" title="Documentation">📖</a></td>
+
+
   </tr>
 </table>
 
