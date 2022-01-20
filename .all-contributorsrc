@@ -23,6 +23,15 @@
         "design",
         "mentoring"
       ]
+    },
+    {
+      "login": "LukeHollingsworth",
+      "name": "Luke Hollingsworth",
+      "avatar_url": "https://avatars.githubusercontent.com/u/93782020?v=4",
+      "profile": "https://github.com/LukeHollingsworth",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
