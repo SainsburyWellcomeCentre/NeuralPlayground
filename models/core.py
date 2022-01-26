@@ -1,7 +1,7 @@
 """
 Base class for models that can interact with environments in this repo
 Any EHC model should inherit this class in order to interact with environments and compare against experimental results
-We expect to make profound changes in this module as we add mode EHC model to the repo
+We expect to make profound changes in this module as we add more EHC model to the repo
 """
 import numpy as np
 
@@ -14,7 +14,7 @@ class NeuralResponseModel(object):
     model_name : str
         Name of the specific instantiation of the ExcInhPlasticity class
     mod_kwargs: dict
-        To be used by children classes
+        Dictionary of specific parameters to be used by children classes
     metadata
         Specific data structure which will contain specific description for each model
     obs_history: list
