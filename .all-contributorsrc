@@ -11,7 +11,8 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/18595111?v=4",
       "profile": "https://github.com/ClementineDomine",
       "contributions": [
-        "design"
+        "design",
+        "mentoring"
       ]
     },
     {
@@ -20,7 +21,17 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/22643681?v=4",
       "profile": "https://github.com/rodrigcd",
       "contributions": [
-        "design"
+        "design",
+        "mentoring"
+      ]
+    },
+    {
+      "login": "LukeHollingsworth",
+      "name": "Luke Hollingsworth",
+      "avatar_url": "https://avatars.githubusercontent.com/u/93782020?v=4",
+      "profile": "https://github.com/LukeHollingsworth",
+      "contributions": [
+        "doc"
       ]
     }
   ],
