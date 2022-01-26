@@ -48,9 +48,9 @@ class ExcInhPlasticity(NeuralResponseModel):
     global_steps: int
         Record of number of updates done on the weights
     inh_rates_functions: list
-        List of parameters of Gaussian functions in tuning curves for inhibitory neurons
+        List of parameters of Gaussian functions in tuning curves for each inhibitory neuron
     exc_rates_functions: list
-        List of parameters of Gaussian functions in tuning curves for excitatory neurons
+        List of parameters of Gaussian functions in tuning curves for each excitatory neuron
 
     Methods
     -------
@@ -187,11 +187,11 @@ class ExcInhPlasticity(NeuralResponseModel):
         n_curves: int
             Number of neurons (Ne or Ni in __init__)
         cov_scale: float
-            Standard deviation of Gaussian functions in neurons tuning curves (exc_sigma or inh_sigma in __init__)
+            Standard deviation of Gaussian functions of each neuron tuning curves (exc_sigma or inh_sigma in __init__)
         Nf: int
-            Number of Gaussians in the spatial tuning of neurons (Nfe or Nfi in __init__)
+            Number of Gaussians in the spatial tuning of each neuron (Nfe or Nfi in __init__)
         alpha: float
-            Gaussian height of Gaussian functions in spatial tuning for neurons (alpha_i or alpha_e in __init__)
+            Height of Gaussian functions in spatial tuning for neurons (alpha_i or alpha_e in __init__)
 
         Returns
         -------
@@ -263,12 +263,12 @@ class ExcInhPlasticity(NeuralResponseModel):
         diff = self.xy_combinations - pos[np.newaxis, ...]
         dist = np.sum(diff**2, axis=1)
         index = np.argmin(dist)  # Get the pixel closest to the pos
-        rout = []
+        input_rates = []
         for i in range(cell_list.shape[0]):
-            rout.append(cell_list[i, index])  # Firing rate for each cell
-        rout = np.array(rout)
-        rout = np.clip(rout, a_min=0, a_max=np.amax(rout))  # negatives to zero
-        return rout
+            input_rates.append(cell_list[i, index])  # Firing rate for each cell
+        input_rates = np.array(input_rates)
+        input_rates = np.clip(input_rates, a_min=0, a_max=np.amax(input_rates))  # negatives to zero
+        return input_rates
 
     def get_full_output_rate(self):
         """
