@@ -12,4 +12,4 @@ def subtract(a, b):
 
 
 # uncomment the following test in step 5
-assert test_add()
+# assert test_add()
