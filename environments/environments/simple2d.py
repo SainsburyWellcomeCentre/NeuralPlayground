@@ -183,7 +183,7 @@ class Sargolini2006(Simple2D):
 
 class Hafting2008(Simple2D):
 
-    def __init__(self, data_path="Hafting2008/C43035A4-5CC5-44F2-B207-126922523FD9_1/", environment_name="Hafting2008", session=None, verbose=False, **env_kwargs):
+    def __init__(self, data_path="Hafting2008/", environment_name="Hafting2008", session=None, verbose=False, **env_kwargs):
         self.data_path = data_path
         self.environment_name = environment_name
         self.session = session
@@ -210,7 +210,19 @@ class Hafting2008(Simple2D):
 
     def step(self, action):
         """ Action is ignored in this case """
+        if self.global_steps >= self.data.position.shape[0]-1:
+            self.global_steps = 0
+        self.global_time = self.global_steps*self.agent_step_size
+        reward = 0  # If you get reward, it should be coded here
+        new_state = self.data.position[self.global_steps, :], self.data.head_direction[self.global_steps, :]
+        new_state = np.concatenate(new_state)
+        transition = {"action": action, "state": self.state, "next_state": new_state,
+                      "reward": reward, "step": self.global_steps}
+        self.history.append(transition)
+        self.state = new_state
+        observation = self.make_observation()
         self.global_steps += 1
+        return observation, new_state, reward
 
 
 if __name__ == "__main__":
