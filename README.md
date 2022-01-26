@@ -7,7 +7,7 @@
 * [1 Introduction](#1-Introduction)
 * [2 The Project](#1-Project)
 * [3 Installation ](#3-Installation)
-* [3 How to Contribute](#3Contribute)
+* [4 How to Contribute](#4Contribute)
 
 ## 1 Introduction
 
