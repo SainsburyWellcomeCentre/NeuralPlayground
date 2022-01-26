@@ -533,6 +533,7 @@ class Hafting2008(Simple2D):
             agent_step_size*global_step_number will give a measure of the distance in the experimental setting
 
         """
+
         self.data_path = data_path
         self.environment_name = environment_name
         self.session = session
@@ -570,21 +571,38 @@ class Hafting2008(Simple2D):
         return observation, self.state
 
     def step(self, action):
-        """  Increment the global step count of the agent in the environment
+        """ Increment the global step count of the agent in the environment (Action is ignored in this case)
 
         Parameters
         ----------
-        action: int
-            Not used when the action are dictated by the behavior data
-            Can be used to modify the state of the agent in the environment
+        action: ndarray (env_dim,env_dim)
+                Array containing the action of the agent
+                In this case the delta_x and detla_y increment to the respective coordinate x and y of the position
 
         Returns
         -------
-        self.global_steps: int
-             Counter of the number of steps in the environment
+        reward: int
+            The reward that the animal recieves in this state
+        new_state: tuple
+            Update the state with the updated vector of coordinate x and y of position and head directions espectively
+        observation: ndarray
+            Fully observable environment, make_observation returns the state
+            Array of the observation of the agent in the environment ( Could be modified as the environments are evolves)
 
         """
+        if self.global_steps >= self.data.position.shape[0]-1:
+            self.global_steps = 0
+        self.global_time = self.global_steps*self.agent_step_size
+        reward = 0  # If you get reward, it should be coded here
+        new_state = self.data.position[self.global_steps, :], self.data.head_direction[self.global_steps, :]
+        new_state = np.concatenate(new_state)
+        transition = {"action": action, "state": self.state, "next_state": new_state,
+                      "reward": reward, "step": self.global_steps}
+        self.history.append(transition)
+        self.state = new_state
+        observation = self.make_observation()
         self.global_steps += 1
+        return observation, new_state, reward   
 
 if __name__ == "__main__":
     from models.weber_and_sprekeler import ExcInhPlasticity
