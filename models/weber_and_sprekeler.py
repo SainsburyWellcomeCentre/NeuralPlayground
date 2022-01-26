@@ -357,23 +357,26 @@ class ExcInhPlasticity(NeuralResponseModel):
         for i in range(self.xy_combinations.shape[0]):
             self.update(exc_normalization=exc_normalization, pos=xy_array[i, :])
 
-    def plot_rates(self, save_path=None):
+    def plot_rates(self, save_path=None, ax=None):
         """
         Plot current rates and an example of inhibitory and excitatory neuron
 
         Parameters
         ----------
-        save_path: str
+        save_path : str
             Path to save the figure. Default None, it doesn't save the figure
+        ax : ndarray of matplotlib.axis
+            (3,) with 3 axis to make plots from matplotlib, if None it will create an entire figure
         """
-        f, ax = plt.subplots(1, 3, figsize=(14, 5))
+        if ax is None:
+            f, ax = plt.subplots(1, 3, figsize=(14, 5))
 
         r_out_im = self.get_full_output_rate()
         r_out_im = r_out_im.reshape((self.resolution, self.resolution))
 
         exc_im = self.exc_cell_list[np.random.choice(np.arange(self.exc_cell_list.shape[0]))
             , ...].reshape((self.resolution, self.resolution))
-        inh_im = self.inh_cell_list[np.random.choice(np.arange(self.exc_cell_list.shape[0]))
+        inh_im = self.inh_cell_list[np.random.choice(np.arange(self.inh_cell_list.shape[0]))
             , ...].reshape((self.resolution, self.resolution))
 
         ax[0].imshow(exc_im, cmap="Reds")
@@ -388,7 +391,7 @@ class ExcInhPlasticity(NeuralResponseModel):
             plt.savefig(save_path, bbox_inches="tight")
             plt.close("all")
         else:
-            plt.show()
+            return ax
 
 
 if __name__ == "__main__":

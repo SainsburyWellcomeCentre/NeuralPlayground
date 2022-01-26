@@ -22,7 +22,7 @@ class FullHaftingData(object):
         if verbose:
             self.show_readme()
             self.show_keys()
-            self.plot_session()
+            # self.plot_session()
         self.set_behavioral_data()
 
     def _load_data(self):
@@ -65,7 +65,7 @@ class FullHaftingData(object):
         with open(readme_path, 'r') as fin:
             print(fin.read())
 
-    def plot_session(self):
+    def plot_session(self, ax=None):
         # print(self.data_per_animal[self.best_session["rat"]][self.best_session["sess"]])
         cell_data = self.data_per_animal[self.rat_id][self.sess]
         position_data = cell_data["position"]
@@ -83,14 +83,15 @@ class FullHaftingData(object):
         x = x[:, 0]
         y = y[:, 0]
         
-        
-        f, ax = plt.subplots(1, 2, figsize=(15, 8))
+        if ax is None:
+            f, ax = plt.subplots(1, 2, figsize=(15, 8))
         ax = ax.flatten()
         ax[0].plot(x, y)
         ax[0].set_title("position")
         h, binx, biny = get_2D_ratemap(time_array, test_spikes, x, y)
         ax[1].imshow(h)
-        plt.show()
+        # plt.show()
+        return ax
         
     def set_behavioral_data(self, rat_id=None, session=None):
         arena_limits = np.array([[-50, 50], [-50, 50]])
@@ -159,7 +160,7 @@ class FullSargoliniData(object):
         if verbose:
             self.show_readme()
             self.show_keys()
-            self.plot_session()
+            # self.plot_session()
         self.set_behavioral_data()
 
     def _load_data(self):
@@ -211,7 +212,7 @@ class FullSargoliniData(object):
         with open(readme_path, 'r') as fin:
             print(fin.read())
 
-    def plot_session(self):
+    def plot_session(self, ax=None):
         # print(self.data_per_animal[self.best_session["rat"]][self.best_session["sess"]])
         cell_data = self.data_per_animal[self.rat_id][self.sess]
         position_data = cell_data["position"]
@@ -228,7 +229,8 @@ class FullSargoliniData(object):
         y = np.clip(y, a_min=self.arena_limits[1, 0], a_max=self.arena_limits[1, 1])
 
         time_array = position_data["post"][:, 0]
-        f, ax = plt.subplots(2, 3, figsize=(15, 8))
+        if ax is None:
+            f, ax = plt.subplots(2, 3, figsize=(15, 8))
         ax = ax.flatten()
         ax[0].plot(x, y)
         ax[0].set_title("position")
@@ -244,7 +246,8 @@ class FullSargoliniData(object):
             count_i += 1
             if count_i >= 5:
                 break
-        plt.show()
+        return ax
+        # plt.show()
 
     def set_behavioral_data(self, rat_id=None, session=None):
         arena_limits = np.array([[-50, 50], [-50, 50]])
