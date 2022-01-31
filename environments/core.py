@@ -10,7 +10,7 @@ class Environment(object):
         Parameters
         ----------
         environment_name: str
-            Environment name
+            environment name for the specific instantiation of the objec
         env_kwargs
             Define within each subclass for specific environments
             time_step_size: float
@@ -32,7 +32,7 @@ class Environment(object):
         -------
         self.state:
             Define within each subclass for specific environments
-            Variable containing the state of the agent (eg.position in the environment)
+            Variable containing the state of the environment (eg.position in the environment)
         """
         return self.state
 
@@ -42,13 +42,13 @@ class Environment(object):
         Returns
         -------
         reward: int
-            The reward that the animal recieves in this state
+            The reward that the animal receives in this state transition
         observation:
             Define within each subclass for specific environments
             Any set of observation that is made by the agent in the environment (position, visual features,...)
         self.state:
             Define within each subclass for specific environments
-            Variable containing the state of the agent (eg.position in the environment)
+            Variable containing the state of the environment (eg.position in the environment)
         """
         observation = self.make_observation() # Build sensory info from current state
         reward = 0
@@ -65,7 +65,7 @@ class Environment(object):
             Any set of observation that is made by the agent in the environment (position, visual features,...)
         self.state:
             Define within each subclass for specific environments
-            Variable containing the state of the agent (eg.position in the environment)
+            Variable containing the state of the environment (eg.position in the environment)
         """
         observation = self.make_observation()
         return observation, self.state
