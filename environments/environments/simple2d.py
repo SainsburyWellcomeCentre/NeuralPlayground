@@ -203,7 +203,7 @@ class BasicSargolini2006(Simple2D):
     reset(self):
         Reset the environment variables
     step(self, action):
-        Increment the global step count of the agent in the environment
+        Increment the global step count of the agent in the environment and updates the position of the agent
 
     Attribute
     ----------
@@ -335,7 +335,8 @@ class Sargolini2006(Simple2D):
     reset(self, sess=None):
         Reset the environment variables
     step(self, action):
-        Increment the global step count of the agent in the environment
+        Increment the global step count of the agent in the environment and updates the position of the agent according 
+        to the recordings of the specific chosen session
 
      Attribute
     ----------
@@ -376,8 +377,8 @@ class Sargolini2006(Simple2D):
             Path to the environment data
         environment_name:str
              Name of the specific instantiation of the Sargolini2006 class
-        session: int
-            Session number to run from the experimental data
+        session: dict
+            Dictionary with a rat number and session id to run from the experimental data
         verbose:bool
             Set to True to show the information of the class
         env_kwargs:dict
@@ -437,7 +438,8 @@ class Sargolini2006(Simple2D):
         return observation, self.state
 
     def step(self, action):
-        """ Increment the global step count of the agent in the environment (Action is ignored in this case)
+        """ Increment the global step count of the agent in the environment and updates the position of the agent according
+        to the recordings of the specific chosen session (Action is ignored in this case)
 
         Parameters
         ----------
@@ -480,7 +482,8 @@ class Hafting2008(Simple2D):
     reset(self):
       Reset the environment variables
     step(self, action):
-       Increment the global step count of the agent in the environment
+       Increment the global step count of the agent in the environment and updates the position of the agent according
+       to the recordings of the specific chosen session
 
     Attribute
     ----------
@@ -571,7 +574,9 @@ class Hafting2008(Simple2D):
         return observation, self.state
 
     def step(self, action):
-        """ Increment the global step count of the agent in the environment (Action is ignored in this case)
+        """ Increment the global step count of the agent in the environment
+        and updates the position of the agent according to the recordings of the specific chosen session 
+        (Action is ignored in this case)
 
         Parameters
         ----------
