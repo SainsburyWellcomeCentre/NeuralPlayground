@@ -16,7 +16,7 @@ class Simple2D(Environment):
     reset(self):
         Reset the environment variables
     step(self, action):
-        Increment the global step count of the agent in the environment
+        Increment the global step count of the agent in the environment and moves the agent in a random direction with a fixed step size
     plot_trajectory(self, history_data=None, ax=None):
         Plot the Trajectory of the agent in the environment
 
@@ -49,7 +49,7 @@ class Simple2D(Environment):
     reward: int
         The reward that the animal recieves in this state
     agent_step_size: float
-        agent_step_size*global_steps will give a measure of the distance in the experimental setting
+         Size of the step when executing movement, agent_step_size*global_steps will give a measure of the total distance traversed by the agent
 
 
 
@@ -89,7 +89,7 @@ class Simple2D(Environment):
         Returns
         -------
         observation: ndarray
-            Fully observable environment, make_observation returns the state
+            Because this is a fully observable environment, make_observation returns the state of the environment
             Array of the observation of the agent in the environment (Could be modified as the environments are evolves)
 
         self.state: ndarray
@@ -292,7 +292,8 @@ class BasicSargolini2006(Simple2D):
         return observation, self.state
 
     def step(self, action):
-        """ Increment the global step count of the agent in the environment (Action is ignored in this case)
+        """ Increment the global step count of the agent in the environmentand updates the state of the agent to be the next
+        recorded position (form the experiment) of the animal (Action is ignored in this case)
 
         Parameters
         ----------
