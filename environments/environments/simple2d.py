@@ -107,7 +107,8 @@ class Simple2D(Environment):
         return observation, self.state
 
     def step(self, action):
-        """ Increment the global step count of the agent in the environment (Action is ignored in this case)
+        """ Increment the global step count of the agent in the environment and updates the position of the agent according 
+        to the recordings of the specific chosen session (Action is ignored in this case)
 
         Parameters
         ----------
