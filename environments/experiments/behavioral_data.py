@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from scipy.ndimage import gaussian_filter
 
+
 class FullHaftingData(object):
 
     def __init__(self, data_path, experiment_name="FullHaftingData", verbose=False, session=None):
