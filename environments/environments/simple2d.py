@@ -140,7 +140,6 @@ class Simple2D(Environment):
         observation = self.make_observation()
         return observation, new_state, reward
 
-
     def plot_trajectory(self, history_data=None, ax=None):
         """ Plot the Trajectory of the agent in the environment
 
