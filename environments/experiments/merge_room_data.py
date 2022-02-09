@@ -111,6 +111,14 @@ class WernleData(object):
         return ax
 
 
+class OnlineRateMap(object):
+
+    def __init__(self, size=(100, 100), x_range=(-100, 100), y_range=(-100, 100)):
+        self.ratemap = np.empty(shape=size)
+        x_pos_bins = np.linspace(x_range[0], x_range[1], num=size[0]+1)
+        y_pos_bins = np.linspace(y_range[0], y_range[1], num=size[1]+1)
+
+
 if __name__ == "__main__":
     data_path = "Wernle2018/"
     data = WernleData(data_path=data_path, verbose=True)
