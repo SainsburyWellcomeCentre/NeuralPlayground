@@ -47,13 +47,14 @@ class RandomAgent(object):
         return np.random.normal(scale=0.1, size=(2,))
 
 if __name__ == "__main__":
-    room_width = 200
-    room_depth = [100, 100, 200]
+    env_name = "MergingRoom"
     time_step_size = 0.1
     agent_step_size = 0.5
     n_steps = 1000
 
-    env = MergingRoom2D(environment_name="MergingRoom")
+    env = MergingRoom2D(environment_name=env_name,
+                        time_step_size=time_step_size,
+                        agent_step_size=agent_step_size)
     agent = RandomAgent()
 
     # Initialize environment
