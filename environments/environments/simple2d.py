@@ -2,9 +2,9 @@ import sys
 sys.path.append("../")
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-from environments.core import Environment
+from core import Environment
 import numpy as np
-from environments.experiments.behavioral_data import SargoliniData, FullSargoliniData,FullHaftingData
+from experiments.behavioral_data import SargoliniData, FullSargoliniData,FullHaftingData
 
 
 class Simple2D(Environment):
