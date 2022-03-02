@@ -1,10 +1,9 @@
 import sys
-sys.path.append("../")
 from tqdm import tqdm
 import numpy as np
 import matplotlib.pyplot as plt
-from environments.environments.simple2d import Simple2D, Sargolini2006, Hafting2008,BasicSargolini2006
-from models.weber_and_sprekeler import ExcInhPlasticity
+from ..environments.environments.simple2d import Simple2D, Sargolini2006, Hafting2008,BasicSargolini2006
+from ..models.weber_and_sprekeler import ExcInhPlasticity
 import pytest
 
 

@@ -1,8 +1,6 @@
 import numpy as np
-import sys
-sys.path.append("../")
 import matplotlib.pyplot as plt
-from environments.environments.simple2d import Simple2D, Sargolini2006, BasicSargolini2006, Hafting2008
+from ..environments.environments.simple2d import Simple2D, Sargolini2006, BasicSargolini2006, Hafting2008
 import pytest
 
 
