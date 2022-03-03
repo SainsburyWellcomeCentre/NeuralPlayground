@@ -31,14 +31,15 @@ class MergingRoom2D(Simple2D):
         
         return self.arena_limits
 
-    def step(self, action):
+    def step(self, action, room_id):
         if self.run_full_experiment == True:
-            if self.global_steps == 0:
-                self.arena_limits = self.set_room("B")
-            """ elif self.global_steps == 333:
-                self.arena_limits = self.set_room("B")
-            elif self.global_steps == 666:
-                self.arena_limits = self.set_room("AB") """
+            self.arena_limits = self.set_room(room_id)
+            # if self.global_steps == 0:
+            #     self.arena_limits = self.set_room("A")
+            # elif self.global_steps == 333:
+            #     self.arena_limits = self.set_room("B")
+            # elif self.global_steps == 666:
+            #     self.arena_limits = self.set_room("AB")
 
 
         self.global_steps += 1
@@ -55,7 +56,7 @@ class MergingRoom2D(Simple2D):
         
         return observation, new_state, reward
 
-    def plot_trajectory(self, history_data=None, ax=None):
+    def plot_trajectory(self, room, history_data=None, ax=None):
         """ Plot the Trajectory of the agent in the environment
 
         Parameters
@@ -82,6 +83,10 @@ class MergingRoom2D(Simple2D):
                 [-self.room_depth/2, self.room_depth/2], "r", lw=2)
         ax.plot([0, 0],
                 [-self.room_depth / 2, self.room_depth / 2], "r", lw=2)
+        
+        if room == "B":
+            ax.plot([0, self.room_width],
+                [0, 0], "r", lw=2)
 
         state_history = [s["state"] for s in history_data]
         next_state_history = [s["next_state"] for s in history_data]
@@ -115,6 +120,7 @@ class RandomAgent(object):
 
 if __name__ == "__main__":
     env_name = "MergingRoom"
+    rooms = ["A", "B", "AB"]
     time_step_size = 0.1
     agent_step_size = 5
     n_steps = 1000
@@ -126,16 +132,31 @@ if __name__ == "__main__":
 
     # Initialize environment
     obs, state = env.reset()
-    for i in range(n_steps):
-        # Observe to choose an action
-        action = agent.act(obs)
-        # Run environment for given action
-        obs, state, reward = env.step(action)
+    for room in rooms:
+        for j in range(n_steps):
+            # Observe to choose an action
+            action = agent.act(obs)
+            # Run environment for given action
+            obs, state, reward = env.step(action, room)
 
-    ax = env.plot_trajectory()
-    fontsize = 16
-    ax.grid()
-    # ax.legend(fontsize=fontsize, loc="upper left")
-    ax.set_xlabel("width", fontsize=fontsize)
-    ax.set_ylabel("depth", fontsize=fontsize)
+        if room == "B":
+            ax1 = env.plot_trajectory(room)
+            fontsize = 16
+            ax1.grid()
+            # ax.legend(fontsize=fontsize, loc="upper left")
+            ax1.set_xlabel("width", fontsize=fontsize)
+            ax1.set_ylabel("depth", fontsize=fontsize)
+
+            # Initialize environment
+            obs, state = env.reset()
+        
+        if room == "AB":
+            ax2 = env.plot_trajectory(room)
+            fontsize = 16
+            ax2.grid()
+            # ax.legend(fontsize=fontsize, loc="upper left")
+            ax2.set_xlabel("width", fontsize=fontsize)
+            ax2.set_ylabel("depth", fontsize=fontsize)
+    
+    
     plt.show()
