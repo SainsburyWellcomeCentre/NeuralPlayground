@@ -172,7 +172,6 @@ class Simple2D(Environment):
         next_state_history = [s["next_state"] for s in history_data]
         starting_point = state_history[0]
         ending_point = next_state_history[-1]
-        print(starting_point)
 
         cmap = mpl.cm.get_cmap("plasma")
         norm = plt.Normalize(0, len(state_history))
