@@ -2,14 +2,14 @@ import sys
 from tqdm import tqdm
 import numpy as np
 import matplotlib.pyplot as plt
-from ..environments.environments.simple2d import Simple2D, Sargolini2006, Hafting2008,BasicSargolini2006
+from ..envs.arenas.simple2d import Simple2D, Sargolini2006, Hafting2008,BasicSargolini2006
 from ..models.weber_and_sprekeler import ExcInhPlasticity
 import pytest
 
 
 @pytest.fixture
 def get_environment():
-    data_path = "../environments/experiments/Sargolini2006/"
+    data_path = "../envs/experiments/Sargolini2006/"
     env = BasicSargolini2006(data_path=data_path,
                              time_step_size=0.1,
                              agent_step_size=None)

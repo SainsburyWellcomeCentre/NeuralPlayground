@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from ..environments.environments.simple2d import Simple2D, Sargolini2006, BasicSargolini2006, Hafting2008
+from ..envs.arenas.simple2d import Simple2D, Sargolini2006, BasicSargolini2006, Hafting2008
 import pytest
 
 
@@ -47,7 +47,7 @@ class TestSimple2D(object):
 class TestBasicSargolini2006(TestSimple2D):
     @pytest.fixture
     def init_env(self):
-        data_path = "../environments/experiments/Sargolini2006/"
+        data_path = "../envs/experiments/Sargolini2006/"
         env = BasicSargolini2006(data_path=data_path,
                                  time_step_size=0.1,
                                  agent_step_size=None)
@@ -60,7 +60,7 @@ class TestBasicSargolini2006(TestSimple2D):
 class TestSargolini2006(TestSimple2D):
     @pytest.fixture
     def init_env(self):
-        data_path = "../environments/experiments/Sargolini2006/raw_data_sample/"
+        data_path = "../envs/experiments/Sargolini2006/raw_data_sample/"
 
         session = {"rat_id": "11016", "sess": "31010502"}
 
@@ -81,7 +81,7 @@ class TestSargolini2006(TestSimple2D):
 class TestHafting2008(TestSimple2D):
     @pytest.fixture
     def init_env(self):
-        data_path = "../environments/experiments/Hafting2008/"
+        data_path = "../envs/experiments/Hafting2008/"
         session = {"rat_id": "11015", "sess": "13120410", "cell_id": "t5c1"}
 
         env = Hafting2008(data_path=data_path,
