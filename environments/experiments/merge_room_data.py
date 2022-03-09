@@ -59,6 +59,16 @@ class WernleData(object):
 
         self.pos_A_B = sio.loadmat(os.path.join(self.data_path, self.inner_path,
                                                 r"Figure 4/posA_B.mat"))["posA_B"]
+        singlerun = self.pos_A_B[0,0]
+        print(singlerun)
+        for i, pos in enumerate(singlerun):
+            if pos[2] > 0:
+                if singlerun[i+1000, 2] > 0:
+                    print("Switch room at: ", pos)
+                    break
+            
+
+
         self.pos_AB = sio.loadmat(os.path.join(self.data_path, self.inner_path,
                                                r"Figure 4/posAB.mat"))["posAB"]
         self.spikes_AB = sio.loadmat(os.path.join(self.data_path, self.inner_path,
@@ -250,9 +260,9 @@ class OnlineRateMap(object):
 if __name__ == "__main__":
     data_path = "Wernle2018/"
     data = WernleData(data_path=data_path, verbose=True)
-    #data.plot_development(n_cells=4, time_interval=(0, 5), skip_every=10)
-    #data.plot_cell_comparison()
-    #plt.show()
+    data.plot_development(n_cells=4, time_interval=(0, 5), skip_every=10)
+    data.plot_cell_comparison()
+    # plt.show()
 
     print("debug")
 
@@ -274,4 +284,4 @@ if __name__ == "__main__":
             rm = ratemap.update_ratemap(dt=5*60, interp_factor=1)
             ax[j, i].imshow(rm, cmap="jet")
 
-    plt.show()
+    # plt.show()

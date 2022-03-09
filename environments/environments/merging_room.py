@@ -1,3 +1,4 @@
+from re import T
 import sys
 sys.path.append("../")
 import matplotlib as mpl
@@ -11,8 +12,9 @@ class MergingRoom2D(Simple2D):
         self.environment_name = environment_name
         env_kwargs["room_width"] = 200
         env_kwargs["room_depth"] = 200
-        self.merge_time = merge_time
-        self.switch_time = switch_time
+        self.time_step_size = time_step_size
+        self.merge_time = (merge_time*60) / self.time_step_size
+        self.switch_time = (switch_time*60) / self.time_step_size
         self.run_full_experiment = True
         super().__init__(environment_name, **env_kwargs)
         self.AB_limits = np.array([[-self.room_width/2, self.room_width/2], [-self.room_depth / 2, self.room_depth / 2]])
@@ -73,11 +75,11 @@ class RandomAgent(object):
 
 if __name__ == "__main__":
     env_name = "MergingRoom"
-    time_step_size = 0.1
-    agent_step_size = 5
-    n_steps = 5000
-    merging_time = 1000
-    switch_time = 500
+    time_step_size = 0.2
+    agent_step_size = 3
+    merging_time = 40
+    switch_time = 20
+    n_steps = ((merging_time + switch_time)*60) / time_step_size
 
     env = MergingRoom2D(environment_name=env_name,
                         merge_time=merging_time,
@@ -87,13 +89,13 @@ if __name__ == "__main__":
     agent = RandomAgent()
 
     obs, state = env.reset()
-    for j in range(n_steps):
+    for j in range(round(n_steps)):
         # Observe to choose an action
         action = agent.act(obs)
         # Run environment for given action
         obs, state, reward = env.step(action)
-        if j == merging_time-1:
+        if j == ((merging_time*60)/time_step_size)-1:
             ax = env.plot_trajectory()
-    merged_history = env.history[merging_time:]
+    merged_history = env.history[int((merging_time*60)/time_step_size):]
     env.plot_trajectory(history_data=merged_history)
     plt.show()
