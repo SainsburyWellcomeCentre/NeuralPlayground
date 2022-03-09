@@ -3,6 +3,10 @@
 [![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
+# For now, install using pip for local editing and testing
+```
+pip install -e .
+```
 
 * [1 Introduction](#1-Introduction)
 * [2 The Project](#1-Project)
