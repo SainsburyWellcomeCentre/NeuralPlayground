@@ -1,10 +1,8 @@
-import sys
-sys.path.append("../")
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-from environments.core import Environment
+from ..envcore import Environment
 import numpy as np
-from environments.experiments.behavioral_data import SargoliniData, FullSargoliniData,FullHaftingData
+from ..experiments.behavioral_data import SargoliniData, FullSargoliniData,FullHaftingData
 
 
 class Simple2D(Environment):
@@ -139,7 +137,6 @@ class Simple2D(Environment):
         self.state = new_state
         observation = self.make_observation()
         return observation, new_state, reward
-
 
     def plot_trajectory(self, history_data=None, ax=None):
         """ Plot the Trajectory of the agent in the environment
@@ -612,10 +609,8 @@ class Hafting2008(Simple2D):
         return observation, new_state, reward   
 
 if __name__ == "__main__":
-    from models.weber_and_sprekeler import ExcInhPlasticity
-    from environments.environments.simple2d import Simple2D, Sargolini2006, Hafting2008, BasicSargolini2006
+    from ..models.weber_and_sprekeler import ExcInhPlasticity
     import sys
-    sys.path.append("../")
     from tqdm import tqdm
     import numpy as np
     import matplotlib.pyplot as plt

@@ -8,7 +8,7 @@ Check examples/testing_weber_model.ipynb
 """
 
 import sys
-sys.path.append("../")
+
 import numpy as np
 import random
 import matplotlib.pyplot as plt
@@ -16,8 +16,8 @@ import numpy as np
 from scipy.stats import multivariate_normal
 from tqdm import tqdm
 
-from models.core import NeuralResponseModel
-from environments.environments.simple2d import Simple2D, Sargolini2006, BasicSargolini2006
+from .modelcore import NeuralResponseModel
+from ..envs.arenas.simple2d import Simple2D, Sargolini2006, BasicSargolini2006
 
 
 class ExcInhPlasticity(NeuralResponseModel):
