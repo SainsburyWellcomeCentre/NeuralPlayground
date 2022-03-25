@@ -1,14 +1,22 @@
+Metadata-Version: 2.1
+Name: sehec
+Version: 0.0.1
+Summary: A Standardized Environment for Hippocampus and Entorhinal Cortex models
+Home-page: https://github.com/ClementineDomine/EHC_model_comparison
+Author: clem_domine_rod_carrasco
+Author-email: rodrigo.carrasco.davis@gmail.com
+License: UNKNOWN
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Description-Content-Type: text/markdown
+
 # The  standardised environment for the hippocampus and entorhinal cortex models. 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
-# For now, install using pip for local editing and testing
-```
-pip install --upgrade setuptools wheel 
-python setup.py sdist bdist_wheel
-pip install -e .
-```
 
 * [1 Introduction](#1-Introduction)
 * [2 The Project](#1-Project)
@@ -93,3 +101,5 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
+
+
