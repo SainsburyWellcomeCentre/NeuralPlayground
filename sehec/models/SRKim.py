@@ -21,7 +21,7 @@ class SR(NeuralResponseModel):
     gamma: scalar, discounting factor
     learning_rate: scalar, scaling the magnitude of the TD update
     random_state: random state object, e.g. np.random.RandomState(seed))
-                set for reproducibility
+    set for reproducibility
     t_episode: scalar, maximum number of timesteps in one episode
     n_episode: scalar, number of episodes
     starting_state: scalar, specifting initial state
@@ -62,6 +62,11 @@ class SR(NeuralResponseModel):
         self.srmat_ground = []
         self.transmat_norm = []
         self.obs_history = []
+        twoD=mod_kwargs['twoD']
+        if twoD==True:
+            self.create_transmat(self.state_density,  '2D_env')
+
+
 
 
     def reset(self):
@@ -77,8 +82,7 @@ class SR(NeuralResponseModel):
         self.global_steps = 0  # Reset global steps
         self.obs_history = []  # Reset observation history
 
-    def obs_to_state(self, obs):
-        pos=obs
+    def obs_to_state(self, pos):
         node_layout = np.arange(self.n_state).reshape(self.l, self.w)
         diff = self.xy_combinations - pos[np.newaxis, ...]
         dist = np.sum(diff ** 2, axis=1)
@@ -110,9 +114,7 @@ class SR(NeuralResponseModel):
             TaskGraph for rectangular environment
 
             Args:
-                param: dictionary {'rec_length': length,
-                                    'rec_width': width,
-                                    'lattice': 'sqaure' / 'tri'}
+                param: dictionary {'rec_length': length,'rec_width': width, 'lattice': 'sqaure' / 'tri'}
 
             Returns:y
                 adjmat: adjacency matrix
@@ -159,7 +161,7 @@ class SR(NeuralResponseModel):
 
         return self.transmat_norm
 
-    def update_successor_rep(self, transmat):
+    def update_successor_rep(self):
         '''
         Compute the successor representation matrix using geometric sums
 
@@ -170,12 +172,12 @@ class SR(NeuralResponseModel):
         Returns:
             srmat: (n_state, n_state) numpy array, successor representation matrix
         '''
-        transmat = np.array(transmat, dtype=np.float64)
+        transmat_type = np.array(self.transmat, dtype=np.float64)
 
-        self.srmat_ground = np.linalg.inv(np.eye(self.n_state) - self.gamma * transmat)
+        self.srmat_ground = np.linalg.inv(np.eye(self.n_state) - self.gamma * transmat_type)
         return self.srmat_ground
 
-    def successor_rep_sum(self, transmat):
+    def successor_rep_sum(self):
         '''
         Compute the successor representation using successive additive update
 
@@ -188,12 +190,10 @@ class SR(NeuralResponseModel):
             srmat: (n_state, n_state) numpy array, successor representation matrix
         '''
 
-
-
-        self.srmat_sum = np.zeros_like(transmat)
+        self.srmat_sum = np.zeros_like(self.transmat)
         keep_going = True
         while keep_going:
-            new_srmat = self.gamma * transmat.dot(self.srmat_sum) + np.eye(self.n_state)
+            new_srmat = self.gamma * self.transmat.dot(self.srmat_sum) + np.eye(self.n_state)
             update = new_srmat - self.srmat_sum
             self.srmat_sum = new_srmat
             if np.max(np.abs(update)) < self.threshold:
@@ -201,7 +201,7 @@ class SR(NeuralResponseModel):
 
         return self.srmat_sum
 
-    def update_successor_rep_td(self, next_state,curr_state,):
+    def update_successor_rep_td(self,obs,curr_state):
         """
         Compute the successor representation matrix using TD learning
         Args:
@@ -210,6 +210,7 @@ class SR(NeuralResponseModel):
             srmat: (n_state, n_state) successor representation matrix
             srmat_snapshots: dictionary, recording srmat at different time steps during learning
         """
+        next_state = self.obs_to_state(obs)
         self.n_state = self.transmat_norm.shape[0]
         a = np.array(curr_state)
         x = a.flatten()
@@ -221,9 +222,10 @@ class SR(NeuralResponseModel):
                                                                                 self.gamma * self.srmat[:,
                                                                                              next_state] - self.srmat[:,
                                                                                                                   curr_state])
-        return self.srmat,
 
-    def update_successor_rep_td_full(self, transmat):
+        return next_state,self.srmat
+
+    def update_successor_rep_td_full(self):
         """
         Compute the successor representation matrix using TD learning
 
@@ -250,8 +252,8 @@ class SR(NeuralResponseModel):
                 L = b.reshape(a.shape + (self.n_state,))
 
                 curr_state_vec = L
-                random_state.multinomial(1, transmat[curr_state, :])
-                next_state = np.where(random_state.multinomial(1, transmat[curr_state, :]))[0][0]
+                random_state.multinomial(1, self.transmat[curr_state, :])
+                next_state = np.where(random_state.multinomial(1, self.transmat[curr_state, :]))[0][0]
 
                 srmat[:, curr_state] = srmat[:, curr_state] + self.learning_rate * (curr_state_vec +
                                                                                     self.gamma * srmat[:,
