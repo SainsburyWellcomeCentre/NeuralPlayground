@@ -81,7 +81,7 @@ class Simple2D(Environment):
         self.state_dims_labels = ["x_pos", "y_pos"]
         self.reset()
 
-    def reset(self):
+    def reset(self, random_state=False):
         """ Reset the environment variables
 
         Returns
@@ -98,7 +98,11 @@ class Simple2D(Environment):
         """
         self.global_steps = 0
         self.history = []
-        self.state = [0,0]
+        if random_state:
+            self.state = [np.random.uniform(low=self.arena_limits[0, 0], high=self.arena_limits[0, 1]),
+                          np.random.uniform(low=self.arena_limits[1, 0], high=self.arena_limits[1, 1])]
+        else:
+            self.state = [0, 0]
         self.state = np.array(self.state)
         # Fully observable environment, make_observation returns the state
         observation = self.make_observation()
@@ -606,58 +610,4 @@ class Hafting2008(Simple2D):
         self.state = new_state
         observation = self.make_observation()
         self.global_steps += 1
-        return observation, new_state, reward   
-
-if __name__ == "__main__":
-    from ..models.weber_and_sprekeler import ExcInhPlasticity
-    import sys
-    from tqdm import tqdm
-    import numpy as np
-    import matplotlib.pyplot as plt
-    data_path = "../experiments/sargolini2006/"
-
-    env = Sargolini2006(data_path=data_path,
-                             time_step_size=0.1,
-                             agent_step_size=None)
-
-
-    exc_eta = 2e-4
-    inh_eta = 8e-4
-    model_name = "model_example"
-    sigma_exc = np.array([0.05, 0.05])
-    sigma_inh = np.array([0.1, 0.1])
-    Ne = 4900
-    Ni = 1225
-    Nef = 1
-    Nif = 1
-    alpha_i = 1
-    alpha_e = 1
-    we_init = 1.0
-    wi_init = 1.5
-    agent_step_size = 0.1
-    agentsimple = ExcInhPlasticity(model_name=model_name, exc_eta=exc_eta, inh_eta=inh_eta, sigma_exc=sigma_exc,
-                                   sigma_inh=sigma_inh, Ne=Ne, Ni=Ni, agent_step_size=agent_step_size, ro=1,
-                                   Nef=Nef, Nif=Nif, room_width=env.room_width, room_depth=env.room_depth,
-                                   alpha_i=alpha_i, alpha_e=alpha_e, we_init=we_init, wi_init=wi_init)
-
-    plot_every = 2
-    total_iters = 10
-
-    n_steps = 50000
-    print(agentsimple.room_width)
-    obs, state = env.reset()
-    for i in tqdm(range(n_steps)):
-        # Observe to choose an action
-        obs = obs[:2]
-        action = agentsimple.act(obs)
-        # rate = agent.update()
-        agentsimple.update()
-        # Run environment for given action
-        obs, state, reward = env.step(action)
-        total_iters += 1
-
-        if i % plot_every == 0:
-            ax = env.plot_trajectory()
-            agentsimple.plot_rates()
-            agentsimple.plot_rates(save_path="../model/figures/pre_processed_iter_" + str(i) + ".pdf")
-
+        return observation, new_state, reward
