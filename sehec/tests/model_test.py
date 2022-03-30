@@ -65,3 +65,37 @@ class TestExcInhPlasticity(object):
 
     def test_plot_rates(self, init_model):
         init_model[0].plot_rates()
+
+class SR(TestExcInhPlasticity):
+
+    @pytest.fixture
+    def init_model(self, get_environment):
+        discount = .9
+        threshold = 1e-6
+        lr_td = 1e-2
+        t_episode = 100
+        n_episode = 1000
+        env = get_environment[0]
+        state_density = 1 / env.agent_step_size
+        twoDvalue = True
+        agent = SR(discount=discount, t_episode=t_episode, n_episode=n_episode, threshold=threshold, lr_td=lr_td,
+                   room_width=env.room_width, room_depth=env.room_depth, state_density=state_density, twoD=twoDvalue)
+        return [agent, ]
+
+    def test_init_model(self, init_model):
+        assert isinstance(init_model[0], SR)
+
+    def test_plot_sr_ground_truth(self, init_model):
+        sr = init_model[0].update_successor_rep()  # Choose your type of Update
+        init_model[0].plot_eigen(sr, save_path=None)
+
+    def test_plot_sr_td(self, init_model):
+        sr_td = init_model[0].update_successor_rep_td_full()  # Choose your type of Update
+        init_model[0].plot_eigen(sr_td, save_path=None)
+
+    def test_plot_sr_sum(self, init_model):
+        sr_sum = init_model[0].successor_rep_sum()
+        init_model[0].plot_eigen(sr_sum, save_path=None)
+
+    def test_agent_interaction(self, init_model, get_environment):
+        a=1+1
