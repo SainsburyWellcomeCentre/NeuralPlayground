@@ -54,7 +54,7 @@ if run_raw_data == False:
             total_iters += 1
             # if total_iters % plot_every == 0:
                 #agent.plot_eigen(K, save_path="./figures/M_processed_iter_" + str(total_iters) + ".pdf")
-    T = agent.get_T_from_M(M_array_sq)
+    T = agent.get_T_from_M(K)
     # agent.plot_trantion(T, save_path="./figures/transtion.pdf")
 else:
     data_path = "../environments/experiments/Sargolini2006/"
