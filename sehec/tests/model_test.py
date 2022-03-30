@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from ..envs.arenas.simple2d import Simple2D, Sargolini2006, Hafting2008,BasicSargolini2006
 from ..models.weber_and_sprekeler import ExcInhPlasticity
+from ..models.SRKim import SR
 import pytest
 
 
@@ -15,6 +16,21 @@ def get_environment():
                              agent_step_size=None)
     return [env, ]
 
+@pytest.fixture
+def get_environment_simple2D():
+    room_width = 7
+    room_depth = 7
+    env_name = "env_example"
+    time_step_size = 1  # seg
+    agent_step_size = 1
+    # Init environment
+    env = Simple2D(environment_name=env_name,
+                   room_width=room_width,
+                   room_depth=room_depth,
+                   time_step_size=time_step_size,
+                   agent_step_size=agent_step_size)
+
+    return [env, ]
 
 class TestExcInhPlasticity(object):
 
@@ -66,17 +82,19 @@ class TestExcInhPlasticity(object):
     def test_plot_rates(self, init_model):
         init_model[0].plot_rates()
 
-class SR(TestExcInhPlasticity):
+class TestSR(object):
 
     @pytest.fixture
     def init_model(self, get_environment):
+        agent_step_size = 10
         discount = .9
         threshold = 1e-6
         lr_td = 1e-2
-        t_episode = 100
-        n_episode = 1000
+        t_episode = 50
+        n_episode = 50
+        state_density = (1 / agent_step_size)
         env = get_environment[0]
-        state_density = 1 / env.agent_step_size
+
         twoDvalue = True
         agent = SR(discount=discount, t_episode=t_episode, n_episode=n_episode, threshold=threshold, lr_td=lr_td,
                    room_width=env.room_width, room_depth=env.room_depth, state_density=state_density, twoD=twoDvalue)

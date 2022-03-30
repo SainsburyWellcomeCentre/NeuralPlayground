@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from sehec.envs.arenas.simple2d import Simple2D, Sargolini2006, Hafting2008,BasicSargolini2006
 from sehec.models.SRKim import SR
 
-run_raw_data = False
+run_raw_data = True
 
 if run_raw_data == False:
     room_width = 7
@@ -27,21 +27,21 @@ if run_raw_data == False:
     t_episode = 100
     n_episode = 10000
     state_density = int(1 / agent_step_size)
-    w = env.room_width * state_density
-    l = env.room_depth * state_density
     twoDvalue=True
     agent = SR(discount=discount, t_episode=t_episode, n_episode=n_episode, threshold=threshold, lr_td=lr_td,
                room_width=env.room_width, room_depth=env.room_depth, state_density=state_density,twoD=twoDvalue)
 
     # Choose your function depending on the type of env '2D_env' or '1D_env' + initialisies the smart as well
-    # sr = agent.update_successor_rep(transmat)  # Choose your type of Update
-    # sr_td = agent.update_successor_rep_td_full(transmat)  # Choose your type of Update
-    # sr_sum = agent.successor_rep_sum(transmat)
-    #  agent.plot_eigen(sr, save_path="./figures/ground_truth.pdf")
-    # agent.plot_eigen(sr_sum, save_path="figures/sr_sum.pdf")
-    #  agent.plot_eigen(sr_td, save_path="./figures/sr_full_td.pdf")
+    # Choose your function depending on the type of env '2D_env' or '1D_env' + initialisies the smart as well
+    # Only run if twoDvalue=True
+    sr = agent.update_successor_rep()  # Choose your type of Update
+    sr_td = agent.update_successor_rep_td_full()  # Choose your type of Update
+    sr_sum = agent.successor_rep_sum()
+    agent.plot_eigen(sr, save_path=None)
+    agent.plot_eigen(sr_sum, save_path=None)
+    agent.plot_eigen(sr_td, save_path=None)
 
-    plot_every = 10000
+    plot_every = 1000
     total_iters = 0
     obs, state = env.reset()
     obs = obs[:2]
@@ -57,63 +57,41 @@ if run_raw_data == False:
     T = agent.get_T_from_M(K)
     # agent.plot_trantion(T, save_path="./figures/transtion.pdf")
 else:
-    data_path = "../environments/experiments/Sargolini2006/"
+    data_path = "../sehec/envs/experiments/Sargolini2006/"
     env = BasicSargolini2006(data_path=data_path,
                              time_step_size=0.1,
                              agent_step_size=None)
-    exc_eta = 2e-4
-    inh_eta = 8e-4
-    model_name = "model_example"
-    sigma_exc = np.array([0.05, 0.05])
-    sigma_inh = np.array([0.1, 0.1])
-    Ne = 4900
-    Ni = 1225
-    Nef = 1
-    Nif = 1
-    alpha_i = 1
-    alpha_e = 1
-    we_init = 1.0
-    wi_init = 1.5
 
     agent_step_size = 10
-
     discount = .9
     threshold = 1e-6
     lr_td = 1e-2
-    t_episode = 1000
-    n_episode = 5000
+    t_episode = 10
+    n_episode = 50
     state_density = (1 / agent_step_size)
-    w = env.room_width * state_density
-    l = env.room_depth * state_density
+    twoDvalue = True
 
     agent = SR(discount=discount, t_episode=t_episode, n_episode=n_episode, threshold=threshold, lr_td=lr_td,
-               room_width=env.room_width, room_depth=env.room_depth, state_density=state_density)
-    transmat = agent.create_transmat(state_density,
-                                     '2D_env')
-    # Choose your function depending on the type of env '2D_env' or '1D_env' + initialisies the smart as well
-    sr = agent.update_successor_rep(transmat)  # Choose your type of Update
-    sr_td = agent.update_successor_rep_td_full(transmat)  # Choose your type of Update
-    sr_sum = agent.successor_rep_sum(transmat)
-    # agent.plot_eigen(sr, save_path="./figures/ground_truth.pdf")
-    # agent.plot_eigen(sr_sum, save_path="figures/sr_sum.pdf")
-    # agent.plot_eigen(sr_td, save_path="./figures/sr_full_td.pdf")
+               room_width=env.room_width, room_depth=env.room_depth, state_density=state_density, twoD=twoDvalue)
 
-    plot_every = 1000000
+    sr = agent.update_successor_rep()  # Choose your type of Update
+
+    agent.plot_eigen(sr, save_path=None)
+    agent.plot_eigen(sr_sum, save_path="figures/sr_sum.pdf")
+    agent.plot_eigen(sr_td, save_path="./figures/sr_full_td.pdf")
+
+    plot_every = 10
     total_iters = 0
     obs, state = env.reset()
-
-    # for i in tqdm(range(env.total_number_of_steps)):
     obs = obs[:2]
     current_state = agent.obs_to_state(obs)
-    for i in tqdm(range(10000000)):
+    for i in tqdm(range(100)):
         # Observe to choose an action
-
         action = agent.act(obs)  # the action is link to density of state to make sure we always land in a new
         obs, state, reward = env.step(action)
         obs = obs[:2]
-        new_state = agent.obs_to_state(obs)
-        K = agent.update_successor_rep_td(new_state, current_state)
-        M_seq = np.asarray(K)
-        M_array_sq = M_seq.sum(axis=0)
-        current_state = new_state
+        current_state, K = agent.update_successor_rep_td(obs, current_state)
         total_iters += 1
+        if total_iters % plot_every == 0:
+            agent.plot_eigen(K, save_path=None)
+

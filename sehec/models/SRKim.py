@@ -172,7 +172,7 @@ class SR(NeuralResponseModel):
         Returns:
             srmat: (n_state, n_state) numpy array, successor representation matrix
         '''
-        transmat_type = np.array(self.transmat, dtype=np.float64)
+        transmat_type = np.array(self.transmat_norm, dtype=np.float64)
 
         self.srmat_ground = np.linalg.inv(np.eye(self.n_state) - self.gamma * transmat_type)
         return self.srmat_ground
@@ -190,10 +190,10 @@ class SR(NeuralResponseModel):
             srmat: (n_state, n_state) numpy array, successor representation matrix
         '''
 
-        self.srmat_sum = np.zeros_like(self.transmat)
+        self.srmat_sum = np.zeros_like(self.transmat_norm)
         keep_going = True
         while keep_going:
-            new_srmat = self.gamma * self.transmat.dot(self.srmat_sum) + np.eye(self.n_state)
+            new_srmat = self.gamma * self.transmat_norm.dot(self.srmat_sum) + np.eye(self.n_state)
             update = new_srmat - self.srmat_sum
             self.srmat_sum = new_srmat
             if np.max(np.abs(update)) < self.threshold:
@@ -252,8 +252,8 @@ class SR(NeuralResponseModel):
                 L = b.reshape(a.shape + (self.n_state,))
 
                 curr_state_vec = L
-                random_state.multinomial(1, self.transmat[curr_state, :])
-                next_state = np.where(random_state.multinomial(1, self.transmat[curr_state, :]))[0][0]
+                random_state.multinomial(1, self.transmat_norm[curr_state, :])
+                next_state = np.where(random_state.multinomial(1, self.transmat_norm[curr_state, :]))[0][0]
 
                 srmat[:, curr_state] = srmat[:, curr_state] + self.learning_rate * (curr_state_vec +
                                                                                     self.gamma * srmat[:,
