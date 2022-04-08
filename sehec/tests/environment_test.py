@@ -2,12 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from ..envs.arenas.simple2d import Simple2D, Sargolini2006, BasicSargolini2006, Hafting2008
 import pytest
-
-
-class RandomAgent(object):
-
-    def act(self, observation):
-        return np.random.normal(scale=0.1, size=(2,))
+from ..utils import RandomAgent
 
 
 class TestSimple2D(object):
