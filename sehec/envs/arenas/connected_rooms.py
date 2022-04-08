@@ -3,10 +3,9 @@ From https://doi.org/10.1016/j.cub.2015.02.037
 """
 
 import numpy as np
-from simple2d import Simple2D
+from .simple2d import Simple2D
+from ...utils import check_crossing_wall
 
-def check_crossing_wall(pre_state, new_state, wall):
-    pass
 
 class ConnectedRooms(Simple2D):
 
@@ -26,26 +25,56 @@ class ConnectedRooms(Simple2D):
         self.arena_limits = np.array([[-self.singleroom_xsize, self.singleroom_xsize],
                                       [-self.singleroom_ysize, self.corridor_ysize]])
 
+        self.define_walls()
+
+    def create_default_walls(self):
+        self.wall_list.append(np.array([[self.arena_limits[0, 0], self.arena_limits[1, 0]],
+                                        [self.arena_limits[0, 0], self.arena_limits[1, 1]]]))
+        self.wall_list.append(np.array([[self.arena_limits[0, 1], self.arena_limits[1, 0]],
+                                        [self.arena_limits[0, 1], self.arena_limits[1, 1]]]))
+        self.wall_list.append(np.array([[self.arena_limits[0, 0], self.arena_limits[1, 0]],
+                                        [self.arena_limits[0, 1], self.arena_limits[1, 0]]]))
+        self.wall_list.append(np.array([[self.arena_limits[0, 0], self.arena_limits[1, 1]],
+                                        [self.arena_limits[0, 1], self.arena_limits[1, 1]]]))
+
     def define_walls(self):
         self.wall_list = []
+        # Walls from limit
+        self.create_default_walls()
+
         self.wall_list.append(np.array([[0, 0], [0, -self.singleroom_ysize]]))
         self.wall_list.append(np.array([[-self.singleroom_xsize, 0], [-(self.singleroom_xsize/2+self.door_size/2), 0]]))
         self.wall_list.append(np.array([[-(self.singleroom_xsize/2-self.door_size/2), 0], [0, 0]]))
         self.wall_list.append(np.array([[0, 0], [self.singleroom_xsize/2-self.door_size/2, 0]]))
         self.wall_list.append(np.array([[self.singleroom_xsize/2+self.door_size/2, 0], [self.singleroom_xsize, 0]]))
 
-    def check_crossing_wall(self, pre_state, new_state, wall):
-        pass
+    def step(self, action):
+        self.global_steps += 1
+        action = action/np.linalg.norm(action)
+        new_state = self.state + self.agent_step_size*action
+        new_state, valid_action = self.validate_action(self.state, action, new_state)
+        #new_state = np.array([np.clip(new_state[0], a_min=self.arena_limits[0, 0], a_max=self.arena_limits[0, 1]),
+        #                      np.clip(new_state[1], a_min=self.arena_limits[1, 0], a_max=self.arena_limits[1, 1])])
+        reward = 0  # If you get reward, it should be coded here
+        transition = {"action": action, "state": self.state, "next_state": new_state,
+                      "reward": reward, "step": self.global_steps}
+        self.history.append(transition)
+        self.state = new_state
+        observation = self.make_observation()
+        return observation, new_state, reward
 
     def validate_action(self, pre_state, action, new_state):
-        """ Origin at the corner of the two rooms with the corridor"""
-        pass
+        valid_action = True
+        for wall in self.wall_list:
+            new_state, new_valid_action = check_crossing_wall(pre_state=pre_state, new_state=new_state, wall=wall)
+            valid_action = new_valid_action and valid_action
+        return new_state, valid_action
 
-
-if __name__ == "__main__":
-    wall_list = []
-    wall_list.append(np.array([[0, 0], [0, -10]]))
-    wall_list.append(np.array([[0, 0], [5, 5]]))
-    wall_list.append(np.array([[0, 0], [10, 0]]))
-
-    points_set_1 = [np.arrapy([[]])]
+    def plot_trajectory(self, history_data=None, ax=None):
+        if len(self.wall_list) != 0:
+            ax = super().plot_trajectory(history_data=history_data, center_room=False)
+            for wall in self.wall_list:
+                ax.plot(wall[:, 0], wall[:, 1], "b", lw=3)
+            return ax
+        else:
+            return super().plot_trajectory(history_data=self.history, center_room=False)

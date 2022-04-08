@@ -142,7 +142,7 @@ class Simple2D(Environment):
         observation = self.make_observation()
         return observation, new_state, reward
 
-    def plot_trajectory(self, history_data=None, ax=None):
+    def plot_trajectory(self, history_data=None, ax=None, center_room=True):
         """ Plot the Trajectory of the agent in the environment
 
         Parameters
@@ -161,14 +161,26 @@ class Simple2D(Environment):
         if ax is None:
             f, ax = plt.subplots(1, 1, figsize=(8, 6))
 
-        ax.plot([-self.room_width/2, self.room_width/2],
-                [-self.room_depth/2, -self.room_depth/2], "r", lw=2)
-        ax.plot([-self.room_width/2, self.room_width/2],
-                [self.room_depth/2, self.room_depth/2], "r", lw=2)
-        ax.plot([-self.room_width/2, -self.room_width/2],
-                [-self.room_depth/2, self.room_depth/2], "r", lw=2)
-        ax.plot([self.room_width / 2, self.room_width / 2],
-                [-self.room_depth / 2, self.room_depth / 2], "r", lw=2)
+        if center_room:
+
+            ax.plot([-self.room_width/2, self.room_width/2],
+                    [-self.room_depth/2, -self.room_depth/2], "r", lw=2)
+            ax.plot([-self.room_width/2, self.room_width/2],
+                    [self.room_depth/2, self.room_depth/2], "r", lw=2)
+            ax.plot([-self.room_width/2, -self.room_width/2],
+                    [-self.room_depth/2, self.room_depth/2], "r", lw=2)
+            ax.plot([self.room_width / 2, self.room_width / 2],
+                    [-self.room_depth / 2, self.room_depth / 2], "r", lw=2)
+
+        else:
+            ax.plot([self.arena_limits[0, 0], self.arena_limits[0, 1]],
+                    [self.arena_limits[1, 0], self.arena_limits[1, 0]], "r", lw=2)
+            ax.plot([self.arena_limits[0, 0], self.arena_limits[0, 1]],
+                    [self.arena_limits[1, 1], self.arena_limits[1, 1]], "r", lw=2)
+            ax.plot([self.arena_limits[0, 0], self.arena_limits[0, 0]],
+                    [self.arena_limits[1, 0], self.arena_limits[1, 1]], "r", lw=2)
+            ax.plot([self.arena_limits[0, 1], self.arena_limits[0, 1]],
+                    [self.arena_limits[1, 0], self.arena_limits[1, 1]], "r", lw=2)
 
         state_history = [s["state"] for s in history_data]
         next_state_history = [s["next_state"] for s in history_data]
