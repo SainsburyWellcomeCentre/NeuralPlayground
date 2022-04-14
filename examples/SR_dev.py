@@ -46,6 +46,16 @@ if run_raw_data == False:
     obs, state = env.reset()
     obs = obs[:2]
     current_state = agent.obs_to_state(obs)
+    for i in tqdm(range(n_episode*t_episode)):
+            action = agent.act(obs)  # the action is link to density of state to make sure we always land in a new
+            obs, state, reward = env.step(action)
+            current_state, K = agent.update_successor_rep_td(obs, current_state)
+            total_iters += 1
+            # if total_iters % plot_every == 0:
+            # agent.plot_eigen(K, save_path="./figures/M_processed_iter_" + str(total_iters) + ".pdf")
+    T = agent.get_T_from_M(K)
+    # agent.plot_trantion(T, save_path="./figures/transtion.pdf")
+
     for i in tqdm(range(n_episode)):
         for j in range(t_episode):
             action = agent.act(obs)  # the action is link to density of state to make sure we always land in a new
@@ -76,22 +86,21 @@ else:
 
     sr = agent.update_successor_rep()  # Choose your type of Update
 
-    agent.plot_eigen(sr, save_path=None)
-    agent.plot_eigen(sr_sum, save_path="figures/sr_sum.pdf")
-    agent.plot_eigen(sr_td, save_path="./figures/sr_full_td.pdf")
+    #agent.plot_eigen(sr, save_path=None)
+    #agent.plot_eigen(sr_sum, save_path="figures/sr_sum.pdf")
+    # agent.plot_eigen(sr_td, save_path="./figures/sr_full_td.pdf")
 
-    plot_every = 10
+    plot_every = 1000000
     total_iters = 0
     obs, state = env.reset()
     obs = obs[:2]
-    current_state = agent.obs_to_state(obs)
-    for i in tqdm(range(100)):
+    for i in tqdm(range(10000000)):
         # Observe to choose an action
-        action = agent.act(obs)  # the action is link to density of state to make sure we always land in a new
+        # the action is link to density of state to make sure we always land in a new
+        action = agent.act(obs)
+        agent.update()
         obs, state, reward = env.step(action)
         obs = obs[:2]
-        current_state, K = agent.update_successor_rep_td(obs, current_state)
         total_iters += 1
-        if total_iters % plot_every == 0:
-            agent.plot_eigen(K, save_path=None)
+
 

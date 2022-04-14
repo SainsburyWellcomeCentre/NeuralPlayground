@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from ..envs.arenas.simple2d import Simple2D, Sargolini2006, Hafting2008,BasicSargolini2006
 from ..models.weber_and_sprekeler import ExcInhPlasticity
 from ..models.SRKim import SR
+from ..models.modelcore import NeuralResponseModel
 import pytest
 
 
@@ -16,23 +17,36 @@ def get_environment():
                              agent_step_size=None)
     return [env, ]
 
-@pytest.fixture
-def get_environment_simple2D():
-    room_width = 7
-    room_depth = 7
-    env_name = "env_example"
-    time_step_size = 1  # seg
-    agent_step_size = 1
-    # Init environment
-    env = Simple2D(environment_name=env_name,
-                   room_width=room_width,
-                   room_depth=room_depth,
-                   time_step_size=time_step_size,
-                   agent_step_size=agent_step_size)
+class Testmodelcore(object):
 
-    return [env, ]
+    @pytest.fixture
+    def init_model(self, get_environment):
+        agent= NeuralResponseModel()
 
-class TestExcInhPlasticity(object):
+        return [agent, ]
+
+    def test_init_model(self, init_model):
+        assert isinstance(init_model[0],NeuralResponseModel)
+
+    def test_agent_interaction(self, init_model, get_environment):
+        env = get_environment[0]
+        plot_every = 0
+        total_iters = 0
+        n_steps = 1
+        obs, state = env.reset()
+        obs = obs[:2]
+        # for i in tqdm(range(env.total_number_of_steps)):
+        for i in tqdm(range(n_steps)):
+            # Observe to choose an action
+            action = init_model[0].act(obs)
+            init_model[0].update()
+            # rate = agent.update()
+            # Run environment for given action
+            obs, state, reward = env.step(action)
+            obs = obs[:2]
+            total_iters += 1
+
+class TestExcInhPlasticity(Testmodelcore):
 
     @pytest.fixture
     def init_model(self, get_environment):
@@ -61,28 +75,11 @@ class TestExcInhPlasticity(object):
     def test_init_model(self, init_model):
         assert isinstance(init_model[0], ExcInhPlasticity)
 
-    def test_agent_interaction(self, init_model, get_environment):
-        env = get_environment[0]
-        plot_every = 0
-        total_iters = 0
-        n_steps = 1
-
-        obs, state = env.reset()
-        # for i in tqdm(range(env.total_number_of_steps)):
-        for i in tqdm(range(n_steps)):
-            # Observe to choose an action
-            obs = obs[:2]
-            action = init_model[0].act(obs)
-            # rate = agent.update()
-            init_model[0].update()
-            # Run environment for given action
-            obs, state, reward = env.step(action)
-            total_iters += 1
 
     def test_plot_rates(self, init_model):
         init_model[0].plot_rates()
 
-class TestSR(object):
+class TestSR(Testmodelcore):
 
     @pytest.fixture
     def init_model(self, get_environment):
@@ -114,6 +111,3 @@ class TestSR(object):
     def test_plot_sr_sum(self, init_model):
         sr_sum = init_model[0].successor_rep_sum()
         init_model[0].plot_eigen(sr_sum, save_path=None)
-
-    def test_agent_interaction(self, init_model, get_environment):
-        a=1+1
