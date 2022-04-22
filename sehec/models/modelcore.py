@@ -54,3 +54,6 @@ class NeuralResponseModel(object):
             self.obs_history = [obs, ]
         action = np.random.normal(scale=0.1, size=(2,))
         return action
+
+    def update(self):
+        pass
