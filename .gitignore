@@ -1,5 +1,6 @@
 # Prerequisites
 *.d
+models/figures/
 environments/experiment_data/Hafting2008/
 # Compiled Object files
 *.slo
