@@ -8,10 +8,28 @@ from ...utils import check_crossing_wall
 
 
 class ConnectedRooms(Simple2D):
-
+    """
+    Simulation from https://doi.org/10.1016/j.cub.2015.02.037
+    Grid Cells Form a Global Representation of Connected Environments
+    """
     def __init__(self, environment_name="ConnectedRooms", corridor_ysize=40.0, singleroom_ysize=90.0,
                  singleroom_xsize=90, door_size=10.0, **env_kwargs):
-        
+        """
+        Parameters
+        ----------
+        environment_name : string
+            name of the environment
+        corridor_ysize : float
+            corridor size from the paper, default 40.0 cm
+        singleroom_ysize : float
+            y-size of one of the rooms, default 90.0 cm
+        singleroom_xsize : float
+            x-size of one of the rooms, default 90.0 cm
+        door_size : float
+            door size from room to corridor, default 10 cm
+        env_kwargs
+        """
+
         self.corridor_ysize = corridor_ysize
         self.singleroom_ysize = singleroom_ysize
         self.singleroom_xsize = singleroom_xsize
@@ -62,6 +80,23 @@ class ConnectedRooms(Simple2D):
         return observation, new_state, reward
 
     def validate_action(self, pre_state, action, new_state):
+        """
+
+        Parameters
+        ----------
+        pre_state : (2,) 2d-ndarray
+            2d position of pre-movement
+        new_state : (2,) 2d-ndarray
+            2d position of post-movement
+
+        Returns
+        -------
+        new_state: (2,) 2d-ndarray
+            corrected new state. If it is not crossing the wall, then the new_state stays the same, if the state cross the
+            wall, new_state will be corrected to a valid place without crossing the wall
+        valid_action: bool
+            True if the change in state cross a wall
+        """
         valid_action = True
         for wall in self.wall_list:
             new_state, new_valid_action = check_crossing_wall(pre_state=pre_state, new_state=new_state, wall=wall)
