@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from ..envs.arenas.simple2d import Simple2D, Sargolini2006, BasicSargolini2006, Hafting2008
+from ..envs.arenas.connected_rooms import ConnectedRooms
 import pytest
 from ..utils import RandomAgent
 
@@ -87,3 +88,20 @@ class TestHafting2008(TestSimple2D):
 
     def test_init_env(self, init_env):
         assert isinstance(init_env[0], Hafting2008)
+
+
+class TestConnectedRooms(TestSimple2D):
+    @pytest.fixture
+    def init_env(self):
+        env_name = "Connected_rooms"
+        time_step_size = 0.1  # seg
+        agent_step_size = 3
+
+        # Init environment
+        env = ConnectedRooms(environment_name=env_name,
+                             time_step_size=time_step_size,
+                             agent_step_size=agent_step_size)
+        return [env, ]
+
+    def test_init_env(self, init_env):
+        assert isinstance(init_env[0], ConnectedRooms)
