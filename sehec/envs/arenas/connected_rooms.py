@@ -11,7 +11,7 @@ class ConnectedRooms(Simple2D):
 
     def __init__(self, environment_name="ConnectedRooms", corridor_ysize=40.0, singleroom_ysize=90.0,
                  singleroom_xsize=90, door_size=10.0, **env_kwargs):
-
+        
         self.corridor_ysize = corridor_ysize
         self.singleroom_ysize = singleroom_ysize
         self.singleroom_xsize = singleroom_xsize
@@ -53,8 +53,6 @@ class ConnectedRooms(Simple2D):
         action = action/np.linalg.norm(action)
         new_state = self.state + self.agent_step_size*action
         new_state, valid_action = self.validate_action(self.state, action, new_state)
-        #new_state = np.array([np.clip(new_state[0], a_min=self.arena_limits[0, 0], a_max=self.arena_limits[0, 1]),
-        #                      np.clip(new_state[1], a_min=self.arena_limits[1, 0], a_max=self.arena_limits[1, 1])])
         reward = 0  # If you get reward, it should be coded here
         transition = {"action": action, "state": self.state, "next_state": new_state,
                       "reward": reward, "step": self.global_steps}
