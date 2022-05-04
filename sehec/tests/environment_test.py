@@ -18,8 +18,8 @@ class TestSimple2D(object):
 
         # Init environment
         env = Simple2D(environment_name=env_name,
-                       room_width=room_width,
-                       room_depth=room_depth,
+                       arena_x_limits=np.array([-room_width / 2, room_width / 2]),
+                       arena_y_limits=np.array([-room_depth / 2, room_depth / 2]),
                        time_step_size=time_step_size,
                        agent_step_size=agent_step_size)
         return [env, ]
