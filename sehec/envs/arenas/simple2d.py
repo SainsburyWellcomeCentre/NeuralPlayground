@@ -2,7 +2,8 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 from ..envcore import Environment
 import numpy as np
-from ..experiments.behavioral_data import SargoliniData, FullSargoliniData,FullHaftingData
+from ..experiments.behavioral_data import SargoliniData, FullSargoliniData, FullHaftingData
+from ...utils import check_crossing_wall
 
 
 class Simple2D(Environment):
@@ -74,14 +75,32 @@ class Simple2D(Environment):
         """
         super().__init__(environment_name, **env_kwargs)
         self.metadata = {"env_kwargs": env_kwargs}
-        self.room_width, self.room_depth = env_kwargs["room_width"], env_kwargs["room_depth"]
-        self.arena_limits = np.array([[-self.room_width/2, self.room_width/2],
-                                      [-self.room_depth/2, self.room_depth/2]])
+        # self.room_width, self.room_depth = env_kwargs["room_width"], env_kwargs["room_depth"]
+        self.arena_x_limits, self.arena_y_limits = env_kwargs["arena_x_limits"], env_kwargs["arena_y_limits"]
+        self.arena_limits = np.array([[self.arena_x_limits[0], self.arena_x_limits[1]],
+                                      [self.arena_y_limits[0], self.arena_y_limits[1]]])
         self.agent_step_size = env_kwargs["agent_step_size"]
         self.state_dims_labels = ["x_pos", "y_pos"]
         self.reset()
+        self._create_default_walls()
+        self._create_custom_walls()
+        self.wall_list = self.default_walls + self.custom_walls
 
-    def reset(self, random_state=False):
+    def _create_default_walls(self):
+        self.default_walls = []
+        self.default_walls.append(np.array([[self.arena_limits[0, 0], self.arena_limits[1, 0]],
+                                           [self.arena_limits[0, 0], self.arena_limits[1, 1]]]))
+        self.default_walls.append(np.array([[self.arena_limits[0, 1], self.arena_limits[1, 0]],
+                                           [self.arena_limits[0, 1], self.arena_limits[1, 1]]]))
+        self.default_walls.append(np.array([[self.arena_limits[0, 0], self.arena_limits[1, 0]],
+                                           [self.arena_limits[0, 1], self.arena_limits[1, 0]]]))
+        self.default_walls.append(np.array([[self.arena_limits[0, 0], self.arena_limits[1, 1]],
+                                           [self.arena_limits[0, 1], self.arena_limits[1, 1]]]))
+
+    def _create_custom_walls(self):
+        self.custom_walls = []
+
+    def reset(self, random_state=False, custom_state=None):
         """ Reset the environment variables
 
         Returns
@@ -104,6 +123,9 @@ class Simple2D(Environment):
         else:
             self.state = [0, 0]
         self.state = np.array(self.state)
+
+        if custom_state is not None:
+            self.state = custom_state
         # Fully observable environment, make_observation returns the state
         observation = self.make_observation()
         return observation, self.state
@@ -132,8 +154,7 @@ class Simple2D(Environment):
         self.global_steps += 1
         action = action/np.linalg.norm(action)
         new_state = self.state + self.agent_step_size*action
-        new_state = np.array([np.clip(new_state[0], a_min=-self.room_width/2, a_max=self.room_width/2),
-                              np.clip(new_state[1], a_min=-self.room_depth/2, a_max=self.room_depth/2)])
+        new_state, valid_action = self.validate_action(self.state, action, new_state)
         reward = 0  # If you get reward, it should be coded here
         transition = {"action": action, "state": self.state, "next_state": new_state,
                       "reward": reward, "step": self.global_steps}
@@ -142,7 +163,31 @@ class Simple2D(Environment):
         observation = self.make_observation()
         return observation, new_state, reward
 
-    def plot_trajectory(self, history_data=None, ax=None, center_room=True):
+    def validate_action(self, pre_state, action, new_state):
+        """
+
+        Parameters
+        ----------
+        pre_state : (2,) 2d-ndarray
+            2d position of pre-movement
+        new_state : (2,) 2d-ndarray
+            2d position of post-movement
+
+        Returns
+        -------
+        new_state: (2,) 2d-ndarray
+            corrected new state. If it is not crossing the wall, then the new_state stays the same, if the state cross the
+            wall, new_state will be corrected to a valid place without crossing the wall
+        valid_action: bool
+            True if the change in state cross a wall
+        """
+        valid_action = True
+        for wall in self.wall_list:
+            new_state, new_valid_action = check_crossing_wall(pre_state=pre_state, new_state=new_state, wall=wall)
+            valid_action = new_valid_action and valid_action
+        return new_state, valid_action
+
+    def plot_trajectory(self, history_data=None, ax=None):
         """ Plot the Trajectory of the agent in the environment
 
         Parameters
@@ -161,26 +206,11 @@ class Simple2D(Environment):
         if ax is None:
             f, ax = plt.subplots(1, 1, figsize=(8, 6))
 
-        if center_room:
+        for wall in self.default_walls:
+            ax.plot(wall[:, 0], wall[:, 1], "C3", lw=3)
 
-            ax.plot([-self.room_width/2, self.room_width/2],
-                    [-self.room_depth/2, -self.room_depth/2], "r", lw=2)
-            ax.plot([-self.room_width/2, self.room_width/2],
-                    [self.room_depth/2, self.room_depth/2], "r", lw=2)
-            ax.plot([-self.room_width/2, -self.room_width/2],
-                    [-self.room_depth/2, self.room_depth/2], "r", lw=2)
-            ax.plot([self.room_width / 2, self.room_width / 2],
-                    [-self.room_depth / 2, self.room_depth / 2], "r", lw=2)
-
-        else:
-            ax.plot([self.arena_limits[0, 0], self.arena_limits[0, 1]],
-                    [self.arena_limits[1, 0], self.arena_limits[1, 0]], "r", lw=2)
-            ax.plot([self.arena_limits[0, 0], self.arena_limits[0, 1]],
-                    [self.arena_limits[1, 1], self.arena_limits[1, 1]], "r", lw=2)
-            ax.plot([self.arena_limits[0, 0], self.arena_limits[0, 0]],
-                    [self.arena_limits[1, 0], self.arena_limits[1, 1]], "r", lw=2)
-            ax.plot([self.arena_limits[0, 1], self.arena_limits[0, 1]],
-                    [self.arena_limits[1, 0], self.arena_limits[1, 1]], "r", lw=2)
+        for wall in self.custom_walls:
+            ax.plot(wall[:, 0], wall[:, 1], "C0", lw=3)
 
         state_history = [s["state"] for s in history_data]
         next_state_history = [s["next_state"] for s in history_data]
@@ -249,7 +279,6 @@ class BasicSargolini2006(Simple2D):
         The reward that the animal recieves in this state
               """
 
-
     def __init__(self, data_path="Sargolini2006/", environment_name="Sargolini2006", **env_kwargs):
         """ Initialise the class
 
@@ -271,11 +300,9 @@ class BasicSargolini2006(Simple2D):
         self.environment_name = environment_name
         self.data = SargoliniData(data_path=self.data_path, experiment_name=self.environment_name)
         self.arena_limits = self.data.arena_limits
-        limits = np.abs(np.diff(self.arena_limits, axis=1))
-        self.room_width = limits[0, 0]
-        self.room_depth = limits[1, 0]
-        env_kwargs["room_width"] = self.room_width
-        env_kwargs["room_depth"] = self.room_depth
+        self.arena_x_limits, self.arena_y_limits = self.arena_limits[0, :], self.arena_limits[1, :]
+        env_kwargs["arena_x_limits"] = self.arena_x_limits
+        env_kwargs["arena_y_limits"] = self.arena_y_limits
         env_kwargs["agent_step_size"] = 1/50  # In seconds
         super().__init__(environment_name, **env_kwargs)
         self.metadata["doi"] = "https://doi.org/10.1126/science.1125572"
@@ -409,11 +436,9 @@ class Sargolini2006(Simple2D):
         self.session = session
         self.data = FullSargoliniData(data_path=self.data_path, experiment_name=self.environment_name, verbose=verbose, session=session)
         self.arena_limits = self.data.arena_limits
-        self.room_width, self.room_depth = np.abs(np.diff(self.arena_limits, axis=1))
-        self.room_width = self.room_width[0]
-        self.room_depth = self.room_depth[0]
-        env_kwargs["room_width"] = self.room_width
-        env_kwargs["room_depth"] = self.room_depth
+        self.arena_x_limits, self.arena_y_limits = self.arena_limits[0, :], self.arena_limits[1, :]
+        env_kwargs["arena_x_limits"] = self.arena_x_limits
+        env_kwargs["arena_y_limits"] = self.arena_y_limits
         env_kwargs["agent_step_size"] = 1/50  # In seconds
         super().__init__(environment_name, **env_kwargs)
         self.metadata["doi"] = "https://doi.org/10.1126/science.1125572"
@@ -557,9 +582,9 @@ class Hafting2008(Simple2D):
         self.session = session
         self.data = FullHaftingData(data_path=self.data_path, experiment_name=self.environment_name, verbose=verbose)
         self.arena_limits = self.data.arena_limits
-        self.room_width, self.room_depth = np.abs(np.diff(self.arena_limits, axis=1))
-        env_kwargs["room_width"] = self.room_width
-        env_kwargs["room_depth"] = self.room_depth
+        self.arena_x_limits, self.arena_y_limits = self.arena_limits[0, :], self.arena_limits[1, :]
+        env_kwargs["arena_x_limits"] = self.arena_x_limits
+        env_kwargs["arena_y_limits"] = self.arena_y_limits
         env_kwargs["agent_step_size"] = 1/50  # In seconds
         super().__init__(environment_name, **env_kwargs)
         self.metadata["doi"] = "https://doi.org/10.1038/nature06957"
