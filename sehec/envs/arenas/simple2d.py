@@ -79,6 +79,8 @@ class Simple2D(Environment):
         self.arena_x_limits, self.arena_y_limits = env_kwargs["arena_x_limits"], env_kwargs["arena_y_limits"]
         self.arena_limits = np.array([[self.arena_x_limits[0], self.arena_x_limits[1]],
                                       [self.arena_y_limits[0], self.arena_y_limits[1]]])
+        self.room_width = np.diff(self.arena_x_limits)[0]
+        self.room_depth = np.diff(self.arena_y_limits)[0]
         self.agent_step_size = env_kwargs["agent_step_size"]
         self.state_dims_labels = ["x_pos", "y_pos"]
         self.reset()
