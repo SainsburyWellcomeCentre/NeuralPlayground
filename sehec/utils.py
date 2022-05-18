@@ -42,3 +42,15 @@ def check_crossing_wall(pre_state, new_state, wall, wall_closenes=1e-5):
 class RandomAgent(object):
     def act(self, observation):
         return np.random.normal(scale=0.1, size=(2,))
+
+
+def inheritors(klass):
+    subclasses = set()
+    work = [klass]
+    while work:
+        parent = work.pop()
+        for child in parent.__subclasses__():
+            if child not in subclasses:
+                subclasses.add(child)
+                work.append(child)
+    return subclasses
