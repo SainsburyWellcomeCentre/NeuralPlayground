@@ -1,4 +1,4 @@
-from environments import *
+from environment_functions import *
 import numpy as np
 import tensorflow as tf
 import copy as cp

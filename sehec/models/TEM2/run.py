@@ -1,6 +1,6 @@
 import tensorflow as tf
+from helper_functions import *
 from parameters import *
-from environments import *
 import tem
 import warnings
 warnings.filterwarnings("ignore")
