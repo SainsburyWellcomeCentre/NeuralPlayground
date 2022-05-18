@@ -119,6 +119,7 @@ def default_params():
     params['ovc_activation'] = lambda x: tf.nn.leaky_relu(tf.minimum(tf.maximum(x, -1), 1), alpha=0.01)
 
     # TRAINING PARAMS
+    params['training'] = True
     params['train_iters'] = int(10000)
     params['optimiser'] = 'Adam'
     params['train_on_visited_states_only'] = True
