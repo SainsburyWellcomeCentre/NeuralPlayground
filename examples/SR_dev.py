@@ -7,6 +7,7 @@ from sehec.models.SRKim import SR
 
 run_raw_data = True
 
+
 if run_raw_data == False:
     room_width = 7
     room_depth = 7
