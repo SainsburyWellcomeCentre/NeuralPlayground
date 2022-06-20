@@ -1,5 +1,6 @@
 #  Config file with default parameters for each experiment
 import numpy as np
+from copy import deepcopy
 
 
 class Config(object):
@@ -11,6 +12,24 @@ class Config(object):
 
     def remove_attribute(self, attr):
         delattr(self, attr)
+
+    def config_tree(self, level=0):
+        config_mssg = self.config_id + "\n"
+        for key, val in self.__dict__.items():
+            if key == "config_id" or key == "available_params":
+                continue
+            else:
+                if isinstance(val, Config):
+                    config_mssg += "|   | "*(level+1) + key + ": " + val.config_tree(level+1) + "\n"
+                else:
+                    config_mssg += "|   | " * (level + 1) + key + ": " + str(val) + "\n"
+        return config_mssg
+
+    def copy(self):
+        return deepcopy(self)
+
+    def add_attribute(self, attr, val):
+        setattr(self, attr, val)
 
 """
 Config files have 4 levels
@@ -38,8 +57,9 @@ sub_exp_id = "sargolini2006_2d_foraging"
 """ 4 - Environment parameters """
 env_params = Config(config_id="Sargolini2006_params",
                     class_name="BasicSargolini2006",
-                    data_path="Sargolini2006",
-                    environment_name="Sargolini2006_2D")
+                    data_path="../envs/experiments/Sargolini2006",
+                    environment_name="Sargolini2006",
+                    time_step_size=0.1)
 model_params = Config(config_id="weber_and_sprekeler_params",
                       class_name="ExcInhPlasticity",
                       exc_eta=2e-4,
@@ -55,7 +75,11 @@ model_params = Config(config_id="weber_and_sprekeler_params",
                       alpha_e=1,
                       we_init=1.0,
                       wi_init=1.5,
-                      agent_step_size=0.1)
+                      agent_step_size=0.1,
+                      ro=1,
+                      room_width=10,
+                      room_depth=10,
+                      n_iters=100)
 
 sub_exp_1 = Config(config_id=sub_exp_id,
                    env_params=env_params,
@@ -76,8 +100,5 @@ custom_classes = Config(config_id="Custom_class_paths",
                         custom_classes_path=["from sehec.models.SRKim import SR",])
 
 if __name__ == "__main__":
-    params = {"config_id": "model1",
-              "param1": 30,
-              "param2": "bla"}
-    exp_config = Config(**params)
-    print("debug")
+
+    print(cfg.config_tree())
