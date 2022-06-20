@@ -33,13 +33,15 @@ model_id = "weber_and_sprekeler"
 sargolini_id = "sargolini2006"
 
 """ 3 - 2D Foraging in sargolini """
-sub_exp_id = "sargolini2006_2dforaging"
+sub_exp_id = "sargolini2006_2d_foraging"
 
 """ 4 - Environment parameters """
 env_params = Config(config_id="Sargolini2006_params",
+                    class_name="BasicSargolini2006",
                     data_path="Sargolini2006",
                     environment_name="Sargolini2006_2D")
 model_params = Config(config_id="weber_and_sprekeler_params",
+                      class_name="ExcInhPlasticity",
                       exc_eta=2e-4,
                       inh_eta=8e-4,
                       model_name="WeberAndSprekeler",
@@ -70,6 +72,8 @@ weber_and_sprekeler = Config(config_id=model_id,
 cfg = Config(config_id="full_configuration",
              model1=weber_and_sprekeler)
 
+custom_classes = Config(config_id="Custom_class_paths",
+                        custom_classes_path=["from sehec.models.SRKim import SR",])
 
 if __name__ == "__main__":
     params = {"config_id": "model1",
