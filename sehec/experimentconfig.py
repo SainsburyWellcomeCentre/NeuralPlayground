@@ -15,14 +15,18 @@ class Config(object):
 
     def config_tree(self, level=0):
         config_mssg = self.config_id + "\n"
+        sub_conf_mssg = ""
         for key, val in self.__dict__.items():
             if key == "config_id" or key == "available_params":
                 continue
             else:
                 if isinstance(val, Config):
-                    config_mssg += "|   | "*(level+1) + key + ": " + val.config_tree(level+1) + "\n"
+                    sub_conf_mssg += "--> "*(level+1) + key + ": " + val.config_tree(level+1) + "\n"
                 else:
-                    config_mssg += "|   | " * (level + 1) + key + ": " + str(val) + "\n"
+                    config_mssg += "--> " * (level + 1) + key + ": " + str(val) + ", type: "+str(type(val))+"\n"
+        if len(sub_conf_mssg) != 0:
+            config_mssg += "\n"
+        config_mssg += sub_conf_mssg
         return config_mssg
 
     def copy(self):
@@ -83,7 +87,8 @@ model_params = Config(config_id="weber_and_sprekeler_params",
 
 sub_exp_1 = Config(config_id=sub_exp_id,
                    env_params=env_params,
-                   model_params=model_params)
+                   model_params=model_params,
+                   n_runs=3)
 
 sargolini2006 = Config(config_id=sargolini_id,
                        sub_exp_1=sub_exp_1)
@@ -93,7 +98,7 @@ weber_and_sprekeler = Config(config_id=model_id,
 
 """ 1 - SR """
 
-cfg = Config(config_id="full_configuration",
+cfg = Config(config_id="### Full Configuration ###",
              model1=weber_and_sprekeler)
 
 custom_classes = Config(config_id="Custom_class_paths",
