@@ -13,7 +13,7 @@ class Config(object):
     def remove_attribute(self, attr):
         delattr(self, attr)
 
-    def config_tree(self, level=0):
+    def get_config_tree(self, level=0):
         config_mssg = self.config_id + "\n"
         sub_conf_mssg = ""
         for key, val in self.__dict__.items():
@@ -21,7 +21,7 @@ class Config(object):
                 continue
             else:
                 if isinstance(val, Config):
-                    sub_conf_mssg += "--> "*(level+1) + key + ": " + val.config_tree(level+1) + "\n"
+                    sub_conf_mssg += "--> "*(level+1) + key + ": " + val.get_config_tree(level+1) + "\n"
                 else:
                     config_mssg += "--> " * (level + 1) + key + ": " + str(val) + ", type: "+str(type(val))+"\n"
         if len(sub_conf_mssg) != 0:

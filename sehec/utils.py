@@ -1,4 +1,5 @@
 import numpy as np
+import os
 
 
 def check_crossing_wall(pre_state, new_state, wall, wall_closenes=1e-5):
@@ -54,3 +55,10 @@ def inheritors(klass):
                 subclasses.add(child)
                 work.append(child)
     return subclasses
+
+
+def check_directory(dir, create=True):
+    check = os.path.isdir(dir)
+    if not check and create:
+        os.makedirs(dir)
+    return check
