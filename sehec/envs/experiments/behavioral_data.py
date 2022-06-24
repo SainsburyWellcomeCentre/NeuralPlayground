@@ -6,6 +6,8 @@ from scipy.interpolate import interp1d
 import matplotlib.pyplot as plt
 import pandas as pd
 from scipy.ndimage import gaussian_filter
+import sys
+import sehec
 
 
 class FullHaftingData(object):
@@ -122,7 +124,8 @@ class FullHaftingData(object):
 class SargoliniData(object):
 
     def __init__(self, data_path, experiment_name):
-        self.data_path = data_path
+        # self.data_path = data_path
+        self.data_path = os.path.join(sehec.__path__[0], "envs/experiments/Sargolini2006")
         self.experiment_name = experiment_name
         if self.experiment_name == "Sargolini2006":
             self.arena_limits, self.position, self.head_direction = self.get_sargolini_data()
