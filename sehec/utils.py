@@ -56,9 +56,3 @@ def inheritors(klass):
                 work.append(child)
     return subclasses
 
-
-def check_directory(dir, create=True):
-    check = os.path.isdir(dir)
-    if not check and create:
-        os.makedirs(dir)
-    return check

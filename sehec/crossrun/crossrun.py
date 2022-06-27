@@ -1,12 +1,15 @@
+import sehec
 from ..experimentconfig import cfg
 from sehec.crossrun.default_run import *
-from sehec.utils import check_directory
 import os
+import glob
+import shutil
+import pickle
 
 
 class CrossRun(object):
 
-    def __init__(self, config_file=None, results_path="../results"):
+    def __init__(self, config_file=None, results_path="../results", reload_experiment=True):
         print("Init cross run")
         if config_file is None:
             self.config_file = cfg
@@ -14,12 +17,14 @@ class CrossRun(object):
             self.config_file = config_file
         self._print_tree()
         self.results_path = results_path
-        check_directory(self.results_path)
+        self.pckg_path = sehec.__path__[0]
+        if not reload_experiment:
+            self.go_to_experiment(create_experiments=True)
 
     def _print_tree(self):
         print(self.config_file.get_config_tree())
 
-    def go_to_experiment(self, set_directories=True, run_experiment=False):
+    def go_to_experiment(self, create_experiments=False, check_experiments=False, run_experiment=False):
         for model_key, model_conf in self.config_file.__dict__.items():
             if "model" in model_key:
                 model_dir_path = model_conf.config_id
@@ -30,11 +35,42 @@ class CrossRun(object):
                             if "sub_exp" in sub_exp_key:
                                 sub_exp_dir_path = os.path.join(exp_dir_path, sub_exp_conf.config_id)
                                 save_path = os.path.join(self.results_path, sub_exp_dir_path)
-                                for i in range(sub_exp_conf.n_runs):
-                                    now_str = str(datetime.now()).replace(" ", "_").replace(":", "-").replace(".", "_")
-                                    now_str = "run_"+str(i+1)+"_"+now_str
-                                    run_save_path = os.path.join(save_path, now_str)
+                                if create_experiments:
+                                    print("Reset results from " + save_path)
+                                    try:
+                                        shutil.rmtree(save_path+"/")
+                                    except:
+                                        pass
+                                    for i in range(sub_exp_conf.n_runs):
+                                        now_str = str(datetime.now()).replace(" ", "_").replace(":", "-").replace(".", "_")
+                                        now_str = "run_"+str(i+1)+"_"+now_str
+                                        run_save_path = os.path.join(save_path, now_str)
+                                        check_experiment_status(dir=run_save_path, create=True)
+                                        pickle.dump(sub_exp_conf,
+                                                    open(os.path.join(run_save_path, "params.cfg"), "wb"),
+                                                    pickle.HIGHEST_PROTOCOL)
+                                if check_experiments:
+                                    run_list = glob.glob(os.path.join(save_path, "run*"))
+                                    for run_dir in run_list:
+                                        check_experiment_status(run_dir, check=True)
+                                if run_experiment:
+                                    run_list = glob.glob(os.path.join(save_path, "run*"))
+                                    for run_dir in run_list:
+                                        check_experiment_status(run_dir, check=True)
+                                        log_path = os.path.join(run_dir, "run.log")
+                                        script_path = os.path.join(self.pckg_path, "crossrun/default_routine_script.py")
+                                        cmd_line = 'python -u '+script_path+' "'+run_dir+'" > '+log_path
+                                        print(cmd_line)
+                                        os.system(cmd_line)
 
-                                    check_directory(run_save_path)
-                                    print(save_path)
-                                    default_run(sub_exp_config=sub_exp_conf, save_path=save_path)
+    def run_cross_exp(self):
+        self.go_to_experiment(run_experiment=True)
+
+
+def check_experiment_status(dir, create=False, check=False):
+    check = os.path.isdir(dir)
+    if create:
+        os.makedirs(dir)
+        with open(os.path.join(dir, 'status.log'), 'w') as f:
+            f.write('run_status: On Queue')
+    return check

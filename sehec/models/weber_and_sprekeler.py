@@ -285,6 +285,7 @@ class ExcInhPlasticity(NeuralResponseModel):
         return r_out
 
     def update(self, exc_normalization=True, pos=None):
+        asdasd
         """
         Update weights using hebbian plasticity according to equation 2 for excitatory weights
         and equation 3 for inhibitory weights for a given position
