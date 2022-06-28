@@ -1,0 +1,14 @@
+#!/bin/bash
+#
+#SBATCH --job-name=new_tem_test
+#SBATCH --output=tem_test.out
+#SBATCH --error=tem_test.err
+#SBATCH -p gpu
+#SBATCH --gres=gpu:1
+#SBATCH -N 1
+#SBATCH -c 1
+#SBATCH --mem=2G
+#SBATCH -t 23:59:00
+#
+
+python run_tem.py
