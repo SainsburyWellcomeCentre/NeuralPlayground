@@ -41,7 +41,8 @@ def default_train_loop(agent, env, n_steps):
 
 def default_run(save_path=None):
 
-    f = open(os.path.join(save_path, 'out.txt'), 'w')
+    f = open(os.path.join(save_path, 'err_out.log'), 'w')
+    sys.stderr = f
 
     sub_exp_config = pd.read_pickle(os.path.join(save_path, "params.cfg"))
     model_config = sub_exp_config.model_params
@@ -53,10 +54,7 @@ def default_run(save_path=None):
 
     init_model_cmd = model_config.class_name+"(**model_config.__dict__)"
     print(init_model_cmd)
-    g = globals()
-    l = locals()
-    g["sys.stdout"] = f
-    model = eval(init_model_cmd, g, l)
+    model = eval(init_model_cmd)
 
     init_env_cmd = env_config.class_name+"(**env_config.__dict__)"
     env = eval(init_env_cmd)

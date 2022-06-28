@@ -57,7 +57,7 @@ class CrossRun(object):
                                     run_list = glob.glob(os.path.join(save_path, "run*"))
                                     for run_dir in run_list:
                                         check_experiment_status(run_dir, check=True)
-                                        log_path = os.path.join(run_dir, "run.log")
+                                        log_path = os.path.join(run_dir, "run_output.log")
                                         script_path = os.path.join(self.pckg_path, "crossrun/default_routine_script.py")
                                         cmd_line = 'python -u '+script_path+' "'+run_dir+'" > '+log_path
                                         print(cmd_line)
