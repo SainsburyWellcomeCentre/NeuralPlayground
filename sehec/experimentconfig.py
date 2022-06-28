@@ -1,6 +1,8 @@
 #  Config file with default parameters for each experiment
 import numpy as np
 from copy import deepcopy
+from sehec.envs.arenas.simple2d import BasicSargolini2006
+from sehec.models.weber_and_sprekeler import ExcInhPlasticity
 
 
 class Config(object):
@@ -60,12 +62,12 @@ sub_exp_id = "sargolini2006_2d_foraging"
 
 """ 4 - Environment parameters """
 env_params = Config(config_id="Sargolini2006_params",
-                    class_name="BasicSargolini2006",
+                    class_name="BasicSargolini2006", #BasicSargolini2006,
                     data_path="../envs/experiments/Sargolini2006",
                     environment_name="Sargolini2006",
                     time_step_size=0.1)
 model_params = Config(config_id="weber_and_sprekeler_params",
-                      class_name="ExcInhPlasticity",
+                      class_name="ExcInhPlasticity",#ExcInhPlasticity,
                       exc_eta=2e-4,
                       inh_eta=8e-4,
                       model_name="WeberAndSprekeler",
