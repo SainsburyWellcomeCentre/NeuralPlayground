@@ -48,6 +48,9 @@ To have access to params, import this file as cfg, then use
 cfg.model.exp.subexp.model_params or cfg.model.exp.subexp.env_params
 
 For details on parameter definitions for environments or models, see source code
+
+for models, setup argument should use the keyword "model_", same for "exp_" and "sub_exp_"
+
 """
 
 
@@ -62,12 +65,12 @@ sub_exp_id = "sargolini2006_2d_foraging"
 
 """ 4 - Environment parameters """
 env_params = Config(config_id="Sargolini2006_params",
-                    class_name="BasicSargolini2006", #BasicSargolini2006,
+                    class_name="BasicSargolini2006",
                     data_path="../envs/experiments/Sargolini2006",
                     environment_name="Sargolini2006",
                     time_step_size=0.1)
 model_params = Config(config_id="weber_and_sprekeler_params",
-                      class_name="ExcInhPlasticity",#ExcInhPlasticity,
+                      class_name="ExcInhPlasticity",
                       exc_eta=2e-4,
                       inh_eta=8e-4,
                       model_name="WeberAndSprekeler",
