@@ -1,5 +1,5 @@
 import sehec
-from ..experimentconfig import cfg
+from sehec.experimentconfig import cfg
 from sehec.crossrun.default_run import *
 import os
 import glob
