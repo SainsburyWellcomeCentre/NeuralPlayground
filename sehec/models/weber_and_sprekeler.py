@@ -145,6 +145,7 @@ class ExcInhPlasticity(NeuralResponseModel):
         self.room_width, self.room_depth = mod_kwargs["room_width"], mod_kwargs["room_depth"]
         self.ro = mod_kwargs["ro"]
         self.obs_history = []  # Initialize observation history to update weights later
+        self.grad_history = []
 
         self.resolution = 50  # Number of pixels in the grid for the tuning functions
         self.x_array = np.linspace(-self.room_width/2, self.room_width/2, num=self.resolution)
@@ -305,6 +306,7 @@ class ExcInhPlasticity(NeuralResponseModel):
         delta_we = self.etaexc*self.get_rates(self.exc_cell_list, pos=pos)*r_out
         # Inhibitory weights update (eq 3)
         delta_wi = self.etainh*self.get_rates(self.inh_cell_list, pos=pos)*(r_out - self.ro)
+        self.grad_history.append(np.sqrt(np.sum(delta_we**2)+np.sum(delta_wi**2)))
 
         self.we = self.we + delta_we
         self.wi = self.wi + delta_wi

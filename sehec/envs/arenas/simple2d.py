@@ -189,7 +189,7 @@ class Simple2D(Environment):
             valid_action = new_valid_action and valid_action
         return new_state, valid_action
 
-    def plot_trajectory(self, history_data=None, ax=None):
+    def plot_trajectory(self, history_data=None, ax=None, return_figure=False):
         """ Plot the Trajectory of the agent in the environment
 
         Parameters
@@ -237,7 +237,10 @@ class Simple2D(Environment):
 
         cbar = plt.colorbar(sc, ax=ax)
         cbar.ax.set_ylabel('N steps', rotation=270)
-        return ax
+        if return_figure:
+            return f, ax
+        else:
+            return ax
 
 
 class BasicSargolini2006(Simple2D):

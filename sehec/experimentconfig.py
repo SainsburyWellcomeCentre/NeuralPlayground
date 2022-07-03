@@ -88,12 +88,13 @@ model_params = Config(config_id="weber_and_sprekeler_params",
                       ro=1,
                       room_width=10,
                       room_depth=10,
-                      n_iters=100)
+                      n_iters=2000)
 
 sub_exp_1 = Config(config_id=sub_exp_id,
                    env_params=env_params,
                    model_params=model_params,
-                   n_runs=3)
+                   n_runs=5,
+                   list_of_plots=["training_curves", "foraging_plot"])
 
 sargolini2006 = Config(config_id=sargolini_id,
                        sub_exp_1=sub_exp_1)
@@ -103,8 +104,39 @@ weber_and_sprekeler = Config(config_id=model_id,
 
 """ 1 - SR """
 
+env_params = Config(config_id="Sargolini2006_params",
+                    class_name="BasicSargolini2006",
+                    data_path="../envs/experiments/Sargolini2006",
+                    environment_name="Sargolini2006",
+                    time_step_size=0.1)
+
+model_params = Config(config_id="SR_params",
+                      class_name="SR",
+                      discount=0.9,
+                      threshold=1e-6,
+                      t_episode=100,
+                      n_episode=100,
+                      lr_td=1e-2,
+                      twoD=True,
+                      state_density=1,
+                      room_width=10,
+                      room_depth=10,
+                      n_iters=2000)
+
+sub_exp1 = Config(config_id=sub_exp_id,
+                  env_params=env_params,
+                  model_params=model_params,
+                  n_runs=5,
+                  list_of_plots=["training_curves", "foraging_plot"])
+
+sargolini2006 = Config(config_id=sargolini_id,
+                       sub_exp_1=sub_exp1)
+SR_model = Config(config_id="SR",
+                  exp_1=sargolini2006)
+
 cfg = Config(config_id="### Full Configuration ###",
-             model1=weber_and_sprekeler)
+             model1=weber_and_sprekeler,
+             model2=SR_model)
 
 custom_classes = Config(config_id="Custom_class_paths",
                         custom_classes_path=["from sehec.models.SRKim import SR",])

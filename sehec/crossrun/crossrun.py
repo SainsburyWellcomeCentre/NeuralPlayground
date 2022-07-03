@@ -61,7 +61,13 @@ class CrossRun(object):
                                         script_path = os.path.join(self.pckg_path, "crossrun/default_routine_script.py")
                                         cmd_line = 'python -u '+script_path+' "'+run_dir+'" > '+log_path
                                         print(cmd_line)
-                                        os.system(cmd_line)
+                                        exit_status = os.system(cmd_line)
+                                        with open(os.path.join(run_dir, 'status.log'), 'w') as f:
+                                            if exit_status == 0:
+                                                f.write('Finished')
+                                            else:
+                                                f.write('Failed')
+                                        # print("EXIT STATUS", exit_status)
 
     def run_cross_exp(self):
         self.go_to_experiment(run_experiment=True)
@@ -72,5 +78,5 @@ def check_experiment_status(dir, create=False, check=False):
     if create:
         os.makedirs(dir)
         with open(os.path.join(dir, 'status.log'), 'w') as f:
-            f.write('run_status: On Queue')
+            f.write('Queued')
     return check

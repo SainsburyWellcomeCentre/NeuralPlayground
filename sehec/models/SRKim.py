@@ -112,6 +112,7 @@ class SR(NeuralResponseModel):
         super().__init__(model_name, **mod_kwargs)
         self.metadata = {"mod_kwargs": mod_kwargs}
         self.obs_history = []  # Initialize observation history to update weights later
+        self.grad_history = []
         self.gamma = mod_kwargs["discount"]
         self.threshold = mod_kwargs["threshold"]
         self.learning_rate = mod_kwargs["lr_td"]
@@ -328,10 +329,10 @@ class SR(NeuralResponseModel):
         L = b.reshape(a.shape + (self.n_state,))
         curr_state_vec = L
 
-        self.srmat[:, self.curr_state] = self.srmat[:, self.curr_state] + self.learning_rate * (curr_state_vec +
-                                                                                    self.gamma * self.srmat[:,
-                                                                                                 next_state] - self.srmat[:,
-                                                                                                                      self.curr_state])
+        update_val = (curr_state_vec + self.gamma * self.srmat[:, next_state] - self.srmat[:,self.curr_state])
+        self.srmat[:, self.curr_state] = self.srmat[:, self.curr_state] + self.learning_rate *update_val
+
+        self.grad_history.append(np.sqrt(np.sum(update_val**2)))
         self.curr_state=next_state
 
         return self.srmat
