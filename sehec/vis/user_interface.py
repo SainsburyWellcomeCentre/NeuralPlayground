@@ -1,12 +1,13 @@
 import sehec
 from sehec.experimentconfig import cfg
 from bokeh.models import Panel, Tabs
-from bokeh.plotting import figure
+from bokeh.plotting import figure, gridplot
+from bokeh.layouts import row
 from bokeh.io import show
 import bokeh
 import os
 import glob
-from sehec.vis.set_of_frames import model_summary
+from sehec.vis.set_of_frames import model_summary, foraging_plot, training_curves
 
 
 class ResultsInterface(object):
@@ -24,15 +25,16 @@ class ResultsInterface(object):
     def _default_fig_params(self):
         """ Default figure parameters """
         self.figure_kwargs = dict()
-        self.figure_kwargs["width"] = 1000
-        self.figure_kwargs["height"] = 700
+        self.figure_kwargs["width"] = 1200
+        self.figure_kwargs["height"] = 1000
 
     def generate_panel(self):
         """ Loop to generate main user interface """
 
         """ Models summary, run status and results summary """
-        model_summary(results_path=self.results_path, config_file=self.config_file)
-        self.model_summary_fig = figure(**self.figure_kwargs)
+        self.model_summary_fig = model_summary(results_path=self.results_path,
+                                               config_file=self.config_file,
+                                               fig_kwargs=self.figure_kwargs)
         self.model_summary_panel = Panel(child=self.model_summary_fig, title="Models summary")
 
         """ Initializing model panels """
@@ -57,16 +59,20 @@ class ResultsInterface(object):
                         exp_dir_path = os.path.join(model_dir_path, exp_conf.config_id)
                         """ Last panel/tab level with experiments """
                         self.model_experiments[model_key][exp_key] = {}
-                        exp_figure = figure(**self.figure_kwargs)
-                        self.model_experiments[model_key][exp_key] = Panel(
-                            child=exp_figure,
-                            title=exp_conf.config_id
-                        )
-                        for sub_exp_key, sub_exp_conf in exp_conf.__dict__.items():
+                        for i, (sub_exp_key, sub_exp_conf) in enumerate(exp_conf.__dict__.items()):
                             if "sub_exp" in sub_exp_key:
                                 sub_exp_dir_path = os.path.join(exp_dir_path, sub_exp_conf.config_id)
                                 save_path = os.path.join(self.results_path, sub_exp_dir_path)
                                 run_list = glob.glob(os.path.join(save_path, "run*"))
+
+                        fig1 = foraging_plot(run_list[0], fig_kwargs=self.figure_kwargs)
+                        fig2 = training_curves(run_list[0], fig_kwargs=self.figure_kwargs)
+                        exp_figure = row([fig1, fig2])
+                        # exp_figure = figure(**self.figure_kwargs)
+                        self.model_experiments[model_key][exp_key] = Panel(
+                            child=exp_figure,
+                            title=exp_conf.config_id
+                        )
 
                 """ Creating specific model panel """
                 self.model_figs[model_key] = Tabs(tabs=[self.exp_summary_panel, ]+list(self.model_experiments[model_key].values()))

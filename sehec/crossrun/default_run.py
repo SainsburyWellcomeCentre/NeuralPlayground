@@ -15,12 +15,14 @@ for imp in import_list:
 def save_run(model, env, save_path, msg=""):
     if model is None or env is None:
         with open(os.path.join(save_path, 'status.log'), 'w') as f:
-            f.write('run_status: Failed! \n')
+            f.write('Failed')
             f.write(msg)
     else:
         with open(os.path.join(save_path, 'status.log'), 'w') as f:
-            f.write('run_status: Finished! \n')
+            f.write('Finished')
             f.write(msg)
+        pickle.dump(model, open(os.path.join(save_path, "model.pickle"), "wb"), protocol=pickle.HIGHEST_PROTOCOL)
+        pickle.dump(env, open(os.path.join(save_path, "env.pickle"), "wb"), protocol=pickle.HIGHEST_PROTOCOL)
     pass
 
 
