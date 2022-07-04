@@ -21,12 +21,14 @@ class MergingRoom2D(Simple2D):
             self.state = [np.random.uniform(low=self.arena_limits[0, 0], high=self.arena_limits[0, 1]),
                           np.random.uniform(low=self.arena_limits[1, 0], high=0)]
             self.custom_walls = [np.array([[-100, 0], [100, 0]])]
+            self.wall_list = self.default_walls + self.custom_walls
         elif room_id == self.B_id:
             self.state = [np.random.uniform(low=self.arena_limits[0, 0], high=self.arena_limits[0, 1]),
                           np.random.uniform(low=0, high=self.arena_limits[1, 1])]
         elif room_id == self.AB_id:
             if len(self.custom_walls) != 0:
                 self.custom_walls.pop()
+                self.wall_list = self.default_walls + self.custom_walls
 
     def _create_custom_walls(self):
         self.custom_walls = [np.array([[-100, 0], [100, 0]])]
@@ -35,9 +37,9 @@ class MergingRoom2D(Simple2D):
         if self.run_full_experiment:
             if self.global_steps == 0:
                 self.set_room("A")
-            elif self.global_steps >= self.merge_time:
+            elif self.global_steps == self.merge_time:
                 self.set_room("AB")
-            elif self.global_steps >= self.switch_time:
+            elif self.global_steps == self.switch_time:
                 self.set_room("B")
 
         return super().step(action)
