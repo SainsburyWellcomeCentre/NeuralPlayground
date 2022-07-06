@@ -31,19 +31,22 @@ class TEM(NeuralResponseModel):
         self.reset()
 
         # Inputs for TEM
-        self.objects = np.zeros(shape=(45, self.t_episode))
-        for i in range(self.t_episode):
-            rand = random.randrange(0, 45)
-            self.objects[rand][i] = 1 
-        random.shuffle(self.objects[0])
-
         self. n_phases_all = [10, 10, 8, 6, 6]
         self.n_freq = len(self.n_phases_all)
+        self.freq = [0.01, 0.7, 0.91, 0.97, 0.99, 0.9995]
+        self.s_size = 45
         self.s_size_comp = 10
-        self.table = combins_table(self.s_size_comp, 2)
+        self.g_init = 0.5
+        self.table, rev_table = combins_table(self.s_size_comp, 2)
+        self.x_ = np.zeros(shape=(self.s_size_comp * self.n_freq))
         self.n_grids_all = [int(3 * n_phase) for n_phase in self.n_phases_all]
         self.g_size = sum(self.n_grids_all)
-        self.g_init = 0.5
+
+        self.objects = np.zeros(shape=(self.s_size, self.t_episode))
+        for i in range(self.t_episode):
+            rand = random.randrange(0, self.s_size)
+            self.objects[rand][i] = 1 
+        random.shuffle(self.objects[0])
         
         # Variables for the SR-agent state space
         self.resolution_d = int(self.state_density * self.room_depth)
@@ -90,12 +93,12 @@ class TEM(NeuralResponseModel):
         self.obs_history.append(obs)
         if len(self.obs_history) >= 1000:
             self.obs_history = [obs, ]
-        # # Initialisation of filtered x
-        # if len(self.obs_history) == 1:
-        #     x_t = np.zeros(shape=(self.s_size_comp * self.n_freq))
-        # # Pointing to previous x
-        # else:
-        #     x_t = self.objects[len(self.obs_history)]
+        # Initialisation of filtered x
+        if len(self.obs_history) == 1:
+            x_t = self.x_
+        # Pointing to previous x
+        else:
+            x_t = self.objects[len(self.obs_history)]
         arrow=[[0,1],[0,-1],[1,0],[-1,0]]
         action = np.random.normal(scale=0.1, size=(2,))
         diff = action- arrow
@@ -104,13 +107,13 @@ class TEM(NeuralResponseModel):
         action = arrow[index]
         self.next_state, self.next_object = self.obs_to_state(obs)
 
-        # # Two-hot Encoding
-        # x_two_hot = onehot2twohot(self, self.next_object, self.table, self.s_size_comp)
+        # Two-hot Encoding
+        self.x_two_hot = onehot2twohot(self, self.next_object, self.table, self.s_size_comp)
 
-        # # Temporally filter
-        # x_ = x2x_(self, x_two_hot, x_t)
+        # Temporally filter
+        self.x_ = x2x_(self, self.x_two_hot, x_t)
 
-        return action, self.next_object, # x_, x_two_hot
+        return action, self.next_object, self.x_, self.x_two_hot
 
 
 # HELPER FUNCTIONS
@@ -166,6 +169,8 @@ def combins(n, k, m):
     return tuple(s)
 
 def combins_table(n, k, map_max=None):
+    " Produces a table of s_size two-hot encoded vectors, each of size 10."
+
     table = []
     rev_table = {}
     table_top = scipy.special.comb(n, k)
@@ -178,16 +183,12 @@ def combins_table(n, k, map_max=None):
         else:
             rev_table[c] = m % map_max
     
-    return table, 
+    return table, rev_table
     
 def onehot2twohot(self, onehot, table, compress_size):
-    seq_len = np.shape(onehot)[2]
-    batch_size = np.shape(onehot)[0]
-    twohot = np.zeros((batch_size, compress_size, seq_len))
-    for i in range(np.shape(onehot)[2]):
-        vals = np.argmax(onehot[:, :, i], 1)
-        for b in range(np.shape(onehot)[0]):
-            twohot[b, :, i] = table[vals[int(b)]]
+    twohot = np.zeros(compress_size)
+    val = np.argmax(list(onehot))
+    twohot = table[val][:]
 
     return twohot
 
@@ -196,7 +197,7 @@ def x2x_(self, x, x_):
     for i in range(self.n_freq):
         with tf.variable_scope("x2x_" + str(i), reuse=tf.AUTO_REUSE):
                 gamma = tf.get_variable("w_smooth_freq", [1], initializer=tf.constant_initializer(
-                    np.log(self.par['freqs'][i] / (1 - self.par['freqs'][i]))),
+                    np.log(self.freq[i] / (1 - self.freq[i]))),
                                         trainable=True)
         # Inverse sigmoid as initial parameter
         a = tf.sigmoid(gamma)
