@@ -445,6 +445,7 @@ class Sargolini2006(Simple2D):
         env_kwargs["arena_x_limits"] = self.arena_x_limits
         env_kwargs["arena_y_limits"] = self.arena_y_limits
         env_kwargs["agent_step_size"] = 1/50  # In seconds
+        self.random_steps = env_kwargs["random_steps"]
         super().__init__(environment_name, **env_kwargs)
         self.metadata["doi"] = "https://doi.org/10.1126/science.1125572"
         self.total_number_of_steps = self.data.position.shape[0]
@@ -472,6 +473,8 @@ class Sargolini2006(Simple2D):
         if not sess is None:
             self.data = FullSargoliniData(data_path=self.data_path, experiment_name=self.environment_name,
                                           verbose=self.verbose, session=sess)
+        if self.random_steps:
+            return super().reset()
 
         self.global_steps = 0
         self.global_time = 0
@@ -482,7 +485,7 @@ class Sargolini2006(Simple2D):
         observation = self.make_observation()
         return observation, self.state
 
-    def step(self, action):
+    def step(self, action, skip_every=10):
         """ Increment the global step count of the agent in the environment and updates the position of the agent according
         to the recordings of the specific chosen session (Action is ignored in this case)
 
@@ -503,11 +506,14 @@ class Sargolini2006(Simple2D):
             Array of the observation of the agent in the environment ( Could be modified as the environments are evolves)
 
         """
-        if self.global_steps >= self.data.position.shape[0]-1:
-            self.global_steps = 0
+        if self.random_steps:
+            return super().step(action)
+        if self.global_steps*skip_every >= self.data.position.shape[0]-1:
+            self.global_steps = np.random.choice(np.arange(skip_every))
         self.global_time = self.global_steps*self.agent_step_size
         reward = 0  # If you get reward, it should be coded here
-        new_state = self.data.position[self.global_steps, :], self.data.head_direction[self.global_steps, :]
+        new_state = self.data.position[self.global_steps*(skip_every), :], \
+                    self.data.head_direction[self.global_steps*(skip_every), :]
         new_state = np.concatenate(new_state)
         transition = {"action": action, "state": self.state, "next_state": new_state,
                       "reward": reward, "step": self.global_steps}

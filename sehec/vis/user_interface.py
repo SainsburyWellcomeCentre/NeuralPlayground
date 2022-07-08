@@ -2,12 +2,12 @@ import sehec
 from sehec.experimentconfig import cfg
 from bokeh.models import Panel, Tabs
 from bokeh.plotting import figure, gridplot
-from bokeh.layouts import row
+from bokeh.layouts import row, column
 from bokeh.io import show
 import bokeh
 import os
 import glob
-from sehec.vis.set_of_frames import model_summary, foraging_plot, training_curves
+from sehec.vis.set_of_frames import model_summary, foraging_plot, training_curves, grid_cell_comparison
 
 
 class ResultsInterface(object):
@@ -68,7 +68,9 @@ class ResultsInterface(object):
                         fig1 = foraging_plot(run_list[0], fig_kwargs=self.figure_kwargs)
                         fig2 = training_curves(run_list[0], fig_kwargs=self.figure_kwargs)
                         exp_figure = row([fig1, fig2])
-                        # exp_figure = figure(**self.figure_kwargs)
+                        if "grid_cell_comparison" in exp_conf.sub_exp_1.list_of_plots:
+                            grid_cell_figure = grid_cell_comparison(run_list[0], fig_kwargs=self.figure_kwargs)
+                            exp_figure = column([exp_figure, grid_cell_figure])
                         self.model_experiments[model_key][exp_key] = Panel(
                             child=exp_figure,
                             title=exp_conf.config_id

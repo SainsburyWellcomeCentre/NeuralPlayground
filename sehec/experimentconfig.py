@@ -1,7 +1,9 @@
 #  Config file with default parameters for each experiment
 import numpy as np
 from copy import deepcopy
-from sehec.envs.arenas.simple2d import BasicSargolini2006
+import sehec
+import os
+from sehec.envs.arenas.simple2d import BasicSargolini2006, Sargolini2006
 from sehec.models.weber_and_sprekeler import ExcInhPlasticity
 
 
@@ -65,10 +67,12 @@ sub_exp_id = "sargolini2006_2d_foraging"
 
 """ 4 - Environment parameters """
 env_params = Config(config_id="Sargolini2006_params",
-                    class_name="BasicSargolini2006",
-                    data_path="../envs/experiments/Sargolini2006",
+                    class_name="Sargolini2006",
+                    data_path=os.path.join(sehec.__path__[0], "envs/experiments/Sargolini2006/raw_data_sample/"), #"../envs/experiments/Sargolini2006",
+                    session = {"rat_id": "11016", "sess": "31010502"},
                     environment_name="Sargolini2006",
-                    time_step_size=0.1)
+                    time_step_size=0.1,
+                    random_steps=False)
 model_params = Config(config_id="weber_and_sprekeler_params",
                       class_name="ExcInhPlasticity",
                       exc_eta=2e-4,
@@ -78,8 +82,8 @@ model_params = Config(config_id="weber_and_sprekeler_params",
                       sigma_inh=np.array([0.1, 0.1]),
                       Ne=4900,
                       Ni=1225,
-                      Nef=1,
-                      Nif=1,
+                      Nef=10,
+                      Nif=10,
                       alpha_i=1,
                       alpha_e=1,
                       we_init=1.0,
@@ -88,13 +92,13 @@ model_params = Config(config_id="weber_and_sprekeler_params",
                       ro=1,
                       room_width=10,
                       room_depth=10,
-                      n_iters=2000)
+                      n_iters=10000)
 
 sub_exp_1 = Config(config_id=sub_exp_id,
                    env_params=env_params,
                    model_params=model_params,
                    n_runs=5,
-                   list_of_plots=["training_curves", "foraging_plot"])
+                   list_of_plots=["training_curves", "foraging_plot", "grid_cell_comparison"])
 
 sargolini2006 = Config(config_id=sargolini_id,
                        sub_exp_1=sub_exp_1)
@@ -106,7 +110,8 @@ weber_and_sprekeler = Config(config_id=model_id,
 
 env_params = Config(config_id="Sargolini2006_params",
                     class_name="BasicSargolini2006",
-                    data_path="../envs/experiments/Sargolini2006",
+                    data_path=os.path.join(sehec.__path__[0], "envs/experiments/Sargolini2006/raw_data_sample/"), #"../envs/experiments/Sargolini2006",
+                    session = {"rat_id": "11016", "sess": "31010502"},
                     environment_name="Sargolini2006",
                     time_step_size=0.1)
 
@@ -121,7 +126,7 @@ model_params = Config(config_id="SR_params",
                       state_density=1,
                       room_width=10,
                       room_depth=10,
-                      n_iters=2000)
+                      n_iters=1000)
 
 sub_exp1 = Config(config_id=sub_exp_id,
                   env_params=env_params,

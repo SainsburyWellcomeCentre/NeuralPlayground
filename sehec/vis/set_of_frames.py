@@ -3,6 +3,7 @@ from bokeh.plotting import figure
 from bokeh.models import ColumnDataSource, TableColumn, DataTable
 from bokeh.io import show
 from bokeh.models.widgets import DataTable, TableColumn, HTMLTemplateFormatter, Div
+from bokeh.layouts import row
 import pandas as pd
 import os
 import glob
@@ -101,25 +102,40 @@ def model_summary(results_path, config_file, fig_kwargs):
     return my_table
 
 
-def grid_cell_comparison():
-    pass
+def grid_cell_comparison(run_path, fig_kwargs, scale=0.5):
+    """ Model rates """
+    model = pd.read_pickle(os.path.join(run_path, "model.pickle"))
+    fig_path = os.path.join(run_path, "model_rates.png")
+    model.plot_rates(save_path=fig_path)
+    div_image_model = Div(
+        text='<img src="' + fig_path + '" alt="div_image" style="height: 100%; width: 100%;" >',
+        width=int(fig_kwargs["width"] * 0.6), height=int(fig_kwargs["height"] * 0.6))
+
+    """ Data rates """
+    env = pd.read_pickle(os.path.join(run_path, "env.pickle"))
+    fig_path = os.path.join(run_path, "data_rates.png")
+    env.data.plot_session(save_path=fig_path)
+    div_image_env = Div(
+        text='<img src="' + fig_path + '" alt="div_image" style="height: 100%; width: 100%;" >',
+        width=int(fig_kwargs["width"] * 0.4), height=int(fig_kwargs["height"] * 0.4))
+    return row([div_image_model, div_image_env])
 
 
-def training_curves(run_path, fig_kwargs):
+def training_curves(run_path, fig_kwargs, scale=0.5):
     model = pd.read_pickle(os.path.join(run_path, "model.pickle"))
     grads = model.grad_history
     p = figure(title="Training", x_axis_label='iters', y_axis_label='grad size',
-               width=int(fig_kwargs["width"]*0.5), height=int(fig_kwargs["height"]*0.5))
+               width=int(fig_kwargs["width"]*scale), height=int(fig_kwargs["height"]*scale))
     p.line(np.arange(len(grads)), grads, line_width=3)
     return p
 
 
-def foraging_plot(run_path, fig_kwargs):
+def foraging_plot(run_path, fig_kwargs, scale=0.5):
     env = pd.read_pickle(os.path.join(run_path, "env.pickle"))
     f, ax = env.plot_trajectory(return_figure=True)
     fig_path = os.path.join(run_path, "Foraging_plot.png")
     plt.savefig(fig_path, bbox_inches="tight")
     div_image = Div(
         text='<img src="'+fig_path+'" alt="div_image" style="height: 100%; width: 100%;" >',
-        width=int(fig_kwargs["width"]*0.5), height=int(fig_kwargs["height"]*0.5))
+        width=int(fig_kwargs["width"]*scale), height=int(fig_kwargs["height"]*scale))
     return div_image
