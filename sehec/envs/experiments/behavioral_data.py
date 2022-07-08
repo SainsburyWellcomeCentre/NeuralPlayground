@@ -215,7 +215,7 @@ class FullSargoliniData(object):
         with open(readme_path, 'r') as fin:
             print(fin.read())
 
-    def plot_session(self, ax=None):
+    def plot_session(self, save_path=None, ax=None):
         # print(self.data_per_animal[self.best_session["rat"]][self.best_session["sess"]])
         cell_data = self.data_per_animal[self.rat_id][self.sess]
         position_data = cell_data["position"]
@@ -249,7 +249,11 @@ class FullSargoliniData(object):
             count_i += 1
             if count_i >= 5:
                 break
-        return ax
+        if not save_path is None:
+            plt.savefig(save_path, bbox_inches="tight")
+            plt.close("all")
+        else:
+            return ax
         # plt.show()
 
     def set_behavioral_data(self, rat_id=None, session=None):
