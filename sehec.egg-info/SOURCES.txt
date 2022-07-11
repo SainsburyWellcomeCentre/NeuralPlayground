@@ -15,6 +15,9 @@ sehec/models/SRKim.py
 sehec/models/__init__.py
 sehec/models/modelcore.py
 sehec/models/weber_and_sprekeler.py
+sehec/models/TEM/__init__.py
+sehec/models/TEM/environment.py
+sehec/models/TEM/model.py
 sehec/tests/__init__.py
 sehec/tests/environment_test.py
 sehec/tests/model_test.py

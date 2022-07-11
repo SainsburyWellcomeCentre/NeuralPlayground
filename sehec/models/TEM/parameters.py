@@ -5,7 +5,7 @@ def default_params():
     params = dict()
 
     params['batch_size'] = 16
-    params['time_each_step'] = 1
+    params['time_step_size'] = 1
     params['agent_step_size'] = 0.2
     params['discount'] = .9
     params['threshold'] = 1e-6
@@ -14,6 +14,9 @@ def default_params():
     params['n_episode'] = 1
     params['state_density'] = 1
     params['twoDvalue'] = True
+
+    params['room_width'] = 2
+    params['room_depth'] = 2
 
     params['world_type'] = 'square'
     params['n_envs'] = params['batch_size']
@@ -26,7 +29,7 @@ def default_params():
 
 
 def get_states(pars):
-    world_type, n_envs, n_laps = pars['world_type'], pars['n_envs'], pars['n_laps']
+    world_type, n_envs = pars['world_type'], pars['n_envs']
     poss_heights = [8, 8, 9, 9, 11, 11, 12, 12, 8, 8, 9, 9, 11, 11, 12, 12]
 
     if world_type == 'square':

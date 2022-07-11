@@ -1,6 +1,5 @@
 import sys
 sys.path.append("../")
-
 import numpy as np
 import random
 import matplotlib.pyplot as plt
@@ -11,10 +10,11 @@ from tqdm import tqdm
 
 from sehec.models.modelcore import NeuralResponseModel
 from sehec.envs.arenas.simple2d import Simple2D
-from parameters import *
+from sehec.models.TEM.parameters import *
 
 fu_co = layer.fully_connected
 eps = 1e-8
+
 
 class TEM(NeuralResponseModel):
     def __init__(self, model_name="TEM", **mod_kwargs):
@@ -34,12 +34,12 @@ class TEM(NeuralResponseModel):
         self.reset()
 
         # Model Parameters
-        self.infer_g_type = 'g_p' # 'g'
+        self.infer_g_type = 'g_p'  # 'g'
         self.no_direc_gen = False
 
         # Inputs for TEM
         self.batch_size = 16
-        self. n_phases_all = [10, 10, 8, 6, 6]
+        self.n_phases_all = [10, 10, 8, 6, 6]
         self.freq = [0.01, 0.7, 0.91, 0.97, 0.99, 0.9995]
         self.s_size = 45
         self.s_size_comp = 10
@@ -60,9 +60,9 @@ class TEM(NeuralResponseModel):
         for i in range(self.batch_size):
             for j in range(self.t_episode):
                 rand = random.randrange(0, self.s_size)
-                self.objects[i][rand][j] = 1 
-        # random.shuffle(self.objects[:][0])
-        
+                self.objects[i][rand][j] = 1
+                # random.shuffle(self.objects[:][0])
+
         # Variables for the SR-agent state spaceg
         self.resolution_d = int(self.state_density * self.room_depth)
         self.resolution_w = int(self.state_density * self.room_width)
@@ -74,7 +74,7 @@ class TEM(NeuralResponseModel):
         self.l = int(self.room_depth * self.state_density)
         self.n_state = int(self.l * self.w)
         self.obs_history = []
-        if twoD==True:
+        if twoD == True:
             adjs, trans = square_world(self.w)
             # self.create_transmat(self.state_density,  '2D_env')
 
@@ -86,7 +86,7 @@ class TEM(NeuralResponseModel):
         print("Transition matrix: ")
         print(trans)
         print("n_states: ", self.n_state)
-        print("First sensory observation: ", self.objects[0,:,0])
+        print("First sensory observation: ", self.objects[0, :, 0])
         print("Size of g: ", self.g_size)
 
     def reset(self):
@@ -101,8 +101,8 @@ class TEM(NeuralResponseModel):
         diff = self.xy_combinations - pos[np.newaxis, ...]
         dist = np.sum(diff ** 2, axis=1)
         index = np.argmin(dist)
-        curr_state=index
-        x = self.objects[:,:,index]
+        curr_state = index
+        x = self.objects[:, :, index]
 
         return curr_state, x
 
@@ -114,9 +114,9 @@ class TEM(NeuralResponseModel):
             if len(self.obs_history) >= 1000:
                 self.obs_history = [obs, ]
 
-            arrow=[[0,1],[0,-1],[1,0],[-1,0]]
+            arrow = [[0, 1], [0, -1], [1, 0], [-1, 0]]
             action = np.random.normal(scale=0.1, size=(2,))
-            diff = action- arrow
+            diff = action - arrow
             dist = np.sum(diff ** 2, axis=1)
             index = np.argmin(dist)
             action = arrow[index]
@@ -129,9 +129,10 @@ class TEM(NeuralResponseModel):
 
         return actions, xs, x_, x_two_hot
 
+
 def calculate(self, x):
     i = len(self.obs_history)
-        # Initialisation of filtered x
+    # Initialisation of filtered x
     if len(self.obs_history) == 1:
         x_t = self.x_s
         g_t = self.gs
@@ -139,7 +140,7 @@ def calculate(self, x):
     else:
         x_t = self.x_[i - 1]
         g_t = self.g[i - 1]
-        
+
     # Two-hot Encoding
     x_two_hot = onehot2twohot(self, x, self.table, self.s_size_comp)
 
@@ -159,27 +160,30 @@ def initialise_hebbian(self):
 
     return a_rnn, a_rnn_inv
 
-def initialise_variables(self):
-        gs = np.maximum(np.random.randn(self.g_size) * self.g_init, 0)
-        x_s = np.zeros((self.s_size_comp * self.n_freq))
-        
-        visited = np.zeros(self.n_state)
 
-        return gs, x_s, visited
+def initialise_variables(self):
+    gs = np.maximum(np.random.randn(self.g_size) * self.g_init, 0)
+    x_s = np.zeros((self.s_size_comp * self.n_freq))
+
+    visited = np.zeros(self.n_state)
+
+    return gs, x_s, visited
+
 
 def hierarchical_logsig(self, x, name, splits, sizes, trainable, concat, k=2):
-        xs = x if splits == 'done' else tf.split(value=x, num_or_size_splits=splits, axis=1)
-        xs = [tf.stop_gradient(x) for x in xs]
+    xs = x if splits == 'done' else tf.split(value=x, num_or_size_splits=splits, axis=1)
+    xs = [tf.stop_gradient(x) for x in xs]
 
-        logsigs_ = [fu_co(xs[i], k * sizes[i], activation_fn=tf.nn.elu, reuse=tf.AUTO_REUSE, scope=name + '_' + str(i),
-                          weights_initializer=layer.xavier_initializer(),
-                          trainable=trainable) for i in range(self.n_freq)]
-        logsigs = [self.logsig_ratio * fu_co(logsigs_[i], sizes[i], activation_fn=tf.nn.tanh,
-                                                    reuse=tf.AUTO_REUSE, scope=name + str(i),
-                                                    weights_initializer=layer.xavier_initializer(),
-                                                    trainable=trainable) for i in range(self.n_freq)]
+    logsigs_ = [fu_co(xs[i], k * sizes[i], activation_fn=tf.nn.elu, reuse=tf.AUTO_REUSE, scope=name + '_' + str(i),
+                      weights_initializer=layer.xavier_initializer(),
+                      trainable=trainable) for i in range(self.n_freq)]
+    logsigs = [self.logsig_ratio * fu_co(logsigs_[i], sizes[i], activation_fn=tf.nn.tanh,
+                                         reuse=tf.AUTO_REUSE, scope=name + str(i),
+                                         weights_initializer=layer.xavier_initializer(),
+                                         trainable=trainable) for i in range(self.n_freq)]
 
-        return tf.concat(logsigs, axis=1) if concat else logsigs
+    return tf.concat(logsigs, axis=1) if concat else logsigs
+
 
 def square_world(width):
     stay_still = True
@@ -203,7 +207,7 @@ def square_world(width):
     for i in range(states):
         if sum(adj[i]) > 0:
             tran[i] = adj[i] / sum(adj[i])
-    
+
     f, ax = plt.subplots(1, 1, figsize=(14, 5))
     ax.imshow(tran, interpolation='nearest')
 
@@ -211,6 +215,7 @@ def square_world(width):
     ax.imshow(adj, interpolation='nearest')
 
     return adj, tran
+
 
 def combins(n, k, m):
     s = []
@@ -223,6 +228,7 @@ def combins(n, k, m):
         else:
             s.append(0)
     return tuple(s)
+
 
 def combins_table(n, k, map_max=None):
     " Produces a table of s_size two-hot encoded vectors, each of size 10."
@@ -237,9 +243,10 @@ def combins_table(n, k, map_max=None):
             rev_table[c] = m
         else:
             rev_table[c] = m % map_max
-    
+
     return table, rev_table
-    
+
+
 def onehot2twohot(self, onehot, table, compress_size):
     seq_len = np.shape(onehot)[2]
     batch_size = np.shape(onehot)[0]
@@ -251,103 +258,112 @@ def onehot2twohot(self, onehot, table, compress_size):
 
     return twohot
 
+
 def x2x_(self, x, x_):
     x_ = [0] * self.n_freq
     for i in range(self.n_freq):
         with tf.variable_scope("x2x_" + str(i), reuse=tf.AUTO_REUSE):
-                gamma = tf.get_variable("w_smooth_freq", [1], initializer=tf.constant_initializer(
-                    np.log(self.freq[i] / (1 - self.freq[i]))),
-                                        trainable=True)
+            gamma = tf.get_variable("w_smooth_freq", [1], initializer=tf.constant_initializer(
+                np.log(self.freq[i] / (1 - self.freq[i]))),
+                                    trainable=True)
         # Inverse sigmoid as initial parameter
         a = tf.sigmoid(gamma)
         # Filter
         x_[i] = a * x_[i] + x * (1 - a)
-    
+
     return x_
 
+
 def gen_g(self, g, d):
-        """generates grid cells from previous time step - sepatated into when for inferene and generation"""
-        # generative prior on grids if first step in environment, else transition
-        mu, sigma = tf.cond(self.seq_pos > 0, true_fn=lambda: self.g2g(g, d, self.no_direc_gen, name='gen'),
-                            false_fn=lambda: self.g_prior())
+    """generates grid cells from previous time step - sepatated into when for inferene and generation"""
+    # generative prior on grids if first step in environment, else transition
+    mu, sigma = tf.cond(self.seq_pos > 0, true_fn=lambda: self.g2g(g, d, self.no_direc_gen, name='gen'),
+                        false_fn=lambda: self.g_prior())
 
-        # the same but for used for inference network
-        mu_inf, sigma_inf = tf.cond(self.seq_pos > 0, true_fn=lambda: self.g2g(g, d, False, name='inf'),
-                                    false_fn=lambda: self.g_prior())
+    # the same but for used for inference network
+    mu_inf, sigma_inf = tf.cond(self.seq_pos > 0, true_fn=lambda: self.g2g(g, d, False, name='inf'),
+                                false_fn=lambda: self.g_prior())
 
-        return mu, (mu_inf, sigma_inf)
+    return mu, (mu_inf, sigma_inf)
+
 
 def g2g(self, g, d, no_direc=False, name=''):
-        """make grid to grid transisiton"""
-        # transition update
-        update = self.get_g2g_update(g, d, no_direc, name='')
-        # add on update to current representation
-        mu = update + g
-        # apply activation
-        mu = self.f_g(mu)
-        # get variance
-        logsig = self.hierarchical_logsig(g, 'sig_g2g' + name, self.n_grids_all, self.n_grids_all,
-                                            self.par['train_sig_g2g'], concat=True)
-        logsig += self.par['logsig_offset']
+    """make grid to grid transisiton"""
+    # transition update
+    update = self.get_g2g_update(g, d, no_direc, name='')
+    # add on update to current representation
+    mu = update + g
+    # apply activation
+    mu = self.f_g(mu)
+    # get variance
+    logsig = self.hierarchical_logsig(g, 'sig_g2g' + name, self.n_grids_all, self.n_grids_all,
+                                      self.par['train_sig_g2g'], concat=True)
+    logsig += self.par['logsig_offset']
 
-        sigma = tf.exp(logsig)
+    sigma = tf.exp(logsig)
 
-        return mu, sigma
+    return mu, sigma
+
 
 def get_g2g_update(self, g_p, d, no_direc, name=''):
-        # get transition matrix
-        t_mat = self.get_transition(d, name)
-        # multiply current entorhinal representation by transition matrix
-        update = tf.reshape(tf.matmul(t_mat, tf.reshape(g_p, [self.par['batch_size'], self.par['g_size'], 1])),
-                            [self.par['batch_size'], self.par['g_size']])
+    # get transition matrix
+    t_mat = self.get_transition(d, name)
+    # multiply current entorhinal representation by transition matrix
+    update = tf.reshape(tf.matmul(t_mat, tf.reshape(g_p, [self.par['batch_size'], self.par['g_size'], 1])),
+                        [self.par['batch_size'], self.par['g_size']])
 
-        if no_direc:
-            # directionless transition weights - used in OVC environments
-            with tf.variable_scope("g2g_directionless_weights" + name, reuse=tf.AUTO_REUSE):
-                t_mat_2 = tf.get_variable("g2g" + name, [self.g_size, self.g_size])
-                t_mat_2 = tf.multiply(t_mat_2, self.mask_g)
+    if no_direc:
+        # directionless transition weights - used in OVC environments
+        with tf.variable_scope("g2g_directionless_weights" + name, reuse=tf.AUTO_REUSE):
+            t_mat_2 = tf.get_variable("g2g" + name, [self.g_size, self.g_size])
+            t_mat_2 = tf.multiply(t_mat_2, self.mask_g)
 
-            update = tf.where(self.no_direction > 0.5, x=tf.matmul(g_p, t_mat_2), y=update)
+        update = tf.where(self.no_direction > 0.5, x=tf.matmul(g_p, t_mat_2), y=update)
 
-        return update
+    return update
+
 
 def g_prior(self, name=''):
-        """Gives prior distribution for grid cells"""
-        with tf.variable_scope("g_prior", reuse=tf.AUTO_REUSE):
-            mu = tf.tile(tf.get_variable("mu_g_prior" + name, [1, self.g_size],
-                                            initializer=tf.truncated_normal_initializer(stddev=self.g_init)), [self.par['batch_size'], 1])
-            logsig = tf.tile(tf.get_variable("logsig_g_prior" + name, [1, self.par['g_size']],
-                                                initializer=tf.truncated_normal_initializer(stddev=self.g_init)), [self.par['batch_size'], 1])
+    """Gives prior distribution for grid cells"""
+    with tf.variable_scope("g_prior", reuse=tf.AUTO_REUSE):
+        mu = tf.tile(tf.get_variable("mu_g_prior" + name, [1, self.g_size],
+                                     initializer=tf.truncated_normal_initializer(stddev=self.g_init)),
+                     [self.par['batch_size'], 1])
+        logsig = tf.tile(tf.get_variable("logsig_g_prior" + name, [1, self.par['g_size']],
+                                         initializer=tf.truncated_normal_initializer(stddev=self.g_init)),
+                         [self.par['batch_size'], 1])
 
-        sigma = tf.exp(logsig)
+    sigma = tf.exp(logsig)
 
-        return mu, sigma
+    return mu, sigma
 
 
-#------------------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------------------------
 # MAIN
 env_name = "env_example"
 pars = default_params()
 # Initialise Environment
-env = Simple2D(environment_name=env_name, room_width=room_width,
-                room_depth=room_depth, time_step_size=time_step_size, agent_step_size=agent_step_size)
+env = Simple2D(environment_name=env_name, room_width=pars['room_width'],
+               room_depth=pars['room_depth'], time_step_size=pars['time_step_size'],
+               agent_step_size=pars['agent_step_size'])
 
-agent = TEM(discount=discount, t_episode=t_episode, threshold=threshold, lr_td=lr_td,
-            room_width=env.room_width, room_depth=env.room_depth, state_density=state_density, twoD=twoDvalue)
+agent = TEM(discount=pars['discount'], t_episode=pars['t_episode'], threshold=pars['threshold'], lr_td=pars['lr_td'],
+            room_width=pars['room_width'], room_depth=pars['room_depth'], state_density=pars['state_density'],
+            twoD=pars['twoDvalue'])
 
 total_iters = 0
 obs, state = env.reset()
 obs = obs[:2]
 xs = []
 # actions = [[-1,0], [0,1], [-1,0], [0,1], [-1,0]]
-for i in range(n_episode):
+for i in range(pars['n_episode']):
     # Initialise Environment Batch
     adjs, trans = env.make_environment()
     a_rnn, a_rnn_inv = initialise_hebbian()
     gs, x_s, visited = initialise_variables()
     actions, x, x_, x_two_hot = agent.act(obs)
     # action = actions[j]
-    for j in range(t_episode):
+    for j in range(pars['t_episode']):
         obs, state, reward = env.step(actions[j])
         obs = obs[:2]
     xs.append(xs)
