@@ -17,6 +17,13 @@ def default_params():
 
     params['room_width'] = 2
     params['room_depth'] = 2
+    params['stay_still'] = True
+    params['p_size'] =
+    params['g_size'] =
+    params['g_init'] =
+    params['s_size_comp'] =
+    params['n_freq'] =
+    params['n_state'] =
 
     params['world_type'] = 'square'
     params['n_envs'] = params['batch_size']

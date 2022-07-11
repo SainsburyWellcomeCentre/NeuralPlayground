@@ -1,4 +1,5 @@
 import sys
+
 sys.path.append("../")
 import numpy as np
 import random
@@ -9,7 +10,7 @@ import scipy
 from tqdm import tqdm
 
 from sehec.models.modelcore import NeuralResponseModel
-from sehec.envs.arenas.simple2d import Simple2D
+from sehec.envs.arenas.TEMenv import TEMenv
 from sehec.models.TEM.parameters import *
 
 fu_co = layer.fully_connected
@@ -154,22 +155,6 @@ def calculate(self, x):
 
 
 # HELPER FUNCTIONS
-def initialise_hebbian(self):
-    a_rnn = np.zeros((self.p_size, self.p_size))
-    a_rnn_inv = np.zeros((self.p_size, self.p_size))
-
-    return a_rnn, a_rnn_inv
-
-
-def initialise_variables(self):
-    gs = np.maximum(np.random.randn(self.g_size) * self.g_init, 0)
-    x_s = np.zeros((self.s_size_comp * self.n_freq))
-
-    visited = np.zeros(self.n_state)
-
-    return gs, x_s, visited
-
-
 def hierarchical_logsig(self, x, name, splits, sizes, trainable, concat, k=2):
     xs = x if splits == 'done' else tf.split(value=x, num_or_size_splits=splits, axis=1)
     xs = [tf.stop_gradient(x) for x in xs]
@@ -183,38 +168,6 @@ def hierarchical_logsig(self, x, name, splits, sizes, trainable, concat, k=2):
                                          trainable=trainable) for i in range(self.n_freq)]
 
     return tf.concat(logsigs, axis=1) if concat else logsigs
-
-
-def square_world(width):
-    stay_still = True
-    states = int(width ** 2)
-    adj = np.zeros((states, states))
-
-    for i in range(states):
-        # stay still
-        if stay_still:
-            adj[i, i] = 1
-        # up - down
-        if i + width < states:
-            adj[i, i + width] = 1
-            adj[i + width, i] = 1
-            # left - right
-        if np.mod(i, width) != 0:
-            adj[i, i - 1] = 1
-            adj[i - 1, i] = 1
-
-    tran = np.zeros((states, states))
-    for i in range(states):
-        if sum(adj[i]) > 0:
-            tran[i] = adj[i] / sum(adj[i])
-
-    f, ax = plt.subplots(1, 1, figsize=(14, 5))
-    ax.imshow(tran, interpolation='nearest')
-
-    f, ax = plt.subplots(1, 1, figsize=(14, 5))
-    ax.imshow(adj, interpolation='nearest')
-
-    return adj, tran
 
 
 def combins(n, k, m):
@@ -342,10 +295,11 @@ def g_prior(self, name=''):
 # MAIN
 env_name = "env_example"
 pars = default_params()
-# Initialise Environment
-env = Simple2D(environment_name=env_name, room_width=pars['room_width'],
-               room_depth=pars['room_depth'], time_step_size=pars['time_step_size'],
-               agent_step_size=pars['agent_step_size'])
+# Initialise Environment(s)
+env = TEMenv(environment_name=env_name, room_width=pars['room_width'], room_depth=pars['room_depth'],
+             time_step_size=pars['time_step_size'], agent_step_size=pars['agent_step_size'],
+             stay_still=pars['stay_still'], p_size=pars['p_size'], g_size=pars['g_size'], g_init=pars['g_init'],
+             s_size_comp=pars['s_size_comp'], n_freq=pars['n_freq'], n_state=pars['n_state'])
 
 agent = TEM(discount=pars['discount'], t_episode=pars['t_episode'], threshold=pars['threshold'], lr_td=pars['lr_td'],
             room_width=pars['room_width'], room_depth=pars['room_depth'], state_density=pars['state_density'],
@@ -358,9 +312,13 @@ xs = []
 # actions = [[-1,0], [0,1], [-1,0], [0,1], [-1,0]]
 for i in range(pars['n_episode']):
     # Initialise Environment Batch
-    adjs, trans = env.make_environment()
-    a_rnn, a_rnn_inv = initialise_hebbian()
-    gs, x_s, visited = initialise_variables()
+    adjs, trans = [], []
+    for width in pars['widths']:
+        adj, tran = env.square_world(width, pars['stay_still'])
+        adjs.append(env)
+        trans.append(tran)
+    a_rnn, a_rnn_inv = env.initialise_hebbian()
+    gs, x_s, visited = env.initialise_variables()
     actions, x, x_, x_two_hot = agent.act(obs)
     # action = actions[j]
     for j in range(pars['t_episode']):
