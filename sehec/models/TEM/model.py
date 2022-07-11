@@ -311,7 +311,7 @@ obs = obs[:2]
 xs = []
 # actions = [[-1,0], [0,1], [-1,0], [0,1], [-1,0]]
 for i in range(pars['n_episode']):
-    # Initialise Environment Batch
+    # Initialise Environment, Weight and Variable Batch
     adjs, trans = [], []
     for width in pars['widths']:
         adj, tran = env.square_world(width, pars['stay_still'])
@@ -319,9 +319,10 @@ for i in range(pars['n_episode']):
         trans.append(tran)
     a_rnn, a_rnn_inv = env.initialise_hebbian()
     gs, x_s, visited = env.initialise_variables()
-    actions, x, x_, x_two_hot = agent.act(obs)
+
     # action = actions[j]
     for j in range(pars['t_episode']):
+        actions, x, x_, x_two_hot = agent.act(obs)
         obs, state, reward = env.step(actions[j])
         obs = obs[:2]
     xs.append(xs)
