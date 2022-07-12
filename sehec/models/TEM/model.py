@@ -6,7 +6,7 @@ import random
 import matplotlib.pyplot as plt
 import tensorflow as tf
 import tensorflow.contrib.layers as layer
-import scipy
+from scipy import special
 from tqdm import tqdm
 
 from sehec.models.modelcore import NeuralResponseModel
@@ -26,8 +26,7 @@ class TEM(NeuralResponseModel):
         self.threshold = mod_kwargs["threshold"]
         self.learning_rate = mod_kwargs["lr_td"]
         self.t_episode = mod_kwargs["t_episode"]
-        self.room_width = mod_kwargs["room_width"]
-        self.room_depth = mod_kwargs["room_depth"]
+        self.widths = mod_kwargs["widths"]
         self.state_density = mod_kwargs["state_density"]
         twoD = mod_kwargs['twoD']
         self.inital_obs_variable = None
@@ -57,38 +56,18 @@ class TEM(NeuralResponseModel):
         self.g_size = sum(self.n_grids_all)
         self.p_size = int(self.tot_phases * self.s_size_comp)
 
-        self.objects = np.zeros(shape=(self.batch_size, self.s_size, self.t_episode))
-        for i in range(self.batch_size):
-            for j in range(self.t_episode):
-                rand = random.randrange(0, self.s_size)
-                self.objects[i][rand][j] = 1
-                # random.shuffle(self.objects[:][0])
 
-        # Variables for the SR-agent state spaceg
-        self.resolution_d = int(self.state_density * self.room_depth)
-        self.resolution_w = int(self.state_density * self.room_width)
-        self.x_array = np.linspace(-self.room_width / 2, self.room_width / 2, num=self.resolution_d)
-        self.y_array = np.linspace(self.room_depth / 2, -self.room_depth / 2, num=self.resolution_w)
-        self.mesh = np.array(np.meshgrid(self.x_array, self.y_array))
-        self.xy_combinations = self.mesh.T.reshape(-1, 2)
-        self.w = int(self.room_width * self.state_density)
-        self.l = int(self.room_depth * self.state_density)
-        self.n_state = int(self.l * self.w)
+        # Variables for the SR-agent state space
+        # self.resolution_d = int(self.state_density * self.room_depth)
+        # self.resolution_w = int(self.state_density * self.room_width)
+        # self.x_array = np.linspace(-self.room_width / 2, self.room_width / 2, num=self.resolution_d)
+        # self.y_array = np.linspace(self.room_depth / 2, -self.room_depth / 2, num=self.resolution_w)
+        # self.mesh = np.array(np.meshgrid(self.x_array, self.y_array))
+        # self.xy_combinations = self.mesh.T.reshape(-1, 2)
+        # self.w = int(self.room_width * self.state_density)
+        # self.l = int(self.room_depth * self.state_density)
+        # self.n_states = int(self.l * self.w)
         self.obs_history = []
-        if twoD == True:
-            adjs, trans = square_world(self.w)
-            # self.create_transmat(self.state_density,  '2D_env')
-
-        # Initialise Variables for TEM
-        self.a_rnn, self.a_rnn_inv = initialise_hebbian(self)
-        self.gs, self.x_s, self.visited = initialise_variables(self)
-
-        # Print Testing
-        print("Transition matrix: ")
-        print(trans)
-        print("n_states: ", self.n_state)
-        print("First sensory observation: ", self.objects[0, :, 0])
-        print("Size of g: ", self.g_size)
 
     def reset(self):
         self.srmat = []
@@ -98,37 +77,51 @@ class TEM(NeuralResponseModel):
         self.inital_obs_variable = None
         self.obs_history = []  # Reset observation history
 
-    def obs_to_state(self, pos):
-        diff = self.xy_combinations - pos[np.newaxis, ...]
-        dist = np.sum(diff ** 2, axis=1)
-        index = np.argmin(dist)
-        curr_state = index
-        x = self.objects[:, :, index]
+    def obs_to_states(self, pos):
+        curr_states = []
+        for i in range(self.batch_size):
+            room_width = self.widths[i]
+            room_depth = room_width
+            resolution_d = int(self.state_density * room_depth)
+            resolution_w = int(self.state_density * room_width)
+            x_array = np.linspace(-room_width / 2, room_width / 2, num=resolution_d)
+            y_array = np.linspace(room_depth / 2, -room_depth / 2, num=resolution_w)
+            mesh = np.array(np.meshgrid(x_array, y_array))
+            xy_combinations = mesh.T.reshape(-1, 2)
 
-        return curr_state, x
+            diff = xy_combinations - pos[np.newaxis, ...]
+            dist = np.sum(diff ** 2, axis=1)
+            index = np.argmin(dist)
+            curr_state = index
+            curr_states.append(curr_state)
+
+        return curr_states
 
     def act(self, obs):
         actions = np.zeros((self.batch_size, 2, self.t_episode))
         xs = np.zeros((self.batch_size, self.s_size, self.t_episode))
-        for i in range(self.t_episode):
+
+        for batch in range(self.batch_size):
+            n_states = self.widths[batch]**2
             self.obs_history.append(obs)
             if len(self.obs_history) >= 1000:
                 self.obs_history = [obs, ]
 
             arrow = [[0, 1], [0, -1], [1, 0], [-1, 0]]
-            action = np.random.normal(scale=0.1, size=(2,))
-            diff = action - arrow
-            dist = np.sum(diff ** 2, axis=1)
-            index = np.argmin(dist)
-            action = arrow[index]
-            next_state, next_object = self.obs_to_state(obs)
+            batch_action = np.random.normal(scale=0.1, size=(2,25))
+            for step in range(self.t_episode):
+                diff = batch_action[:,step] - arrow
+                dist = np.sum(diff ** 2, axis=1)
+                index = np.argmin(dist)
+                action = arrow[index]
+                actions[batch, :, step] = action
 
-            actions.append(action)
-            xs.append(next_object[0])
-        print(xs)
-        x_, x_two_hot = calculate(self, xs)
+            # next_states = self.obs_to_states(obs)
 
-        return actions, xs, x_, x_two_hot
+            # xs[:, :, step] = objects[next_states]
+            # x_, x_two_hot = calculate(self, xs)
+
+        return actions
 
 
 def calculate(self, x):
@@ -173,7 +166,7 @@ def hierarchical_logsig(self, x, name, splits, sizes, trainable, concat, k=2):
 def combins(n, k, m):
     s = []
     for i in range(1, n + 1):
-        c = scipy.special.comb(n - i, k)
+        c = special.comb(n - i, k)
         if m >= c:
             s.append(1)
             m -= c
@@ -187,7 +180,7 @@ def combins_table(n, k, map_max=None):
     " Produces a table of s_size two-hot encoded vectors, each of size 10."
     table = []
     rev_table = {}
-    table_top = scipy.special.comb(n, k)
+    table_top = special.comb(n, k)
 
     for m in range(int(table_top)):
         c = combins(n, k, m)
@@ -296,37 +289,29 @@ def g_prior(self, name=''):
 env_name = "env_example"
 pars = default_params()
 # Initialise Environment(s)
-env = TEMenv(environment_name=env_name, room_width=pars['room_width'], room_depth=pars['room_depth'],
-             time_step_size=pars['time_step_size'], agent_step_size=pars['agent_step_size'],
-             stay_still=pars['stay_still'], p_size=pars['p_size'], g_size=pars['g_size'], g_init=pars['g_init'],
-             s_size_comp=pars['s_size_comp'], n_freq=pars['n_freq'], n_state=pars['n_state'])
+env = TEMenv(environment_name=env_name, batch_size=pars['batch_size'], world_type=pars['world_type'], widths=pars['widths'],
+             time_step_size=pars['time_step_size'], agent_step_size=pars['agent_step_size'], t_episode=pars['t_episode'],
+             state_density=pars['state_density'], stay_still=pars['stay_still'], p_size=pars['p_size'], g_size=pars['g_size'],
+             g_init=pars['g_init'], s_size_comp=pars['s_size_comp'], n_freq=pars['n_freq'], n_states=pars['n_states'],
+             n_states_world=pars['n_states_world'])
 
 agent = TEM(discount=pars['discount'], t_episode=pars['t_episode'], threshold=pars['threshold'], lr_td=pars['lr_td'],
-            room_width=pars['room_width'], room_depth=pars['room_depth'], state_density=pars['state_density'],
-            twoD=pars['twoDvalue'])
+            widths=pars['widths'], state_density=pars['state_density'], twoD=pars['twoDvalue'])
 
-total_iters = 0
-obs, state = env.reset()
-obs = obs[:2]
-xs = []
-# actions = [[-1,0], [0,1], [-1,0], [0,1], [-1,0]]
 for i in range(pars['n_episode']):
+    obs, state = env.reset()
+    # obs = obs[:2]
+    xs = []
+
     # Initialise Environment, Weight and Variable Batch
-    adjs, trans = [], []
-    for width in pars['widths']:
-        adj, tran = env.square_world(width, pars['stay_still'])
-        adjs.append(env)
-        trans.append(tran)
+    adjs, trans = env.make_environment()
     a_rnn, a_rnn_inv = env.initialise_hebbian()
     gs, x_s, visited = env.initialise_variables()
 
-    # action = actions[j]
-    for j in range(pars['t_episode']):
-        actions, x, x_, x_two_hot = agent.act(obs)
-        obs, state, reward = env.step(actions[j])
-        obs = obs[:2]
-    xs.append(xs)
-    total_iters += 1
+    actions = agent.act(obs)
+    obs, states, rewards = env.step(actions)
+    # obs = obs[:2]
+    xs = obs
 
 # print(np.shape(x), x_, np.shape(x_two_hot))
 env.plot_trajectory()

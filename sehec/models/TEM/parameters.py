@@ -4,7 +4,10 @@ import numpy as np
 def default_params():
     params = dict()
 
+    # Environment Parameters
     params['batch_size'] = 16
+    params['world_type'] = 'square'
+
     params['time_step_size'] = 1
     params['agent_step_size'] = 0.2
     params['discount'] = .9
@@ -17,20 +20,29 @@ def default_params():
 
     params['room_width'] = 2
     params['room_depth'] = 2
-    params['stay_still'] = True
-    params['p_size'] =
-    params['g_size'] =
-    params['g_init'] =
-    params['s_size_comp'] =
-    params['n_freq'] =
-    params['n_state'] =
+    params['w'] = int(params['room_width'] * params['state_density'])
+    params['l'] = int(params['room_depth'] * params['state_density'])
 
-    params['world_type'] = 'square'
     params['n_envs'] = params['batch_size']
     params['diff_env_batches_envs'] = np.arange(params['batch_size'])  # which batch in which environment
 
     params['widths'], params['n_states'], params['n_states_world'], params['n_actions'], params['jump_length'], \
         params['heights'] = get_states(params)
+
+    # Model Parameters
+    n_phases_all = [10, 10, 8, 6, 6] # numbers of variables for each frequency
+    params['s_size'] = 45
+    params['s_size_comp'] = 10
+    params['n_phases_all'] = n_phases_all
+    params['n_grids_all'] = [int(3 * n_phase) for n_phase in params['n_phases_all']]
+    params['tot_phases'] = sum(params['n_phases_all'])
+    params['stay_still'] = True
+    params['p_size'] =int(params['tot_phases'] * params['s_size_comp'])
+    params['g_size'] = sum(params['n_grids_all'])
+    params['n_freq'] = len(params['n_phases_all'])
+
+    # Initialisations
+    params['g_init'] = 0.5
 
     return params
 

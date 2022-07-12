@@ -1,21 +1,158 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from sehec.envs.arenas.simple2d import Simple2D
+import random
+from sehec.envs.envcore import Environment
 
 
-class TEMenv(Simple2D):
+class TEMenv(Environment):
     def __init__(self, environment_name="TEMenv", **env_kwargs):
         super().__init__(environment_name, **env_kwargs)
-        self.environment_name = environment_name
-        self.width = env_kwargs['room_width']
+        self.metadata = {"env_kwargs": env_kwargs}
+        self.widths = env_kwargs['widths']
+        self.agent_step_size = env_kwargs["agent_step_size"]
+        self.batch_size = env_kwargs['batch_size']
+        self.t_episode = env_kwargs['t_episode']
+        self.state_density = env_kwargs['state_density']
+        self.world_type = env_kwargs['world_type']
         self.stay_still = env_kwargs['stay_still']
+        self.batch_size = 16
+        self.s_size = 45
+        self.s_size_comp = 10
         self.p_size = env_kwargs['p_size']
         self.g_size = env_kwargs['g_size']
         self.g_init = env_kwargs['g_init']
         self.s_size_comp = env_kwargs['s_size_comp']
         self.n_freq = env_kwargs['n_freq']
-        self.n_state = env_kwargs['n_state']
+        self.n_states = env_kwargs['n_states']
+        self.n_states_world = env_kwargs['n_states_world']
+
+        self.poss_objects = np.zeros(shape=(self.s_size, self.s_size))
+        for i in range(self.s_size):
+            rand = random.randint(0, self.s_size)
+            for j in range(self.s_size):
+                if j == rand:
+                    self.poss_objects[i][j] = 1
+
         self.reset()
+
+    def reset(self):
+        self.global_steps = 0
+        self.history = []
+        self.state = [0,0]
+        self.state = np.array(self.state)
+        observation = self.state # make_observation()
+
+        return observation, self.state
+
+    def make_observation(self, pos, objects):
+        room_width = np.sqrt(len(objects))
+        room_depth = room_width
+        resolution_d = int(self.state_density * room_depth)
+        resolution_w = int(self.state_density * room_width)
+        x_array = np.linspace(-room_width / 2, room_width / 2, num=resolution_d)
+        y_array = np.linspace(room_depth / 2, -room_depth / 2, num=resolution_w)
+        mesh = np.array(np.meshgrid(x_array, y_array))
+        xy_combinations = mesh.T.reshape(-1, 2)
+
+        diff = xy_combinations - pos[np.newaxis, ...]
+        dist = np.sum(diff ** 2, axis=1)
+        index = np.argmin(dist)
+        curr_state = index
+
+        observation = objects[curr_state]
+
+        return observation
+
+    def step(self, actions):
+        self.global_steps += 1
+        observations = np.zeros(shape=(self.batch_size, self.s_size, self. t_episode))
+        new_states = np.zeros(shape=(self.batch_size, 2, self. t_episode))
+        rewards = []
+        for batch in range(self.batch_size):
+            objects = np.zeros(shape=(self.n_states[batch], self.s_size))
+
+            for i in range(self.n_states[batch]):
+                rand = random.randint(0, self.s_size - 1)
+                objects[i] = self.poss_objects[rand]
+
+            room_width = self.widths[batch]
+            room_depth = self.widths[batch]
+            for step in range(self.t_episode):
+                action = actions[batch,:,step]/np.linalg.norm(actions[batch,:,step])
+                new_state = self.state + self.agent_step_size*action
+                new_state = np.array([np.clip(new_state[0], a_min=-room_width/2, a_max=room_width/2),
+                                      np.clip(new_state[1], a_min=-room_depth/2, a_max=room_depth/2)])
+                reward = 0  # If you get reward, it should be coded here
+                transition = {"action": action, "state": self.state, "next_state": new_state,
+                          "reward": reward, "step": self.global_steps}
+                self.history.append(transition)
+                self.state = new_state
+                observation = self.make_observation(new_state, objects)
+
+                observations[batch,:,step] = observation
+                new_states[batch,:,step] = new_state
+                rewards.append(reward)
+
+        return observations, new_states, rewards
+
+    def plot_trajectory(self, history_data=None, ax=None):
+        if history_data is None:
+            history_data = self.history
+        if ax is None:
+            f, ax = plt.subplots(1, 1, figsize=(8, 6))
+
+        ax.plot([-self.room_width/2, self.room_width/2],
+                [-self.room_depth/2, -self.room_depth/2], "r", lw=2)
+        ax.plot([-self.room_width/2, self.room_width/2],
+                [self.room_depth/2, self.room_depth/2], "r", lw=2)
+        ax.plot([-self.room_width/2, -self.room_width/2],
+                [-self.room_depth/2, self.room_depth/2], "r", lw=2)
+        ax.plot([self.room_width / 2, self.room_width / 2],
+                [-self.room_depth / 2, self.room_depth / 2], "r", lw=2)
+
+        state_history = [s["state"] for s in history_data]
+        next_state_history = [s["next_state"] for s in history_data]
+        starting_point = state_history[0]
+        ending_point = next_state_history[-1]
+        print(starting_point)
+
+        cmap = mpl.cm.get_cmap("plasma")
+        norm = plt.Normalize(0, len(state_history))
+
+        aux_x = []
+        aux_y = []
+        for i, s in enumerate(state_history):
+            x_ = [s[0], next_state_history[i][0]]
+            y_ = [s[1], next_state_history[i][1]]
+            aux_x.append(s[0])
+            aux_y.append(s[1])
+            ax.plot(x_, y_, "-", color=cmap(norm(i)), alpha=0.6)
+
+        sc = ax.scatter(aux_x, aux_y, c=np.arange(len(state_history)),
+                        vmin=0, vmax=len(state_history), cmap="plasma", alpha=0.6)
+
+        cbar = plt.colorbar(sc, ax=ax)
+        cbar.ax.set_ylabel('N steps', rotation=270)
+
+        return ax
+
+    def make_environment(self):
+        n_envs = len(self.widths)
+        adjs, trans = [], []
+
+        for env in range(n_envs):
+            width = self.widths[env]
+
+            if self.world_type == 'square':
+                adj, tran = self.square_world(width, self.stay_still)
+
+            else:
+                raise ValueError('incorrect world specified')
+
+            adjs.append(adj)
+            trans.append(tran)
+
+        return adjs, trans
 
     def square_world(self, width, stay_still):
         states = int(width ** 2)
@@ -48,15 +185,16 @@ class TEMenv(Simple2D):
         return adj, tran
 
     def initialise_hebbian(self):
-        a_rnn = np.zeros((self.p_size, self.p_size))
-        a_rnn_inv = np.zeros((self.p_size, self.p_size))
+        a_rnn = np.zeros((self.batch_size, self.p_size, self.p_size))
+        a_rnn_inv = np.zeros((self.batch_size, self.p_size, self.p_size))
 
         return a_rnn, a_rnn_inv
 
     def initialise_variables(self):
-        gs = np.maximum(np.random.randn(self.g_size) * self.g_init, 0)
-        x_s = np.zeros(self.s_size_comp * self.n_freq)
+        gs = np.maximum(np.random.randn(self.batch_size, self.g_size) * self.g_init, 0)
+        x_s = np.zeros((self.batch_size, self.s_size_comp * self.n_freq))
 
-        visited = np.zeros(self.n_state)
+        n_states = self.n_states_world
+        visited = np.zeros(self.batch_size, max(n_states))
 
         return gs, x_s, visited
