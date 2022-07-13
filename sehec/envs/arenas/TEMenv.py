@@ -1,3 +1,4 @@
+import matplotlib as mlp
 import matplotlib.pyplot as plt
 import numpy as np
 import random
@@ -38,9 +39,9 @@ class TEMenv(Environment):
     def reset(self):
         self.global_steps = 0
         self.history = []
-        self.state = [0,0]
+        self.state = [0, 0]
         self.state = np.array(self.state)
-        observation = self.state # make_observation()
+        observation = self.state  # make_observation()
 
         return observation, self.state
 
@@ -65,8 +66,8 @@ class TEMenv(Environment):
 
     def step(self, actions):
         self.global_steps += 1
-        observations = np.zeros(shape=(self.batch_size, self.s_size, self. t_episode))
-        new_states = np.zeros(shape=(self.batch_size, 2, self. t_episode))
+        observations = np.zeros(shape=(self.batch_size, self.s_size, self.t_episode))
+        new_states = np.zeros(shape=(self.batch_size, 2, self.t_episode))
         rewards = []
         for batch in range(self.batch_size):
             objects = np.zeros(shape=(self.n_states[batch], self.s_size))
@@ -78,19 +79,20 @@ class TEMenv(Environment):
             room_width = self.widths[batch]
             room_depth = self.widths[batch]
             for step in range(self.t_episode):
-                action = actions[batch,:,step]/np.linalg.norm(actions[batch,:,step])
-                new_state = self.state + self.agent_step_size*action
-                new_state = np.array([np.clip(new_state[0], a_min=-room_width/2, a_max=room_width/2),
-                                      np.clip(new_state[1], a_min=-room_depth/2, a_max=room_depth/2)])
+                action = actions[batch, :, step] / np.linalg.norm(actions[batch, :, step])
+                new_state = self.state + self.agent_step_size * action
+                new_state = np.array([np.clip(new_state[0], a_min=-room_width / 2, a_max=room_width / 2),
+                                      np.clip(new_state[1], a_min=-room_depth / 2, a_max=room_depth / 2)])
                 reward = 0  # If you get reward, it should be coded here
                 transition = {"action": action, "state": self.state, "next_state": new_state,
-                          "reward": reward, "step": self.global_steps}
-                self.history.append(transition)
+                              "reward": reward, "step": self.global_steps}
                 self.state = new_state
                 observation = self.make_observation(new_state, objects)
+                if batch == 0:
+                    self.history.append(transition)
 
-                observations[batch,:,step] = observation
-                new_states[batch,:,step] = new_state
+                observations[batch, :, step] = observation
+                new_states[batch, :, step] = new_state
                 rewards.append(reward)
 
         return observations, new_states, rewards
@@ -101,14 +103,17 @@ class TEMenv(Environment):
         if ax is None:
             f, ax = plt.subplots(1, 1, figsize=(8, 6))
 
-        ax.plot([-self.room_width/2, self.room_width/2],
-                [-self.room_depth/2, -self.room_depth/2], "r", lw=2)
-        ax.plot([-self.room_width/2, self.room_width/2],
-                [self.room_depth/2, self.room_depth/2], "r", lw=2)
-        ax.plot([-self.room_width/2, -self.room_width/2],
-                [-self.room_depth/2, self.room_depth/2], "r", lw=2)
-        ax.plot([self.room_width / 2, self.room_width / 2],
-                [-self.room_depth / 2, self.room_depth / 2], "r", lw=2)
+        room_width = self.widths[0]
+        room_depth = room_width
+
+        ax.plot([-room_width / 2, room_width / 2],
+                [-room_depth / 2, -room_depth / 2], "r", lw=2)
+        ax.plot([-room_width / 2, room_width / 2],
+                [room_depth / 2, room_depth / 2], "r", lw=2)
+        ax.plot([-room_width / 2, -room_width / 2],
+                [-room_depth / 2, room_depth / 2], "r", lw=2)
+        ax.plot([room_width / 2, room_width / 2],
+                [-room_depth / 2, room_depth / 2], "r", lw=2)
 
         state_history = [s["state"] for s in history_data]
         next_state_history = [s["next_state"] for s in history_data]
@@ -116,7 +121,7 @@ class TEMenv(Environment):
         ending_point = next_state_history[-1]
         print(starting_point)
 
-        cmap = mpl.cm.get_cmap("plasma")
+        cmap = mlp.cm.get_cmap("plasma")
         norm = plt.Normalize(0, len(state_history))
 
         aux_x = []

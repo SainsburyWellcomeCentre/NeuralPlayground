@@ -315,3 +315,4 @@ for i in range(pars['n_episode']):
 
 # print(np.shape(x), x_, np.shape(x_two_hot))
 env.plot_trajectory()
+plt.show()
