@@ -25,7 +25,6 @@ class TEMenv(Environment):
         self.s_size_comp = env_kwargs['s_size_comp']
         self.n_freq = env_kwargs['n_freq']
         self.n_states = env_kwargs['n_states']
-        self.n_states_world = env_kwargs['n_states_world']
 
         self.poss_objects = np.zeros(shape=(self.s_size, self.s_size))
         for i in range(self.s_size):
@@ -188,18 +187,3 @@ class TEMenv(Environment):
         ax.imshow(adj, interpolation='nearest')
 
         return adj, tran
-
-    def initialise_hebbian(self):
-        a_rnn = np.zeros((self.batch_size, self.p_size, self.p_size))
-        a_rnn_inv = np.zeros((self.batch_size, self.p_size, self.p_size))
-
-        return a_rnn, a_rnn_inv
-
-    def initialise_variables(self):
-        gs = np.maximum(np.random.randn(self.batch_size, self.g_size) * self.g_init, 0)
-        x_s = np.zeros((self.batch_size, self.s_size_comp * self.n_freq))
-
-        n_states = self.n_states_world
-        visited = np.zeros(self.batch_size, max(n_states))
-
-        return gs, x_s, visited

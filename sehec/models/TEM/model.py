@@ -28,6 +28,7 @@ class TEM(NeuralResponseModel):
         self.t_episode = mod_kwargs["t_episode"]
         self.widths = mod_kwargs["widths"]
         self.state_density = mod_kwargs["state_density"]
+        self.n_states_world = mod_kwargs["n_states_world"]
         twoD = mod_kwargs['twoD']
         self.inital_obs_variable = None
 
@@ -56,17 +57,6 @@ class TEM(NeuralResponseModel):
         self.g_size = sum(self.n_grids_all)
         self.p_size = int(self.tot_phases * self.s_size_comp)
 
-
-        # Variables for the SR-agent state space
-        # self.resolution_d = int(self.state_density * self.room_depth)
-        # self.resolution_w = int(self.state_density * self.room_width)
-        # self.x_array = np.linspace(-self.room_width / 2, self.room_width / 2, num=self.resolution_d)
-        # self.y_array = np.linspace(self.room_depth / 2, -self.room_depth / 2, num=self.resolution_w)
-        # self.mesh = np.array(np.meshgrid(self.x_array, self.y_array))
-        # self.xy_combinations = self.mesh.T.reshape(-1, 2)
-        # self.w = int(self.room_width * self.state_density)
-        # self.l = int(self.room_depth * self.state_density)
-        # self.n_states = int(self.l * self.w)
         self.obs_history = []
 
     def reset(self):
@@ -122,6 +112,21 @@ class TEM(NeuralResponseModel):
             # x_, x_two_hot = calculate(self, xs)
 
         return actions
+
+    def initialise_hebbian(self):
+        a_rnn = np.zeros((self.batch_size, self.p_size, self.p_size))
+        a_rnn_inv = np.zeros((self.batch_size, self.p_size, self.p_size))
+
+        return a_rnn, a_rnn_inv
+
+    def initialise_variables(self):
+        gs = np.maximum(np.random.randn(self.batch_size, self.g_size) * self.g_init, 0)
+        x_s = np.zeros((self.batch_size, self.s_size_comp * self.n_freq))
+
+        n_states = self.n_states_world
+        visited = np.zeros(self.batch_size, max(n_states))
+
+        return gs, x_s, visited
 
 
 def calculate(self, x):
@@ -289,30 +294,30 @@ def g_prior(self, name=''):
 env_name = "env_example"
 pars = default_params()
 # Initialise Environment(s)
-env = TEMenv(environment_name=env_name, batch_size=pars['batch_size'], world_type=pars['world_type'], widths=pars['widths'],
+envs = TEMenv(environment_name=env_name, batch_size=pars['batch_size'], world_type=pars['world_type'], widths=pars['widths'],
              time_step_size=pars['time_step_size'], agent_step_size=pars['agent_step_size'], t_episode=pars['t_episode'],
              state_density=pars['state_density'], stay_still=pars['stay_still'], p_size=pars['p_size'], g_size=pars['g_size'],
-             g_init=pars['g_init'], s_size_comp=pars['s_size_comp'], n_freq=pars['n_freq'], n_states=pars['n_states'],
-             n_states_world=pars['n_states_world'])
+             g_init=pars['g_init'], s_size_comp=pars['s_size_comp'], n_freq=pars['n_freq'], n_states=pars['n_states'])
 
 agent = TEM(discount=pars['discount'], t_episode=pars['t_episode'], threshold=pars['threshold'], lr_td=pars['lr_td'],
-            widths=pars['widths'], state_density=pars['state_density'], twoD=pars['twoDvalue'])
+            widths=pars['widths'], state_density=pars['state_density'], n_states_world=pars['n_states_world'],
+            twoD=pars['twoDvalue'])
 
 for i in range(pars['n_episode']):
-    obs, state = env.reset()
+    obs, state = envs.reset()
     # obs = obs[:2]
     xs = []
 
     # Initialise Environment, Weight and Variable Batch
-    adjs, trans = env.make_environment()
-    a_rnn, a_rnn_inv = env.initialise_hebbian()
-    gs, x_s, visited = env.initialise_variables()
+    adjs, trans = envs.make_environment()
+    a_rnn, a_rnn_inv = agent.initialise_hebbian()
+    gs, x_s, visited = agent.initialise_variables()
 
     actions = agent.act(obs)
-    obs, states, rewards = env.step(actions)
+    obs, states, rewards = envs.step(actions)
     # obs = obs[:2]
     xs = obs
 
 # print(np.shape(x), x_, np.shape(x_two_hot))
-env.plot_trajectory()
+envs.plot_trajectory()
 plt.show()
