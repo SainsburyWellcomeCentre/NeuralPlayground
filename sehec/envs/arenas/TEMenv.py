@@ -11,6 +11,7 @@ class TEMenv(Environment):
         self.metadata = {"env_kwargs": env_kwargs}
         self.widths = env_kwargs['widths']
         self.agent_step_size = env_kwargs["agent_step_size"]
+        self.time_step_size = env_kwargs["time_step_size"]
         self.batch_size = env_kwargs['batch_size']
         self.t_episode = env_kwargs['t_episode']
         self.state_density = env_kwargs['state_density']
