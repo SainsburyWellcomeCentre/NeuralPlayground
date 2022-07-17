@@ -30,7 +30,7 @@ class TEM(NeuralResponseModel):
         self.widths = mod_kwargs["widths"]
         self.state_density = mod_kwargs["state_density"]
         self.n_states_world = mod_kwargs["n_states_world"]
-        twoD = mod_kwargs['twoD']
+        twoD = mod_kwargs['twoDvalue']
         self.inital_obs_variable = None
 
         self.reset()
@@ -188,12 +188,14 @@ class TEM(NeuralResponseModel):
     def gen_g(self, g, d):
         """generates grid cells from previous time step - sepatated into when for inferene and generation"""
         # generative prior on grids if first step in environment, else transition
-        mu = tf.cond(tf.constant(self.seq_pos > 0, dtype=tf.bool), true_fn=lambda: self.g2g(g, d, self.no_direc_gen, name='gen'),
-                            false_fn=lambda: self.g_prior())
+        mu = tf.cond(tf.constant(self.seq_pos > 0, dtype=tf.bool),
+                     true_fn=lambda: self.g2g(g, d, self.no_direc_gen, name='gen'),
+                     false_fn=lambda: self.g_prior())
 
         # the same but for used for inference network
-        mu_inf = tf.cond(tf.constant(self.seq_pos > 0, dtype=tf.bool), true_fn=lambda: self.g2g(g, d, False, name='inf'),
-                                    false_fn=lambda: self.g_prior())
+        mu_inf = tf.cond(tf.constant(self.seq_pos > 0, dtype=tf.bool),
+                         true_fn=lambda: self.g2g(g, d, False, name='inf'),
+                         false_fn=lambda: self.g_prior())
 
         return mu, mu_inf
 
@@ -248,6 +250,7 @@ class TEM(NeuralResponseModel):
 
         return trans_all
 
+
 def combins(n, k, m):
     s = []
     for i in range(1, n + 1):
@@ -289,19 +292,16 @@ def onehot2twohot(self, onehot, table, compress_size):
 
     return twohot
 
+
 # ------------------------------------------------------------------------------------------------------
 # MAIN
-env_name = "env_example"
+env_name = "TEMenv"
+mod_name = "TEM"
 pars = default_params()
 # Initialise Environment(s)
-envs = TEMenv(environment_name=env_name, batch_size=pars['batch_size'], world_type=pars['world_type'], widths=pars['widths'],
-              time_step_size=pars['time_step_size'], agent_step_size=pars['agent_step_size'], t_episode=pars['t_episode'],
-              state_density=pars['state_density'], stay_still=pars['stay_still'], p_size=pars['p_size'], g_size=pars['g_size'],
-              g_init=pars['g_init'], s_size_comp=pars['s_size_comp'], n_freq=pars['n_freq'], n_states=pars['n_states'])
+envs = TEMenv(environment_name=env_name, **pars)
 
-agent = TEM(world_type=pars['world_type'], discount=pars['discount'], t_episode=pars['t_episode'], threshold=pars['threshold'], lr_td=pars['lr_td'],
-            widths=pars['widths'], state_density=pars['state_density'], n_states_world=pars['n_states_world'],
-            twoD=pars['twoDvalue'])
+agent = TEM(model_name=mod_name, **pars)
 
 for i in range(pars['n_episode']):
     obs, state = envs.reset()
