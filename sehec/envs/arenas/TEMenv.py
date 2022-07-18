@@ -45,37 +45,15 @@ class TEMenv(Environment):
 
         return observation, self.state
 
-    def make_observation(self, pos, objects):
-        room_width = np.sqrt(len(objects))
-        room_depth = room_width
-        resolution_d = int(self.state_density * room_depth)
-        resolution_w = int(self.state_density * room_width)
-        x_array = np.linspace(-room_width / 2, room_width / 2, num=resolution_d)
-        y_array = np.linspace(room_depth / 2, -room_depth / 2, num=resolution_w)
-        mesh = np.array(np.meshgrid(x_array, y_array))
-        xy_combinations = mesh.T.reshape(-1, 2)
-
-        diff = xy_combinations - pos[np.newaxis, ...]
-        dist = np.sum(diff ** 2, axis=1)
-        index = np.argmin(dist)
-        curr_state = index
-
-        observation = objects[curr_state]
-
-        return observation
+    def make_observation(self):
+        return self.state
 
     def step(self, actions):
         self.global_steps += 1
-        observations = np.zeros(shape=(self.batch_size, self.s_size, self.t_episode))
+        observations = np.zeros(shape=(self.batch_size, 2, self.t_episode))
         new_states = np.zeros(shape=(self.batch_size, 2, self.t_episode))
         rewards = []
         for batch in range(self.batch_size):
-            objects = np.zeros(shape=(self.n_states[batch], self.s_size))
-
-            for i in range(self.n_states[batch]):
-                rand = random.randint(0, self.s_size - 1)
-                objects[i] = self.poss_objects[rand]
-
             room_width = self.widths[batch]
             room_depth = self.widths[batch]
             for step in range(self.t_episode):
@@ -87,7 +65,7 @@ class TEMenv(Environment):
                 transition = {"action": action, "state": self.state, "next_state": new_state,
                               "reward": reward, "step": self.global_steps}
                 self.state = new_state
-                observation = self.make_observation(new_state, objects)
+                observation = self.make_observation()
                 if batch == 0:
                     self.history.append(transition)
 

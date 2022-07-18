@@ -30,10 +30,13 @@ class TEM(NeuralResponseModel):
         self.widths = mod_kwargs["widths"]
         self.state_density = mod_kwargs["state_density"]
         self.n_states_world = mod_kwargs["n_states_world"]
+        self.n_states = mod_kwargs["n_states"]
         twoD = mod_kwargs['twoDvalue']
         self.inital_obs_variable = None
+        self.d_mixed = mod_kwargs["d_mixed"]
+        self.d_mixed_size = mod_kwargs["d_mixed_size"]
 
-        self.reset()
+        self.pars = mod_kwargs
 
         # Model Parameters
         self.infer_g_type = 'g_p'  # 'g'
@@ -57,11 +60,16 @@ class TEM(NeuralResponseModel):
         self.g = [0] * self.t_episode
         self.g_size = sum(self.n_grids_all)
         self.p_size = int(self.tot_phases * self.s_size_comp)
+        self.no_direction = None
 
-        self.d_mixed = True
-        self.d_mixed_size = 15 if self.world_type == 'square' else 20
+        self.poss_objects = np.zeros(shape=(self.s_size, self.s_size))
+        for i in range(self.s_size):
+            rand = random.randint(0, self.s_size)
+            for j in range(self.s_size):
+                if j == rand:
+                    self.poss_objects[i][j] = 1
 
-        self.obs_history = []
+        self.reset()
 
     def reset(self):
         self.srmat = []
@@ -70,52 +78,6 @@ class TEM(NeuralResponseModel):
         self.transmat_norm = []
         self.inital_obs_variable = None
         self.obs_history = []  # Reset observation history
-
-    def obs_to_states(self, pos):
-        curr_states = []
-        for i in range(self.batch_size):
-            room_width = self.widths[i]
-            room_depth = room_width
-            resolution_d = int(self.state_density * room_depth)
-            resolution_w = int(self.state_density * room_width)
-            x_array = np.linspace(-room_width / 2, room_width / 2, num=resolution_d)
-            y_array = np.linspace(room_depth / 2, -room_depth / 2, num=resolution_w)
-            mesh = np.array(np.meshgrid(x_array, y_array))
-            xy_combinations = mesh.T.reshape(-1, 2)
-
-            diff = xy_combinations - pos[np.newaxis, ...]
-            dist = np.sum(diff ** 2, axis=1)
-            index = np.argmin(dist)
-            curr_state = index
-            curr_states.append(curr_state)
-
-        return curr_states
-
-    def act(self, obs):
-        actions = np.zeros((self.batch_size, 2, self.t_episode))
-        xs = np.zeros((self.batch_size, self.s_size, self.t_episode))
-
-        for batch in range(self.batch_size):
-            n_states = self.widths[batch] ** 2
-            self.obs_history.append(obs)
-            if len(self.obs_history) >= 1000:
-                self.obs_history = [obs, ]
-
-            arrow = [[0, 1], [0, -1], [1, 0], [-1, 0]]
-            batch_action = np.random.normal(scale=0.1, size=(2, 25))
-            for step in range(self.t_episode):
-                diff = batch_action[:, step] - arrow
-                dist = np.sum(diff ** 2, axis=1)
-                index = np.argmin(dist)
-                action = arrow[index]
-                actions[batch, :, step] = action
-
-            # next_states = self.obs_to_states(obs)
-
-            # xs[:, :, step] = objects[next_states]
-            # x_, x_two_hot = calculate(self, xs)
-
-        return actions
 
     def initialise_hebbian(self):
         a_rnn = np.zeros((self.batch_size, self.p_size, self.p_size))
@@ -132,11 +94,66 @@ class TEM(NeuralResponseModel):
 
         return gs, x_s, visited
 
-    def update(self, actions, x, x_s, gs):
+    def obs_to_states(self, pos, batch):
+        curr_states = []
+        room_width = self.widths[batch]
+        room_depth = self.widths[batch]
+
+        resolution_d = int(self.state_density * room_depth)
+        resolution_w = int(self.state_density * room_width)
+        x_array = np.linspace(-room_width / 2, room_width / 2, num=resolution_d)
+        y_array = np.linspace(room_depth / 2, -room_depth / 2, num=resolution_w)
+        mesh = np.array(np.meshgrid(x_array, y_array))
+        xy_combinations = mesh.T.reshape(-1, 2)
+
+        diff = xy_combinations - pos[np.newaxis, ...]
+        dist = np.sum(diff ** 2, axis=1)
+        index = np.argmin(dist)
+        curr_state = index
+        curr_states.append(curr_state)
+
+        return curr_states
+
+    def act(self, obs):
+        actions = np.zeros((self.batch_size, 2, self.t_episode))
+        direc = np.zeros(shape=(self.batch_size, 4, self.t_episode))
+        for batch in range(self.batch_size):
+            n_states = self.widths[batch] ** 2
+            self.obs_history.append(obs)
+            if len(self.obs_history) >= 1000:
+                self.obs_history = [obs, ]
+
+            arrow = [[0, 1], [0, -1], [1, 0], [-1, 0]]
+            batch_action = np.random.normal(scale=0.1, size=(2, 25))
+            for step in range(self.t_episode):
+                diff = batch_action[:, step] - arrow
+                dist = np.sum(diff ** 2, axis=1)
+                index = np.argmin(dist)
+                action = arrow[index]
+                actions[batch, :, step] = action
+                direc[batch, :, step] = direction(action)
+
+        return actions, direc
+
+    def update(self, direcs, obs, gs, x_s, visited, no_d):
+        xs = np.zeros(shape=(self.batch_size, self.s_size, self.t_episode))
+        self.no_direction = no_d
+        for batch in range(self.batch_size):
+            objects = np.zeros(shape=(self.n_states[batch], self.s_size))
+
+            for i in range(self.n_states[batch]):
+                rand = random.randint(0, self.s_size - 1)
+                objects[i] = self.poss_objects[rand]
+
+            for step in range(self.t_episode):
+                state = self.obs_to_states(obs[batch, :, step], batch)
+                observation = objects[state]
+                xs[batch, :, step] = observation
+
         for i in range(self.t_episode):
             self.seq_pos = 1 * self.t_episode + i
-            # Initialisation of filtered x
-            if len(self.obs_history) == 1:
+            # Initialisation of filtered x and g
+            if i == 0:
                 x_s = tf.split(axis=1, num_or_size_splits=self.n_freq, value=x_s)
                 x_t = x_s
                 g_t = gs
@@ -146,15 +163,17 @@ class TEM(NeuralResponseModel):
                 g_t = self.g[i - 1]
 
             # Two-hot Encoding
-            x_two_hot = onehot2twohot(self, x, self.table, self.s_size_comp)
+            x_two_hot = onehot2twohot(self, xs, self.table, self.s_size_comp)
 
             # Temporally filter
-            x_ = self.x2x_(x_two_hot, x_t)
+            self.x_ = self.x2x_(x_two_hot, x_t)
 
             # Generative Transition
-            g_gen, g2g_all = self.gen_g(g_t, actions)
+            g_gen, g2g_all = self.gen_g(g_t, direcs[:, :, i])
 
-        return x_, x_two_hot
+            print("big dick")
+
+        return x_, x_two_hot, g_gen, g2g_all
 
     # HELPER FUNCTIONS
     def hierarchical_logsig(self, x, name, splits, sizes, trainable, concat, k=2):
@@ -186,18 +205,16 @@ class TEM(NeuralResponseModel):
         return x_
 
     def gen_g(self, g, d):
-        """generates grid cells from previous time step - sepatated into when for inferene and generation"""
         # generative prior on grids if first step in environment, else transition
-        mu = tf.cond(tf.constant(self.seq_pos > 0, dtype=tf.bool),
-                     true_fn=lambda: self.g2g(g, d, self.no_direc_gen, name='gen'),
-                     false_fn=lambda: self.g_prior())
-
+        mu, sigma = tf.cond(tf.constant(self.seq_pos > 0, dtype=tf.bool),
+                            true_fn=lambda: self.g2g(g, d, self.no_direc_gen, name='gen'),
+                            false_fn=lambda: self.g_prior())
         # the same but for used for inference network
-        mu_inf = tf.cond(tf.constant(self.seq_pos > 0, dtype=tf.bool),
-                         true_fn=lambda: self.g2g(g, d, False, name='inf'),
-                         false_fn=lambda: self.g_prior())
+        mu_inf, sigma_inf = tf.cond(tf.constant(self.seq_pos > 0, dtype=tf.bool),
+                                    true_fn=lambda: self.g2g(g, d, False, name='inf'),
+                                    false_fn=lambda: self.g_prior())
 
-        return mu, mu_inf
+        return mu, (mu_inf, sigma_inf)
 
     def g2g(self, g, d, no_direc=False, name=''):
         """make grid to grid transisiton"""
@@ -207,38 +224,48 @@ class TEM(NeuralResponseModel):
         mu = update + g
         # apply activation
         mu = self.f_g(mu)
+        # get variance
+        logsig = self.hierarchical_logsig(g, 'sig_g2g' + name, self.pars['n_grids_all'], self.pars['n_grids_all'],
+                                          self.pars['train_sig_g2g'], concat=True)
+        logsig += self.pars['logsig_offset']
 
-        return mu
+        sigma = tf.exp(logsig)
+
+        return tf.cast(mu, tf.float32), tf.cast(sigma, tf.float32)
 
     def get_g2g_update(self, g_p, d, no_direc, name=''):
         # get transition matrix
         t_mat = self.get_transition(d, name)
         # multiply current entorhinal representation by transition matrix
-        update = tf.reshape(tf.matmul(t_mat, tf.reshape(g_p, [self.par['batch_size'], self.par['g_size'], 1])),
-                            [self.par['batch_size'], self.par['g_size']])
+        update = tf.reshape(tf.matmul(t_mat, tf.reshape(g_p, [self.batch_size, self.g_size, 1])),
+                            [self.batch_size, self.g_size])
 
         if no_direc:
             # directionless transition weights - used in OVC environments
             with tf.variable_scope("g2g_directionless_weights" + name, reuse=tf.AUTO_REUSE):
                 t_mat_2 = tf.get_variable("g2g" + name, [self.g_size, self.g_size])
-                t_mat_2 = tf.multiply(t_mat_2, self.mask_g)
+                t_mat_2 = tf.multiply(t_mat_2, self.pars['mask_g'])
 
             update = tf.where(self.no_direction > 0.5, x=tf.matmul(g_p, t_mat_2), y=update)
 
         return update
 
     def g_prior(self, name=''):
-        """Gives prior distribution for grid cells"""
         with tf.variable_scope("g_prior", reuse=tf.AUTO_REUSE):
             mu = tf.tile(tf.get_variable("mu_g_prior" + name, [1, self.g_size],
                                          initializer=tf.truncated_normal_initializer(stddev=self.g_init)),
-                         [self.par['batch_size'], 1])
+                         [self.batch_size, 1])
+            logsig = tf.tile(tf.get_variable("logsig_g_prior" + name, [1, self.g_size],
+                                             initializer=tf.truncated_normal_initializer(stddev=self.g_init)
+                                             ), [self.batch_size, 1])
 
-        return mu
+        sigma = tf.exp(logsig)
+
+        return mu, sigma
 
     def get_transition(self, d, name=''):
         # get transition matrix based on relationship / action
-        d_mixed = fu_co(d, (self.d_mixed_size), activation_fn=tf.tanh, reuse=tf.AUTO_REUSE,
+        d_mixed = fu_co(d, self.d_mixed_size, activation_fn=tf.tanh, reuse=tf.AUTO_REUSE,
                         scope='d_mixed_g2g' + name) if self.d_mixed else d
 
         t_vec = tf.layers.dense(d_mixed, self.g_size ** 2, activation=None, reuse=tf.AUTO_REUSE,
@@ -246,9 +273,87 @@ class TEM(NeuralResponseModel):
         # turn vector into matrix
         trans_all = tf.reshape(t_vec, [self.batch_size, self.g_size, self.g_size])
         # apply mask - i.e. if hierarchically or only transition within frequency
-        trans_all = tf.multiply(trans_all, self.mask_g)
+        trans_all = tf.multiply(trans_all, self.pars['mask_g'])
 
         return trans_all
+
+    def f_g(self, g):
+        with tf.name_scope('f_g'):
+            gs = tf.split(value=g, num_or_size_splits=self.pars['n_grids_all'], axis=1)
+            for i in range(self.pars['n_freq']):
+                # apply activation to each frequency separately
+                gs[i] = self.f_g_freq(gs[i], i)
+
+            g = tf.concat(gs, axis=1)
+
+        return g
+
+    def f_g_freq(self, g, freq):
+        g = self.pars['g2g_activation'](g)
+
+        return g
+
+
+def curriculum(pars_orig, pars, n_restart):
+    n_envs = len(pars['widths'])
+    b_s = int(pars['batch_size'])
+    # choose pars for current stage of training
+    # choose between shiny / normal
+
+    rn = np.random.randint(low=-pars['seq_jitter'], high=pars['seq_jitter'])
+    n_restart = np.maximum(n_restart - pars['curriculum_steps'], pars['restart_min'])
+
+    pars['direc_bias_env'] = [0 for _ in range(n_envs)]
+
+    # make choice for each env
+    choices = []
+    for env in range(n_envs):
+        choice = np.random.choice(pars['poss_behaviours'])
+
+        choices.append(choice)
+
+        if choice == 'normal':
+            pars['direc_bias_env'][env] = pars_orig['direc_bias']
+        else:
+            raise Exception('Not a correct possible behaviour')
+
+    # choose which of batch gets no_direc or not - 1 is no_direc, 0 is with direc
+    no_direc_batch = np.ones(pars['batch_size'])
+    for batch in range(b_s):
+        env = pars['diff_env_batches_envs'][batch]
+        choice = choices[env]
+        if choice == 'normal':
+            no_direc_batch[batch] = 0
+        else:
+            no_direc_batch[batch] = 1
+
+    return pars, rn, n_restart, no_direc_batch
+
+
+def direction(action):
+    # Turns action [x,y] into direction [R,L,U,D]
+    x, y = action
+    direc = np.zeros(shape=4)
+    if x > 0 and y == 0:
+        d = 0
+        name = 'right'
+        direc[d] = 1
+    elif x < 0 and y == 0:
+        d = 1
+        name = 'left'
+        direc[d] = 1
+    elif x == 0 and y > 0:
+        d = 2
+        name = 'up'
+        direc[d] = 1
+    elif x == 0 and y < 0:
+        d = 3
+        name = 'down'
+        direc[d] = 1
+    else:
+        ValueError('impossible action')
+
+    return direc
 
 
 def combins(n, k, m):
@@ -298,6 +403,10 @@ def onehot2twohot(self, onehot, table, compress_size):
 env_name = "TEMenv"
 mod_name = "TEM"
 pars = default_params()
+pars_orig = pars.copy()
+
+n_restart = pars['restart_max'] + pars['curriculum_steps']
+
 # Initialise Environment(s)
 envs = TEMenv(environment_name=env_name, **pars)
 
@@ -305,19 +414,18 @@ agent = TEM(model_name=mod_name, **pars)
 
 for i in range(pars['n_episode']):
     obs, state = envs.reset()
-    # obs = obs[:2]
 
+    # curriculum of behaviour types
+    pars, rn, n_restart, no_direc_batch = curriculum(pars_orig, pars, n_restart)
     # Initialise Environment, Weight and Variable Batch
-    adjs, trans = envs.make_environment()
+    # adjs, trans = envs.make_environment()
     a_rnn, a_rnn_inv = agent.initialise_hebbian()
     gs, x_s, visited = agent.initialise_variables()
 
-    actions = agent.act(obs)
+    actions, direc = agent.act(obs)
     obs, states, rewards = envs.step(actions)
-    # obs = obs[:2]
     xs = obs
-    x_, x_two_hot = agent.update(actions, xs, x_s, gs)
+    x_, x_two_hot, g_gen, g2g_all = agent.update(direc, obs, gs, x_s, visited, no_direc_batch)
 
-# print(np.shape(x), x_, np.shape(x_two_hot))
 envs.plot_trajectory()
 plt.show()
