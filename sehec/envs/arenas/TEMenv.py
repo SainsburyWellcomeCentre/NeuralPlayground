@@ -2,38 +2,16 @@ import matplotlib as mlp
 import matplotlib.pyplot as plt
 import numpy as np
 import random
+
 from sehec.envs.envcore import Environment
+from sehec.models.TEM.agent_policy import policy_act
 
 
 class TEMenv(Environment):
     def __init__(self, environment_name="TEMenv", **env_kwargs):
         super().__init__(environment_name, **env_kwargs)
         self.metadata = {"env_kwargs": env_kwargs}
-        self.widths = env_kwargs['widths']
-        self.agent_step_size = env_kwargs["agent_step_size"]
-        self.time_step_size = env_kwargs["time_step_size"]
-        self.batch_size = env_kwargs['batch_size']
-        self.t_episode = env_kwargs['t_episode']
-        self.state_density = env_kwargs['state_density']
-        self.world_type = env_kwargs['world_type']
-        self.stay_still = env_kwargs['stay_still']
-        self.batch_size = 16
-        self.s_size = 45
-        self.s_size_comp = 10
-        self.p_size = env_kwargs['p_size']
-        self.g_size = env_kwargs['g_size']
-        self.g_init = env_kwargs['g_init']
-        self.s_size_comp = env_kwargs['s_size_comp']
-        self.n_freq = env_kwargs['n_freq']
-        self.n_states = env_kwargs['n_states']
-
-        self.poss_objects = np.zeros(shape=(self.s_size, self.s_size))
-        for i in range(self.s_size):
-            rand = random.randint(0, self.s_size)
-            for j in range(self.s_size):
-                if j == rand:
-                    self.poss_objects[i][j] = 1
-
+        self.pars = env_kwargs
         self.reset()
 
     def reset(self):
@@ -48,17 +26,26 @@ class TEMenv(Environment):
     def make_observation(self):
         return self.state
 
-    def step(self, actions):
+    def step(self, obs):
         self.global_steps += 1
-        observations = np.zeros(shape=(self.batch_size, 2, self.t_episode))
-        new_states = np.zeros(shape=(self.batch_size, 2, self.t_episode))
+        observations = np.zeros(shape=(self.pars['batch_size'], 2, self.pars['t_episode']))
+        new_states = np.zeros(shape=(self.pars['batch_size'], 2, self.pars['t_episode']))
         rewards = []
-        for batch in range(self.batch_size):
-            room_width = self.widths[batch]
-            room_depth = self.widths[batch]
-            for step in range(self.t_episode):
-                action = actions[batch, :, step] / np.linalg.norm(actions[batch, :, step])
-                new_state = self.state + self.agent_step_size * action
+
+        actions = np.zeros((self.pars['batch_size'], 2, self.pars['t_episode']))
+        direcs = np.zeros(shape=(self.pars['batch_size'], 4, self.pars['t_episode']))
+
+        for batch in range(self.pars['batch_size']):
+            room_width = self.pars['widths'][batch]
+            room_depth = self.pars['widths'][batch]
+
+            for step in range(self.pars['t_episode']):
+                # action = actions[batch, :, step] / np.linalg.norm(actions[batch, :, step])
+                action, direc = policy_act(obs)
+                actions[batch, :, step] = action
+                direcs[batch, :, step] = direc
+
+                new_state = self.state + [self.pars['agent_step_size'] * i for i in action]
                 new_state = np.array([np.clip(new_state[0], a_min=-room_width / 2, a_max=room_width / 2),
                                       np.clip(new_state[1], a_min=-room_depth / 2, a_max=room_depth / 2)])
                 reward = 0  # If you get reward, it should be coded here
@@ -73,7 +60,7 @@ class TEMenv(Environment):
                 new_states[batch, :, step] = new_state
                 rewards.append(reward)
 
-        return observations, new_states, rewards
+        return observations, new_states, rewards, actions, direcs
 
     def plot_trajectory(self, history_data=None, ax=None):
         if history_data is None:
@@ -81,7 +68,7 @@ class TEMenv(Environment):
         if ax is None:
             f, ax = plt.subplots(1, 1, figsize=(8, 6))
 
-        room_width = self.widths[0]
+        room_width = self.pars['widths'][0]
         room_depth = room_width
 
         ax.plot([-room_width / 2, room_width / 2],
@@ -118,51 +105,3 @@ class TEMenv(Environment):
         cbar.ax.set_ylabel('N steps', rotation=270)
 
         return ax
-
-    def make_environment(self):
-        n_envs = len(self.widths)
-        adjs, trans = [], []
-
-        for env in range(n_envs):
-            width = self.widths[env]
-
-            if self.world_type == 'square':
-                adj, tran = self.square_world(width, self.stay_still)
-
-            else:
-                raise ValueError('incorrect world specified')
-
-            adjs.append(adj)
-            trans.append(tran)
-
-        return adjs, trans
-
-    def square_world(self, width, stay_still):
-        states = int(width ** 2)
-        adj = np.zeros((states, states))
-
-        for i in range(states):
-            # stay still
-            if stay_still:
-                adj[i, i] = 1
-            # up - down
-            if i + width < states:
-                adj[i, i + width] = 1
-                adj[i + width, i] = 1
-                # left - right
-            if np.mod(i, width) != 0:
-                adj[i, i - 1] = 1
-                adj[i - 1, i] = 1
-
-        tran = np.zeros((states, states))
-        for i in range(states):
-            if sum(adj[i]) > 0:
-                tran[i] = adj[i] / sum(adj[i])
-
-        f, ax = plt.subplots(1, 1, figsize=(14, 5))
-        ax.imshow(tran, interpolation='nearest')
-
-        f, ax = plt.subplots(1, 1, figsize=(14, 5))
-        ax.imshow(adj, interpolation='nearest')
-
-        return adj, tran

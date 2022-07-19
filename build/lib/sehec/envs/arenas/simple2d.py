@@ -649,7 +649,7 @@ if __name__ == "__main__":
     for i in tqdm(range(n_steps)):
         # Observe to choose an action
         obs = obs[:2]
-        action = agentsimple.act(obs)
+        action = agentsimple.policy_act(obs)
         # rate = agent.update()
         agentsimple.update()
         # Run environment for given action

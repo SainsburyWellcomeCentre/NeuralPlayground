@@ -43,6 +43,7 @@ def default_params():
 
     # Model Parameters
     n_phases_all = [10, 10, 8, 6, 6]  # numbers of variables for each frequency
+    params['freq'] = [0.01, 0.7, 0.91, 0.97, 0.99, 0.9995]
     params['s_size'] = 45
     params['s_size_comp'] = 10
     params['n_phases_all'] = n_phases_all
@@ -55,8 +56,11 @@ def default_params():
 
     # Training Parameters
     params['infer_g_type'] = 'g_p'
+    params['no_direc_gen'] = False
+    params['no_direction'] = None
     params['train_sig_g2g'] = True if 'g' in params['infer_g_type'] else False
     params['logsig_offset'] = -2
+    params['logsig_ratio'] = 6
 
     # Activations
     params['g2g_activation'] = lambda x: tf.minimum(tf.maximum(x, -1), 1)
