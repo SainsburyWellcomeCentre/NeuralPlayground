@@ -10,25 +10,14 @@ def default_params():
     params['batch_size'] = 16
     params['world_type'] = 'square'
     params['diff_env_batches_envs'] = np.arange(params['batch_size'])
-
-    params['time_step_size'] = 1
-    params['agent_step_size'] = 0.2
-    params['discount'] = .9
-    params['threshold'] = 1e-6
-    params['lr_td'] = 1e-2
-    params['t_episode'] = 25
-    params['n_episode'] = 1
-    params['state_density'] = 1
     params['twoDvalue'] = True
-
+    params['state_density'] = 1
     params['room_width'] = 2
     params['room_depth'] = 2
     params['w'] = int(params['room_width'] * params['state_density'])
     params['l'] = int(params['room_depth'] * params['state_density'])
-
     params['n_envs'] = params['batch_size']
     params['diff_env_batches_envs'] = np.arange(params['batch_size'])  # which batch in which environment
-
     params['widths'], params['n_states'], params['n_states_world'], params['n_actions'], params['jump_length'], \
     params['heights'] = get_states(params)
 
@@ -42,6 +31,14 @@ def default_params():
     params['curriculum_steps'] = 12 / params['t_episode']
 
     # Model Parameters
+    params['time_step_size'] = 1
+    params['agent_step_size'] = 0.2
+    params['discount'] = .9
+    params['threshold'] = 1e-6
+    params['lr_td'] = 1e-2
+    params['t_episode'] = 25
+    params['n_episode'] = 1
+
     n_phases_all = [10, 10, 8, 6, 6]  # numbers of variables for each frequency
     params['freq'] = [0.01, 0.7, 0.91, 0.97, 0.99, 0.9995]
     params['s_size'] = 45
@@ -82,8 +79,8 @@ def default_params():
                     [0, 0, 0, 1, 1, 1],
                     [0, 0, 0, 0, 1, 1],
                     [0, 0, 0, 0, 0, 1]]
-    # STATE TRANSITION
-    # R_G_F_f says how frequency f influences frequency F (opposite to R_F_f_F)
+
+    # STATE TRANSITION [R_G_F_f says how frequency f influences frequency F (opposite to R_F_f_F)]
     params['R_G_F_f'] = cp.deepcopy(hierarchical)
     params['mask_g'] = grid_mask(params['n_grids_all'], params['R_G_F_f'])
     params['d_mixed'] = True

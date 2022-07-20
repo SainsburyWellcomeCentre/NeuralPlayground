@@ -32,34 +32,38 @@ class TEM(NeuralResponseModel):
         self.g = [0] * pars['t_episode']
         self.no_direction = None
 
+        # Initialisation of Possible Floor Objects
         self.poss_objects = np.zeros(shape=(pars['s_size'], pars['s_size']))
         for i in range(pars['s_size']):
-            rand = random.randint(0, pars['s_size'])
             for j in range(pars['s_size']):
-                if j == rand:
+                if j == i:
                     self.poss_objects[i][j] = 1
 
         self.reset()
 
     def reset(self):
-        self.obs_history = []  # Reset observation history
+        # Reset observation history
+        self.obs_history = []
 
     def initialise_hebbian(self):
+        # Initialise Hebbian matrices for memory retrieval
         a_rnn = np.zeros((pars['batch_size'], pars['p_size'], pars['p_size']))
         a_rnn_inv = np.zeros((pars['batch_size'], pars['p_size'], pars['p_size']))
 
         return a_rnn, a_rnn_inv
 
     def initialise_variables(self):
+        # Initialise variables for use in TEM model
         gs = np.maximum(np.random.randn(pars['batch_size'], pars['g_size']) * pars['g_init'], 0)
         x_s = np.zeros((pars['batch_size'], pars['s_size_comp'] * pars['n_freq']))
 
         n_states = pars['n_states_world']
-        visited = np.zeros(pars['batch_size'], max(n_states))
+        visited = np.zeros(pars['batch_size'], max(n_states))  # Used when computing losses
 
         return gs, x_s, visited
 
     def obs_to_states(self, pos, batch):
+        # Converts position to SR state
         curr_states = []
         room_width = pars['widths'][batch]
         room_depth = pars['widths'][batch]
@@ -80,6 +84,7 @@ class TEM(NeuralResponseModel):
         return curr_states
 
     def act(self, obs):
+        # Produce trajectory of actions from random policy (not used whilst agent_policy.py being used)
         actions = np.zeros((pars['batch_size'], 2, pars['t_episode']))
         direc = np.zeros(shape=(pars['batch_size'], 4, pars['t_episode']))
         for batch in range(pars['batch_size']):
@@ -101,6 +106,7 @@ class TEM(NeuralResponseModel):
         return actions, direc
 
     def update(self, direcs, obs, gs, x_s, visited, no_d):
+        # Updates all internal representations of TEM
         self.obs_history.append(obs)
         if len(self.obs_history) >= 1000:
             self.obs_history = [obs, ]
@@ -109,12 +115,13 @@ class TEM(NeuralResponseModel):
         self.no_direction = no_d
 
         for batch in range(pars['batch_size']):
+            # Generate landscape of objects in each environment
             objects = np.zeros(shape=(pars['n_states'][batch], pars['s_size']))
-
             for i in range(pars['n_states'][batch]):
                 rand = random.randint(0, pars['s_size'] - 1)
                 objects[i] = self.poss_objects[rand]
 
+            # Make observations of sensorium in SR states
             for step in range(pars['t_episode']):
                 state = self.obs_to_states(obs[batch, :, step], batch)
                 observation = objects[state]
@@ -127,7 +134,7 @@ class TEM(NeuralResponseModel):
                 x_s = tf.split(axis=1, num_or_size_splits=pars['n_freq'], value=x_s)
                 x_t = x_s
                 g_t = gs
-            # Pointing to previous
+            # Pointing to previous x and g
             else:
                 x_t = self.x_[i - 1]
                 g_t = self.g[i - 1]
@@ -141,6 +148,7 @@ class TEM(NeuralResponseModel):
             # Generative Transition
             g_gen, g2g_all = self.gen_g(g_t, direcs[:, :, i])
 
+            # Update internal representations
             self.x_[i] = x_
             self.g[i] = g_gen
 
@@ -157,12 +165,13 @@ class TEM(NeuralResponseModel):
                           weights_initializer=layer.xavier_initializer(),
                           trainable=trainable) for i in range(pars['n_freq'])]
         logsigs = [pars['logsig_ratio'] * fu_co(logsigs_[i], sizes[i], activation_fn=tf.nn.tanh, reuse=tf.AUTO_REUSE,
-                                             scope=name + str(i), weights_initializer=layer.xavier_initializer(),
-                                             trainable=trainable) for i in range(pars['n_freq'])]
+                                                scope=name + str(i), weights_initializer=layer.xavier_initializer(),
+                                                trainable=trainable) for i in range(pars['n_freq'])]
 
         return tf.concat(logsigs, axis=1) if concat else logsigs
 
     def x2x_(self, x, x_):
+        # Temporally filter sensorium (into 5 frequencies)
         x_ = [0] * pars['n_freq']
         for i in range(pars['n_freq']):
             with tf.variable_scope("x2x_" + str(i), reuse=tf.AUTO_REUSE):
@@ -177,38 +186,37 @@ class TEM(NeuralResponseModel):
         return x_
 
     def gen_g(self, g, d):
-        mu1, sig1 = self.g2g(g, d, pars['no_direc_gen'], name='gen')
-        mu2, sig2 = self.g_prior()
-        # generative prior on grids if first step in environment, else transition
-        mu, sigma = tf.cond(tf.constant(self.seq_pos > 0, dtype=tf.bool),
+        # Generative prior on grids if first step in environment, else transition
+        g, sigma = tf.cond(tf.constant(self.seq_pos > 0, dtype=tf.bool),
                             true_fn=lambda: self.g2g(g, d, pars['no_direc_gen'], name='gen'),
                             false_fn=lambda: self.g_prior())
-        # the same but for used for inference network
-        mu_inf, sigma_inf = tf.cond(tf.constant(self.seq_pos > 0, dtype=tf.bool),
+        # Same but for used for inference network
+        g_inf, sigma_inf = tf.cond(tf.constant(self.seq_pos > 0, dtype=tf.bool),
                                     true_fn=lambda: self.g2g(g, d, False, name='inf'),
                                     false_fn=lambda: self.g_prior())
 
-        return mu, (mu_inf, sigma_inf)
+        return g, (g_inf, sigma_inf)
 
-    def g2g(self, g, d, no_direc=False, name=''):
-        """make grid to grid transisiton"""
-        # transition update
-        update = self.get_g2g_update(g, d, no_direc, name='')
-        # add on update to current representation
-        mu = update + g
-        # apply activation
-        mu = self.f_g(mu)
-        # get variance
+    def g2g(self, g_old, d, no_direc=False, name=''):
+        # Make grid to grid transition
+        # Transition update
+        update = self.get_g2g_update(g_old, d, no_direc, name='')
+        # Add on update to current representation
+        g = update + g_old
+        # Apply activation
+        g = self.f_g(g)
+        # Get variance
         logsig = self.hierarchical_logsig(g, 'sig_g2g' + name, self.pars['n_grids_all'], self.pars['n_grids_all'],
                                           self.pars['train_sig_g2g'], concat=True)
         logsig += self.pars['logsig_offset']
 
         sigma = tf.exp(logsig)
 
-        return mu, sigma
+        return g, sigma
 
     def get_g2g_update(self, g_p, d, no_direc, name=''):
-        # get transition matrix
+        # Calculate update to EC representation
+        # Get transition matrix
         t_mat = self.get_transition(d, name)
         # multiply current entorhinal representation by transition matrix
         update = tf.reshape(tf.matmul(t_mat, tf.reshape(g_p, [pars['batch_size'], pars['g_size'], 1])),
@@ -225,8 +233,9 @@ class TEM(NeuralResponseModel):
         return update
 
     def g_prior(self, name=''):
+        # Initial EC representation
         with tf.variable_scope("g_prior", reuse=tf.AUTO_REUSE):
-            mu = tf.tile(tf.get_variable("mu_g_prior" + name, [1, pars['g_size']],
+            g = tf.tile(tf.get_variable("mu_g_prior" + name, [1, pars['g_size']],
                                          initializer=tf.truncated_normal_initializer(stddev=pars['g_init'])),
                          [pars['batch_size'], 1])
             logsig = tf.tile(tf.get_variable("logsig_g_prior" + name, [1, pars['g_size']],
@@ -235,27 +244,28 @@ class TEM(NeuralResponseModel):
 
         sigma = tf.exp(logsig)
 
-        return tf.cast(mu,tf.float64), tf.cast(sigma, tf.float64)
+        return tf.cast(g, tf.float64), tf.cast(sigma, tf.float64)
 
     def get_transition(self, d, name=''):
-        # get transition matrix based on relationship / action
+        # Get transition matrix based on relationship / action
         d_mixed = fu_co(d, pars['d_mixed_size'], activation_fn=tf.tanh, reuse=tf.AUTO_REUSE,
                         scope='d_mixed_g2g' + name) if pars['d_mixed'] else d
 
         t_vec = tf.layers.dense(d_mixed, pars['g_size'] ** 2, activation=None, reuse=tf.AUTO_REUSE,
                                 name='mu_g2g' + name, kernel_initializer=tf.zeros_initializer, use_bias=False)
-        # turn vector into matrix
+        # Turn vector into matrix
         trans_all = tf.reshape(t_vec, [pars['batch_size'], pars['g_size'], pars['g_size']])
-        # apply mask - i.e. if hierarchically or only transition within frequency
+        # Apply mask - i.e. if hierarchically or only transition within frequency
         trans_all = tf.multiply(trans_all, self.pars['mask_g'])
 
         return trans_all
 
     def f_g(self, g):
+        # Apply activation to EC representation
         with tf.name_scope('f_g'):
             gs = tf.split(value=g, num_or_size_splits=self.pars['n_grids_all'], axis=1)
             for i in range(self.pars['n_freq']):
-                # apply activation to each frequency separately
+                # Apply activation to each frequency separately
                 gs[i] = self.f_g_freq(gs[i], i)
 
             g = tf.concat(gs, axis=1)
@@ -271,15 +281,13 @@ class TEM(NeuralResponseModel):
 def curriculum(pars_orig, pars, n_restart):
     n_envs = len(pars['widths'])
     b_s = int(pars['batch_size'])
-    # choose pars for current stage of training
-    # choose between shiny / normal
-
+    # Choose pars for current stage of training
     rn = np.random.randint(low=-pars['seq_jitter'], high=pars['seq_jitter'])
     n_restart = np.maximum(n_restart - pars['curriculum_steps'], pars['restart_min'])
 
     pars['direc_bias_env'] = [0 for _ in range(n_envs)]
 
-    # make choice for each env
+    # Make choice for each env
     choices = []
     for env in range(n_envs):
         choice = np.random.choice(pars['poss_behaviours'])
@@ -291,7 +299,7 @@ def curriculum(pars_orig, pars, n_restart):
         else:
             raise Exception('Not a correct possible behaviour')
 
-    # choose which of batch gets no_direc or not - 1 is no_direc, 0 is with direc
+    # Choose which of batch gets no_direc or not - 1 is no_direc, 0 is with direc
     no_direc_batch = np.ones(pars['batch_size'])
     for batch in range(b_s):
         env = pars['diff_env_batches_envs'][batch]
@@ -344,7 +352,7 @@ def combins(n, k, m):
 
 
 def combins_table(n, k, map_max=None):
-    " Produces a table of s_size two-hot encoded vectors, each of size 10."
+    # Produces a table of s_size two-hot encoded vectors, each of size 10
     table = []
     rev_table = {}
     table_top = special.comb(n, k)
@@ -361,6 +369,7 @@ def combins_table(n, k, map_max=None):
 
 
 def onehot2twohot(self, onehot, table, compress_size):
+    # Compresses one-hot vector of size 45 to two-hot of size 10
     seq_len = np.shape(onehot)[2]
     batch_size = np.shape(onehot)[0]
     twohot = np.zeros((batch_size, compress_size, seq_len))
@@ -401,7 +410,7 @@ for i in range(pars['n_episode']):
     # actions, direc = act(obs)
     obs, states, rewards, actions, direcs = envs.step(obs)
     xs = obs
-    agent.update(direc, obs, gs, x_s, visited, no_direc_batch)
+    agent.update(direcs, obs, gs, x_s, visited, no_direc_batch)
 
 envs.plot_trajectory()
 plt.show()

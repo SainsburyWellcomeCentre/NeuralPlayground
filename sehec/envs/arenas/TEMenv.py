@@ -19,7 +19,7 @@ class TEMenv(Environment):
         self.history = []
         self.state = [0, 0]
         self.state = np.array(self.state)
-        observation = self.state  # make_observation()
+        observation = self.state
 
         return observation, self.state
 
@@ -27,6 +27,7 @@ class TEMenv(Environment):
         return self.state
 
     def step(self, obs):
+        # Step through environment depending on given action policy
         self.global_steps += 1
         observations = np.zeros(shape=(self.pars['batch_size'], 2, self.pars['t_episode']))
         new_states = np.zeros(shape=(self.pars['batch_size'], 2, self.pars['t_episode']))
@@ -41,10 +42,12 @@ class TEMenv(Environment):
 
             for step in range(self.pars['t_episode']):
                 # action = actions[batch, :, step] / np.linalg.norm(actions[batch, :, step])
+                # Generate action from given policy
                 action, direc = policy_act(obs)
                 actions[batch, :, step] = action
                 direcs[batch, :, step] = direc
 
+                # Determine state transitioned to
                 new_state = self.state + [self.pars['agent_step_size'] * i for i in action]
                 new_state = np.array([np.clip(new_state[0], a_min=-room_width / 2, a_max=room_width / 2),
                                       np.clip(new_state[1], a_min=-room_depth / 2, a_max=room_depth / 2)])
