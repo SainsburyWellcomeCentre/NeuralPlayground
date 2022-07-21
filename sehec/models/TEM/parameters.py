@@ -21,6 +21,15 @@ def default_params():
     params['widths'], params['n_states'], params['n_states_world'], params['n_actions'], params['jump_length'], \
     params['heights'] = get_states(params)
 
+    params['time_step_size'] = 1
+    params['agent_step_size'] = 0.2
+    params['discount'] = .9
+    params['threshold'] = 1e-6
+    params['lr_td'] = 1e-2
+    params['t_episode'] = 25
+    params['n_episode'] = 1
+    params['two_hot'] = True
+
     # Behaviour Parameters
     params['poss_behaviours'] = ['normal']  # '['shiny', 'normal'] for OVC cells, ['normal'] otherwise
     params['direc_bias'] = 0.2  # strength of that bias
@@ -31,39 +40,59 @@ def default_params():
     params['curriculum_steps'] = 12 / params['t_episode']
 
     # Model Parameters
-    params['time_step_size'] = 1
-    params['agent_step_size'] = 0.2
-    params['discount'] = .9
-    params['threshold'] = 1e-6
-    params['lr_td'] = 1e-2
-    params['t_episode'] = 25
-    params['n_episode'] = 1
+    params['infer_g_type'] = 'g_p'
+    params['two_hot'] = False
 
     n_phases_all = [10, 10, 8, 6, 6]  # numbers of variables for each frequency
     params['freq'] = [0.01, 0.7, 0.91, 0.97, 0.99, 0.9995]
     params['s_size'] = 45
     params['s_size_comp'] = 10
+    params['s_size_comp_hidden'] = 20 * params['s_size_comp']
+
     params['n_phases_all'] = n_phases_all
+    params['n_place_all'] = [p * params['s_size_comp'] for p in params['n_phases_all']]
     params['n_grids_all'] = [int(3 * n_phase) for n_phase in params['n_phases_all']]
     params['tot_phases'] = sum(params['n_phases_all'])
     params['stay_still'] = True
     params['p_size'] = int(params['tot_phases'] * params['s_size_comp'])
     params['g_size'] = sum(params['n_grids_all'])
     params['n_freq'] = len(params['n_phases_all'])
+    params['prediction_freq'] = 1
 
     # Training Parameters
-    params['infer_g_type'] = 'g_p'
     params['no_direc_gen'] = False
     params['no_direction'] = None
+    params['learning_rate_max'] = 9.4e-4
+    params['learning_rate_min'] = 8e-5
     params['train_sig_g2g'] = True if 'g' in params['infer_g_type'] else False
     params['logsig_offset'] = -2
     params['logsig_ratio'] = 6
 
     # Activations
+    params['p_activation'] = lambda x: tf.nn.leaky_relu(tf.minimum(tf.maximum(x, -1), 1), alpha=0.01)
     params['g2g_activation'] = lambda x: tf.minimum(tf.maximum(x, -1), 1)
 
     # Initialisations
     params['g_init'] = 0.5
+
+    # Number gradient updates for annealing
+    params['temp_it'] = 2000
+    params['forget_it'] = 200
+    params['hebb_learn_it'] = 16000
+    params['p2g_use_it'] = 400
+    params['p2g_scale'] = 200
+    params['p2g_sig_val'] = 10000
+    params['ovc_reg_it'] = 4000
+    params['g_reg_it'] = 40000000
+    params['p_reg_it'] = 4000
+    params['l_r_decay_steps'] = 4000
+    params['l_r_decay_rate'] = 0.5
+
+    # Hebbian
+    params['hebb_mat_max'] = 1
+    params['lambd'] = 0.9999
+    params['eta'] = 0.5
+    params['hebb_type'] = [[2], [2]]
 
     # Types of allowed connections in Hebbian matrices
     separate = [[1, 0, 0, 0, 0, 0],
@@ -80,11 +109,35 @@ def default_params():
                     [0, 0, 0, 0, 1, 1],
                     [0, 0, 0, 0, 0, 1]]
 
+    hierarchical_t = [[1, 0, 0, 0, 0, 0],
+                      [1, 1, 0, 0, 0, 0],
+                      [1, 1, 1, 0, 0, 0],
+                      [1, 1, 1, 1, 0, 0],
+                      [1, 1, 1, 1, 1, 0],
+                      [1, 1, 1, 1, 1, 1]]
+
+    all2all = [[1, 1, 1, 1, 1, 1],
+               [1, 1, 1, 1, 1, 1],
+               [1, 1, 1, 1, 1, 1],
+               [1, 1, 1, 1, 1, 1],
+               [1, 1, 1, 1, 1, 1],
+               [1, 1, 1, 1, 1, 1]]
+
     # STATE TRANSITION [R_G_F_f says how frequency f influences frequency F (opposite to R_F_f_F)]
+    params['R_f_F'] = cp.deepcopy(hierarchical_t)
+    params['R_f_F_inv'] = cp.deepcopy(all2all)
+
     params['R_G_F_f'] = cp.deepcopy(hierarchical)
+
     params['mask_g'] = grid_mask(params['n_grids_all'], params['R_G_F_f'])
     params['d_mixed'] = True
     params['d_mixed_size'] = 15 if params['world_type'] == 'square' else 20
+
+    # PLACE ATTRACTOR
+    params['n_recurs'] = params['n_freq']
+    params['which_way'] = ['normal', 'normal'] if len(params['hebb_type']) < 2 else ['normal', 'inv']
+    params['Hebb_diff_freq_its_max'] = [params['n_recurs'] - freq for freq in range(params['n_recurs'])]
+    params['Hebb_inv_diff_freq_its_max'] = [params['n_recurs'] for _ in range(params['n_recurs'])]
 
     return params
 
