@@ -38,10 +38,11 @@ def default_params():
     params['restart_min'] = np.ceil(2500 / params['t_episode']).astype(int)
     params['seq_jitter'] = np.ceil(200 / params['t_episode']).astype(int)
     params['curriculum_steps'] = 12 / params['t_episode']
+    params['n_restart'] = params['restart_max'] + params['curriculum_steps']
 
     # Model Parameters
     params['infer_g_type'] = 'g_p'
-    params['two_hot'] = False
+    params['two_hot'] = True
 
     n_phases_all = [10, 10, 8, 6, 6]  # numbers of variables for each frequency
     params['freq'] = [0.01, 0.7, 0.91, 0.97, 0.99, 0.9995]

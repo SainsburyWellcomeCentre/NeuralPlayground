@@ -4,7 +4,7 @@ import numpy as np
 import random
 
 from sehec.envs.envcore import Environment
-from sehec.models.TEM.agent_policy import policy_act
+import sehec.models.TEM as model
 
 
 class TEMenv(Environment):
@@ -43,7 +43,7 @@ class TEMenv(Environment):
             for step in range(self.pars['t_episode']):
                 # action = actions[batch, :, step] / np.linalg.norm(actions[batch, :, step])
                 # Generate action from given policy
-                action, direc = policy_act(obs)
+                action, direc = model.model.TEM.act(self, obs)
                 actions[batch, :, step] = action
                 direcs[batch, :, step] = direc
 

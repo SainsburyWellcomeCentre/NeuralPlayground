@@ -12,7 +12,7 @@ from tqdm import tqdm
 from sehec.models.modelcore import NeuralResponseModel
 from sehec.envs.arenas.TEMenv import TEMenv
 from sehec.models.TEM.parameters import *
-from sehec.models.TEM.agent_policy import *
+from sehec.models.TEM.main import *
 
 fu_co = layer.fully_connected
 eps = 1e-8
@@ -24,12 +24,19 @@ class TEM(NeuralResponseModel):
         self.metadata = {"mod_kwargs": mod_kwargs}
         self.obs_history = []  # Initialize observation history to update weights later
         self.pars = mod_kwargs
+        self.pars_orig = self.pars.copy()
 
         # Variables that are initialised in update( )
         self.temp = self.forget = self.h_l = self.p2g_use = None
         self.g_cell_reg = self.p_cell_reg = self.ovc_cell_reg = None
         self.A = self.A_inv = self.A_split = None
         self.seq_pos = None
+
+        # Curriculum of behaviour types
+        self.pars, self.rn, self.n_restart, self.no_direc_batch = curriculum(self.pars_orig, self.pars, self.pars['n_restart'])
+
+        # Initialise Environment and Variables (same each batch)
+        self.gs, self.x_s, self.visited = self.initialise_variables()
 
         # Inputs for TEM
         self.table, rev_table = combins_table(self.pars['s_size_comp'], 2)
@@ -110,28 +117,17 @@ class TEM(NeuralResponseModel):
         return curr_states
 
     def act(self, obs):
-        # Produce trajectory of actions from random policy (not used whilst agent_policy.py being used)
-        actions = np.zeros((self.pars['batch_size'], 2, self.pars['t_episode']))
-        direc = np.zeros(shape=(self.pars['batch_size'], 4, self.pars['t_episode']))
-        for batch in range(self.pars['batch_size']):
-            n_states = self.pars['widths'][batch] ** 2
-            self.obs_history.append(obs)
-            if len(self.obs_history) >= 1000:
-                self.obs_history = [obs, ]
+        action = np.random.normal(scale=0.1, size=2)
+        arrow = [[0, 1], [0, -1], [1, 0], [-1, 0]]
+        diff = action - arrow
+        dist = np.sum(diff ** 2, axis=1)
+        index = np.argmin(dist)
+        action = arrow[index]
+        direc = direction(action)
 
-            arrow = [[0, 1], [0, -1], [1, 0], [-1, 0]]
-            batch_action = np.random.normal(scale=0.1, size=(2, 25))
-            for step in range(self.pars['t_episode']):
-                diff = batch_action[:, step] - arrow
-                dist = np.sum(diff ** 2, axis=1)
-                index = np.argmin(dist)
-                action = arrow[index]
-                actions[batch, :, step] = action
-                direc[batch, :, step] = direction(action)
+        return action, direc
 
-        return actions, direc
-
-    def update(self, direcs, obs, gs, x_s, visited, no_d, hmat, hmat_inv):
+    def update(self, direcs, obs, hmat, hmat_inv):
         # Updates all internal representations of TEM
         self.obs_history.append(obs)
         if len(self.obs_history) >= 1000:
@@ -144,8 +140,8 @@ class TEM(NeuralResponseModel):
         self.A_split = tf.split(self.A, num_or_size_splits=self.pars['n_place_all'], axis=2)
 
         xs = np.zeros(shape=(self.pars['batch_size'], self.pars['s_size'], self.pars['t_episode']))
-        x_s = tf.split(axis=1, num_or_size_splits=self.pars['n_freq'], value=x_s)
-        self.no_direction = no_d
+        x_s = tf.split(axis=1, num_or_size_splits=self.pars['n_freq'], value=self.x_s)
+        self.no_direction = self.no_direc_batch
 
         for batch in range(self.pars['batch_size']):
             # Generate landscape of objects in each environment
@@ -169,7 +165,7 @@ class TEM(NeuralResponseModel):
             # Initialisation of filtered x and g
             if i == 0:
                 x_t = x_s
-                g_t = gs
+                g_t = self.gs
             # Pointing to previous x and g
             else:
                 x_t = self.x_[i - 1]
@@ -273,14 +269,6 @@ class TEM(NeuralResponseModel):
         # multiply current entorhinal representation by transition matrix
         update = tf.reshape(tf.matmul(t_mat, tf.reshape(g_p, [self.pars['batch_size'], self.pars['g_size'], 1])),
                             [self.pars['batch_size'], self.pars['g_size']])
-
-        if no_direc:
-            # directionless transition weights - used in OVC environments
-            with tf.variable_scope("g2g_directionless_weights" + name, reuse=tf.AUTO_REUSE):
-                t_mat_2 = tf.get_variable("g2g" + name, [self.pars['g_size'], self.pars['g_size']])
-                t_mat_2 = tf.multiply(t_mat_2, self.pars['mask_g'])
-
-            update = tf.where(self.no_direction > 0.5, x=tf.matmul(g_p, t_mat_2), y=update)
 
         return update
 
@@ -637,38 +625,3 @@ def onehot2twohot(self, onehot, table, compress_size):
             twohot[b, :, i] = table[vals[int(b)]]
 
     return twohot
-
-
-# ------------------------------------------------------------------------------------------------------
-# MAIN
-pars = default_params()
-pars_orig = pars.copy()
-
-env_name = "TEMenv"
-mod_name = "TEM"
-n_restart = pars['restart_max'] + pars['curriculum_steps']
-
-# Initialise Environment(s)
-envs = TEMenv(environment_name=env_name, **pars)
-agent = TEM(model_name=mod_name, **pars)
-
-# Curriculum of behaviour types
-pars, rn, n_restart, no_direc_batch = curriculum(pars_orig, pars, n_restart)
-
-# Initialise Environment and Variables (same each batch)
-gs, x_s, visited = agent.initialise_variables()
-
-for i in range(pars['n_episode']):
-    obs, state = envs.reset()
-
-    # Initalise Hebbian Weights
-    a_rnn, a_rnn_inv = agent.initialise_hebbian()
-
-    # RL Loop
-    # actions, direc = act(obs)
-    obs, states, rewards, actions, direcs = envs.step(obs)
-    xs = obs
-    agent.update(direcs, obs, gs, x_s, visited, no_direc_batch, a_rnn, a_rnn_inv)
-
-envs.plot_trajectory()
-plt.show()
