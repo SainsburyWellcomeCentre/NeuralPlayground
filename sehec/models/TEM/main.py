@@ -17,13 +17,10 @@ agent = TEM(model_name=mod_name, **pars)
 for i in range(pars['n_episode']):
     obs, state = envs.reset()
 
-    # Initalise Hebbian Weights
-    a_rnn, a_rnn_inv = agent.initialise_hebbian()
-
     # RL Loop
     # actions, direc = act(obs)
     obs, states, rewards, actions, direcs = envs.step(obs)
-    agent.update(direcs, obs, a_rnn, a_rnn_inv)
+    agent.update(direcs, obs)
 
 envs.plot_trajectory()
 plt.show()

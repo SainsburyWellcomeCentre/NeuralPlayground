@@ -32,8 +32,8 @@ class TEM(NeuralResponseModel):
         self.A = self.A_inv = self.A_split = None
         self.seq_pos = None
 
-        # Curriculum of behaviour types
-        self.pars, self.rn, self.n_restart, self.no_direc_batch = curriculum(self.pars_orig, self.pars, self.pars['n_restart'])
+        # Information on direction
+        self.pars, self.rn, self.n_restart, self.no_direc_batch = direction_pars(self.pars_orig, self.pars, self.pars['n_restart'])
 
         # Initialise Environment and Variables (same each batch)
         self.gs, self.x_s, self.visited = self.initialise_variables()
@@ -127,15 +127,14 @@ class TEM(NeuralResponseModel):
 
         return action, direc
 
-    def update(self, direcs, obs, hmat, hmat_inv):
+    def update(self, direcs, obs):
         # Updates all internal representations of TEM
         self.obs_history.append(obs)
         if len(self.obs_history) >= 1000:
             self.obs_history = [obs, ]
 
         # Initalise Hebbian matrices each batch
-        self.A = hmat
-        self.A_inv = hmat_inv
+        self.A, self.A_inv = self.initialise_hebbian()
         # split into frequencies for hierarchical attractor - i.e. finish attractor early for low freq memories
         self.A_split = tf.split(self.A, num_or_size_splits=self.pars['n_place_all'], axis=2)
 
@@ -178,7 +177,7 @@ class TEM(NeuralResponseModel):
             g_gen, g2g_all = self.gen_g(g_t, direcs[:, :, i])
 
             # Inference
-            self.inference(g2g_all, xs[:, :, i], x_two_hot[:, :, i], x_t)
+            # self.inference(g2g_all, xs[:, :, i], x_two_hot[:, :, i], x_t)
 
             # Update internal representations
             # self.x_[i] = x_
@@ -524,7 +523,7 @@ class TEM(NeuralResponseModel):
         return
 
 
-def curriculum(pars_orig, pars, n_restart):
+def direction_pars(pars_orig, pars, n_restart):
     n_envs = len(pars['widths'])
     b_s = int(pars['batch_size'])
     # Choose self.pars for current stage of training

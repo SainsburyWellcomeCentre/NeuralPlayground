@@ -22,7 +22,7 @@ def default_params():
     params['heights'] = get_states(params)
 
     params['time_step_size'] = 1
-    params['agent_step_size'] = 0.2
+    params['agent_step_size'] = 1
     params['discount'] = .9
     params['threshold'] = 1e-6
     params['lr_td'] = 1e-2
