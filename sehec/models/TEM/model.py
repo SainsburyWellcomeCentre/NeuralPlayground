@@ -29,11 +29,12 @@ class TEM(NeuralResponseModel):
         # Variables that are initialised in update( )
         self.temp = self.forget = self.h_l = self.p2g_use = None
         self.g_cell_reg = self.p_cell_reg = self.ovc_cell_reg = None
-        self.A = self.A_inv = self.A_split = None
+        self.A = self.A_inv = self.A_split = self.A_inv_split = None
         self.seq_pos = None
 
         # Information on direction
-        self.pars, self.rn, self.n_restart, self.no_direc_batch = direction_pars(self.pars_orig, self.pars, self.pars['n_restart'])
+        self.pars, self.rn, self.n_restart, self.no_direc_batch = direction_pars(self.pars_orig, self.pars,
+                                                                                 self.pars['n_restart'])
 
         # Initialise Environment and Variables (same each batch)
         self.gs, self.x_s, self.visited = self.initialise_variables()
@@ -42,6 +43,7 @@ class TEM(NeuralResponseModel):
         self.table, rev_table = combins_table(self.pars['s_size_comp'], 2)
         self.x_p, self.x_g, self.x_gt = [0] * self.pars['t_episode'], [0] * self.pars['t_episode'], [0] * self.pars[
             't_episode']
+        self.p, self.p_g = [0] * self.pars['t_episode'], [0] * self.pars['t_episode']
         self.x_ = [0] * self.pars['t_episode']
         self.g = [0] * self.pars['t_episode']
         self.no_direction = None
@@ -127,7 +129,7 @@ class TEM(NeuralResponseModel):
 
         return action, direc
 
-    def update(self, direcs, obs):
+    def update(self, direcs, obs, index):
         # Updates all internal representations of TEM
         self.obs_history.append(obs)
         if len(self.obs_history) >= 1000:
@@ -137,6 +139,7 @@ class TEM(NeuralResponseModel):
         self.A, self.A_inv = self.initialise_hebbian()
         # split into frequencies for hierarchical attractor - i.e. finish attractor early for low freq memories
         self.A_split = tf.split(self.A, num_or_size_splits=self.pars['n_place_all'], axis=2)
+        self.A_inv_split = tf.split(self.A_inv, num_or_size_splits=self.pars['n_place_all'], axis=2)
 
         xs = np.zeros(shape=(self.pars['batch_size'], self.pars['s_size'], self.pars['t_episode']))
         x_s = tf.split(axis=1, num_or_size_splits=self.pars['n_freq'], value=self.x_s)
@@ -160,15 +163,15 @@ class TEM(NeuralResponseModel):
             self.temp, self.forget, self.h_l, self.p2g_use, l_r, self.g_cell_reg, self.p_cell_reg, self.ovc_cell_reg \
                 = self.get_scaling_parameters(i)
 
-            self.seq_pos = 1 * self.pars['t_episode'] + i
+            self.seq_pos = index * self.pars['t_episode'] + i
             # Initialisation of filtered x and g
             if i == 0:
-                x_t = x_s
-                g_t = self.gs
+                x_t = tf.cast(x_s, tf.float32)
+                g_t = tf.cast(self.gs, tf.float32)
             # Pointing to previous x and g
             else:
-                x_t = self.x_[i - 1]
-                g_t = self.g[i - 1]
+                x_t = tf.cast(self.x_[i - 1], tf.float32)
+                g_t = tf.cast(self.g[i - 1], tf.float32)
 
             # Two-hot Encoding
             x_two_hot = onehot2twohot(self, xs, self.table, self.pars['s_size_comp'])
@@ -177,15 +180,16 @@ class TEM(NeuralResponseModel):
             g_gen, g2g_all = self.gen_g(g_t, direcs[:, :, i])
 
             # Inference
-            # self.inference(g2g_all, xs[:, :, i], x_two_hot[:, :, i], x_t)
+            g, p, x_s, p_x = self.inference(g2g_all, xs[:, :, i], x_two_hot[:, :, i], x_t)
 
             # Update internal representations
-            # self.x_[i] = x_
-            self.g[i] = g_gen
+            self.x_[i] = x_s
+            self.g[i] = g
+            self.p[i] = p
 
             print("finished step ", i)
 
-        return
+        return self.x_, self.p, self.g
 
     # HELPER FUNCTIONS
     def hierarchical_logsig(self, x, name, splits, sizes, trainable, concat, k=2):
@@ -201,6 +205,17 @@ class TEM(NeuralResponseModel):
                                               trainable=trainable) for i in range(self.pars['n_freq'])]
 
         return tf.concat(logsigs, axis=1) if concat else logsigs
+
+    def hierarchical_g(self, x, name, splits, sizes, concat, k=2):
+        # this is just for p2g
+        xs = x if splits == 'done' else tf.split(value=x, num_or_size_splits=splits, axis=1)
+        gs_ = [fu_co(a, k * sizes[i], activation_fn=tf.nn.elu, reuse=tf.AUTO_REUSE, scope=name + '_' + str(i),
+                     weights_initializer=layer.xavier_initializer()) for i, a in enumerate(xs)]
+        gs = [fu_co(a, sizes[i], activation_fn=None, reuse=tf.AUTO_REUSE, scope=name + str(i),
+                    weights_initializer=tf.truncated_normal_initializer(stddev=self.pars['p2g_init']))
+              for i, a in enumerate(gs_)]
+
+        return tf.concat(gs, axis=1) if concat else gs
 
     def get_scaling_parameters(self, index):  # these should scale with gradient updates
         temp = tf.minimum((index + 1) / self.pars['temp_it'], 1)
@@ -225,7 +240,7 @@ class TEM(NeuralResponseModel):
                     np.log(self.pars['freq'][i] / (1 - self.pars['freq'][i]))),
                                         trainable=True)
             # Inverse sigmoid as initial parameter
-            a = tf.cast(tf.sigmoid(gamma), tf.float64)
+            a = tf.sigmoid(gamma)
             # Filter
             x_s[i] = a * x_[i] + x * (1 - a)
 
@@ -234,11 +249,11 @@ class TEM(NeuralResponseModel):
     # PATH INTEGRATION
     def gen_g(self, g, d):
         # Generative prior on grids if first step in environment, else transition
-        g, sigma = tf.cond(tf.constant(self.seq_pos > 0, dtype=tf.bool),
+        g, sigma = tf.cond(tf.cast(self.seq_pos > 0, tf.bool),
                            true_fn=lambda: self.g2g(g, d, self.pars['no_direc_gen'], name='gen'),
                            false_fn=lambda: self.g_prior())
         # Same but for used for inference network
-        g_inf, sigma_inf = tf.cond(tf.constant(self.seq_pos > 0, dtype=tf.bool),
+        g_inf, sigma_inf = tf.cond(tf.cast(self.seq_pos > 0, tf.bool),
                                    true_fn=lambda: self.g2g(g, d, False, name='inf'),
                                    false_fn=lambda: self.g_prior())
 
@@ -266,7 +281,7 @@ class TEM(NeuralResponseModel):
         # Get transition matrix
         t_mat = self.get_transition(d, name)
         # multiply current entorhinal representation by transition matrix
-        update = tf.reshape(tf.matmul(t_mat, tf.reshape(g_p, [self.pars['batch_size'], self.pars['g_size'], 1])),
+        update = tf.reshape(tf.matmul(tf.cast(t_mat, tf.float32), tf.reshape(g_p, [self.pars['batch_size'], self.pars['g_size'], 1])),
                             [self.pars['batch_size'], self.pars['g_size']])
 
         return update
@@ -283,7 +298,7 @@ class TEM(NeuralResponseModel):
 
         sigma = tf.exp(logsig)
 
-        return tf.cast(g, tf.float64), tf.cast(sigma, tf.float64)
+        return g, sigma
 
     def get_transition(self, d, name=''):
         # Get transition matrix based on relationship / action
@@ -318,13 +333,17 @@ class TEM(NeuralResponseModel):
 
     # INFERENCE
     def inference(self, g2g_all, x, x_two_hot, x_):
+        # INFER G
         # Infer all variables
         x2p, x_s, _, x_comp = self.x2p(x, x_, x_two_hot)
 
         # Infer entorhinal representation
         g, p_x = self.infer_g(g2g_all, x2p, x)
 
-        return
+        # INFER P
+        p = self.infer_p(x2p, g)
+
+        return g, p, x_s, p_x
 
     def x2p(self, x, x_t, x_two_hot):
         # Provides input to place cell layer
@@ -350,12 +369,49 @@ class TEM(NeuralResponseModel):
         for i in range(self.pars['n_freq']):
             with tf.variable_scope("x_2p" + str(i), reuse=tf.AUTO_REUSE):
                 w_p = tf.get_variable("w_p", [1], initializer=tf.constant_initializer(1.0))
-            w_p = tf.cast(tf.sigmoid(w_p), tf.float64)
+            w_p = tf.sigmoid(w_p)
 
             # Tile to size of hippocampus
             ps[i] = tf.tile(w_p * x_[i], (1, self.pars['n_phases_all'][i]))
 
         p = tf.concat(ps, 1)
+
+        return p
+
+    def g2p(self, g):
+        # Split into frequencies
+        gs = tf.split(value=g, num_or_size_splits=self.pars['n_grids_all'], axis=1)
+
+        # DOwn-sampling (only take sub-sample of grid cells
+        gs_ = [tf.slice(ting, [0, 0], [self.pars['batch_size'], self.pars['n_phases_all'][freq]]) for freq, ting
+               in enumerate(gs)]
+        g_ = tf.concat(gs_, axis=1)
+
+        # Repeat to get same dimension as hippocampus (W_repeat)
+        g2p = tf_repeat_axis_1(g_, self.pars['s_size_comp'], self.pars['p_size'])
+
+        return g2p
+
+    def infer_g(self, g2g_all, g_x2p, x):
+        # Infers EC representation (grid cells)
+        p_x = None
+        g, sigma = g2g_all
+
+        # Inference (factorise posteriors) [if 'p' in 'infer_g_type']
+        g_p2g, sigma_p2g, p_x = self.p2g(g_x2p, x)
+        _, g, _, sigma = combine2(g, g_p2g, sigma, sigma_p2g, self.pars['batch_size'])
+
+        return g, p_x
+
+    def infer_p(self, x2p, g):
+        # Grid input to HPC
+        g2p = self.g2p(g)
+
+        # HPC as conjunction of grid and sensory inputs
+        p = g2p * x2p
+
+        # Apply activation (leaky ReLU)
+        p = self.pars['p_activation'](p)
 
         return p
 
@@ -366,19 +422,29 @@ class TEM(NeuralResponseModel):
         p_x = self.attractor(x2p, self.pars['which_way'][1])
 
         # Check if memory predicts data
-        x_hat = x_hat_logits = self.f_x(p_x)
+        x_hat, x_hat_logits = self.f_x(p_x)
+        err = squared_error(x, x_hat, keep_dims=True)
+        err = tf.stop_gradient(err)
 
-        return
+        # Sum over senses and make grid prediction
+        g_attractor_sensum = tf.reduce_mean(tf.reshape(p_x, (self.pars['batch_size'], self.pars['tot_phases'],
+                                                             self.pars['s_size_comp'])), 2)
+        gs = self.hierarchical_g(g_attractor_sensum, 'g_p2g', self.pars['n_phases_all'], self.pars['n_grids_all'],
+                                 concat=False)
+        g = tf.concat(gs, axis=1)
+        g = self.f_g(g)
 
-    def infer_g(self, g2g_all, g_x2p, x):
-        # Infers EC representation (grid cells)
-        p_x = None
-        g, sigma = g2g_all
+        # Logsig based on quality of memory (length of retrieved memory)
+        logsig_input = [tf.concat([tf.reduce_sum(x ** 2, keepdims=True, axis=1), err], axis=1) for x in gs]
+        logsigma = self.hierarchical_logsig(logsig_input, 'sig_p2g', 'done', self.pars['n_grids_all'],
+                                            self.pars['train_sig_p2g'], concat=True, k=2)
+        logsigma += self.pars['logsig_offset']
+        sigma = tf.exp(logsigma)
 
-        # Inference (factorise posteriors)
-        g_p2g, sigma_p2g, p_x = self.p2g(g_x2p, x)
+        # Ignore p2g at beginning (when memories are bad)
+        sigma += (1 - self.p2g_use) * self.pars['p2g_sig_val']
 
-        return
+        return g, sigma, p_x
 
     def f_n(self, x):
         x_normed = [0] * self.pars['n_freq']
@@ -404,8 +470,8 @@ class TEM(NeuralResponseModel):
                                                                           self.pars['s_size_comp'])), 1)
 
         with tf.variable_scope("f_x", reuse=tf.AUTO_REUSE):
-            w_x = tf.get_variable("w_x", [1], initializer=tf.constant_initializer(1.0))
-            b_x = tf.get_variable("bias", [self.pars['s_size_comp']], initializer=tf.constant_initializer(0.0))
+            w_x = tf.identity(tf.get_variable("w_x", [1], initializer=tf.constant_initializer(1.0)))
+            b_x = tf.identity(tf.get_variable("bias", [self.pars['s_size_comp']], initializer=tf.constant_initializer(0.0)))
 
         x_logits = w_x * x_s + b_x
 
@@ -424,6 +490,13 @@ class TEM(NeuralResponseModel):
                        scope='f_compress_2')
 
         return x_comp
+
+    def f_decompress(self, x_compressed):
+        x_hidden = fu_co(x_compressed, self.pars['s_size_comp_hidden'], activation_fn=tf.nn.elu, reuse=tf.AUTO_REUSE,
+                         scope='f_decompress_1')
+        x = fu_co(x_hidden, self.pars['s_size'], activation_fn=None, reuse=tf.AUTO_REUSE, scope='f_decompress_2')
+
+        return x
 
     def attractor(self, init, which_way):
         # Attractor network for retrieving memories
@@ -468,8 +541,8 @@ class TEM(NeuralResponseModel):
 
         for freq in range(self.pars['n_freq']):
             # More iterations for higher frequencies
-            if it_num < hebb_diff_freq_its_max[freq] and np.sum(r_f_f, 0) > 0:
-                hebb_add = tf.squeeze(tf.matmul(p_, h_split[freq]))
+            if it_num < hebb_diff_freq_its_max[freq] and np.sum(r_f_f, 0)[freq] > 0:
+                hebb_add = tf.squeeze(tf.matmul(p_, tf.cast(h_split[freq], tf.float32)))
                 updates[freq] = updates_poss[freq] + hebb_add
 
         return updates
@@ -624,3 +697,25 @@ def onehot2twohot(self, onehot, table, compress_size):
             twohot[b, :, i] = table[vals[int(b)]]
 
     return twohot
+
+
+def squared_error(t, o, keep_dims=False):
+    return 0.5 * tf.reduce_sum(tf.square(t - o), 1, keepdims=keep_dims)
+
+
+def combine2(g1, g2, sigma1, sigma2, batch_size):
+    out_size = tf.shape(g1)[1]
+    inv_sigma_sq1 = tf.truediv(1.0, tf.square(sigma1))
+    inv_sigma_sq2 = tf.truediv(1.0, tf.square(sigma2))
+
+    logsigma = -0.5 * tf.log(inv_sigma_sq1 + inv_sigma_sq2)
+    sigma = tf.exp(logsigma)
+
+    g = tf.square(sigma) * (g1 * inv_sigma_sq1 + g2 * inv_sigma_sq2)
+    e = tf.random_normal((batch_size, out_size), mean=0, stddev=1)
+    return g + sigma * e, g, logsigma, sigma
+
+
+def tf_repeat_axis_1(tensor, repeat, dim1):
+    dim0 = tf.shape(tensor)[0]
+    return tf.reshape(tf.tile(tf.reshape(tensor, (-1, 1)), (1, repeat)), (dim0, dim1))

@@ -66,6 +66,7 @@ def default_params():
     params['learning_rate_max'] = 9.4e-4
     params['learning_rate_min'] = 8e-5
     params['train_sig_g2g'] = True if 'g' in params['infer_g_type'] else False
+    params['train_sig_p2g'] = True if 'p' in params['infer_g_type'] else False
     params['logsig_offset'] = -2
     params['logsig_ratio'] = 6
 
@@ -75,6 +76,7 @@ def default_params():
 
     # Initialisations
     params['g_init'] = 0.5
+    params['p2g_init'] = 0.1
 
     # Number gradient updates for annealing
     params['temp_it'] = 2000
@@ -136,6 +138,7 @@ def default_params():
 
     # PLACE ATTRACTOR
     params['n_recurs'] = params['n_freq']
+    params['prev_p_decay'] = 0.8
     params['which_way'] = ['normal', 'normal'] if len(params['hebb_type']) < 2 else ['normal', 'inv']
     params['Hebb_diff_freq_its_max'] = [params['n_recurs'] - freq for freq in range(params['n_recurs'])]
     params['Hebb_inv_diff_freq_its_max'] = [params['n_recurs'] for _ in range(params['n_recurs'])]

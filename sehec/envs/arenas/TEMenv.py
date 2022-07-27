@@ -26,7 +26,7 @@ class TEMenv(Environment):
     def make_observation(self):
         return self.state
 
-    def step(self, obs):
+    def step(self, policy):
         # Step through environment depending on given action policy
         self.global_steps += 1
         observations = np.zeros(shape=(self.pars['batch_size'], 2, self.pars['t_episode']))
@@ -35,6 +35,8 @@ class TEMenv(Environment):
 
         actions = np.zeros((self.pars['batch_size'], 2, self.pars['t_episode']))
         direcs = np.zeros(shape=(self.pars['batch_size'], 4, self.pars['t_episode']))
+
+        observation = [0, 0]
 
         for batch in range(self.pars['batch_size']):
             room_width = self.pars['widths'][batch]
@@ -45,7 +47,7 @@ class TEMenv(Environment):
             for step in range(self.pars['t_episode']):
                 # action = actions[batch, :, step] / np.linalg.norm(actions[batch, :, step])
                 # Generate action from given policy
-                action, direc = model.model.TEM.act(self, obs)
+                action, direc = policy(observation)
                 actions[batch, :, step] = action
                 direcs[batch, :, step] = direc
 

@@ -19,8 +19,8 @@ for i in range(pars['n_episode']):
 
     # RL Loop
     # actions, direc = act(obs)
-    obs, states, rewards, actions, direcs = envs.step(obs)
-    agent.update(direcs, obs)
+    obs, states, rewards, actions, direcs = envs.step(agent.act)
+    x_, p, g = agent.update(direcs, obs, i)
 
 envs.plot_trajectory()
 plt.show()
