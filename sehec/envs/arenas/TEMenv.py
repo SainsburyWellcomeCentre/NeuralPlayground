@@ -42,7 +42,8 @@ class TEMenv(Environment):
             room_width = self.pars['widths'][batch]
             room_depth = self.pars['widths'][batch]
             batch_history = []
-            self.state = [0, 0]
+            self.state = [round(random.uniform(-room_width/2, room_width/2), 2),
+                          round(random.uniform(-room_depth/2, room_depth/2), 2)]
 
             for step in range(self.pars['t_episode']):
                 # action = actions[batch, :, step] / np.linalg.norm(actions[batch, :, step])
@@ -76,6 +77,7 @@ class TEMenv(Environment):
             # for i in range(0, 400, 25):
             #     history_data.append(self.history[i:i+25])
         if ax is None:
+            mlp.rc('font', size=6)
             fig = plt.figure(figsize=(8, 6))
 
         for batch in range(16):
@@ -109,6 +111,10 @@ class TEMenv(Environment):
 
             sc = ax.scatter(aux_x, aux_y, c=np.arange(len(state_history)),
                             vmin=0, vmax=len(state_history), cmap="plasma", alpha=0.6)
+            ax.set_xlim([-6, 6])
+            ax.set_xticks([-5, 0, 5])
+            ax.set_ylim([-6, 6])
+            ax.set_yticks([-5, 0, 5])
 
         fig.subplots_adjust(right=0.8)
         cbar_ax = fig.add_axes([0.85, 0.15, 0.05, 0.7])

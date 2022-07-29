@@ -182,8 +182,15 @@ class TEM(NeuralResponseModel):
             # Inference
             g, p, x_s, p_x = self.inference(g2g_all, xs[:, :, i], x_two_hot[:, :, i], x_t)
 
+            # Generate Sensory
+            x_all, x_logits_all, p_g = self.generation(p, g, g_gen)
+
+            # Update Hebbian Matrices
+            self.hebbian(p, p_g, p_x)
+
             # Update internal representations
             self.x_[i] = x_s
+            self.x_p[i], self.x_g[i], self.x_gt[i] = x_all
             self.g[i] = g
             self.p[i] = p
 
@@ -246,7 +253,17 @@ class TEM(NeuralResponseModel):
 
         return x_s
 
-    # PATH INTEGRATION
+    # GENERATIVE FUNCTIONS
+    def gen_p(self, g):
+        # Generate place cells p from g
+        # Grid input to HPC
+        g2p = self.g2p(g)
+
+        # Retrieve memory
+        p = self.attractor(g2p, self.pars['which_way'][0])
+
+        return p
+
     def gen_g(self, g, d):
         # Generative prior on grids if first step in environment, else transition
         g, sigma = tf.cond(tf.cast(self.seq_pos > 0, tf.bool),
@@ -446,6 +463,23 @@ class TEM(NeuralResponseModel):
 
         return g, sigma, p_x
 
+    def generation(self, p, g, g_gen):
+        # Generate sensory from inferred memory p
+        x_p, x_p_logits = self.f_x(p)
+
+        # Generate sensory from inferred g
+        p_g = self.gen_p(g)
+        x_g, x_g_logits = self.f_x(p_g)
+
+        # Generate sensory from path-integrated g
+        p_gt = self.gen_p(g_gen)
+        x_gt, x_gt_logits = self.f_x(p_gt)
+
+        x_all = (x_p, x_g, x_gt)
+        x_logits_all = (x_p_logits, x_g_logits, x_gt_logits)
+
+        return x_all, x_logits_all, p_g
+
     def f_n(self, x):
         x_normed = [0] * self.pars['n_freq']
         for i in range(self.pars['n_freq']):
@@ -588,12 +622,32 @@ class TEM(NeuralResponseModel):
                                                                                            self.mem_list_f_s)
         # 'forget' the Hebbian matrices
         self.A = self.A * self.forget * self.pars['lambd']
-        self.A_split = tf.split(self.A, num_or_size_splits=self.par['n_place_all'], axis=2)
+        self.A_split = tf.split(self.A, num_or_size_splits=self.pars['n_place_all'], axis=2)
 
         self.A_inv = self.A_inv * self.forget * self.pars['lambd']
         self.A_inv_split = tf.split(self.A_inv, num_or_size_splits=self.pars['n_place_all'], axis=2)
 
         return
+
+    def mem_update(self, mem, mem_list, mem_list_s):
+        # Update bank of memories (for scalar product computation)
+        mem_list.append(tf.multiply(tf.sqrt(self.pars['eta'] * self.h_l), mem))
+        for i, el in enumerate(mem_list):
+            if i < len(mem_list) - 1:
+                mem_list[i] = el * tf.sqrt(self.forget * self.pars['lambd'])
+        mems = tf.stack(mem_list, axis=1)
+
+        # For hierarchy
+        mems_s = []
+        mem_s = tf.split(value=mem, num_or_size_splits=self.pars['n_place_all'], axis=1)
+        for i in range(self.pars['n_freq']):
+            mem_list_s[i].append(tf.multiply(tf.sqrt(self.pars['eta'] * self.h_l), mem_s[i]))
+            for j, el in enumerate(mem_list_s[i]):
+                if j < len(mem_list_s) - 1:
+                    mem_list_s[i][j] = el * tf.sqrt(self.forget * self.pars['lambd'])
+            mems_s.append(tf.stack(mem_list_s[i], axis=2))
+
+        return mems, mems_s, mem_list, mem_list_s
 
 
 def direction_pars(pars_orig, pars, n_restart):
