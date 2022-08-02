@@ -27,7 +27,8 @@ def default_params():
     params['threshold'] = 1e-6
     params['lr_td'] = 1e-2
     params['t_episode'] = 25
-    params['n_episode'] = 1
+    params['n_episode'] = 5
+    params['n_iters'] = 5
     params['two_hot'] = True
 
     # Behaviour Parameters
@@ -63,12 +64,23 @@ def default_params():
     # Training Parameters
     params['no_direc_gen'] = False
     params['no_direction'] = None
+    params['train_on_visited_states_only'] = True
     params['learning_rate_max'] = 9.4e-4
     params['learning_rate_min'] = 8e-5
     params['train_sig_g2g'] = True if 'g' in params['infer_g_type'] else False
     params['train_sig_p2g'] = True if 'p' in params['infer_g_type'] else False
     params['logsig_offset'] = -2
     params['logsig_ratio'] = 6
+
+    # losses
+    params['which_costs'] = ['lx_p', 'lx_g', 'lx_gt', 'lp', 'lg', 'lg_reg', 'lp_reg']
+    if 'p' in params['infer_g_type']:
+        params['which_costs'].append('lp_x')
+
+    # regularisation values
+    params['g_reg_pen'] = 0.01
+    params['p_reg_pen'] = 0.02
+    params['weight_reg_val'] = 0.001
 
     # Activations
     params['p_activation'] = lambda x: tf.nn.leaky_relu(tf.minimum(tf.maximum(x, -1), 1), alpha=0.01)
@@ -129,9 +141,9 @@ def default_params():
     # STATE TRANSITION [R_G_F_f says how frequency f influences frequency F (opposite to R_F_f_F)]
     params['R_f_F'] = cp.deepcopy(hierarchical_t)
     params['R_f_F_inv'] = cp.deepcopy(all2all)
-
     params['R_G_F_f'] = cp.deepcopy(hierarchical)
 
+    params['mask_p'] = place_mask(params['n_phases_all'], params['s_size_comp'], params['R_f_F'])
     params['mask_g'] = grid_mask(params['n_grids_all'], params['R_G_F_f'])
     params['d_mixed'] = True
     params['d_mixed_size'] = 15 if params['world_type'] == 'square' else 20
@@ -186,5 +198,25 @@ def grid_mask(n_phases, r):
     for freq_row in range(len(n_phases)):
         for freq_col in range(len(n_phases)):
             mask[c_p[freq_row]:c_p[freq_row + 1], c_p[freq_col]:c_p[freq_col + 1]] = r[freq_row][freq_col]
+
+    return mask
+
+
+def place_mask(n_phases, s_size, rff):
+    # mask - only allow across freq, within sense connections
+    # p_size : total place cell size
+    # s_size : total number of senses
+    # n_phases : number of phases in each frequency
+    tot_phases = sum(n_phases)
+    p_size = s_size * tot_phases
+    cum_phases = np.cumsum(n_phases)
+
+    c_p = np.insert(cum_phases * s_size, 0, 0).astype(int)
+
+    mask = np.zeros((p_size, p_size), dtype=np.float32)
+
+    for freq_row in range(len(n_phases)):
+        for freq_col in range(len(n_phases)):
+            mask[c_p[freq_row]:c_p[freq_row + 1], c_p[freq_col]:c_p[freq_col + 1]] = rff[freq_row][freq_col]
 
     return mask

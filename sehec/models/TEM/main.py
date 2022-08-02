@@ -12,15 +12,19 @@ mod_name = "TEM"
 
 # Initialise Environment(s)
 envs = TEMenv(environment_name=env_name, **pars)
-agent = TEM(model_name=mod_name, **pars)
 
-for i in range(pars['n_episode']):
-    obs, state = envs.reset()
+for i in range(pars['n_iters']):
+    # Initialise Agent (variables, weights etc.)
+    agent = TEM(model_name=mod_name, **pars)
 
-    # RL Loop
-    # actions, direc = act(obs)
-    obs, states, rewards, actions, direcs = envs.step(agent.act)
-    x_, p, g = agent.update(direcs, obs, i)
+    for j in range(pars['n_episode']):
+        obs, state = envs.reset()
+
+        # RL Loop
+        obs, states, rewards, actions, direcs = envs.step(agent.act)
+        x_, p, g = agent.update(direcs, obs, j)
+        print("finished episode ", j)
+    print("finished iteration ", i)
 
 envs.plot_trajectory()
 plt.show()

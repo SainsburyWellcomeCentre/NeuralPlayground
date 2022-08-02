@@ -46,7 +46,6 @@ class TEMenv(Environment):
                           round(random.uniform(-room_depth/2, room_depth/2), 2)]
 
             for step in range(self.pars['t_episode']):
-                # action = actions[batch, :, step] / np.linalg.norm(actions[batch, :, step])
                 # Generate action from given policy
                 action, direc = policy(observation)
                 actions[batch, :, step] = action
@@ -66,6 +65,7 @@ class TEMenv(Environment):
                 observations[batch, :, step] = observation
                 new_states[batch, :, step] = new_state
                 rewards.append(reward)
+
             self.history.append(batch_history)
 
         return observations, new_states, rewards, actions, direcs

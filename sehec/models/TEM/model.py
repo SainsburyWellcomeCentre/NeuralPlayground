@@ -26,18 +26,29 @@ class TEM(NeuralResponseModel):
         self.pars = mod_kwargs
         self.pars_orig = self.pars.copy()
 
-        # Variables that are initialised in update( )
+        # Variables that are initialised elsewhere
         self.temp = self.forget = self.h_l = self.p2g_use = None
         self.g_cell_reg = self.p_cell_reg = self.ovc_cell_reg = None
         self.A = self.A_inv = self.A_split = self.A_inv_split = None
-        self.seq_pos = None
+        self.seq_pos = self.poss_objects = None
+        self.weight_reg = None
+        self.train_op_all = None
 
         # Information on direction
         self.pars, self.rn, self.n_restart, self.no_direc_batch = direction_pars(self.pars_orig, self.pars,
                                                                                  self.pars['n_restart'])
 
+        # Initialise Hebbian matrices each batch
+        self.A, self.A_inv = self.initialise_hebbian()
+
         # Initialise Environment and Variables (same each batch)
         self.gs, self.x_s, self.visited = self.initialise_variables()
+
+        # Initialise Sensory Objects
+        self.poss_objects = self.initialise_objects()
+
+        self.mask = tf.constant(self.pars['mask_p'], dtype=tf.float32)
+        self.mask_g = tf.constant(self.pars['mask_g'], dtype=tf.float32)
 
         # Inputs for TEM
         self.table, rev_table = combins_table(self.pars['s_size_comp'], 2)
@@ -47,13 +58,9 @@ class TEM(NeuralResponseModel):
         self.x_ = [0] * self.pars['t_episode']
         self.g = [0] * self.pars['t_episode']
         self.no_direction = None
-
-        # Initialisation of Possible Floor Objects
-        self.poss_objects = np.zeros(shape=(self.pars['s_size'], self.pars['s_size']))
-        for i in range(self.pars['s_size']):
-            for j in range(self.pars['s_size']):
-                if j == i:
-                    self.poss_objects[i][j] = 1
+        self.lx_p, self.lx_g, self.lx_gt, self.lp, self.lg, self.lg_reg, self.lp_reg, self.lp_x, self.ovc_reg = \
+            0, 0, 0, 0, 0, 0, 0, 0, 0
+        self.accuracy_p, self.accuracy_g, self.accuracy_gt = 0, 0, 0
 
         # Memories 
         self.mem_list_a, self.mem_list_b, self.mem_list_e, self.mem_list_f = [], [], [], []
@@ -93,9 +100,19 @@ class TEM(NeuralResponseModel):
         x_s = np.zeros((self.pars['batch_size'], self.pars['s_size_comp'] * self.pars['n_freq']))
 
         n_states = self.pars['n_states_world']
-        visited = np.zeros(self.pars['batch_size'], max(n_states))  # Used when computing losses
+        visited = np.zeros((self.pars['batch_size'], max(n_states)))  # Used when computing losses
 
         return gs, x_s, visited
+
+    def initialise_objects(self):
+        # Initialisation of Possible Floor Objects
+        self.poss_objects = np.zeros(shape=(self.pars['s_size'], self.pars['s_size']))
+        for i in range(self.pars['s_size']):
+            for j in range(self.pars['s_size']):
+                if j == i:
+                    self.poss_objects[i][j] = 1
+
+        return self.poss_objects
 
     def obs_to_states(self, pos, batch):
         # Converts position to SR state
@@ -135,15 +152,17 @@ class TEM(NeuralResponseModel):
         if len(self.obs_history) >= 1000:
             self.obs_history = [obs, ]
 
-        # Initalise Hebbian matrices each batch
-        self.A, self.A_inv = self.initialise_hebbian()
-        # split into frequencies for hierarchical attractor - i.e. finish attractor early for low freq memories
+        # Split into frequencies for hierarchical attractor - i.e. finish attractor early for low freq memories
         self.A_split = tf.split(self.A, num_or_size_splits=self.pars['n_place_all'], axis=2)
         self.A_inv_split = tf.split(self.A_inv, num_or_size_splits=self.pars['n_place_all'], axis=2)
 
         xs = np.zeros(shape=(self.pars['batch_size'], self.pars['s_size'], self.pars['t_episode']))
         x_s = tf.split(axis=1, num_or_size_splits=self.pars['n_freq'], value=self.x_s)
         self.no_direction = self.no_direc_batch
+
+        # Get all scaling parameters - they slowly change to help network learn
+        self.temp, self.forget, self.h_l, self.p2g_use, l_r, self.g_cell_reg, self.p_cell_reg, self.ovc_cell_reg \
+            = self.get_scaling_parameters(index)
 
         for batch in range(self.pars['batch_size']):
             # Generate landscape of objects in each environment
@@ -158,12 +177,20 @@ class TEM(NeuralResponseModel):
                 observation = objects[state]
                 xs[batch, :, step] = observation
 
-        for i in range(self.pars['t_episode']):
-            # get all scaling parameters - they slowly change to help network learn
-            self.temp, self.forget, self.h_l, self.p2g_use, l_r, self.g_cell_reg, self.p_cell_reg, self.ovc_cell_reg \
-                = self.get_scaling_parameters(i)
+        # Identify visited states
+        if self.pars['train_on_visited_states_only']:
+            s_visited = np.zeros((self.pars['batch_size'], self.pars['t_episode']))
+            for batch in range(self.pars['batch_size']):
+                for step in range(self.pars['t_episode']):
+                    pos = self.obs_to_states(obs[batch, :, step], batch)
+                    s_visited[batch, step] = 1 if self.visited[batch, pos] == 1 else 0
+                    self.visited[batch, pos] = 1
+        else:
+            s_visited = np.ones((self.pars['batch_size'], self.pars['t_episode']))
 
+        for i in range(self.pars['t_episode']):
             self.seq_pos = index * self.pars['t_episode'] + i
+
             # Initialisation of filtered x and g
             if i == 0:
                 x_t = tf.cast(x_s, tf.float32)
@@ -188,13 +215,43 @@ class TEM(NeuralResponseModel):
             # Update Hebbian Matrices
             self.hebbian(p, p_g, p_x)
 
+            # Compute Losses
+            self.compute_losses(xs[:, :, i], x_logits_all, g, p, g_gen, p_g, p_x, s_visited[:, i])
+
+            # Compute Accuracies
+            self.compute_accuracies(xs[:, :, i], x_all)
+
             # Update internal representations
             self.x_[i] = x_s
             self.x_p[i], self.x_g[i], self.x_gt[i] = x_all
             self.g[i] = g
             self.p[i] = p
 
-            print("finished step ", i)
+        # Full Hebbian matrices update after BPTT truncation
+        self.final_hebbian()
+
+        # Total Losses
+        cost_all = 0
+        cost_all += self.lx_gt
+        cost_all += self.lx_p
+        cost_all += self.lx_g
+        cost_all += self.lg
+        cost_all += self.lp
+        cost_all += self.lp_x
+        cost_all += self.lg_reg
+        cost_all += self.lp_reg
+
+        varis = tf.trainable_variables()
+        self.weight_reg = tf.add_n([tf.nn.l2_loss(tf.cast(v, tf.float32)) for v in varis
+                                    if 'bias' not in v.name]) * self.pars['weight_reg_val']
+        cost_all += self.weight_reg
+
+        # Train
+        optimizer = tf.train.AdamOptimizer(l_r, beta1=0.9)
+        cost_all = cost_all / self.pars['t_episode']
+        grads = optimizer.compute_gradients(cost_all)
+        capped_grads = [(tf.clip_by_norm(grad, 2), var) if grad is not None else (grad, var) for grad, var in grads]
+        self.train_op_all = optimizer.apply_gradients(capped_grads)
 
         return self.x_, self.p, self.g
 
@@ -298,8 +355,9 @@ class TEM(NeuralResponseModel):
         # Get transition matrix
         t_mat = self.get_transition(d, name)
         # multiply current entorhinal representation by transition matrix
-        update = tf.reshape(tf.matmul(tf.cast(t_mat, tf.float32), tf.reshape(g_p, [self.pars['batch_size'], self.pars['g_size'], 1])),
-                            [self.pars['batch_size'], self.pars['g_size']])
+        update = tf.reshape(
+            tf.matmul(tf.cast(t_mat, tf.float32), tf.reshape(g_p, [self.pars['batch_size'], self.pars['g_size'], 1])),
+            [self.pars['batch_size'], self.pars['g_size']])
 
         return update
 
@@ -505,7 +563,8 @@ class TEM(NeuralResponseModel):
 
         with tf.variable_scope("f_x", reuse=tf.AUTO_REUSE):
             w_x = tf.identity(tf.get_variable("w_x", [1], initializer=tf.constant_initializer(1.0)))
-            b_x = tf.identity(tf.get_variable("bias", [self.pars['s_size_comp']], initializer=tf.constant_initializer(0.0)))
+            b_x = tf.identity(
+                tf.get_variable("bias", [self.pars['s_size_comp']], initializer=tf.constant_initializer(0.0)))
 
         x_logits = w_x * x_s + b_x
 
@@ -635,19 +694,75 @@ class TEM(NeuralResponseModel):
         for i, el in enumerate(mem_list):
             if i < len(mem_list) - 1:
                 mem_list[i] = el * tf.sqrt(self.forget * self.pars['lambd'])
-        mems = tf.stack(mem_list, axis=1)
+        mems = tf.stack(mem_list, axis=2)
 
-        # For hierarchy
+        # Do it for hierarchy
         mems_s = []
         mem_s = tf.split(value=mem, num_or_size_splits=self.pars['n_place_all'], axis=1)
         for i in range(self.pars['n_freq']):
             mem_list_s[i].append(tf.multiply(tf.sqrt(self.pars['eta'] * self.h_l), mem_s[i]))
             for j, el in enumerate(mem_list_s[i]):
-                if j < len(mem_list_s) - 1:
+                if j < len(mem_list_s[i]) - 1:
                     mem_list_s[i][j] = el * tf.sqrt(self.forget * self.pars['lambd'])
             mems_s.append(tf.stack(mem_list_s[i], axis=2))
 
         return mems, mems_s, mem_list, mem_list_s
+
+    def compute_losses(self, x, x_logits_all, g, p, g_gen, p_g, p_x, visited):
+        visited = tf.cast(visited, tf.float32)
+        x_p_logits, x_g_logits, x_gt_logits = x_logits_all
+
+        # Softmax Cross-Entropy Losses
+        lx_p = sparse_softmax_cross_entropy_with_logits(x, x_p_logits)
+        lx_g = sparse_softmax_cross_entropy_with_logits(x, x_g_logits)
+        lx_gt = sparse_softmax_cross_entropy_with_logits(x, x_gt_logits)
+
+        # Squared Error Losses
+        lp = squared_error(p, p_g)
+        lp_x = squared_error(p, p_x) if 'lp_x' in self.pars['which_costs'] else 0
+        lg = squared_error(g, g_gen)
+
+        # Regularise grid cells
+        lg_reg = tf.add_n([tf.reduce_sum(z_g_ ** 2, 1)
+                           for z_g_ in tf.split(g, axis=1, num_or_size_splits=self.pars['n_grids_all'])])
+        lp_reg = tf.reduce_sum(tf.abs(p), 1)
+
+        # Total losses
+        batch_vis = tf.reduce_sum(visited) + eps
+        self.lx_p += tf.reduce_sum(lx_p * visited) / batch_vis
+        self.lx_g += tf.reduce_sum(lx_g * visited) / batch_vis
+        self.lx_gt += tf.reduce_sum(lx_gt * visited) / batch_vis
+        self.lp += tf.reduce_sum(lp * visited) * self.temp / batch_vis
+        self.lg += tf.reduce_sum(lg * visited) * self.temp / batch_vis
+        self.lp_x += tf.reduce_sum(lp_x * visited) * self.p2g_use * self.temp / batch_vis
+
+        self.lg_reg += tf.reduce_sum(lg_reg * visited) * self.pars['g_reg_pen'] * self.g_cell_reg / batch_vis
+        self.lp_reg += tf.reduce_sum(lp_reg * visited) * self.pars['p_reg_pen'] * self.p_cell_reg / batch_vis
+
+        return
+
+    def compute_accuracies(self, x, x_all):
+        # Work out accuracies
+        x_p, x_g, x_gt = x_all
+        self.accuracy_p += acc_tf(x, x_p) / self.pars['t_episode']
+        self.accuracy_g += acc_tf(x, x_g) / self.pars['t_episode']
+        self.accuracy_gt += acc_tf(x, x_gt) / self.pars['t_episode']
+
+        return
+
+    def final_hebbian(self):
+        # Final Hebbian matrix computation
+        for i_num, h_type in enumerate(self.pars['hebb_type']):
+            if i_num > 0:
+                self.A_inv += tf.matmul(self.mem_f, tf.transpose(self.mem_e, [0, 2, 1]))
+            else:
+                self.A += tf.matmul(self.mem_b, tf.transpose(self.mem_a, [0, 2, 1]))
+
+        self.A = tf.multiply(self.A, self.mask)
+        self.A = tf.clip_by_value(self.A, -self.pars['hebb_mat_max'], self.pars['hebb_mat_max'])
+        self.A_inv = tf.clip_by_value(self.A_inv, -self.pars['hebb_mat_max'], self.pars['hebb_mat_max'])
+
+        return
 
 
 def direction_pars(pars_orig, pars, n_restart):
@@ -753,11 +868,8 @@ def onehot2twohot(self, onehot, table, compress_size):
     return twohot
 
 
-def squared_error(t, o, keep_dims=False):
-    return 0.5 * tf.reduce_sum(tf.square(t - o), 1, keepdims=keep_dims)
-
-
 def combine2(g1, g2, sigma1, sigma2, batch_size):
+    # Combine inferred and path-integrated gs
     out_size = tf.shape(g1)[1]
     inv_sigma_sq1 = tf.truediv(1.0, tf.square(sigma1))
     inv_sigma_sq2 = tf.truediv(1.0, tf.square(sigma2))
@@ -771,5 +883,24 @@ def combine2(g1, g2, sigma1, sigma2, batch_size):
 
 
 def tf_repeat_axis_1(tensor, repeat, dim1):
+    # Same as applying W_tile
     dim0 = tf.shape(tensor)[0]
     return tf.reshape(tf.tile(tf.reshape(tensor, (-1, 1)), (1, repeat)), (dim0, dim1))
+
+
+def sparse_softmax_cross_entropy_with_logits(labels, logits):
+    # Compute Softmax Cross-Entropy
+    labels = tf.argmax(labels, 1)
+    return tf.nn.sparse_softmax_cross_entropy_with_logits(labels=labels, logits=logits)
+
+
+def squared_error(t, o, keep_dims=False):
+    # Compute Squared Error
+    return 0.5 * tf.reduce_sum(tf.square(t - o), 1, keepdims=keep_dims)
+
+
+def acc_tf(real, pred):
+    # Compute Accuracy
+    correct_prediction = tf.equal(tf.argmax(real, 1), tf.argmax(pred, 1))
+    accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+    return tf.cast(accuracy * 100, tf.int32)
