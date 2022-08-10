@@ -10,16 +10,12 @@ pars = default_params()
 env_name = "TEMenv"
 mod_name = "TEM"
 
-# Initialise Environment(s)
+# Initialise Environment(s) and Agent (variables, weights etc.)
 envs = TEMenv(environment_name=env_name, **pars)
+agent = TEM(model_name=mod_name, **pars)
 
 for i in range(pars['n_iters']):
-    # Initialise Agent (variables, weights etc.)
-    agent = TEM(model_name=mod_name, **pars)
-
     for j in range(pars['n_episode']):
-        obs, state = envs.reset()
-
         # RL Loop
         obs, states, rewards, actions, direcs = envs.step(agent.act)
         x_, p, g = agent.update(direcs, obs, j)

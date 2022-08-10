@@ -30,6 +30,7 @@ def default_params():
     params['n_episode'] = 5
     params['n_iters'] = 5
     params['two_hot'] = True
+    params['n_walk'] = params['t_episode']
 
     # Behaviour Parameters
     params['poss_behaviours'] = ['normal']  # '['shiny', 'normal'] for OVC cells, ['normal'] otherwise

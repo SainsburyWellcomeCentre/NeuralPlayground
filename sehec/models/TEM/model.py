@@ -87,6 +87,16 @@ class TEM(NeuralResponseModel):
         # Reset observation history
         self.obs_history = []
 
+    def training_reset(self):
+        # Reset Hebbian matrices each batch
+        self.A, self.A_inv = self.initialise_hebbian()
+
+        # Reset Environment and Variables (same each batch)
+        self.gs, self.x_s, self.visited = self.initialise_variables()
+
+        # Reset Sensory Objects
+        self.poss_objects = self.initialise_objects()
+
     def initialise_hebbian(self):
         # Initialise Hebbian matrices for memory retrieval
         a_rnn = np.zeros((self.pars['batch_size'], self.pars['p_size'], self.pars['p_size']))
@@ -252,6 +262,10 @@ class TEM(NeuralResponseModel):
         grads = optimizer.compute_gradients(cost_all)
         capped_grads = [(tf.clip_by_norm(grad, 2), var) if grad is not None else (grad, var) for grad, var in grads]
         self.train_op_all = optimizer.apply_gradients(capped_grads)
+
+        # Reset Hebbian weights & model variables at the end of training iteration
+        if index == self.pars['n_walk'] - 1:
+            self.training_reset()
 
         return self.x_, self.p, self.g
 
