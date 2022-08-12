@@ -40,7 +40,7 @@ class Environment(object):
         """
         return self.state
 
-    def step(self):
+    def step(self, action=None):
         """ Given some action, return observation, new state and reward
 
         Returns
