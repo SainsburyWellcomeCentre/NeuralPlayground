@@ -3,12 +3,7 @@
 [![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
-# For now, install using pip for local editing and testing
-```
-pip install --upgrade setuptools wheel 
-python setup.py sdist bdist_wheel
-pip install -e .
-```
+
 
 * [1 Introduction](#1-Introduction)
 * [2 The Project](#1-Project)
@@ -53,8 +48,12 @@ This project will push for standardisation of neuroscience as a whole. Every hip
 
 
 ## 3 Installation
-
-
+For now, install using pip for local editing and testing
+```
+pip install --upgrade setuptools wheel 
+python setup.py sdist bdist_wheel
+pip install -e .
+```
 ## 4 Contribute
 
 There are three main ways to contribute to the porject: 
