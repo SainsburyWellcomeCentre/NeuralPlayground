@@ -8,7 +8,8 @@
 * [1 Introduction](#1-Introduction)
 * [2 The Project](#1-Project)
 * [3 Installation ](#3-Installation)
-* [4 How to Contribute](#4Contribute)
+* [4 Cite ](#4-Cite)
+* [5 How to Contribute](#5-Contribute)
 
 ## 1 Introduction
 
@@ -77,7 +78,7 @@ We inspire the Organisation of the Project from the Turing Way Guide lines. Befo
   BookTitle = {Arxiv},
 }
 
-## Contributors ✨
+## 5 Contributors ✨
 
 Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
 
