@@ -8,8 +8,8 @@
 * [1 Introduction](#1-Introduction)
 * [2 The Project](#1-Project)
 * [3 Installation ](#3-Installation)
-* [4 Cite ](#4-Cite)
-* [5 How to Contribute](#5-Contribute)
+* [4 How to Contribute](#4-Contribute)
+* [5 Cite ](#5-Cite)
 
 ## 1 Introduction
 
@@ -70,13 +70,15 @@ We inspire the Organisation of the Project from the Turing Way Guide lines. Befo
 
 
 ### 5 Cite 
-
+```
 @inproceedings{sehec2022,
-  Author = {Clementine C. J Domine and Rodrigo and Davis, Brandon and Sereno, Margaret and Momennejad, Ida},
+  Author = {Clementine C. J Domine and Rodrigo Carrasco-Davis and Luke Hollingsworth and  Andrew M. Saxe and  Caswell Barry },
   Title = {A Standardised Environment for evaluation of Hippocampus and Entorhinal Cortex Models},
   Year = {2022},
   BookTitle = {Arxiv},
 }
+
+```
 
 ## Contributors ✨
 
