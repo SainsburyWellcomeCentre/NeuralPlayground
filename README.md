@@ -69,7 +69,7 @@ Refere to the README.md files found in the files of intterest for further detail
 We inspire the Organisation of the Project from the Turing Way Guide lines. Before Adding to the project, please make sure to check the Lisencing frameworks.
 
 
-####CITE 
+### 5 Cite 
 
 @inproceedings{sehec2022,
   Author = {Clementine C. J Domine and Rodrigo and Davis, Brandon and Sereno, Margaret and Momennejad, Ida},
@@ -78,7 +78,7 @@ We inspire the Organisation of the Project from the Turing Way Guide lines. Befo
   BookTitle = {Arxiv},
 }
 
-## 5 Contributors ✨
+## Contributors ✨
 
 Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
 
