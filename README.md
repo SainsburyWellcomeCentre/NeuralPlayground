@@ -69,8 +69,14 @@ Refere to the README.md files found in the files of intterest for further detail
 We inspire the Organisation of the Project from the Turing Way Guide lines. Before Adding to the project, please make sure to check the Lisencing frameworks.
 
 
+####CITE 
 
-
+@inproceedings{sehec2022,
+  Author = {Clementine C. J Domine and Rodrigo and Davis, Brandon and Sereno, Margaret and Momennejad, Ida},
+  Title = {A Standardised Environment for evaluation of Hippocampus and Entorhinal Cortex Models},
+  Year = {2022},
+  BookTitle = {Arxiv},
+}
 
 ## Contributors ✨
 
