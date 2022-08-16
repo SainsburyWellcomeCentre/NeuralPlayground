@@ -15,25 +15,25 @@ Here are listed the mile stone achived by the project team
 
 1. Literature Review
 
-3. Environement
+2. Environement
     > Implement Any 2D Environment
     
     >   Merging room
     
     > Batch Environements 
     
-4. Agent
+3. Agent
       > Learning place cells, grid cells and invariances with excitatory and   inhibitory. Weber, 2018 https://github.com/ClementineDomine/EHC_model_comparison/blob/main/examples/testing_weber_model.ipynb
 
      > A general model of hippocampal and dorsal striatal learning and decision making. Stachenfeld,2018   
 https://github.com/ClementineDomine/EHC_model_comparison/blob/main/examples/SRexample.ipynb
    
-5. Experiments 
+4. Experiments 
     > ”Conjunctive Representation of Position, Direction, and Velocity in Entorhinal Cortex” Sargolini et al. 2006
  
     > ”Hippocampus-independent phase precession in entorhinal grid cells”, Hafting et al 2008. 
   
-6. Comparaison Board  
+5. Comparaison Board  
      
 
 Congratulation Team !
@@ -43,20 +43,23 @@ Congratulation Team !
 
 1. Literature Review
 
-3. Environement
-     > Implement Any 3D Environment
+2. Environement
+     > Implement Any 3D Environment, add sensory stimuli 
     
-4. Agent
-      > Implement an hippocampal and entorhinal cortex models of your choice.
-
+3. Agent
+      > Implement an hippocampal and entorhinal cortex models of your choice (eg. Tolman-Eichenbaum Machine (TEM). Whittington, 2020, An oscillatory interference model of grid cell firing. Burgess, 2007.)
+      
       >  Develope a new model
    
-5. Experiments 
-    > Add Experimental Data
-      
-6. Comparaison Board  
-    > Add comparison metric (eg. Grid Score,...)
+4. Experiments 
+    > Add Experimental Data (eg. Barry et al., 2012, Chen et al., 2018)
 
+      
+5. Comparaison Board  
+    > Add comparison metric (eg. Grid Score, Corrolation score ...)
+
+6. Public Access
+    > Web-site, Public Server
 
 Let's go Team ! 
 
