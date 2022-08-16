@@ -70,15 +70,8 @@ We inspire the Organisation of the Project from the Turing Way Guide lines. Befo
 
 
 ### 5 Cite 
-```
-@inproceedings{sehec2022,
-  Author = {Clementine C. J Domine and Rodrigo Carrasco-Davis and Luke Hollingsworth and  Andrew M. Saxe and  Caswell Barry },
-  Title = {A Standardised Environment for evaluation of Hippocampus and Entorhinal Cortex Models},
-  Year = {2022},
-  BookTitle = {Arxiv},
-}
 
-```
+See Documents/Citation 
 
 ## Contributors ✨
 
