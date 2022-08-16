@@ -23,9 +23,7 @@ the Environments through the projects, adding experimental specifications
 
 1. Create an environment class to following the template shown in the [Env_Core](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/sehec/envs/envcore.py) and the [Style Guide](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/documents/Style_Guide). 
 
-2. Cite the any resources approrialty.
-
-3. Record your contribution.
+2. Record your contribution.
 
 All contribution should be sumbited through a pull request that we will later acess. 
 Before sending a pull request make sure you have: 
