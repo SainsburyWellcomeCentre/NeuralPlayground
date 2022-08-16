@@ -55,7 +55,7 @@ Congratulation Team !
     > Add Experimental Data
       
 6. Comparaison Board  
-    > Add comparison metric (eg. Grid Score,)
+    > Add comparison metric (eg. Grid Score,...)
 
 
 Let's go Team ! 
