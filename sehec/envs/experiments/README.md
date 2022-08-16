@@ -18,12 +18,11 @@ We use the following data sets:
 
     1. [”Conjunctive Representation of Position, Direction, and Velocity in Entorhinal Cortex” Sargolini et al. 2006.](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/envs/experiments/Sargolini2006)
  
-    2.  [”Hippocampus-independent phase precession in entorhinal grid cells”, Hafting et al 2008] (https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/envs/experiments/Hafting2008)
+    2. [”Hippocampus-independent phase precession in entorhinal grid cells”, Hafting et al 2008] (https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/envs/experiments/Hafting2008)
    
 One of our goals is to expand this list to add more experiments that are relevant to this literature and that are publicly available.
 
 ## 3. How-to-Contribute
-
 
 1. Create a file that indicates where to download the data.
 
@@ -31,7 +30,7 @@ One of our goals is to expand this list to add more experiments that are relevan
 
 3. Cite the Data approrialty.
 
-4. Use the data to be compared to the model results.
+4. Create an environement Class for the experiment
 
 5. Record your contribution
 
