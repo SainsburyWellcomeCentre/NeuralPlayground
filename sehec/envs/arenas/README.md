@@ -7,7 +7,13 @@
 
 ## 1.Introduction
 
-The environment aims at replicating the experimental setting where behavioral data and possible recordings werecollected.  Each specific environment implemented to resemble an experimental setting should be created as a subclassof the main environment class.  We begin with creating a simple 2-dimensional arena, and we now plan to implementmore complex architectures used in experimental settings such as a T-maze or a cycle. We will work toward improvingeach of the environments through the projects, adding experimental specifications
+The environment aims at replicating the experimental setting where behavioral data and possible recordings werecollected.  Each specific environment implemented to resemble an experimental setting should be created as a subclassof the main environment class. We begin with
+creating 2-dimensional arenas. The arena are build using unite walls that can be place in the two dimensional
+space, delimiting the allowed transition of the Agent. This way, complex architectures such as a T-maze or a cycle,
+resembling experimental settings can be created. In practice, the begging and end points of the
+barriers are given as input. As a result the transition across line created by these two points are forbidden. The
+Environment can be initialised with data from the real-life experiments. We will work toward improving each of
+the Environments through the projects, adding experimental specifications
 
 ## 2.Arena-Implemented
 
