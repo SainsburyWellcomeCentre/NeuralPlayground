@@ -12,17 +12,14 @@ The agent can be thought as the animal performing the task in the experiment.  A
 
 ## 2.Model Implemented 
 
-Here we list some of the models we reviewed to implement in the first version of the software.  As mentioned before,each model predicts a different set of experimental observations that we will need to organize comprehensively.  Fornow, a rough taxonomy for these models could bereplayandnavigationrelated models (navigation ones are moreconnected with the place and grid cells predictions)
-
-  1. The Tolman-Eichenbaum machine 
+  1. [The Tolman-Eichenbaum machine](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/sehec/models/TEM)
   
-  2. An oscillatory interference model of grid cell firing 
-  
-  3. A general model of hippocampal and dorsal striatal learning and decision making 
+ 
+  2. [A general model of hippocampal and dorsal striatal learning and decision making](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/sehec/models/SRKim.py)
 
-  4. Learning place cells, grid cells and invariances with excitatory and inhibitory plasticity
+  4. [Learning place cells, grid cells and invariances with excitatory and inhibitory plasticity](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/sehec/models/weber_and_sprekeler.py)
 
-Some of the models are implemented in a jupyter notebook to facilitate the intereraction.
+Each of the models are implemented in a jupyter notebook in  [Examples](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/examples) to facilitate the intereraction.
 
 ## 3.How to Contribute
 
