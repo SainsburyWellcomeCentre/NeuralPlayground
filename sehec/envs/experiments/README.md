@@ -15,9 +15,9 @@ We use open-source data of the experiment to replicate the experimental conditio
 
 We use the following data sets:
 
-1. “Conjunctive Representation of Position, Direction, and Velocity in Entorhinal Cortex” Sargolini et al. 2006 Conjuctive cells
+1. [“Conjunctive Representation of Position, Direction, and Velocity in Entorhinal Cortex” Sargolini et al. 2006 Conjuctive cells](https://pubmed.ncbi.nlm.nih.gov/16675704/)
 
-2. “Hippocampus-independent phase precession in entorhinal grid cells”, Hafting et al 2008.
+2.[“Hippocampus-independent phase precession in entorhinal grid cells”, Hafting et al 2008.](https://www.nature.com/articles/nature06957)
    
 One of our goals is to expand this list to add more experiments that are relevant to this literature and that are publicly available.
 
