@@ -16,20 +16,20 @@ Here are listed the mile stone achived by the project team
 1. Literature Review
 
 2. Environement
-    > Implement Any 2D Environment
+    > Implement Any 2D Environment.
     
-    >   Merging room
+    > Merging room.
     
-    > Batch Environements 
+    > Batch Environements.
     
 3. Agent
-      > Learning place cells, grid cells and invariances with excitatory and   inhibitory. Weber, 2018 https://github.com/ClementineDomine/EHC_model_comparison/blob/main/examples/testing_weber_model.ipynb
+      > Learning place cells, grid cells and invariances with excitatory and   inhibitory. Weber, 2018 https://github.com/ClementineDomine/EHC_model_comparison/blob/main/examples/testing_weber_model.ipynb.
 
      > A general model of hippocampal and dorsal striatal learning and decision making. Stachenfeld,2018   
-https://github.com/ClementineDomine/EHC_model_comparison/blob/main/examples/SRexample.ipynb
+https://github.com/ClementineDomine/EHC_model_comparison/blob/main/examples/SRexample.ipynb.
    
 4. Experiments 
-    > ”Conjunctive Representation of Position, Direction, and Velocity in Entorhinal Cortex” Sargolini et al. 2006
+    > ”Conjunctive Representation of Position, Direction, and Velocity in Entorhinal Cortex” Sargolini et al. 2006.
  
     > ”Hippocampus-independent phase precession in entorhinal grid cells”, Hafting et al 2008. 
   
@@ -44,22 +44,22 @@ Congratulation Team !
 1. Literature Review
 
 2. Environement
-     > Implement Any 3D Environment, add sensory stimuli 
+     > Implement Any 3D Environment, add sensory stimuli.
     
 3. Agent
-      > Implement an hippocampal and entorhinal cortex models of your choice (eg. Tolman-Eichenbaum Machine (TEM). Whittington, 2020, An oscillatory interference model of grid cell firing. Burgess, 2007.)
+      > Implement an hippocampal and entorhinal cortex models of your choice (eg. Tolman-Eichenbaum Machine (TEM). Whittington, 2020, An oscillatory interference model of grid cell firing. Burgess, 2007).
       
-      >  Develope a new model
+      >  Develope a new model.
    
 4. Experiments 
-    > Add Experimental Data (eg. Barry et al., 2012, Chen et al., 2018)
+    > Add Experimental Data (eg. Barry et al., 2012, Chen et al., 2018).
 
       
 5. Comparaison Board  
-    > Add comparison metric (eg. Grid Score, Corrolation score ...)
+    > Add comparison metric (eg. Grid Score, Corrolation score ...).
 
 6. Public Access
-    > Web-site, Public Server
+    > Web-site, Public Server.
 
 Let's go Team ! 
 
