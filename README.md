@@ -25,14 +25,11 @@ python setup.py sdist bdist_wheel
 pip install -e .
 ```
 
-
 ## 3. Project
+Please refere to the [ROADMAP](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/documents/ROADMAP.md) to understand the state of the project and get an idea of the direction it is going in.
 
-Please refere to the Documents/ROADMAP.md to understand the state of the project and get an idea of the direction it is going in.
-
-#### How to Run 
-
-You will find in the [Examples](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/models)) files a simple implementation of the models implemented.
+#### How to run a single 
+You will find in the [Examples](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/examples) file a simple implementation of each single model and in a single Environment. The Agent and Environment class can be initialised to use data from an experiment. These two classes are allowed to interact to reproduce the full experimental setting. 
 
 #### How to Run the comparaison board
 
@@ -41,6 +38,7 @@ You will find in the [Examples](https://github.com/ClementineDomine/EHC_model_co
 ## 4. Contribute
 
 There are many ways to contribute to the porject. 
+
  1. Implement an hippocampal and entorhinal cortex models of your choice. ([Agent](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/models))
     
  2. Add functionality to the Comparison Board to compare results to real experimental data. (Comparaison Board)
@@ -67,7 +65,7 @@ Refere to the README.md files found in each the modules for further details on h
 
 ### 5. Cite 
 
-See Documents/Citation for correct citation of this framework. 
+See [Citation](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/documents/CITATION.cff) for correct citation of this framework. 
 
 ## Contributors ✨
 
