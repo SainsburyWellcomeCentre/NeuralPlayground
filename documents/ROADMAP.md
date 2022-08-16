@@ -47,7 +47,7 @@ Congratulation Team !
 3. Agent
       > Implement an hippocampal and entorhinal cortex models of your choice (eg. Tolman-Eichenbaum Machine (TEM). Whittington, 2020, An oscillatory interference model of grid cell firing. Burgess, 2007).
       
-      >  Develope a new model.
+      >  Devellope a new model.
    
 4. Experiments 
     > Add Experimental Data (eg. Barry et al., 2012, Chen et al., 2018).
