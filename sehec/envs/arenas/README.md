@@ -1,5 +1,4 @@
-# The  standardised environment for the hippocampus and entorhinal cortex models. (Environement  )
-
+# Environement: The standardised environment for the hippocampus and entorhinal cortex models. 
 
 * [1 Introduction](#1-Introduction)
 * [2 Arena Implemented](#2-Arena-Implemented)
