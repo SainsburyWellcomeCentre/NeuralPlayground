@@ -6,72 +6,65 @@
 
 
 * [1 Introduction](#1-Introduction)
-* [2 The Project](#1-Project)
-* [3 Installation ](#3-Installation)
+* [2 Installation ](#2-Installation)
+* [3 The Project](#3-Project)
 * [4 How to Contribute](#4-Contribute)
 * [5 Cite ](#5-Cite)
 
-## 1 Introduction
+## 1. Introduction
 
 This framework will allow neuroscientists to easily contrast the different hippocampus and entorhinal cortex models against experimental observations. This new tool aims at standardising the methods of building and comparing models as well as reporting empirical evidences. The code is constructed of two main classes, an agent class and an environment class.  The agent can be thought of as the animal performing the experiment, and the environment as where the animal navigates and performs a task.  These two classes are allowed to interact to reproduce the full experimental setting.
 
-We create this framework with the perspective that the neuroscience community should be able to continue its development by increasing the databases of model and experimental results without our intervention. Therefore, the software is made easy to use, facilitating future growth. 
-This new environment will revolutionize how theoretical models are proposed in neuroscience and push for easy access and implementation of new ideas. 
+We create this framework with the perspective that the neuroscience community should be able to continue its development by increasing the databases of model and experimental results without our intervention. Therefore, the software is made easy to use, facilitating future growth. This new environment will revolutionize how theoretical models are proposed in neuroscience and push for easy access and implementation of new ideas. 
 
-
-## 2 Project
-
-### 2.1 The ProjectMotivation:
-
-After an in-depth review of the literature of the entorhinal and hippocampus complex (EHC) models, we made several observations.
-The EHC is a system that is assigned a great number of roles. On the one hand, the hippocampus is known to be involved in the consolidation of episodic memory to semantic memory from the hippocampus to the neocortex, presumably through the mechanism of replay.
-On the other hand, the EHC is famously known for its function in navigation, through its ability to encode spatial information through a cognitive map of the environment. Therefore we observe two main types of model and evidence: models interested in the replay consolidation mechanisms during tasks and models that resemble neural patterns and behavior, both phenomena are observed during navigation tasks. It doesn't seem easy to reconcile these two functions of the hippocampus and entorhinal cortex. However, we believe that creating an environment that easily allows comparison of both types of models will guide us on the right track. 
-
-We pay particular attention to the comparisons that each proposed model makes against experimental results. We first notice that many model results do not necessarily arise from the replication of the experimental behavioral data. Moreover, each researcher designs a specific implementation of animal simulation or behavioral data processing, repeating vainly the same work where similar tasks or behavioral data are used. We also noticed that model results are generally compared to hand-selected experimental observations that confirm the model's predictions. In addition, we observe an evident lack of counter-evidence and indication of the regimes where the model might produce outcomes that differ from experimental observations.
-Indeed, there does not seem to be a consensus on the choice of experimental evidence. Considering the difficulty accessing the validity of experimental neuroscience observations from the multitude of experimental settings and the difficulty of building a model that assumes an extensive range of phenomena, the lack of counter-evidence seems natural. However, we believe that a single environment that allows the comparison of a model against multiple experimental observations will alleviate these difficulties and push for the standardisation of design and testing of new models. 
-
-
-Finally, we came across multiple coding styles and implementations, complicating their understanding and comparison. In addition to proposing an environment to compare theoretical models against experimental data, this also requires a common code structure that is flexible enough to add new experimental results and models. Hence, researchers would be able to add their contributions without re-designing the rest of the code.
-
-The above reasons lead us to build this project.
-
-### 2.2 Inspiration
-
-Benchmarks in machine learning are very common and helpful in assessing the performance of models. It is undoubtedly challenging to construct a measure as precise for neuroscience evidence. However, one can imagine an environment that allows the comparison of a model to many experimental observations, which will effectively act as a benchmark. This was attempted in the paper _'CCNLab: A Benchmarking Framework for Computational Cognitive Neuroscience'_. We aim to create a similar environment for hippocampus and entorhinal cortex models. In our case, we deviate from the benchmark approach since we might not be able to give an exact measure of _performance_ of the model to match experimental data due to the diversity of conditions under which experiments are done. Instead, we plan to automatically generate several metrics and plots for easy quantitative and qualitative comparison of the results from the model and the experimental data.
-
-### 2.3 Our Solution:
-
-We, therefore, propose a standardised environment to compare hippocampus and entorhinal cortex models to address all of the above limitations. This environment is being implemented as a software written in Python.
-This software will allow the theoretical neuroscientists to compare their model efficiently and consistently against the same set of experimental results. This project was built to be collaborative and lasting. We hope that the framework will be simple enough to be adopted by a great number of neuroscientists, eventually guiding the path to the computational understanding of the hippocampal mechanisms.
-This project will push for standardisation of neuroscience as a whole. Every hippocampal model integrated into this framework will have the same core structure. Along the same lines, the methods and details of the experiment will be reported in a standardised manner. Finally, we think this framework will guide the theorists in building their models by clearly laying out the set of observations they need to replicate. 
-
-
-
-
-## 3 Installation
+## 2. Installation
 For now, install using pip for local editing and testing
 ```
 pip install --upgrade setuptools wheel 
 python setup.py sdist bdist_wheel
 pip install -e .
 ```
-## 4 Contribute
-
-There are three main ways to contribute to the porject: 
-
-    1. Implement an hippocampal and entorhinal cortex models of your choice.
-
-    2. Compare its results to real experimental data.
-
-    3. Work on improving the environment
-
-Refere to the README.md files found in the files of intterest for further details on how to contibute to the project.
-We inspire the Organisation of the Project from the Turing Way Guide lines. Before Adding to the project, please make sure to check the Lisencing frameworks.
 
 
-### 5 Cite 
+## 3. Project
 
-See Documents/Citation 
+Please refere to the Documents/ROADMAP.md to understand the state of the project and get an idea of the direction it is going in.
+#### How to Run 
+
+#### How to Run the comparaison board
+
+
+## 4. Contribute
+
+There are many ways to contribute to the porject. 
+
+```
+    1. Implement an hippocampal and entorhinal cortex models of your choice. (Agent)
+
+    2. Add functionality to the Comparison Board to compare results to real experimental data. (Comparaison Board)
+
+    3. Work on improving the environment (Environement)
+    
+    4. Add an experimental data set (Experiment)
+```
+
+All contribution should be sumbited through a pull request that we will later acess. 
+Before sending a pull request make sure you have: 
+    1. Checked the Lisencing frameworks. 
+    
+    2. Followed the Style Guide (\Documents\StyleGuide)
+    
+    3. Implemented and ran tests
+    
+    4. Commented your work 
+    
+All contributions to the repository are acknowledged through the all-contributors bot and in future publicaiton.
+Refere to the README.md files found in each the modules for further details on how to contibute to them.
+
+
+### 5. Cite 
+
+See Documents/Citation for correct citation of this framework. 
 
 ## Contributors ✨
 
