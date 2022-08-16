@@ -2,8 +2,8 @@
 
 
 * [1 Introduction](#1-Introduction)
-* [2 Arena Implemented](#2-Arena Implemented)
-* [3 How to Contribute](#3-How to Contribute)
+* [2 Arena Implemented](#2-ArenaImplemented)
+* [3 How to Contribute](#3-HowtoContribute)
 
 ## 1.Introduction
 
