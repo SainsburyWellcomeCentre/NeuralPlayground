@@ -33,15 +33,12 @@ All contribution should be sumbited through a pull request that we will later ac
 Before sending a pull request make sure you have:
 1. Checked the Lisencing frameworks. 
 
-3. Followed them [Style Guide](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/Documents).
+2. Followed the [Style Guide](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/Documents).
 
-4. Implemented and ran [Test](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/test).
+3. Implemented and ran [Test](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/test).
 
-
-6. Commented your work 
-
-    
-    
+4. Commented your work 
+        
 All contributions to the repository are acknowledged through the all-contributors bot and in future publicaiton.
 
 
