@@ -25,7 +25,7 @@ Each of the models are implemented in a jupyter notebook in  [Examples](https://
 
   1. Create a file that indicates the appropirate reference to the model
 
-  2. Create a class to run the model following the template shown in the [Core.py](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/models/core.py) and the [Style Guide](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/Documents).
+  2. Create a class to run the model following the template shown in the [modelcore.py](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/models/core.py) and the [Style Guide](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/Documents).
   
   3. Record your contribution
 
