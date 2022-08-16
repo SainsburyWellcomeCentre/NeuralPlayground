@@ -39,25 +39,25 @@ Please refere to the Documents/ROADMAP.md to understand the state of the project
 There are many ways to contribute to the porject. 
 
 ```
-    1. Implement an hippocampal and entorhinal cortex models of your choice. (Agent)
+    1. Implement an hippocampal and entorhinal cortex models of your choice. ([Agent](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/models).)
 
     2. Add functionality to the Comparison Board to compare results to real experimental data. (Comparaison Board)
 
-    3. Work on improving the environment (Environement)
+    3. Work on improving the environment ([Environement](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/envs/arena).)
     
-    4. Add an experimental data set (Experiment)
+    4. Add an experimental data set ([Experiment](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/envs/experiment).)
 ```
 
 All contribution should be sumbited through a pull request that we will later acess. 
 Before sending a pull request make sure you have: 
 
-    1. Checked the Lisencing frameworks. 
-    
-    2. Followed the Style Guide (\Documents\StyleGuide)
-    
-    3. Implemented and ran tests
-    
-    4. Commented your work 
+1.Checked the Lisencing frameworks. 
+
+2. Followed them [Style Guide](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/Documents).
+
+3. Implemented and ran [Test](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/test).
+
+4. Commented your work 
     
 All contributions to the repository are acknowledged through the all-contributors bot and in future publicaiton.
 Refere to the README.md files found in each the modules for further details on how to contibute to them.
