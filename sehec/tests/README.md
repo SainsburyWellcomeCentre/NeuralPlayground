@@ -6,7 +6,7 @@
 
 ## 1. Introduction
 When you commit code to your repository, you can continuously build and test the code to make sure that the commit doesn't introduce errors.
-Anytime you submit a pullrequest make sure you included tests.
+Anytime you submit a pull request make sure you included tests.
 
 ## 2.  Add Env Test
 
