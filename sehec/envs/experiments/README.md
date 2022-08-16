@@ -5,13 +5,13 @@
 * [2. Experiment Implemented](#2-Experiment-Implemented)
 * [3. How to Contribute](#3-How-to-Contribute)
 
-## 1 Introduction
+## 1. Introduction
 
 We use open-source data of the experiment to replicate the experimental condition.
 
  We hope to assess the performance of the models against a set of selected experimental observations, roughly categorized as qualitative and quantitative evidence.
 
-## 2-Experiment-Implemented
+## 2. Experiment-Implemented
 
 We use the following data sets:
 
@@ -21,7 +21,7 @@ We use the following data sets:
    
 One of our goals is to expand this list to add more experiments that are relevant to this literature and that are publicly available.
 
-## 3 How-to-Contribute
+## 3.How-to-Contribute
 
 
 1. Create a file that indicates where to download the data.
