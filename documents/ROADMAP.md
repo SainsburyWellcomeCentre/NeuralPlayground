@@ -23,10 +23,10 @@ Here are listed the mile stone achived by the project team
     > [Batch Environements](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/sehec/envs/arenas/TEM_env.py)
     
 3. Agent
-      > Learning place cells, grid cells and invariances with excitatory and   inhibitory. Weber, 2018 https://github.com/ClementineDomine/EHC_model_comparison/blob/main/examples/testing_weber_model.ipynb.
+      > [Learning place cells, grid cells and invariances with excitatory and   inhibitory. Weber, 2018 ](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/examples/testing_weber_model.ipynb)
 
-     > A general model of hippocampal and dorsal striatal learning and decision making. Stachenfeld,2018   
-https://github.com/ClementineDomine/EHC_model_comparison/blob/main/examples/SRexample.ipynb.
+     > [A general model of hippocampal and dorsal striatal learning and decision making. Stachenfeld,2018 ]
+(https://github.com/ClementineDomine/EHC_model_comparison/blob/main/examples/SRexample.ipynb)
    
 4. Experiments 
     > [”Conjunctive Representation of Position, Direction, and Velocity in Entorhinal Cortex” Sargolini et al. 2006.](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/envs/experiments/Sargolini2006)
