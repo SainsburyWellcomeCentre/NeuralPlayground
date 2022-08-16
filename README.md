@@ -33,7 +33,7 @@ You will find in the [Examples](https://github.com/ClementineDomine/EHC_model_co
 
 #### How to Run the comparaison board
 
-
+A second way to work with the framework is through the [Comparison board](). This tool empowers the users to flexibly choose the models, Environments, experiments, metrics and plot they would like to run. The initialisation of the   are automatized in the background. 
 
 ## 4. Contribute
 
