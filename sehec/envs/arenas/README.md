@@ -25,7 +25,7 @@ The environment aims at replicating the experimental setting where behavioral da
 All contribution should be sumbited through a pull request that we will later acess. 
 Before sending a pull request make sure you have: 
 
-1.Checked the Lisencing frameworks. 
+1. Checked the Lisencing frameworks. 
 
 2. Followed the [Style Guide](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/Documents).
 
