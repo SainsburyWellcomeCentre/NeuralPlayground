@@ -31,17 +31,17 @@ Please refere to the [ROADMAP](https://github.com/ClementineDomine/EHC_model_com
 #### How to run a single model
 You will find in the [Examples](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/examples) file a simple implementation of each single model and in a single Environment. The Agent and Environment class can be initialised to use data from an experiment. These two classes are allowed to interact to reproduce the full experimental setting. 
 
-#### How to Run the comparaison board
+#### How to Run the ([Comparaison Board]())
 
 A second way to work with the framework is through the [Comparison board](). This tool empowers the users to flexibly choose the models, Environments, experiments, metrics and plot they would like to run. The initialisation of the   are automatized in the background. 
 
 ## 4. Contribute
 
-There are many ways to contribute to the porject. 
+There are many ways to contribute to the [sehec](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec). 
 
  1. Implement an hippocampal and entorhinal cortex models of your choice. ([Agent](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/models))
     
- 2. Add functionality to the Comparison Board to compare results to real experimental data. [Comparaison Board]()
+ 2. Add functionality to the Comparison Board to compare results to real experimental data. ([Comparaison Board]())
     
  3. Work on improving the environment ([Environement](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/envs/arena))
     
@@ -50,7 +50,7 @@ There are many ways to contribute to the porject.
 All contribution should be sumbited through a pull request that we will later acess. 
 Before sending a pull request make sure you have: 
 
-1.Checked the Lisencing frameworks. 
+1. Checked the Lisencing frameworks. 
 
 2. Followed them [Style Guide](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/Documents).
 
