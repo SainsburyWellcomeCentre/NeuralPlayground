@@ -41,7 +41,7 @@ There are many ways to contribute to the porject.
 
  1. Implement an hippocampal and entorhinal cortex models of your choice. ([Agent](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/models))
     
- 2. Add functionality to the Comparison Board to compare results to real experimental data. (Comparaison Board)
+ 2. Add functionality to the Comparison Board to compare results to real experimental data. [Comparaison Board]()
     
  3. Work on improving the environment ([Environement](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/envs/arena))
     
