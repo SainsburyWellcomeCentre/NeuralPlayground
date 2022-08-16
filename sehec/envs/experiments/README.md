@@ -21,7 +21,7 @@ We use the following data sets:
    
 One of our goals is to expand this list to add more experiments that are relevant to this literature and that are publicly available.
 
-## 3.How-to-Contribute
+## 3. How-to-Contribute
 
 
 1. Create a file that indicates where to download the data.
