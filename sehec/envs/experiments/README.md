@@ -26,7 +26,7 @@ One of our goals is to expand this list to add more experiments that are relevan
 
 1. Create a file that indicates where to download the data.
 
-2. Create a class to read/filter the data following the template shown in the [Behavior_data] and the [Style Guide](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/Documents).
+2. Create a class to read/filter the data following the template shown in the [Behavior_data](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/Documents).
 
 3. Cite the Data approrialty.
 
