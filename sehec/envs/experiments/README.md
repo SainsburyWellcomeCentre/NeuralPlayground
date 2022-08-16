@@ -14,6 +14,7 @@ We use open-source data of the experiment to replicate the experimental conditio
 ## 2. Experiment-Implemented
 
 We use the following data sets:
+
     1. [”Conjunctive Representation of Position, Direction, and Velocity in Entorhinal Cortex” Sargolini et al. 2006.](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/envs/experiments/Sargolini2006)
     
     2. [”Hippocampus-independent phase precession in entorhinal grid cells”, Hafting et al 2008](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/envs/experiments/Hafting2008)
