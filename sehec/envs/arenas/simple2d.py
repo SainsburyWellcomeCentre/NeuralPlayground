@@ -50,8 +50,6 @@ class Simple2D(Environment):
     agent_step_size: float
          Size of the step when executing movement, agent_step_size*global_steps will give a measure of the total distance traversed by the agent
 
-
-
      """
     def __init__(self, environment_name="2DEnv", **env_kwargs):
         """ Initialise the class
@@ -232,11 +230,14 @@ class Simple2D(Environment):
                 aux_y.append(s[1])
                 ax.plot(x_, y_, "-", color=cmap(norm(i)), alpha=0.6)
 
+            ax.set_xticks([])
+            ax.set_yticks([])
             sc = ax.scatter(aux_x, aux_y, c=np.arange(len(state_history)),
                             vmin=0, vmax=len(state_history), cmap="plasma", alpha=0.6)
 
-            cbar = plt.colorbar(sc, ax=ax)
-            cbar.ax.set_ylabel('N steps', rotation=270)
+            cbar = plt.colorbar(sc, ax=ax,ticks = [0, len(state_history)])
+            cbar.ax.set_ylabel('N steps', rotation=270,fontsize=16)
+            cbar.ax.set_yticklabels([0,len(state_history)],fontsize=16)
         if return_figure:
             return f, ax
         else:
