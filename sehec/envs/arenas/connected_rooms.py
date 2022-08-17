@@ -4,7 +4,6 @@ From https://doi.org/10.1016/j.cub.2015.02.037
 
 import numpy as np
 from .simple2d import Simple2D
-from ...utils import check_crossing_wall
 
 
 class ConnectedRooms(Simple2D):
