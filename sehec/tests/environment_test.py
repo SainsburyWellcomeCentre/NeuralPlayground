@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from ..envs.arenas.simple2d import Simple2D, Sargolini2006, BasicSargolini2006, Hafting2008
 from ..envs.arenas.connected_rooms import ConnectedRooms
+from ..envs.arenas.merging_rooms import MergingRoom2D
 import pytest
 from ..utils import RandomAgent
 
@@ -18,8 +19,8 @@ class TestSimple2D(object):
 
         # Init environment
         env = Simple2D(environment_name=env_name,
-                       room_width=room_width,
-                       room_depth=room_depth,
+                       arena_x_limits=np.array([-room_width / 2, room_width / 2]),
+                       arena_y_limits=np.array([-room_depth / 2, room_depth / 2]),
                        time_step_size=time_step_size,
                        agent_step_size=agent_step_size)
         return [env, ]
@@ -105,3 +106,24 @@ class TestConnectedRooms(TestSimple2D):
 
     def test_init_env(self, init_env):
         assert isinstance(init_env[0], ConnectedRooms)
+
+
+class TestMergingRoom2D(TestSimple2D):
+    @pytest.fixture
+    def init_env(self):
+        env_name = "MergingRoom"
+        time_step_size = 0.2
+        agent_step_size = 3
+        merging_time = 40
+        switch_time = 20
+        n_steps = ((merging_time + switch_time) * 60) / time_step_size
+
+        env = MergingRoom2D(environment_name=env_name,
+                            merge_time=merging_time,
+                            switch_time=switch_time,
+                            time_step_size=time_step_size,
+                            agent_step_size=agent_step_size)
+        return [env, ]
+
+    def test_init_env(self, init_env):
+        assert isinstance(init_env[0], MergingRoom2D)

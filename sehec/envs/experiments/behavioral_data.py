@@ -6,6 +6,8 @@ from scipy.interpolate import interp1d
 import matplotlib.pyplot as plt
 import pandas as pd
 from scipy.ndimage import gaussian_filter
+import sys
+import sehec
 
 
 class FullHaftingData(object):
@@ -122,7 +124,8 @@ class FullHaftingData(object):
 class SargoliniData(object):
 
     def __init__(self, data_path, experiment_name):
-        self.data_path = data_path
+        # self.data_path = data_path
+        self.data_path = os.path.join(sehec.__path__[0], "envs/experiments/Sargolini2006")
         self.experiment_name = experiment_name
         if self.experiment_name == "Sargolini2006":
             self.arena_limits, self.position, self.head_direction = self.get_sargolini_data()
@@ -212,7 +215,7 @@ class FullSargoliniData(object):
         with open(readme_path, 'r') as fin:
             print(fin.read())
 
-    def plot_session(self, ax=None):
+    def plot_session(self, save_path=None, ax=None):
         # print(self.data_per_animal[self.best_session["rat"]][self.best_session["sess"]])
         cell_data = self.data_per_animal[self.rat_id][self.sess]
         position_data = cell_data["position"]
@@ -246,7 +249,11 @@ class FullSargoliniData(object):
             count_i += 1
             if count_i >= 5:
                 break
-        return ax
+        if not save_path is None:
+            plt.savefig(save_path, bbox_inches="tight")
+            plt.close("all")
+        else:
+            return ax
         # plt.show()
 
     def set_behavioral_data(self, rat_id=None, session=None):

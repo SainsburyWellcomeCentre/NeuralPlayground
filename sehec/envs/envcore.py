@@ -1,5 +1,9 @@
 from abc import ABC, abstractmethod
 import numpy as np
+import pickle
+import os
+import pandas as pd
+from deepdiff import DeepDiff
 
 
 class Environment(object):
@@ -36,7 +40,7 @@ class Environment(object):
         """
         return self.state
 
-    def step(self):
+    def step(self, action=None):
         """ Given some action, return observation, new state and reward
 
         Returns
@@ -56,7 +60,7 @@ class Environment(object):
         return observation, self.state, reward
 
     def reset(self):
-        """ Re initialize state. Returns observation and re-setted state
+        """ Re-initialize state. Returns observation and re-setted state
 
         Returns
         -------
@@ -78,7 +82,9 @@ class Environment(object):
         save_path: str
             Path to save the environment
         """
-        pass
+        pickle.dump(self.__dict__,
+                    open(os.path.join(save_path), "wb"),
+                    pickle.HIGHEST_PROTOCOL)
 
     def restore_environment(self, save_path):
         """ Restore saved environment
@@ -88,7 +94,14 @@ class Environment(object):
         save_path: str
             Path to retrieve the environment
         """
-        pass
+        self.__dict__ = pd.read_pickle(save_path)
+
+    def __eq__(self, other):
+        diff = DeepDiff(self.__dict__, other.__dict__)
+        if len(diff) == 0:
+            return True
+        else:
+            return False
 
     def get_trajectory_data(self):
         """ Return some sort of actions history """

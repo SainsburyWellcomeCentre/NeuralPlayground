@@ -4,6 +4,10 @@ Any EHC model should inherit this class in order to interact with environments a
 We expect to make profound changes in this module as we add more EHC model to the repo
 """
 import numpy as np
+import pickle
+from deepdiff import DeepDiff
+import os
+import pandas as pd
 
 
 class NeuralResponseModel(object):
@@ -57,3 +61,32 @@ class NeuralResponseModel(object):
 
     def update(self):
         pass
+
+    def save_agent(self, save_path):
+        """ Save current state and information in general to re-instantiate the environment
+
+        Parameters
+        ----------
+        save_path: str
+            Path to save the agent
+        """
+        pickle.dump(self.__dict__,
+                    open(os.path.join(save_path), "wb"),
+                    pickle.HIGHEST_PROTOCOL)
+
+    def restore_agent(self, save_path):
+        """ Restore saved environment
+
+        Parameters
+        ----------
+        save_path: str
+            Path to retrieve the agent
+        """
+        self.__dict__ = pd.read_pickle(save_path)
+
+    def __eq__(self, other):
+        diff = DeepDiff(self.__dict__, other.__dict__)
+        if len(diff) == 0:
+            return True
+        else:
+            return False
