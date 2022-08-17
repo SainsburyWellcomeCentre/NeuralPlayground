@@ -15,7 +15,7 @@ The agent can be thought as the animal performing the task in the experiment.  A
   1. [The Tolman-Eichenbaum machine](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/sehec/models/TEM)
   
  
-  2. [A general model of hippocampal and dorsal striatal learning and decision making](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/sehec/models/SRKim.py)
+  2. [The hippocampus as a predictive map](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/sehec/models/SRKim.py)
 
   4. [Learning place cells, grid cells and invariances with excitatory and inhibitory plasticity](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/sehec/models/weber_and_sprekeler.py)
 
