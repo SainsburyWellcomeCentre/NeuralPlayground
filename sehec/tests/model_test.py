@@ -17,6 +17,7 @@ def get_environment():
                              agent_step_size=None)
     return [env, ]
 
+
 class Testmodelcore(object):
 
     @pytest.fixture
@@ -45,6 +46,7 @@ class Testmodelcore(object):
             obs, state, reward = env.step(action)
             obs = obs[:2]
             total_iters += 1
+
 
 class TestExcInhPlasticity(Testmodelcore):
 
@@ -75,9 +77,9 @@ class TestExcInhPlasticity(Testmodelcore):
     def test_init_model(self, init_model):
         assert isinstance(init_model[0], ExcInhPlasticity)
 
-
     def test_plot_rates(self, init_model):
         init_model[0].plot_rates()
+
 
 class TestSR(Testmodelcore):
 

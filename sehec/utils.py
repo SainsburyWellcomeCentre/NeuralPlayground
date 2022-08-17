@@ -1,4 +1,5 @@
 import numpy as np
+import os
 
 
 def check_crossing_wall(pre_state, new_state, wall, wall_closenes=1e-5):
@@ -39,6 +40,30 @@ def check_crossing_wall(pre_state, new_state, wall, wall_closenes=1e-5):
     return new_state, cross_wall
 
 
+def create_circular_wall(center, radius, n_walls=100):
+    d_angle = 2*np.pi/n_walls
+    list_of_segments = []
+    for i in range(n_walls):
+        init_point = np.array([radius*np.cos(d_angle*i), radius*np.sin(d_angle*i)]) + center
+        end_point = np.array([radius*np.cos(d_angle*(i+1)), radius*np.sin(d_angle*(i+1))]) + center
+        wall = np.stack([init_point, end_point])
+        list_of_segments.append(wall)
+    return list_of_segments
+
+
 class RandomAgent(object):
     def act(self, observation):
         return np.random.normal(scale=0.1, size=(2,))
+
+
+def inheritors(klass):
+    subclasses = set()
+    work = [klass]
+    while work:
+        parent = work.pop()
+        for child in parent.__subclasses__():
+            if child not in subclasses:
+                subclasses.add(child)
+                work.append(child)
+    return subclasses
+

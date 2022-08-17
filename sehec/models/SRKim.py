@@ -1,5 +1,5 @@
 """
-Implementation for SR 2017 by Kimberly L. Stachenfeld1,2,*, Matthew M. Botvinick1,3, and Samuel J. Gershman4
+Implementation for SR 2017 by Kimberly L. Stachenfeld1,2,*, Matthew M. Botvinick1,3, and Samuel J. Gershman
 The hippocampus as a predictive map
 https://doi.org/10.1101/097170;
 
@@ -112,6 +112,7 @@ class SR(NeuralResponseModel):
         super().__init__(model_name, **mod_kwargs)
         self.metadata = {"mod_kwargs": mod_kwargs}
         self.obs_history = []  # Initialize observation history to update weights later
+        self.grad_history = []
         self.gamma = mod_kwargs["discount"]
         self.threshold = mod_kwargs["threshold"]
         self.learning_rate = mod_kwargs["lr_td"]
@@ -135,12 +136,8 @@ class SR(NeuralResponseModel):
         self.l = int(self.room_depth * self.state_density)
         self.n_state = int(self.l * self.w)
         self.obs_history = []
-        if twoD==True:
+        if twoD:
             self.create_transmat(self.state_density,  '2D_env')
-
-
-
-
 
     def reset(self):
         """
@@ -174,10 +171,10 @@ class SR(NeuralResponseModel):
         diff = self.xy_combinations - pos[np.newaxis, ...]
         dist = np.sum(diff ** 2, axis=1)
         index = np.argmin(dist)
-        curr_state=index
+        curr_state = index
         return curr_state
 
-    def act(self,obs):
+    def act(self, obs):
         """
         The base model executes one of four action (up-down-right-left) with equal probability.
         This is used to move on the rectangular environment states space (transmat).
@@ -215,7 +212,7 @@ class SR(NeuralResponseModel):
         T: array (n_state,n_state)
              The computed transition matrix from the successor representation matrix M
         """
-        T=(1/self.gamma)*np.linalg.inv(M)@(M-np.eye(self.n_state))
+        T = (1/self.gamma)*np.linalg.inv(M)@(M-np.eye(self.n_state))
         return T
 
     def create_transmat(self, state_density, name_env, plotting_variable=True):
@@ -311,7 +308,6 @@ class SR(NeuralResponseModel):
 
         return self.srmat_sum
 
-
     def update(self):
         """
         Compute the successor representation matrix using TD learning while interacting with the environement
@@ -333,10 +329,10 @@ class SR(NeuralResponseModel):
         L = b.reshape(a.shape + (self.n_state,))
         curr_state_vec = L
 
-        self.srmat[:, self.curr_state] = self.srmat[:, self.curr_state] + self.learning_rate * (curr_state_vec +
-                                                                                    self.gamma * self.srmat[:,
-                                                                                                 next_state] - self.srmat[:,
-                                                                                                                      self.curr_state])
+        update_val = (curr_state_vec + self.gamma * self.srmat[:, next_state] - self.srmat[:,self.curr_state])
+        self.srmat[:, self.curr_state] = self.srmat[:, self.curr_state] + self.learning_rate *update_val
+
+        self.grad_history.append(np.sqrt(np.sum(update_val**2)))
         self.curr_state=next_state
 
         return self.srmat
@@ -399,7 +395,6 @@ class SR(NeuralResponseModel):
             plt.savefig(save_path, bbox_inches="tight")
             plt.close("all")
         return ax
-
 
     def plot_eigen(self,matrix, save_path, ax=None):
         """"
