@@ -207,7 +207,7 @@ class TEM(NeuralResponseModel):
                 g_t = tf.cast(self.g[i - 1], tf.float32)
 
             # Two-hot Encoding
-            x_two_hot = onehot2twohot(self, xs, self.table, self.pars['s_size_comp'])
+            x_two_hot = onehot2twohot(self, xs, tf.convert_to_tensor(self.table), self.pars['s_size_comp'])
 
             # Generative Transition
             g_gen, g2g_all = self.gen_g(g_t, direcs[:, :, i])
@@ -909,14 +909,18 @@ def onehot2twohot(self, onehot, table, compress_size):
     # Compresses one-hot vector of size 45 to two-hot of size 10
     seq_len = np.shape(onehot)[2]
     batch_size = np.shape(onehot)[0]
-    twohot = np.zeros((batch_size, compress_size, seq_len))
+    all_values = []
     for i in range(seq_len):
+        values = []
         vals = tf.argmax(onehot[:, :, i], 1)
         for b in range(batch_size):
-            # twohot[b, :, i] = tf.gather(table, vals[int(b)])
-            twohot[b, :, i] = table[vals[int(b)]]
+            value = tf.gather(table, vals[int(b)])
+            values.append(value)
+            # twohot[b, :, i] = table[vals[int(b)]]
+        all_values.append(tf.stack(values, axis=0))
+    twohot = tf.stack(all_values, axis=2)
 
-    return twohot
+    return tf.cast(twohot, tf.float32)
 
 
 def combine2(g1, g2, sigma1, sigma2, batch_size):
