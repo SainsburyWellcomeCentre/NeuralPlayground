@@ -12,9 +12,12 @@ import sehec
 
 class FullHaftingData(object):
 
-    def __init__(self, data_path, experiment_name="FullHaftingData", verbose=False, session=None):
+    def __init__(self, data_path=None, experiment_name="FullHaftingData", verbose=False, session=None):
         self.experiment_name = experiment_name
-        self.data_path = data_path
+        if data_path is None:
+            self.data_path = os.path.join(sehec.__path__[0], "envs/experiments/Hafting2008/")
+        else:
+            self.data_path = data_path
         self._load_data()
         
         if session is None:
@@ -45,11 +48,11 @@ class FullHaftingData(object):
                 for cell_id in cell_ids:
                     if cell_id == "_POS":
                         session_info = "position"
-                    elif cell_id in ["_EEG", "_EGF"]:
-                        continue
+                    elif "EG" in cell_id:
+                        session_info = cell_id[1:]
                     else:
                         session_info = cell_id
-                        print(cell_id)
+                        # print(cell_id)
                     r_path = glob.glob(self.data_path + m_id + "-" + sess + "*" + cell_id + "*.mat")
                     cleaned_data = clean_data(sio.loadmat(r_path[0]))
                     self.data_per_animal[m_id][sess][session_info] = cleaned_data
@@ -57,10 +60,10 @@ class FullHaftingData(object):
     def show_keys(self):
         print("Rat ids", list(self.data_per_animal.keys()))
         for rat_id, val in self.data_per_animal.items():
-            print("Sessions for " + rat_id)
+            print("Sessions for rat " + rat_id)
             print(list(self.data_per_animal[rat_id].keys()))
             for sess in self.data_per_animal[rat_id].keys():
-                print("Cells recorded in session " + sess)
+                print("Data recorded in session " + sess)
                 print(list(self.data_per_animal[rat_id][sess].keys()))
 
     def show_readme(self):
@@ -96,7 +99,7 @@ class FullHaftingData(object):
         # plt.show()
         return ax
         
-    def set_behavioral_data(self, rat_id=None, session=None):
+    def set_behavioral_data(self, rat_id=None, session=None, tolerance=1e-10):
         arena_limits = np.array([[-50, 50], [-50, 50]])
         if rat_id is None:
             rat_id = self.rat_id
@@ -114,7 +117,7 @@ class FullHaftingData(object):
 
         position = np.stack([x, y], axis=1) # Convert to cm
         head_direction = np.diff(position, axis=0)
-        head_direction = head_direction/np.sqrt(np.sum(head_direction**2, axis=1))[..., np.newaxis]
+        head_direction = head_direction/np.sqrt(np.sum(head_direction**2, axis=1) + tolerance)[..., np.newaxis]
         self.arena_limits = arena_limits
         self.position = position
         self.head_direction = head_direction
@@ -123,14 +126,14 @@ class FullHaftingData(object):
 
 class SargoliniData(object):
 
-    def __init__(self, data_path, experiment_name):
-        # self.data_path = data_path
-        self.data_path = os.path.join(sehec.__path__[0], "envs/experiments/Sargolini2006")
-        self.experiment_name = experiment_name
-        if self.experiment_name == "Sargolini2006":
-            self.arena_limits, self.position, self.head_direction = self.get_sargolini_data()
+    def __init__(self, experiment_name='Sargolini_2006_Data', data_path=None):
+        if data_path is None:
+            self.data_path = os.path.join(sehec.__path__[0], "envs/experiments/Sargolini2006")
+        else:
+            self.data_path = data_path
+        self.arena_limits, self.position, self.head_direction = self.get_sargolini_data()
 
-    def get_sargolini_data(self):
+    def get_sargolini_data(self, tolerance=1e-10):
         arena_limits = np.array([[-50, 50], [-50, 50]])
         filenames_x = os.path.join(self.data_path, "sargolini_x_pos_")
         filenames_y = os.path.join(self.data_path, "sargolini_y_pos_")
@@ -145,15 +148,20 @@ class SargoliniData(object):
 
         position = np.stack([x_position, y_position], axis=1)*100 # Convert to cm
         head_direction = np.diff(position, axis=0)
-        head_direction = head_direction/np.sqrt(np.sum(head_direction**2, axis=1))[..., np.newaxis]
+        head_direction = head_direction/np.sqrt(np.sum(head_direction**2, axis=1) + tolerance)[..., np.newaxis]
         return arena_limits, position, head_direction
 
 
 class FullSargoliniData(object):
 
-    def __init__(self, data_path, experiment_name="FullSargoliniData", verbose=False, session=None):
-        self.data_path = data_path
+    def __init__(self, data_path=None, experiment_name="FullSargoliniData", verbose=False, session=None):
+        if data_path is None:
+            self.data_path = os.path.join(sehec.__path__[0], "envs/experiments/Sargolini2006/raw_data_sample/")
+        else:
+            self.data_path = data_path
+        print("Data path ", self.data_path)
         self.experiment_name = experiment_name
+        self.show_readme()
         self._load_data()
         if session is None:
             self.rat_id, self.sess = self.best_session["rat_id"], self.best_session["sess"]
@@ -187,13 +195,13 @@ class FullSargoliniData(object):
                     if cell_id == "_POS":
                         session_info = "position"
                     elif cell_id in ["_EEG", "_EGF"]:
-                        continue
+                        session_info = cell_id[1:]
                     else:
                         session_info = cell_id
 
                     r_path = glob.glob(self.data_path + m_id + "-" + sess + "*" + cell_id + "*.mat")
                     cleaned_data = clean_data(sio.loadmat(r_path[0]))
-                    if cell_id != "_POS":
+                    if cell_id != "_POS" and not cell_id in ["_EEG", "_EGF"]:
                         try:
                             self.data_per_animal[m_id][sess][session_info] = cleaned_data["cellTS"]
                         except:
@@ -204,10 +212,10 @@ class FullSargoliniData(object):
     def show_keys(self):
         print("Rat ids", list(self.data_per_animal.keys()))
         for rat_id, val in self.data_per_animal.items():
-            print("Sessions for " + rat_id)
+            print("Sessions for rat " + rat_id)
             print(list(self.data_per_animal[rat_id].keys()))
             for sess in self.data_per_animal[rat_id].keys():
-                print("Cells recorded in session " + sess)
+                print("Data recorded in session " + sess)
                 print(list(self.data_per_animal[rat_id][sess].keys()))
 
     def show_readme(self):
