@@ -99,6 +99,30 @@ class TEM(NeuralResponseModel):
 
         x_s = tf.split(axis=1, num_or_size_splits=self.pars['n_freq'], value=self.x_s)
 
+        # Initialise Sensory Objects
+        self.poss_objects = self.initialise_objects()
+
+        for batch in range(self.pars['batch_size']):
+            # Generate landscape of objects in each environment
+            objects = np.zeros(shape=(self.pars['n_states'][batch], self.pars['s_size']))
+            for i in range(self.pars['n_states'][batch]):
+                rand = random.randint(0, self.pars['s_size'] - 1)
+                objects[i] = self.poss_objects[rand]
+
+            # Make observations of sensorium in SR states
+            for step in range(self.pars['t_episode']):
+                state = self.obs_to_states(self.x[batch, :, step], batch)
+                observation = objects[state]
+                self.x[batch, :, step] = observation
+
+        # Identify visited states
+        s_visited = np.zeros((self.pars['batch_size'], self.pars['t_episode']))
+        for batch in range(self.pars['batch_size']):
+            for step in range(self.pars['t_episode']):
+                pos = self.obs_to_states(self.x[batch, :, step], batch)
+                s_visited[batch, step] = 1 if self.visited[batch, pos] == 1 else 0
+                self.visited[batch, pos] = 1
+
         # Calculate variables
         self.loop(self.x, x_s, self.d, self.g_, self.seq_index, self.s_vis)
 
@@ -275,32 +299,8 @@ class TEM(NeuralResponseModel):
         # Initialise Environment and Variables (same each batch)
         gs, x_s, visited = TEM.initialise_variables(self)
 
-        # Initialise Sensory Objects
-        self.poss_objects = self.initialise_objects()
-
-        for batch in range(self.pars['batch_size']):
-            # Generate landscape of objects in each environment
-            objects = np.zeros(shape=(self.pars['n_states'][batch], self.pars['s_size']))
-            for i in range(self.pars['n_states'][batch]):
-                rand = random.randint(0, self.pars['s_size'] - 1)
-                objects[i] = self.poss_objects[rand]
-
-            # Make observations of sensorium in SR states
-            for step in range(self.pars['t_episode']):
-                state = self.obs_to_states(self.obs[batch, :, step], batch)
-                observation = objects[state]
-                self.x[batch, :, step] = observation
-
-        # Identify visited states
-        s_visited = np.zeros((self.pars['batch_size'], self.pars['t_episode']))
-        for batch in range(self.pars['batch_size']):
-            for step in range(self.pars['t_episode']):
-                pos = self.obs_to_states(self.obs[batch, :, step], batch)
-                s_visited[batch, step] = 1 if visited[batch, pos] == 1 else 0
-                visited[batch, pos] = 1
-
-        feed_dict = {self.obs: x, self.x_: x_s, self.d: d, self.g_: gs, self.rnn: a_rnn, self.rnn_inv: a_rnn_inv,
-                     self.it_num: it_num, self.seq_index: seq_index, self.s_vis: s_visited}
+        feed_dict = {self.x: x, self.x_: x_s, self.d: d, self.g_: gs, self.rnn: a_rnn, self.rnn_inv: a_rnn_inv,
+                     self.it_num: it_num, self.seq_index: seq_index}
         results = self.sess.run(self.fetches_all, feed_dict)
 
         return results
@@ -911,9 +911,8 @@ def onehot2twohot(self, onehot, table, compress_size):
     batch_size = np.shape(onehot)[0]
     twohot = np.zeros((batch_size, compress_size, seq_len))
     for i in range(seq_len):
-        vals = tf.argmax(onehot[:, :, i], 1)
+        vals = np.argmax(onehot[:, :, i], 1)
         for b in range(batch_size):
-            # twohot[b, :, i] = tf.gather(table, vals[int(b)])
             twohot[b, :, i] = table[vals[int(b)]]
 
     return twohot

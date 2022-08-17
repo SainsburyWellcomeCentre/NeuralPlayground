@@ -911,9 +911,8 @@ def onehot2twohot(self, onehot, table, compress_size):
     batch_size = np.shape(onehot)[0]
     twohot = np.zeros((batch_size, compress_size, seq_len))
     for i in range(seq_len):
-        vals = tf.argmax(onehot[:, :, i], 1)
+        vals = tf.argmax(onehot[:, :, i], axis=1).numpy()
         for b in range(batch_size):
-            # twohot[b, :, i] = tf.gather(table, vals[int(b)])
             twohot[b, :, i] = table[vals[int(b)]]
 
     return twohot

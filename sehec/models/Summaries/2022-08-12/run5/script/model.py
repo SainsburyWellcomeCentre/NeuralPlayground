@@ -22,36 +22,16 @@ eps = 1e-8
 
 
 class TEM(NeuralResponseModel):
-    def __init__(self, model_name="TEM", **mod_kwargs):
+    def __init__(self, x, x_, d, index, rnn, rnn_inv, g, model_name="TEM", **mod_kwargs):
+        global s_visited
         super().__init__(model_name, **mod_kwargs)
         self.metadata = {"mod_kwargs": mod_kwargs}
         self.obs_history = []  # Initialize observation history to update weights later
         self.pars = mod_kwargs
         self.pars_orig = self.pars.copy()
-        gen_path, train_path, model_path, save_path, script_path = make_directories()
 
-        # Initialise Graph
-        tf.reset_default_graph()
-        self.it_num = tf.placeholder(tf.float32, shape=(), name='it_num')
-        self.seq_index = tf.placeholder(tf.float32, shape=(), name='seq_index')
-        self.obs = tf.placeholder(tf.float32, shape=(self.pars['batch_size'], 2, self.pars['t_episode']), name='x')
-        self.x = tf.placeholder(tf.float32, shape=(self.pars['batch_size'], self.pars['s_size'], self.pars['t_episode']),
-                                name='x')
-        self.x_s = tf.placeholder(tf.float32, shape=(self.pars['batch_size'],
-                                                     self.pars['s_size_comp'] * self.pars['n_freq']), name='x_')
-        self.d = tf.placeholder(tf.float32, shape=(self.pars['batch_size'], self.pars['n_actions'],
-                                                   self.pars['t_episode']), name='d')
-        self.s_vis = tf.placeholder(tf.float32, shape=(self.pars['batch_size'], self.pars['t_episode']),
-                                    name='s_visited')
-        self.rnn = tf.placeholder(tf.float32, shape=(self.pars['batch_size'], self.pars['p_size'], self.pars['p_size']),
-                                  name='rnn')
-        self.rnn_inv = tf.placeholder(tf.float32,
-                                      shape=(self.pars['batch_size'], self.pars['p_size'], self.pars['p_size']),
-                                      name='rnn_')
-        self.g_ = tf.placeholder(tf.float32, shape=(self.pars['batch_size'], self.pars['g_size']), name='g_')
-        # self.x = tf.unstack(self.x1, axis=2)
-        # self.d = tf.unstack(self.d0, axis=2)
-        # self.s_vis = tf.unstack(self.s_visi, axis=1)
+        self.mask = tf.constant(self.pars['mask_p'], dtype=tf.float32)
+        self.mask_g = tf.constant(self.pars['mask_g'], dtype=tf.float32)
 
         # Inputs for TEM
         self.seq_pos = None
@@ -64,9 +44,6 @@ class TEM(NeuralResponseModel):
         self.lx_p, self.lx_g, self.lx_gt, self.lp, self.lg, self.lg_reg, self.lp_reg, self.lp_x, self.ovc_reg = \
             0, 0, 0, 0, 0, 0, 0, 0, 0
         self.accuracy_p, self.accuracy_g, self.accuracy_gt = 0, 0, 0
-
-        self.mask = tf.constant(self.pars['mask_p'], dtype=tf.float32)
-        self.mask_g = tf.constant(self.pars['mask_g'], dtype=tf.float32)
 
         # Memories
         self.mem_list_a, self.mem_list_b, self.mem_list_e, self.mem_list_f = [], [], [], []
@@ -88,46 +65,60 @@ class TEM(NeuralResponseModel):
                                  dtype=tf.float32) for i in range(self.pars['n_freq'])]
 
         # Get all scaling parameters - they slowly change to help network learn
-        self.temp, self.forget, self.h_l, self.p2g_use, self.l_r, self.g_cell_reg, self.p_cell_reg, self.ovc_cell_reg \
-            = self.get_scaling_parameters(self.it_num)
+        self.temp, self.forget, self.h_l, self.p2g_use, l_r, self.g_cell_reg, self.p_cell_reg, self.ovc_cell_reg \
+            = self.get_scaling_parameters(index)
 
         # Variables that are initialised elsewhere
-        self.A = self.rnn
-        self.A_inv = self.rnn_inv
+        self.A = rnn
+        self.A_inv = rnn_inv
         self.A_split = tf.split(self.A, num_or_size_splits=self.pars['n_place_all'], axis=2)
         self.A_inv_split = tf.split(self.A_inv, num_or_size_splits=self.pars['n_place_all'], axis=2)
 
-        x_s = tf.split(axis=1, num_or_size_splits=self.pars['n_freq'], value=self.x_s)
+        x_s = tf.split(axis=1, num_or_size_splits=self.pars['n_freq'], value=x_)
+
+        # Initialise Sensory Objects
+        self.poss_objects = self.initialise_objects()
+
+        for batch in range(self.pars['batch_size']):
+            # Generate landscape of objects in each environment
+            objects = np.zeros(shape=(self.pars['n_states'][batch], self.pars['s_size']))
+            for i in range(self.pars['n_states'][batch]):
+                rand = random.randint(0, self.pars['s_size'] - 1)
+                objects[i] = self.poss_objects[rand]
+
+            # Make observations of sensorium in SR states
+            for step in range(self.pars['t_episode']):
+                state = self.obs_to_states(x[batch, :, step], batch)
+                observation = objects[state]
+                x[batch, :, step] = observation
+
+        # Identify visited states
+        if self.pars['train_on_visited_states_only']:
+            s_visited = np.zeros((self.pars['batch_size'], self.pars['t_episode']))
+            for batch in range(self.pars['batch_size']):
+                for step in range(self.pars['t_episode']):
+                    pos = self.obs_to_states(x[batch, :, step], batch)
+                    s_visited[batch, step] = 1 if self.visited[batch, pos] == 1 else 0
+                    self.visited[batch, pos] = 1
 
         # Calculate variables
-        self.loop(self.x, x_s, self.d, self.g_, self.seq_index, self.s_vis)
+        self.update(x, x_s, d, index, g, s_visited)
 
-        # CREATE SESSION
-        self.sess = tf.InteractiveSession()
-        saver = tf.train.Saver(max_to_keep=1)  # saves variables learned during training
-        train_writer = tf.summary.FileWriter(train_path, self.sess.graph)
-        tf.global_variables_initializer().run()
-        tf.get_default_graph().finalize()
-
-        self.fetches_all, self.fetches_all_ = [], []
-        self.fetches_all.extend([self.g, self.p, self.p_g, self.x_gt, self.x_, self.A, self.A_inv,
-                                 self.accuracy_gt, self.train_op_all])
-        self.fetches_all_.extend([self.g, self.p, self.p_g, self.x_gt, self.x_, self.A, self.A_inv,
-                                  self.accuracy_gt, self.temp])
+        self.reset()
 
     def reset(self):
         # Reset observation history
         self.obs_history = []
 
     def training_reset(self):
-        # Information on direction
-        # pars, rn, n_restart, no_direc_batch = direction_pars(self.pars_orig, self.pars, self.pars['n_restart'])
+        # Reset Hebbian matrices each batch
+        self.A, self.A_inv = self.initialise_hebbian()
 
-        # Initialise Hebbian matrices each batch
-        a_rnn, a_rnn_inv = TEM.initialise_hebbian()
+        # Reset Environment and Variables (same each batch)
+        self.gs, self.x_s, self.visited = self.initialise_variables()
 
-        # Initialise Environment and Variables (same each batch)
-        gs, x_s, visited = TEM.initialise_variables()
+        # Reset Sensory Objects
+        self.poss_objects = self.initialise_objects()
 
     def initialise_hebbian(self):
         # Initialise Hebbian matrices for memory retrieval
@@ -170,7 +161,7 @@ class TEM(NeuralResponseModel):
         xy_combinations = mesh.T.reshape(-1, 2)
 
         diff = xy_combinations - pos[np.newaxis, ...]
-        dist = np.sum(diff ** 2)
+        dist = np.sum(diff ** 2, axis=1)
         index = np.argmin(dist)
         curr_state = index
         curr_states.append(curr_state)
@@ -188,7 +179,7 @@ class TEM(NeuralResponseModel):
 
         return action, direc
 
-    def loop(self, xs, x_s, direcs, gs, index, s_visited):
+    def update(self, xs, x_s, direcs, gs, index, s_visited):
         # Updates all internal representations of TEM
         self.obs_history.append(xs)
         if len(self.obs_history) >= 1000:
@@ -253,7 +244,7 @@ class TEM(NeuralResponseModel):
         cost_all += self.weight_reg
 
         # Train
-        optimizer = tf.train.AdamOptimizer(self.l_r, beta1=0.9)
+        optimizer = tf.train.AdamOptimizer(l_r, beta1=0.9)
         cost_all = cost_all / self.pars['t_episode']
         grads = optimizer.compute_gradients(cost_all)
         capped_grads = [(tf.clip_by_norm(grad, 2), var) if grad is not None else (grad, var) for grad, var in grads]
@@ -264,46 +255,6 @@ class TEM(NeuralResponseModel):
             self.training_reset()
 
         return self.x_, self.p, self.g
-
-    def update(self, x, d, it_num, seq_index):
-        # Information on direction
-        # pars, rn, n_restart, no_direc_batch = direction_pars(self.pars_orig, self.pars, self.pars['n_restart'])
-
-        # Initialise Hebbian matrices each batch
-        a_rnn, a_rnn_inv = TEM.initialise_hebbian(self)
-
-        # Initialise Environment and Variables (same each batch)
-        gs, x_s, visited = TEM.initialise_variables(self)
-
-        # Initialise Sensory Objects
-        self.poss_objects = self.initialise_objects()
-
-        for batch in range(self.pars['batch_size']):
-            # Generate landscape of objects in each environment
-            objects = np.zeros(shape=(self.pars['n_states'][batch], self.pars['s_size']))
-            for i in range(self.pars['n_states'][batch]):
-                rand = random.randint(0, self.pars['s_size'] - 1)
-                objects[i] = self.poss_objects[rand]
-
-            # Make observations of sensorium in SR states
-            for step in range(self.pars['t_episode']):
-                state = self.obs_to_states(self.obs[batch, :, step], batch)
-                observation = objects[state]
-                self.x[batch, :, step] = observation
-
-        # Identify visited states
-        s_visited = np.zeros((self.pars['batch_size'], self.pars['t_episode']))
-        for batch in range(self.pars['batch_size']):
-            for step in range(self.pars['t_episode']):
-                pos = self.obs_to_states(self.obs[batch, :, step], batch)
-                s_visited[batch, step] = 1 if visited[batch, pos] == 1 else 0
-                visited[batch, pos] = 1
-
-        feed_dict = {self.obs: x, self.x_: x_s, self.d: d, self.g_: gs, self.rnn: a_rnn, self.rnn_inv: a_rnn_inv,
-                     self.it_num: it_num, self.seq_index: seq_index, self.s_vis: s_visited}
-        results = self.sess.run(self.fetches_all, feed_dict)
-
-        return results
 
     # HELPER FUNCTIONS
     def hierarchical_logsig(self, x, name, splits, sizes, trainable, concat, k=2):
@@ -815,38 +766,38 @@ class TEM(NeuralResponseModel):
         return
 
 
-# def direction_pars(pars_orig, pars, n_restart):
-#     n_envs = len(pars['widths'])
-#     b_s = int(pars['batch_size'])
-#     # Choose self.pars for current stage of training
-#     rn = np.random.randint(low=-pars['seq_jitter'], high=pars['seq_jitter'])
-#     n_restart = np.maximum(n_restart - pars['curriculum_steps'], pars['restart_min'])
-#
-#     pars['direc_bias_env'] = [0 for _ in range(n_envs)]
-#
-#     # Make choice for each env
-#     choices = []
-#     for env in range(n_envs):
-#         choice = np.random.choice(pars['poss_behaviours'])
-#
-#         choices.append(choice)
-#
-#         if choice == 'normal':
-#             pars['direc_bias_env'][env] = pars_orig['direc_bias']
-#         else:
-#             raise Exception('Not a correct possible behaviour')
-#
-#     # Choose which of batch gets no_direc or not - 1 is no_direc, 0 is with direc
-#     no_direc_batch = np.ones(pars['batch_size'])
-#     for batch in range(b_s):
-#         env = pars['diff_env_batches_envs'][batch]
-#         choice = choices[env]
-#         if choice == 'normal':
-#             no_direc_batch[batch] = 0
-#         else:
-#             no_direc_batch[batch] = 1
-#
-#     return pars, rn, n_restart, no_direc_batch
+def direction_pars(pars_orig, pars, n_restart):
+    n_envs = len(pars['widths'])
+    b_s = int(pars['batch_size'])
+    # Choose self.pars for current stage of training
+    rn = np.random.randint(low=-pars['seq_jitter'], high=pars['seq_jitter'])
+    n_restart = np.maximum(n_restart - pars['curriculum_steps'], pars['restart_min'])
+
+    pars['direc_bias_env'] = [0 for _ in range(n_envs)]
+
+    # Make choice for each env
+    choices = []
+    for env in range(n_envs):
+        choice = np.random.choice(pars['poss_behaviours'])
+
+        choices.append(choice)
+
+        if choice == 'normal':
+            pars['direc_bias_env'][env] = pars_orig['direc_bias']
+        else:
+            raise Exception('Not a correct possible behaviour')
+
+    # Choose which of batch gets no_direc or not - 1 is no_direc, 0 is with direc
+    no_direc_batch = np.ones(pars['batch_size'])
+    for batch in range(b_s):
+        env = pars['diff_env_batches_envs'][batch]
+        choice = choices[env]
+        if choice == 'normal':
+            no_direc_batch[batch] = 0
+        else:
+            no_direc_batch[batch] = 1
+
+    return pars, rn, n_restart, no_direc_batch
 
 
 def direction(action):
@@ -911,9 +862,8 @@ def onehot2twohot(self, onehot, table, compress_size):
     batch_size = np.shape(onehot)[0]
     twohot = np.zeros((batch_size, compress_size, seq_len))
     for i in range(seq_len):
-        vals = tf.argmax(onehot[:, :, i], 1)
+        vals = np.argmax(onehot[:, :, i], 1)
         for b in range(batch_size):
-            # twohot[b, :, i] = tf.gather(table, vals[int(b)])
             twohot[b, :, i] = table[vals[int(b)]]
 
     return twohot
