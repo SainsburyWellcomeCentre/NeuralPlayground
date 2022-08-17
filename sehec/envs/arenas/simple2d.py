@@ -415,7 +415,8 @@ class Sargolini2006(Simple2D):
         The reward that the animal recieves in this state
 
         """
-    def __init__(self, data_path="sargolini2006/", environment_name="Sargolini2006", session=None, verbose=False, **env_kwargs):
+    def __init__(self, data_path="sargolini2006/", environment_name="Sargolini2006", session=None, verbose=False,
+                 random_steps=False, **env_kwargs):
         """  Initialise the class
 
         Parameters
@@ -445,7 +446,7 @@ class Sargolini2006(Simple2D):
         env_kwargs["arena_x_limits"] = self.arena_x_limits
         env_kwargs["arena_y_limits"] = self.arena_y_limits
         env_kwargs["agent_step_size"] = 1/50  # In seconds
-        self.random_steps = env_kwargs["random_steps"]
+        self.random_steps = random_steps
         super().__init__(environment_name, **env_kwargs)
         self.metadata["doi"] = "https://doi.org/10.1126/science.1125572"
         self.total_number_of_steps = self.data.position.shape[0]
