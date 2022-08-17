@@ -214,29 +214,29 @@ class Simple2D(Environment):
         for wall in self.custom_walls:
             ax.plot(wall[:, 0], wall[:, 1], "C0", lw=3)
 
-        state_history = [s["state"] for s in history_data]
-        next_state_history = [s["next_state"] for s in history_data]
-        starting_point = state_history[0]
-        ending_point = next_state_history[-1]
-        print(starting_point)
+        if len(history_data) != 0:
+            state_history = [s["state"] for s in history_data]
+            next_state_history = [s["next_state"] for s in history_data]
+            starting_point = state_history[0]
+            ending_point = next_state_history[-1]
 
-        cmap = mpl.cm.get_cmap("plasma")
-        norm = plt.Normalize(0, len(state_history))
+            cmap = mpl.cm.get_cmap("plasma")
+            norm = plt.Normalize(0, len(state_history))
 
-        aux_x = []
-        aux_y = []
-        for i, s in enumerate(state_history):
-            x_ = [s[0], next_state_history[i][0]]
-            y_ = [s[1], next_state_history[i][1]]
-            aux_x.append(s[0])
-            aux_y.append(s[1])
-            ax.plot(x_, y_, "-", color=cmap(norm(i)), alpha=0.6)
+            aux_x = []
+            aux_y = []
+            for i, s in enumerate(state_history):
+                x_ = [s[0], next_state_history[i][0]]
+                y_ = [s[1], next_state_history[i][1]]
+                aux_x.append(s[0])
+                aux_y.append(s[1])
+                ax.plot(x_, y_, "-", color=cmap(norm(i)), alpha=0.6)
 
-        sc = ax.scatter(aux_x, aux_y, c=np.arange(len(state_history)),
-                        vmin=0, vmax=len(state_history), cmap="plasma", alpha=0.6)
+            sc = ax.scatter(aux_x, aux_y, c=np.arange(len(state_history)),
+                            vmin=0, vmax=len(state_history), cmap="plasma", alpha=0.6)
 
-        cbar = plt.colorbar(sc, ax=ax)
-        cbar.ax.set_ylabel('N steps', rotation=270)
+            cbar = plt.colorbar(sc, ax=ax)
+            cbar.ax.set_ylabel('N steps', rotation=270)
         if return_figure:
             return f, ax
         else:
