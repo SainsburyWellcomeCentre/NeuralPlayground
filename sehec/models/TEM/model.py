@@ -102,6 +102,12 @@ class TEM(NeuralResponseModel):
         # Calculate variables
         self.loop(self.x, x_s, self.d, self.g_, self.seq_index, self.s_vis)
 
+        self.fetches_all, self.fetches_all_ = [], []
+        self.fetches_all.extend([self.g, self.p, self.p_g, self.x_gt, self.x_, self.A, self.A_inv,
+                                 self.accuracy_gt, self.train_op_all])
+        self.fetches_all_.extend([self.g, self.p, self.p_g, self.x_gt, self.x_, self.A, self.A_inv,
+                                  self.accuracy_gt, self.temp])
+
         # CREATE SESSION
         self.sess = tf.InteractiveSession()
         saver = tf.train.Saver(max_to_keep=1)  # saves variables learned during training
@@ -109,11 +115,6 @@ class TEM(NeuralResponseModel):
         tf.global_variables_initializer().run()
         tf.get_default_graph().finalize()
 
-        self.fetches_all, self.fetches_all_ = [], []
-        self.fetches_all.extend([self.g, self.p, self.p_g, self.x_gt, self.x_, self.A, self.A_inv,
-                                 self.accuracy_gt, self.train_op_all])
-        self.fetches_all_.extend([self.g, self.p, self.p_g, self.x_gt, self.x_, self.A, self.A_inv,
-                                  self.accuracy_gt, self.temp])
 
     def reset(self):
         # Reset observation history
