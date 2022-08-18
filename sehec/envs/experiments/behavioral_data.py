@@ -8,7 +8,7 @@ import pandas as pd
 from scipy.ndimage import gaussian_filter
 import sys
 import sehec
-
+import matplotlib as mpl
 
 class FullHaftingData(object):
 
@@ -88,7 +88,7 @@ class FullHaftingData(object):
         time_array = time_array[:, 0]
         x = x[:, 0]
         y = y[:, 0]
-        
+
         if ax is None:
             f, ax = plt.subplots(1, 2, figsize=(15, 8))
         ax = ax.flatten()
@@ -223,7 +223,7 @@ class FullSargoliniData(object):
         with open(readme_path, 'r') as fin:
             print(fin.read())
 
-    def plot_session(self, save_path=None, ax=None):
+    def plot_trajetory(self, save_path=None, ax=None):
         # print(self.data_per_animal[self.best_session["rat"]][self.best_session["sess"]])
         cell_data = self.data_per_animal[self.rat_id][self.sess]
         position_data = cell_data["position"]
@@ -232,19 +232,70 @@ class FullSargoliniData(object):
             x2, y2 = position_data["posy2"][:, 0], position_data["posy2"][:, 0]
         else:
             x2, y2 = x1, y1
+        # Selecting positional data
+        x = np.mean(np.stack([x1, x2], axis=1), axis=1)
+        y = np.mean(np.stack([y1, y2], axis=1), axis=1)
+        x = np.clip(x, a_min=self.arena_limits[0, 0], a_max=self.arena_limits[0, 1])
+        y = np.clip(y, a_min=self.arena_limits[1, 0], a_max=self.arena_limits[1, 1])
+        cmap = mpl.cm.get_cmap("plasma")
+        time_array = position_data["post"][:, 0]
+        norm = plt.Normalize(0, np.size(x))
 
+        if ax is None:
+            f, ax = plt.subplots(1, 1, figsize=(15, 8))
+        ax.plot([self.arena_limits[0, 0],self.arena_limits[0, 0]],[self.arena_limits[1, 0],self.arena_limits[1, 1]] ,"C3", lw=3)
+        ax.plot([self.arena_limits[0, 1], self.arena_limits[0, 1]],
+                   [self.arena_limits[1, 0], self.arena_limits[1, 1]], "C3", lw=3)
+        ax.plot([self.arena_limits[0, 0], self.arena_limits[0, 0]],
+                   [self.arena_limits[1, 0], self.arena_limits[1, 1]], "C3", lw=3)
+        ax.plot([self.arena_limits[0, 0], self.arena_limits[0, 1]],
+                   [self.arena_limits[1, 1], self.arena_limits[1, 1]], "C3", lw=3)
+        ax.plot([self.arena_limits[0, 0], self.arena_limits[0, 1]],
+                   [self.arena_limits[1, 0], self.arena_limits[1, 0]], "C3", lw=3)
+
+        i=0
+        len_x=np.ones(len(x)-1)
+        aux_x = []
+        aux_y = []
+        for k in len_x:
+            x_ = [x[i],x[i+1]]
+            y_ = [y[i],y[i+1]]
+            aux_x.append(x[i])
+            aux_y.append(y[i])
+            i = i + 1
+            sc=ax.plot(x_, y_, "-", color=cmap(norm(i)), alpha=0.6,linewidth=1)
+        ax.set_xticks([])
+        ax.set_yticks([])
+        ax.set_ylabel('width')
+        ax.set_xlabel('depth')
+        ax.set_title("position")
+        sc = ax.scatter(aux_x, aux_y, c=np.arange(len(x)-1),vmin=0, vmax=len(x), cmap="plasma", alpha=0.6,s=0.1 )
+
+        cbar = plt.colorbar(sc, ax=ax, ticks=[0, len(x)])
+        cbar.ax.set_ylabel('N steps', rotation=270, fontsize=12)
+        cbar.ax.set_yticklabels([0, len(x)], fontsize=12)
+
+    def plot_recording(self, save_path=None, ax=None):
+        cell_data = self.data_per_animal[self.rat_id][self.sess]
+        position_data = cell_data["position"]
+        x1, y1 = position_data["posx"][:, 0], position_data["posy"][:, 0]
+        if len(position_data["posy2"]) != 0:
+            x2, y2 = position_data["posy2"][:, 0], position_data["posy2"][:, 0]
+        else:
+            x2, y2 = x1, y1
         # Selecting positional data
         x = np.mean(np.stack([x1, x2], axis=1), axis=1)
         y = np.mean(np.stack([y1, y2], axis=1), axis=1)
         x = np.clip(x, a_min=self.arena_limits[0, 0], a_max=self.arena_limits[0, 1])
         y = np.clip(y, a_min=self.arena_limits[1, 0], a_max=self.arena_limits[1, 1])
 
+        cmap = mpl.cm.get_cmap("plasma")
         time_array = position_data["post"][:, 0]
+        norm = plt.Normalize(0, np.size(x))
+
         if ax is None:
-            f, ax = plt.subplots(2, 3, figsize=(15, 8))
+            f, ax = plt.subplots(2, 2, figsize=(8, 8))
         ax = ax.flatten()
-        ax[0].plot(x, y)
-        ax[0].set_title("position")
 
         count_i = 0
         for i, (key, single_cell_data) in enumerate(cell_data.items()):
@@ -252,10 +303,17 @@ class FullSargoliniData(object):
                 continue
             test_spikes = single_cell_data[:, 0]
             h, binx, biny = get_2D_ratemap(time_array, test_spikes, x, y, filter_result=True)
-            ax[count_i + 1].imshow(h)
-            ax[count_i + 1].set_title(key)
+            sc=ax[count_i ].imshow(h,cmap='jet')
+            cbar = plt.colorbar(sc, ax=ax[count_i],ticks = [np.min(h), np.max(h)])
+            cbar.ax.set_ylabel('Firing rate', rotation=270, fontsize=16)
+            cbar.ax.set_yticklabels([np.round(np.min(h)), np.round(np.max(h))], fontsize=16)
+            ax[count_i ].set_title(key)
+            ax[count_i ].set_ylabel('width')
+            ax[count_i ].set_xlabel('depth')
+            ax[count_i ].set_xticks([])
+            ax[count_i ].set_yticks([])
             count_i += 1
-            if count_i >= 5:
+            if count_i >= 4:
                 break
         if not save_path is None:
             plt.savefig(save_path, bbox_inches="tight")
@@ -302,7 +360,7 @@ def clean_data(data, keep_headers=False):
                 aux_dict[key] = val
             continue
         else:
-            # print(len(val))
+
             if not np.isnan(val).any():
                 aux_dict[key] = val
             else:
