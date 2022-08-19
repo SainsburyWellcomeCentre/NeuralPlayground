@@ -19,7 +19,10 @@ class FullHaftingData(object):
         else:
             self.data_path = data_path
         self._load_data()
-        
+
+
+
+
         if session is None:
             self.rat_id, self.sess = self.best_session["rat_id"], self.best_session["sess"]
         else:
@@ -163,6 +166,18 @@ class FullSargoliniData(object):
         self.experiment_name = experiment_name
         self.show_readme()
         self._load_data()
+        self.list = []
+        l = 0
+        for i, rat_id in enumerate(self.data_per_animal):
+            rat_id = list(self.data_per_animal.keys())
+            for j, sess in enumerate(self.data_per_animal[rat_id[i]]):
+                sess = list(self.data_per_animal[rat_id[i]])
+                for k, cell in enumerate(self.data_per_animal[rat_id[i]][sess[j]]):
+                    if cell != 'position':
+                        cells=list(self.data_per_animal[rat_id[i]][sess[j]])
+                        self.list.append({"recording_nbr": l, "rat_id": rat_id[i], "sess": sess[j], "cell_id": cells[k]})
+                        l = l + 1
+
         if session is None:
             self.rat_id, self.sess = self.best_session["rat_id"], self.best_session["sess"]
         else:
@@ -210,22 +225,28 @@ class FullSargoliniData(object):
                         self.data_per_animal[m_id][sess][session_info] = cleaned_data
 
     def show_keys(self):
+        for i,recording in enumerate(self.list):
+            print(self.list[i])
         print("Rat ids", list(self.data_per_animal.keys()))
-        for rat_id, val in self.data_per_animal.items():
-            print("Sessions for rat " + rat_id)
-            print(list(self.data_per_animal[rat_id].keys()))
-            for sess in self.data_per_animal[rat_id].keys():
-                print("Data recorded in session " + sess)
-                print(list(self.data_per_animal[rat_id][sess].keys()))
+        # for rat_id, val in self.data_per_animal.items():
+            # print("Sessions for rat " + rat_id)
+            # print(list(self.data_per_animal[rat_id].keys()))
+            # for sess in self.data_per_animal[rat_id].keys():
+                #                 print("Data recorded in session " + sess)
+                # print(list(self.data_per_animal[rat_id][sess].keys()))
+
+
 
     def show_readme(self):
         readme_path = glob.glob(self.data_path + "readme" + "*.txt")[0]
         with open(readme_path, 'r') as fin:
             print(fin.read())
 
-    def plot_trajetory(self, save_path=None, ax=None):
+    def plot_trajectory(self, save_path=None, ax=None, recording_nbr=1):
+        self.rat_id, self.sess, key = self.get_recorded_session(recording_nbr)
         # print(self.data_per_animal[self.best_session["rat"]][self.best_session["sess"]])
         cell_data = self.data_per_animal[self.rat_id][self.sess]
+
         position_data = cell_data["position"]
         x1, y1 = position_data["posx"][:, 0], position_data["posy"][:, 0]
         if len(position_data["posy2"]) != 0:
@@ -240,9 +261,18 @@ class FullSargoliniData(object):
         cmap = mpl.cm.get_cmap("plasma")
         time_array = position_data["post"][:, 0]
         norm = plt.Normalize(0, np.size(x))
+        arena_width=self.arena_limits[0, 0]-self.arena_limits[0, 1]
+        arena_depth = self.arena_limits[1, 0] - self.arena_limits[1, 1]
+        if arena_width==arena_depth:
+            if ax is None:
+                f, ax = plt.subplots(1, 1, figsize=(10, 8))
+        if arena_width> arena_depth:
+            if ax is None:
+                f, ax = plt.subplots(1, 1, figsize=(np.round((arena_width/arena_depth))*8, 8))
+        if arena_depth> arena_width:
+            if ax is None:
+                f, ax = plt.subplots(1, 1, figsize=(8,np.round((arena_depth/arena_width))*8))
 
-        if ax is None:
-            f, ax = plt.subplots(1, 1, figsize=(15, 8))
         ax.plot([self.arena_limits[0, 0],self.arena_limits[0, 0]],[self.arena_limits[1, 0],self.arena_limits[1, 1]] ,"C3", lw=3)
         ax.plot([self.arena_limits[0, 1], self.arena_limits[0, 1]],
                    [self.arena_limits[1, 0], self.arena_limits[1, 1]], "C3", lw=3)
@@ -275,7 +305,15 @@ class FullSargoliniData(object):
         cbar.ax.set_ylabel('N steps', rotation=270, fontsize=12)
         cbar.ax.set_yticklabels([0, len(x)], fontsize=12)
 
-    def plot_recording(self, save_path=None, ax=None):
+    def get_recorded_session(self,recording_nbr):
+        list_item = self.list[recording_nbr]
+        self.rat_id, self.sess ,self.cell= list_item["rat_id"],  list_item["sess"], list_item["cell_id"]
+        return  self.rat_id, self.sess,self.cell
+
+    def plot_recording(self, recording_nbr=1, save_path=None, ax=None, ):
+        self.rat_id, self.sess,key = self.get_recorded_session(recording_nbr)
+
+
         cell_data = self.data_per_animal[self.rat_id][self.sess]
         position_data = cell_data["position"]
         x1, y1 = position_data["posx"][:, 0], position_data["posy"][:, 0]
@@ -288,33 +326,33 @@ class FullSargoliniData(object):
         y = np.mean(np.stack([y1, y2], axis=1), axis=1)
         x = np.clip(x, a_min=self.arena_limits[0, 0], a_max=self.arena_limits[0, 1])
         y = np.clip(y, a_min=self.arena_limits[1, 0], a_max=self.arena_limits[1, 1])
-
-        cmap = mpl.cm.get_cmap("plasma")
         time_array = position_data["post"][:, 0]
-        norm = plt.Normalize(0, np.size(x))
+        arena_width = self.arena_limits[0, 0] - self.arena_limits[0, 1]
+        arena_depth = self.arena_limits[1, 0] - self.arena_limits[1, 1]
 
-        if ax is None:
-            f, ax = plt.subplots(2, 2, figsize=(8, 8))
-        ax = ax.flatten()
 
-        count_i = 0
-        for i, (key, single_cell_data) in enumerate(cell_data.items()):
-            if key == "position":
-                continue
-            test_spikes = single_cell_data[:, 0]
-            h, binx, biny = get_2D_ratemap(time_array, test_spikes, x, y, filter_result=True)
-            sc=ax[count_i ].imshow(h,cmap='jet')
-            cbar = plt.colorbar(sc, ax=ax[count_i],ticks = [np.min(h), np.max(h)])
-            cbar.ax.set_ylabel('Firing rate', rotation=270, fontsize=16)
-            cbar.ax.set_yticklabels([np.round(np.min(h)), np.round(np.max(h))], fontsize=16)
-            ax[count_i ].set_title(key)
-            ax[count_i ].set_ylabel('width')
-            ax[count_i ].set_xlabel('depth')
-            ax[count_i ].set_xticks([])
-            ax[count_i ].set_yticks([])
-            count_i += 1
-            if count_i >= 4:
-                break
+        if arena_width==arena_depth:
+            if ax is None:
+                f, ax = plt.subplots(1, 1, figsize=(10, 8))
+        if arena_width> arena_depth:
+            if ax is None:
+                f, ax = plt.subplots(1, 1, figsize=(np.round((arena_width/arena_depth))*8, 8))
+        if arena_depth> arena_width:
+            if ax is None:
+                f, ax = plt.subplots(1, 1, figsize=(8,np.round((arena_depth/arena_width))*8))
+
+        test_spikes = cell_data[key][:, 0]
+        h, binx, biny = get_2D_ratemap(time_array, test_spikes, x, y, filter_result=True)
+        sc=ax.imshow(h,cmap='jet')
+        cbar = plt.colorbar(sc, ax=ax,ticks = [np.min(h), np.max(h)])
+        cbar.ax.set_ylabel('Firing rate', rotation=270, fontsize=16)
+        cbar.ax.set_yticklabels([np.round(np.min(h)), np.round(np.max(h))], fontsize=16)
+        ax.set_title(key)
+        ax.set_ylabel('width')
+        ax.set_xlabel('depth')
+        ax.set_xticks([])
+        ax.set_yticks([])
+
         if not save_path is None:
             plt.savefig(save_path, bbox_inches="tight")
             plt.close("all")
@@ -391,12 +429,10 @@ def get_2D_ratemap(time_array, spikes, x, y, x_size=50, y_size=50, filter_result
 
 
 if __name__ == "__main__":
-    # data_path = "sargolini2006/"
-    # experiment_name = "Sargolini2006"
-    # data = SargoliniData(data_path=data_path, experiment_name=experiment_name)
-    # print(data.position.shape)
-    # print(data.head_direction.shape)
-    # print(np.amin(data.position), np.amax(data.position))
 
-    data_path = "/home/rodrigo/HDisk/8F6BE356-3277-475C-87B1-C7A977632DA7_1/all_data/"
-    data = FullSargoliniData(data_path=data_path, verbose=True)
+    data = FullSargoliniData( verbose=True)
+    data.plot_recording(2)
+    data.plot_trajectory(2)
+
+
+
