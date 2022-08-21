@@ -11,14 +11,17 @@ save_params(pars, save_path, script_path)
 pars_orig = pars.copy()
 
 # Initialise Environment(s) and Agent (variables, weights etc.)
+print("Initialising Graph")
 env_name = "TEMenv"
 mod_name = "TEM"
 
 envs = TEMenv(environment_name=env_name, **pars)
 agent = TEM(model_name=mod_name, **pars)
+print("Graph Initialised")
 
 # Run Model
 it = 0
+print("Start Training")
 for i in range(pars['n_iters']):
     for j in range(pars['n_episode']):
         # RL Loop
