@@ -11,22 +11,27 @@ save_params(pars, save_path, script_path)
 pars_orig = pars.copy()
 
 # Initialise Environment(s) and Agent (variables, weights etc.)
+print("Graph Initialising")
 env_name = "TEMenv"
 mod_name = "TEM"
 
 envs = TEMenv(environment_name=env_name, **pars)
 agent = TEM(model_name=mod_name, **pars)
+print("Graph Initialised")
 
 # Run Model
 it = 0
+print("Training Started")
 for i in range(pars['n_iters']):
     for j in range(pars['n_episode']):
         # RL Loop
         obs, states, rewards, actions, direcs = envs.step(agent.act)
-        x_, p, g = agent.update(obs, direcs, it, j)
+        results = agent.update(obs, direcs, it, j)
+        gs, ps, ps_gen, x_gt, x_s, a_rnn, a_rnn_inv, acc_gt, _ = results
         it += 1
         print("finished episode ", j)
     print("finished iteration ", i)
+print("Training Finished")
 
 envs.plot_trajectory()
 plt.show()

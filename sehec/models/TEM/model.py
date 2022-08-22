@@ -232,7 +232,7 @@ class TEM(NeuralResponseModel):
             self.x_[i] = x_s
             self.x_p[i], self.x_g[i], self.x_gt[i] = x_all
             self.g[i] = g
-            self.p[i] = p
+            self.p[i], self.p_g[i] = p, p_g
 
         # Full Hebbian matrices update after BPTT truncation
         self.final_hebbian()
@@ -266,9 +266,12 @@ class TEM(NeuralResponseModel):
 
         return self.x_, self.p, self.g
 
-    def update(self, x, d, it_num, seq_index):
+    def update(self, obs, d, it_num, seq_index):
         # Information on direction
         # pars, rn, n_restart, no_direc_batch = direction_pars(self.pars_orig, self.pars, self.pars['n_restart'])
+        # Variables Passed into Session
+        x = np.zeros(shape=(self.pars['batch_size'], self.pars['s_size'], self.pars['t_episode']))
+        s_visited = np.zeros(shape=(self.pars['batch_size'], self.pars['t_episode']))
 
         # Initialise Hebbian matrices each batch
         a_rnn, a_rnn_inv = TEM.initialise_hebbian(self)
@@ -288,19 +291,18 @@ class TEM(NeuralResponseModel):
 
             # Make observations of sensorium in SR states
             for step in range(self.pars['t_episode']):
-                state = self.obs_to_states(self.obs[batch, :, step], batch)
+                state = self.obs_to_states(obs[batch, :, step], batch)
                 observation = objects[state]
-                self.x[batch, :, step] = observation
+                x[batch, :, step] = observation
 
         # Identify visited states
-        s_visited = np.zeros((self.pars['batch_size'], self.pars['t_episode']))
         for batch in range(self.pars['batch_size']):
             for step in range(self.pars['t_episode']):
-                pos = self.obs_to_states(self.obs[batch, :, step], batch)
+                pos = self.obs_to_states(obs[batch, :, step], batch)
                 s_visited[batch, step] = 1 if visited[batch, pos] == 1 else 0
                 visited[batch, pos] = 1
 
-        feed_dict = {self.obs: x, self.x_: x_s, self.d: d, self.g_: gs, self.rnn: a_rnn, self.rnn_inv: a_rnn_inv,
+        feed_dict = {self.x: x, self.x_s: x_s, self.d: d, self.g_: gs, self.rnn: a_rnn, self.rnn_inv: a_rnn_inv,
                      self.it_num: it_num, self.seq_index: seq_index, self.s_vis: s_visited}
         results = self.sess.run(self.fetches_all, feed_dict)
 
