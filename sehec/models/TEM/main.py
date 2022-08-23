@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-
+from tqdm import tqdm
 from sehec.envs.arenas.TEMenv import TEMenv
 from sehec.models.TEM.model import *
 from sehec.models.TEM.parameters import *
@@ -22,15 +22,13 @@ print("Graph Initialised")
 # Run Model
 it = 0
 print("Training Started")
-for i in range(pars['n_iters']):
+for i in tqdm(range(pars['n_iters'])):
     for j in range(pars['n_episode']):
         # RL Loop
         obs, states, rewards, actions, direcs = envs.step(agent.act)
         results = agent.update(obs, direcs, it, j)
         gs, ps, ps_gen, x_gt, x_s, a_rnn, a_rnn_inv, acc_gt, _ = results
         it += 1
-        print("finished episode ", j)
-    print("finished iteration ", i)
 print("Training Finished")
 
 envs.plot_trajectory()

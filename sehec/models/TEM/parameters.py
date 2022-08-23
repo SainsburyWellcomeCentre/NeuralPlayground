@@ -27,8 +27,8 @@ def default_params():
     params['threshold'] = 1e-6
     params['lr_td'] = 1e-2
     params['t_episode'] = 25
-    params['n_episode'] = 5
-    params['n_iters'] = 5
+    params['n_episode'] = 25
+    params['n_iters'] = 20
     params['two_hot'] = True
     params['n_walk'] = params['t_episode']
 
