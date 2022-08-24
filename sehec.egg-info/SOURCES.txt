@@ -7,6 +7,7 @@ sehec.egg-info/dependency_links.txt
 sehec.egg-info/top_level.txt
 sehec/envs/__init__.py
 sehec/envs/envcore.py
+sehec/envs/arenas/TEMenv.py
 sehec/envs/arenas/__init__.py
 sehec/envs/arenas/simple2d.py
 sehec/envs/experiments/__init__.py
@@ -16,8 +17,9 @@ sehec/models/__init__.py
 sehec/models/modelcore.py
 sehec/models/weber_and_sprekeler.py
 sehec/models/TEM/__init__.py
-sehec/models/TEM/environment.py
+sehec/models/TEM/main.py
 sehec/models/TEM/model.py
+sehec/models/TEM/parameters.py
 sehec/tests/__init__.py
 sehec/tests/environment_test.py
 sehec/tests/model_test.py
