@@ -42,6 +42,14 @@ def default_params():
     params['curriculum_steps'] = 12 / params['t_episode']
     params['n_restart'] = params['restart_max'] + params['curriculum_steps']
 
+    # Saving Parameters
+    params['n_save_data'] = int(25 * max(params['n_states']) / params['t_episode'])
+    params['n_envs_save'] = 6  # only save date from first X of batch
+    params['save_interval'] = int(int(50000 / params['t_episode']) / params['n_save_data']) * params['n_save_data']
+    params['save_model'] = 5 * params['save_interval']
+    params['sum_int'] = 200
+
+
     # Model Parameters
     params['infer_g_type'] = 'g_p'
     params['two_hot'] = True

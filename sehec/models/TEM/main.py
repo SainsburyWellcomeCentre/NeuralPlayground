@@ -23,11 +23,11 @@ print("Graph Initialised")
 it = 0
 print("Training Started")
 for i in tqdm(range(pars['n_iters'])):
-    for j in range(pars['n_episode']):
+    n_walk = agent.initialise(i, it)
+    for j in range(n_walk):
         # RL Loop
         obs, states, rewards, actions, direcs = envs.step(agent.act)
-        results = agent.update(obs, direcs, it, j)
-        gs, ps, ps_gen, x_gt, x_s, a_rnn, a_rnn_inv, acc_gt, _ = results
+        agent.update(obs, direcs, it, j, i)
         it += 1
 print("Training Finished")
 

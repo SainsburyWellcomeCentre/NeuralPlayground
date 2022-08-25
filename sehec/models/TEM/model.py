@@ -9,6 +9,7 @@ import tensorflow.contrib.layers as layer
 from scipy import special
 import datetime
 import os
+import logging
 from distutils.dir_util import copy_tree
 import inspect
 from tqdm import tqdm
@@ -28,7 +29,8 @@ class TEM(NeuralResponseModel):
         self.obs_history = []  # Initialize observation history to update weights later
         self.pars = mod_kwargs
         self.pars_orig = self.pars.copy()
-        gen_path, train_path, model_path, save_path, script_path = make_directories()
+        self.gen_path, self.train_path, self.model_path, self.save_path, self.script_path = make_directories()
+        self.logger = make_logger(gen_path)
 
         # Initialise Graph
         tf.reset_default_graph()
@@ -67,6 +69,24 @@ class TEM(NeuralResponseModel):
 
         self.mask = tf.constant(self.pars['mask_p'], dtype=tf.float32)
         self.mask_g = tf.constant(self.pars['mask_g'], dtype=tf.float32)
+
+        # INITIALISE VARIABLES
+        self.lx_ps, self.lx_gs, self.lx_gts, self.lps, self.lgs = [], [], [], [], []
+        self.accs_p, self.accs_g, self.accs_gt = [], [], []
+        check_link_inference = False
+        self.acc_p, self.acc_g, self.acc_gt, self.seq_index, self.rn = 0, 0, 0, 0, 0
+        self.correct_link, self.positions_link, self.positions, self.visited, self.state_guess = None, None, None, None, None
+        self.position_all, self.direc_all = None, None
+        self.gs_all, self.ps_all, self.ps_gen_all, self.xs_all, self.gs_timeseries, self.ps_timeseries, self.pos_timeseries = \
+            [None] * self.pars['n_envs_save'], [None] * self.pars['n_envs_save'], [None] * self.pars['n_envs_save'], \
+            [None] * self.pars['n_envs_save'], [None] * self.pars['n_envs_save'], [None] * self.pars['n_envs_save'], \
+            [None] * self.pars['n_envs_save']
+        self.cell_timeseries, self.prev_cell_timeseries = None, None
+        self.accs_x_to, self.accs_x_from = [None] * self.pars['n_envs_save'], [None] * self.pars['n_envs_save']
+        self.save_needed, self.save_ticker, self.summary_needed, self.summary_ticker, self.save_model = False, False, False, False, False
+        self.n_restart = self.pars['restart_max'] + self.pars['curriculum_steps']
+        self.a_rnn, self.a_rnn_inv = None, None
+        self.gs, self.ps, self.x_data, self.start_state, self.prev_direc = None, None, None, None, None
 
         # Memories
         self.mem_list_a, self.mem_list_b, self.mem_list_e, self.mem_list_f = [], [], [], []
@@ -110,8 +130,8 @@ class TEM(NeuralResponseModel):
 
         # CREATE SESSION
         self.sess = tf.InteractiveSession()
-        saver = tf.train.Saver(max_to_keep=1)  # saves variables learned during training
-        train_writer = tf.summary.FileWriter(train_path, self.sess.graph)
+        self.saver = tf.train.Saver(max_to_keep=1)  # saves variables learned during training
+        self.train_writer = tf.summary.FileWriter(self.train_path, self.sess.graph)
         tf.global_variables_initializer().run()
         tf.get_default_graph().finalize()
 
@@ -266,21 +286,60 @@ class TEM(NeuralResponseModel):
 
         return self.x_, self.p, self.g
 
-    def update(self, obs, d, it_num, seq_index):
-        # Information on direction
-        # pars, rn, n_restart, no_direc_batch = direction_pars(self.pars_orig, self.pars, self.pars['n_restart'])
-        # Variables Passed into Session
-        x = np.zeros(shape=(self.pars['batch_size'], self.pars['s_size'], self.pars['t_episode']))
-        s_visited = np.zeros(shape=(self.pars['batch_size'], self.pars['t_episode']))
+    def initialise(self, i, index):
+        # INITIALISE ENVIRONMENT AND INPUT VARIABLES
+        msg = 'New Environment ' + str(i) + ' ' + str(index) + ' ' + str(index * self.pars['t_episode'])
+        self.logger.info(msg)
+
+        if self.save_ticker:
+            self.save_needed = True
+            self.gs_all, self.ps_all, self.ps_gen_all, self.xs_all, self.gs_timeseries, self.ps_timeseries, self.pos_timeseries = \
+                [None] * self.pars['n_envs_save'], [None] * self.pars['n_envs_save'], [None] * self.pars['n_envs_save'], \
+                [None] * self.pars['n_envs_save'], [None] * self.pars['n_envs_save'], [None] * self.pars['n_envs_save'], \
+                [None] * self.pars['n_envs_save']
+            self.accs_x_to, self.accs_x_from = [None] * self.pars['n_envs_save'], [None] * self.pars['n_envs_save']
+            n_walk = self.pars['n_save_data']
+        elif i % 10 in [5]:  # check for link inference every 10 environments
+            self.check_link_inference, self.positions_link, self.correct_link, self.state_guess = True, [None] * self.pars['batch_size'], \
+                                                                              [None] * self.pars['batch_size'], [None] * \
+                                                                              self.pars['batch_size']
+            n_walk = self.pars['link_inf_walk']
+        else:
+            n_walk = int(n_restart) + rn
 
         # Initialise Hebbian matrices each batch
-        a_rnn, a_rnn_inv = self.initialise_hebbian()
+        self.a_rnn, self.a_rnn_inv = self.initialise_hebbian()
 
         # Initialise Environment and Variables (same each batch)
-        gs, x_s, visited = self.initialise_variables()
+        self.gs, self.x_, self.visited = self.initialise_variables()
 
         # Initialise Sensory Objects
         self.poss_objects = self.initialise_objects()
+
+        return n_walk
+
+    def update(self, obs, d, it_num, seq_index, it_index):
+        x, s_visited, position = self.generate_sensorium(obs)
+
+        feed_dict = {self.x: x, self.x_s: self.x_, self.d: d, self.g_: self.gs, self.rnn: self.a_rnn,
+                     self.rnn_inv: self.a_rnn_inv, self.it_num: it_num, self.seq_index: seq_index, self.s_vis: s_visited}
+        results = self.sess.run(self.fetches_all, feed_dict)
+        gs, ps, ps_gen, x_gt, x_s, a_rnn, a_rnn_inv, acc_gt, _ = results
+
+        self.gs, self.x_ = self.save_and_plot(x, position, it_num, gs, ps, ps_gen, x_gt, x_s, a_rnn, a_rnn_inv, acc_gt)
+
+        if it_index == self.pars['train_iters'] - 1:
+            self.train_writer.close()
+            self.sess.close()
+            print('Finished training')
+
+        return
+
+    def generate_sensorium(self, obs):
+        # Variables Passed into Session
+        x = np.zeros(shape=(self.pars['batch_size'], self.pars['s_size'], self.pars['t_episode']))
+        s_visited = np.zeros(shape=(self.pars['batch_size'], self.pars['t_episode']))
+        states = np.zeros(shape=(selF.pars['batch_size'], 1, self.pars['t_episode']))
 
         for batch in range(self.pars['batch_size']):
             # Generate landscape of objects in each environment
@@ -293,21 +352,94 @@ class TEM(NeuralResponseModel):
             for step in range(self.pars['t_episode']):
                 state = self.obs_to_states(obs[batch, :, step], batch)
                 observation = objects[state]
+                states[batch, :, step] = state
                 x[batch, :, step] = observation
 
         # Identify visited states
         for batch in range(self.pars['batch_size']):
             for step in range(self.pars['t_episode']):
                 pos = self.obs_to_states(obs[batch, :, step], batch)
-                s_visited[batch, step] = 1 if visited[batch, pos] == 1 else 0
-                visited[batch, pos] = 1
+                s_visited[batch, step] = 1 if self.visited[batch, pos] == 1 else 0
+                self.visited[batch, pos] = 1
 
-        feed_dict = {self.x: x, self.x_s: x_s, self.d: d, self.g_: gs, self.rnn: a_rnn, self.rnn_inv: a_rnn_inv,
-                     self.it_num: it_num, self.seq_index: seq_index, self.s_vis: s_visited}
-        results = self.sess.run(self.fetches_all, feed_dict)
+        return x, s_visited, states
 
-        return results
+    def save_and_plot(self, x, position, index, gs, ps, ps_gen, x_gt, x_s, a_rnn, a_rnn_inv, acc_gt):
+        # Check for nans etc.
+        for ar, array in enumerate([gs, ps, ps_gen, x_gt, x_s]):
+            if np.isnan(array).any():
+                raise ValueError('Nan in array ' + str(ar))
 
+        # checking link inference
+        if self.check_link_inference:
+            # store positions and store g_t accuracy at each position
+            self.positions_link = positions_online(position, self.positions_link, self.pars['batch_size'])
+            _, self.correct_link = accuracy_online(self.correct_link, acc_sense, x, x_gt, self.pars['t_episode'])
+            self.state_guess = sense_online(x_gt, self.state_guess, self.pars['t_episode'])
+
+        # preparing representations for saving
+        if self.save_needed:
+            acc_st, _ = accuracy_online(None, acc_sense, x, x_gt, self.pars['t_episode'])
+            save_data = [gs, ps, ps_gen, x_s, position, acc_st]
+            prev_cell_maps = [self.gs_all, self.ps_all, self.ps_gen_all, self.xs_all]
+            prev_acc_maps = [self.accs_x_to, self.accs_x_from]
+
+            acc_list, cell_list, self.positions = prepare_data_maps(save_data, prev_cell_maps, prev_acc_maps, self.positions,
+                                                               self.pars)
+            self.gs_all, self.ps_all, self.ps_gen_all, self.xs_all = cell_list
+            self.accs_x_to, self.accs_x_from = acc_list
+
+            self.prev_cell_timeseries = [self.gs_timeseries, self.ps_timeseries, self.pos_timeseries]
+            save_data_timeseries = [gs, ps, position]
+            self.cell_timeseries = prepare_cell_timeseries(save_data_timeseries, self.prev_cell_timeseries, self.pars)
+            self.gs_timeseries, self.ps_timeseries, self.pos_timeseries = self.cell_timeseries
+
+        if index % self.pars['save_interval'] == 0 and index > 0:
+            save_ticker = True
+        if index % self.pars['save_model'] == 0:
+            save_model = True
+        if index % self.pars['sum_int'] == 0:
+            summary_ticker = True
+        index += 1
+
+        # feeding in correct initial states
+        gs, x_s = cp.deepcopy(gs[-1]), cp.deepcopy(np.concatenate(x_s[-1], 1))
+
+        # save representations
+        if self.save_needed:
+            states = [self.pars['n_states_world'][self.pars['diff_env_batches_envs'][env]] for env in range(self.pars['n_envs_save'])]
+
+            data_list = [self.gs_all, self.ps_all, self.ps_gen_all, self.xs_all, self.accs_x_to, self.accs_x_from]
+            names = ['g_all', 'p_all', 'p_gen_all', 'x_all', 'acc_s_t_to', 'acc_s_t_from']
+            save_data_maps(self.positions, data_list, self.save_path, self.pars['n_envs_save'], index, states, names)
+
+            g2g = [v for v in tf.trainable_variables() if "mu_g2g" in v.name][0]
+            np.save(self.save_path + '/A_RNN_' + str(index), a_rnn[:self.pars['n_envs_save']])
+            np.save(self.save_path + '/A_RNN_inv_' + str(index), a_rnn_inv[:self.pars['n_envs_save']])
+            np.save(self.save_path + '/g2g_' + str(index), g2g.eval())
+            np.save(self.save_path + '/widths_' + str(index), self.pars['widths'])
+            np.save(self.save_path + '/gs_timeseries_' + str(index), self.gs_timeseries)
+            np.save(self.save_path + '/pos_timeseries_' + str(index), self.pos_timeseries)
+            self.save_needed, self.save_ticker = False, False
+            del data_list
+            self.gs_all, self.ps_all, self.ps_gen_all, self.xs_all, self.accs_x_to, self.accs_x_from, self.gs_timeseries, \
+                self.pos_timeseries, self.ps_timeseries, self.cell_timeseries, self.prev_cell_timeseries, self.positions \
+                = None, None, None, None, None, None, None, None, None, None, None, None
+
+        # save link inferences
+        if self.check_link_inference:
+            np.save(self.save_path + '/positions_link' + str(index), self.positions_link)
+            np.save(self.save_path + '/correct_link' + str(index), self.correct_link)
+            np.save(self.save_path + '/state_guess_link' + str(index), self.state_guess)
+            self.check_link_inference = False
+            self.positions_link, self.correct_link, self.state_guess = None, None, None
+
+        # save model
+        if self.save_model:
+            self.saver.save(self.sess, self.model_path + '/TTJmodel' + str(index) + '.ckpt')
+            self.save_model = False
+
+        return gs, x_s
     # HELPER FUNCTIONS
     def hierarchical_logsig(self, x, name, splits, sizes, trainable, concat, k=2):
         xs = x if splits == 'done' else tf.split(value=x, num_or_size_splits=splits, axis=1)
@@ -963,6 +1095,119 @@ def acc_tf(real, pred):
     accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
     return tf.cast(accuracy * 100, tf.int32)
 
+def positions_online(position, positions, n_envs_save):
+    pos = position[:, 1:]  # doesn't include initial 'start state'
+    for env in range(n_envs_save):
+        try:
+            positions[env] = np.concatenate((positions[env], pos[env]), axis=0)
+        except:
+            positions[env] = cp.deepcopy(pos[env])
+    return positions
+def accuracy_online(accs, acc_fn, real, pred, n_seqs):
+    acc = []
+    for seq in range(n_seqs):
+        acc.append(acc_fn(real[:, :, seq], pred[seq]))
+    acc = np.transpose(np.squeeze(np.array(acc)), [1, 0])
+
+    try:
+        accs = np.concatenate((accs, acc), axis=1)
+    except:
+        accs = cp.deepcopy(acc)
+
+    return acc, accs
+
+def sense_online(sense, senses, n_seqs):
+    senses_ = []
+    for seq in range(n_seqs):
+        senses_.append(np.argmax(sense[seq], 1))
+    senses_ = np.transpose(np.squeeze(np.array(senses_)), [1, 0])
+
+    try:
+        senses = np.concatenate((senses, senses_), axis=1)
+    except:
+        senses = cp.deepcopy(senses_)
+
+    return senses
+
+def acc_sense(real, pred):
+    accuracy = np.equal(np.argmax(real, 1), np.argmax(pred, 1))
+    accuracy = np.expand_dims(accuracy, 1)
+    return accuracy.astype(np.int32)
+
+def prepare_data_maps(data, prev_cell_maps, prev_acc_maps, positions, pars):
+    gs, ps, ps_gen, x_s, position, acc_st = data
+    gs_all, ps_all, ps_gen_all, xs_all = prev_cell_maps
+    accs_x_to, accs_x_from = prev_acc_maps
+
+    g1s = np.transpose(np.array(cp.deepcopy(gs)), [1, 2, 0])
+    p1s = np.transpose(np.array(cp.deepcopy(ps)), [1, 2, 0])
+    p1s_gen = np.transpose(np.array(cp.deepcopy(ps_gen)), [1, 2, 0])
+    x_s1 = np.transpose(np.array(np.concatenate(np.transpose(cp.deepcopy(x_s), [1, 0, 2, 3]), axis=2)),
+                        [1, 2, 0])  # clearly shouldn't need to use two transposes
+
+    pos_to = position[:, 1:pars['seq_len'] + 1]
+    pos_from = position[:, :pars['seq_len']]
+
+    gs_all = cell_norm_online(g1s, pos_to, gs_all, pars)
+    ps_all = cell_norm_online(p1s, pos_to, ps_all, pars)
+    ps_gen_all = cell_norm_online(p1s_gen, pos_to, ps_gen_all, pars)
+    xs_all = cell_norm_online(x_s1, pos_to, xs_all, pars)
+    accs_x_to = accuracy_positions_online(acc_st, pos_to, accs_x_to, pars)
+    accs_x_from = accuracy_positions_online(acc_st, pos_from, accs_x_from, pars)
+
+    if positions is None:
+        positions = [None] * pars['n_envs_save']
+    positions = positions_online(position, positions, pars['n_envs_save'])
+
+    cell_list = [gs_all, ps_all, ps_gen_all, xs_all]
+    acc_list = [accs_x_to, accs_x_from]
+
+    return acc_list, cell_list, positions
+
+def prepare_cell_timeseries(data, prev_data, pars):
+    gs, ps, poss = data
+    gs_, ps_, pos_ = prev_data
+    # convert to batch_size x cells x timesteps
+    g1s = np.transpose(np.array(cp.deepcopy(gs)), [1, 2, 0])
+    p1s = np.transpose(np.array(cp.deepcopy(ps)), [1, 2, 0])
+    g1s = g1s[:pars['n_envs_save'], :, :]
+    p1s = p1s[:pars['n_envs_save'], :, :]
+
+    pos = poss[:, 1:]
+
+    grids, places, positions = [None] * pars['n_envs_save'], [None] * pars['n_envs_save'], [None] * pars['n_envs_save']
+
+    for env in range(pars['n_envs_save']):
+        try:
+            grids[env] = np.concatenate((gs_[env], g1s[env]), axis=1)
+            places[env] = np.concatenate((ps_[env], p1s[env]), axis=1)
+            positions[env] = np.concatenate((pos_[env], pos[env]), axis=0)
+        except:
+            grids[env], places[env], positions[env] = cp.deepcopy(g1s[env]), cp.deepcopy(p1s[env]), \
+                                                      cp.deepcopy(pos[env])
+
+    return [grids, places, positions]
+
+def save_data_maps(positions, data_list, save_path, n_envs_save, index, states, names):
+    pos_count = [0] * n_envs_save
+
+    for env in range(n_envs_save):
+        pos_count[env] = np.bincount(positions[env].astype(np.int32).flatten(), minlength=states[env]) + 0.001
+    np.save(save_path + '/pos_count_' + str(index), pos_count)
+
+    for data, name in zip(data_list, names):
+        data_map = [None] * n_envs_save
+        for env in range(n_envs_save):
+            try:
+                data_map[env] = np.matmul(np.diag(1 / pos_count[env]), data[env])
+            except:
+                pass
+
+        np.save(save_path + '/' + name + '_' + str(index), data_map)
+
+        del data_map
+
+    return
 
 def make_directories():
     date = datetime.datetime.today().strftime('%Y-%m-%d')
@@ -1001,3 +1246,17 @@ def save_params(pars, save_path, script_path):
     copy_tree('./', script_path)
 
     return
+
+def make_logger(gen_path):
+    logger = logging.getLogger(__name__)
+    logger.setLevel(logging.INFO)
+    # create a file handler
+    handler = logging.FileHandler(gen_path + 'report.log')
+    handler.setLevel(logging.INFO)
+    # create a logging format
+    formatter = logging.Formatter('%(asctime)s: %(message)s')
+    handler.setFormatter(formatter)
+    # add the handlers to the logger
+    logger.addHandler(handler)
+
+    return logger
