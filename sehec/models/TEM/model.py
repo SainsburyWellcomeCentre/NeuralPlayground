@@ -30,14 +30,15 @@ class TEM(NeuralResponseModel):
         self.pars = mod_kwargs
         self.pars_orig = self.pars.copy()
         self.gen_path, self.train_path, self.model_path, self.save_path, self.script_path = make_directories()
-        self.logger = make_logger(gen_path)
+        self.logger = make_logger(self.gen_path)
 
         # Initialise Graph
         tf.reset_default_graph()
         self.it_num = tf.placeholder(tf.float32, shape=(), name='it_num')
         self.seq_index = tf.placeholder(tf.float32, shape=(), name='seq_index')
         self.obs = tf.placeholder(tf.float32, shape=(self.pars['batch_size'], 2, self.pars['t_episode']), name='x')
-        self.x = tf.placeholder(tf.float32, shape=(self.pars['batch_size'], self.pars['s_size'], self.pars['t_episode']),
+        self.x = tf.placeholder(tf.float32,
+                                shape=(self.pars['batch_size'], self.pars['s_size'], self.pars['t_episode']),
                                 name='x')
         self.x_s = tf.placeholder(tf.float32, shape=(self.pars['batch_size'],
                                                      self.pars['s_size_comp'] * self.pars['n_freq']), name='x_')
@@ -134,7 +135,6 @@ class TEM(NeuralResponseModel):
         self.train_writer = tf.summary.FileWriter(self.train_path, self.sess.graph)
         tf.global_variables_initializer().run()
         tf.get_default_graph().finalize()
-
 
     def reset(self):
         # Reset observation history
@@ -300,12 +300,17 @@ class TEM(NeuralResponseModel):
             self.accs_x_to, self.accs_x_from = [None] * self.pars['n_envs_save'], [None] * self.pars['n_envs_save']
             n_walk = self.pars['n_save_data']
         elif i % 10 in [5]:  # check for link inference every 10 environments
-            self.check_link_inference, self.positions_link, self.correct_link, self.state_guess = True, [None] * self.pars['batch_size'], \
-                                                                              [None] * self.pars['batch_size'], [None] * \
-                                                                              self.pars['batch_size']
+            self.check_link_inference, self.positions_link, self.correct_link, self.state_guess = True, [None] * \
+                                                                                                  self.pars[
+                                                                                                      'batch_size'], \
+                                                                                                  [None] * self.pars[
+                                                                                                      'batch_size'], [
+                                                                                                      None] * \
+                                                                                                  self.pars[
+                                                                                                      'batch_size']
             n_walk = self.pars['link_inf_walk']
         else:
-            n_walk = int(n_restart) + rn
+            n_walk = int(self.n_restart) + self.rn
 
         # Initialise Hebbian matrices each batch
         self.a_rnn, self.a_rnn_inv = self.initialise_hebbian()
@@ -322,7 +327,8 @@ class TEM(NeuralResponseModel):
         x, s_visited, position = self.generate_sensorium(obs)
 
         feed_dict = {self.x: x, self.x_s: self.x_, self.d: d, self.g_: self.gs, self.rnn: self.a_rnn,
-                     self.rnn_inv: self.a_rnn_inv, self.it_num: it_num, self.seq_index: seq_index, self.s_vis: s_visited}
+                     self.rnn_inv: self.a_rnn_inv, self.it_num: it_num, self.seq_index: seq_index,
+                     self.s_vis: s_visited}
         results = self.sess.run(self.fetches_all, feed_dict)
         gs, ps, ps_gen, x_gt, x_s, a_rnn, a_rnn_inv, acc_gt, _ = results
 
@@ -339,7 +345,7 @@ class TEM(NeuralResponseModel):
         # Variables Passed into Session
         x = np.zeros(shape=(self.pars['batch_size'], self.pars['s_size'], self.pars['t_episode']))
         s_visited = np.zeros(shape=(self.pars['batch_size'], self.pars['t_episode']))
-        states = np.zeros(shape=(selF.pars['batch_size'], 1, self.pars['t_episode']))
+        states = np.zeros(shape=(self.pars['batch_size'], 1, self.pars['t_episode']))
 
         for batch in range(self.pars['batch_size']):
             # Generate landscape of objects in each environment
@@ -384,8 +390,9 @@ class TEM(NeuralResponseModel):
             prev_cell_maps = [self.gs_all, self.ps_all, self.ps_gen_all, self.xs_all]
             prev_acc_maps = [self.accs_x_to, self.accs_x_from]
 
-            acc_list, cell_list, self.positions = prepare_data_maps(save_data, prev_cell_maps, prev_acc_maps, self.positions,
-                                                               self.pars)
+            acc_list, cell_list, self.positions = prepare_data_maps(save_data, prev_cell_maps, prev_acc_maps,
+                                                                    self.positions,
+                                                                    self.pars)
             self.gs_all, self.ps_all, self.ps_gen_all, self.xs_all = cell_list
             self.accs_x_to, self.accs_x_from = acc_list
 
@@ -407,7 +414,8 @@ class TEM(NeuralResponseModel):
 
         # save representations
         if self.save_needed:
-            states = [self.pars['n_states_world'][self.pars['diff_env_batches_envs'][env]] for env in range(self.pars['n_envs_save'])]
+            states = [self.pars['n_states_world'][self.pars['diff_env_batches_envs'][env]] for env in
+                      range(self.pars['n_envs_save'])]
 
             data_list = [self.gs_all, self.ps_all, self.ps_gen_all, self.xs_all, self.accs_x_to, self.accs_x_from]
             names = ['g_all', 'p_all', 'p_gen_all', 'x_all', 'acc_s_t_to', 'acc_s_t_from']
@@ -423,7 +431,7 @@ class TEM(NeuralResponseModel):
             self.save_needed, self.save_ticker = False, False
             del data_list
             self.gs_all, self.ps_all, self.ps_gen_all, self.xs_all, self.accs_x_to, self.accs_x_from, self.gs_timeseries, \
-                self.pos_timeseries, self.ps_timeseries, self.cell_timeseries, self.prev_cell_timeseries, self.positions \
+            self.pos_timeseries, self.ps_timeseries, self.cell_timeseries, self.prev_cell_timeseries, self.positions \
                 = None, None, None, None, None, None, None, None, None, None, None, None
 
         # save link inferences
@@ -440,6 +448,7 @@ class TEM(NeuralResponseModel):
             self.save_model = False
 
         return gs, x_s
+
     # HELPER FUNCTIONS
     def hierarchical_logsig(self, x, name, splits, sizes, trainable, concat, k=2):
         xs = x if splits == 'done' else tf.split(value=x, num_or_size_splits=splits, axis=1)
@@ -1095,6 +1104,7 @@ def acc_tf(real, pred):
     accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
     return tf.cast(accuracy * 100, tf.int32)
 
+
 def positions_online(position, positions, n_envs_save):
     pos = position[:, 1:]  # doesn't include initial 'start state'
     for env in range(n_envs_save):
@@ -1103,6 +1113,8 @@ def positions_online(position, positions, n_envs_save):
         except:
             positions[env] = cp.deepcopy(pos[env])
     return positions
+
+
 def accuracy_online(accs, acc_fn, real, pred, n_seqs):
     acc = []
     for seq in range(n_seqs):
@@ -1115,6 +1127,7 @@ def accuracy_online(accs, acc_fn, real, pred, n_seqs):
         accs = cp.deepcopy(acc)
 
     return acc, accs
+
 
 def sense_online(sense, senses, n_seqs):
     senses_ = []
@@ -1129,10 +1142,12 @@ def sense_online(sense, senses, n_seqs):
 
     return senses
 
+
 def acc_sense(real, pred):
     accuracy = np.equal(np.argmax(real, 1), np.argmax(pred, 1))
     accuracy = np.expand_dims(accuracy, 1)
     return accuracy.astype(np.int32)
+
 
 def prepare_data_maps(data, prev_cell_maps, prev_acc_maps, positions, pars):
     gs, ps, ps_gen, x_s, position, acc_st = data
@@ -1164,6 +1179,7 @@ def prepare_data_maps(data, prev_cell_maps, prev_acc_maps, positions, pars):
 
     return acc_list, cell_list, positions
 
+
 def prepare_cell_timeseries(data, prev_data, pars):
     gs, ps, poss = data
     gs_, ps_, pos_ = prev_data
@@ -1188,6 +1204,53 @@ def prepare_cell_timeseries(data, prev_data, pars):
 
     return [grids, places, positions]
 
+def cell_norm_online(cells, positions, current_cell_mat, pars):
+    # for separate environments within each batch
+    envs = pars['diff_env_batches_envs']
+    n_states = pars['n_states_world']
+    n_envs_save = pars['n_envs_save']
+
+    num_cells = np.shape(cells)[1]
+    n_trials = np.shape(cells)[2]
+
+    cell_mat = [np.zeros((n_states[envs[env]], num_cells)) for env in range(n_envs_save)]
+
+    new_cell_mat = [None] * n_envs_save
+
+    for env in range(n_envs_save):
+        for ii in range(n_trials):
+            position = int(positions[env, ii])
+            cell_mat[env][position, :] += cells[env, :, ii]
+        try:
+            new_cell_mat[env] = cell_mat[env] + current_cell_mat[env]
+        except:
+            new_cell_mat[env] = cell_mat[env]
+
+    return new_cell_mat
+
+def accuracy_positions_online(cells, positions, current_cell_mat, pars):
+    # for separate environments within each batch
+    envs = pars['diff_env_batches_envs']
+    n_states = pars['n_states_world']
+    n_envs_save = pars['n_envs_save']
+    n_trials = np.shape(cells)[1]
+
+    cell_mat = [np.zeros(n_states[envs[env]]) for env in range(n_envs_save)]
+
+    new_cell_mat = [None] * n_envs_save
+
+    for env in range(n_envs_save):
+        for ii in range(n_trials):
+            position = int(positions[env, ii])
+            cell_mat[env][position] += cells[env, ii]
+
+        try:
+            new_cell_mat[env] = cell_mat[env] + current_cell_mat[env]
+        except:
+            new_cell_mat[env] = cell_mat[env]
+
+    return new_cell_mat
+
 def save_data_maps(positions, data_list, save_path, n_envs_save, index, states, names):
     pos_count = [0] * n_envs_save
 
@@ -1208,6 +1271,7 @@ def save_data_maps(positions, data_list, save_path, n_envs_save, index, states, 
         del data_map
 
     return
+
 
 def make_directories():
     date = datetime.datetime.today().strftime('%Y-%m-%d')
@@ -1246,6 +1310,7 @@ def save_params(pars, save_path, script_path):
     copy_tree('./', script_path)
 
     return
+
 
 def make_logger(gen_path):
     logger = logging.getLogger(__name__)
