@@ -9,40 +9,29 @@ from scipy.ndimage import gaussian_filter
 import sys
 import sehec
 import matplotlib as mpl
+from IPython.display import display
+
 
 class FullHaftingData(object):
 
-    def __init__(self, data_path=None, recording_nbr= None, experiment_name="FullHaftingData", verbose=False,):
+    def __init__(self, data_path=None, recording_index=None, experiment_name="FullHaftingData", verbose=False,):
         self.experiment_name = experiment_name
+        self._find_data_path(data_path)
+        self._load_data()
+        self._create_dataframe()
+        self.rat_id, self.sess, self.rec_vars = self.get_recorded_session(recording_index)
+        if verbose:
+            self.show_readme()
+            self.show_keys()
+
+    def _find_data_path(self, data_path):
         if data_path is None:
             self.data_path = os.path.join(sehec.__path__[0], "envs/experiments/Hafting2008/")
         else:
             self.data_path = data_path
-        self._load_data()
-        self.list = []
-        l = 0
-        for i, rat_id in enumerate(self.data_per_animal):
-            rat_id = list(self.data_per_animal.keys())
-            for j, sess in enumerate(self.data_per_animal[rat_id[i]]):
-                sess = list(self.data_per_animal[rat_id[i]])
-                for k, cell in enumerate(self.data_per_animal[rat_id[i]][sess[j]]):
-                    if cell != 'position':
-                        cells = list(self.data_per_animal[rat_id[i]][sess[j]])
-                        self.list.append(
-                            {"recording_nbr": l, "rat_id": rat_id[i], "sess": sess[j], "record_type": cells[k]})
-                        l = l + 1
-        if recording_nbr is None:
-            self.rat_id, self.sess, key = self.best_session["rat_id"], self.best_session["sess"], self.best_session[
-                    "record_type"]
-        else:
-            self.rat_id, self.sess, self.key = self.get_recorded_session(recording_nbr)
-        if verbose:
-            self.show_readme()
-            self.show_keys()
-        self.set_behavioral_data()
 
     def _load_data(self):
-        self.best_session ={'recording_nbr': 4, "rat_id": "11015", "sess": "13120410", "record_type": "t5c1"}
+        self.best_recording_index = 4
         self.arena_limits = np.array([[-200, 200], [-20, 20]])
         data_path_list = glob.glob(self.data_path + "*.mat")
         mice_ids = np.unique([dp.split("/")[-1][:5] for dp in data_path_list])
@@ -67,158 +56,150 @@ class FullHaftingData(object):
                     cleaned_data = clean_data(sio.loadmat(r_path[0]))
                     self.data_per_animal[m_id][sess][session_info] = cleaned_data
 
+    def _create_dataframe(self):
+        self.list = []
+        l = 0
+        for rat_id, rat_sess in self.data_per_animal.items():
+            for sess, recorded_vars in rat_sess.items():
+                self.list.append( {"rec_index": l, "rat_id": rat_id, "session": sess,
+                                   "recorded_vars": list(recorded_vars.keys())})
+                l += 1
+        self.recording_list = pd.DataFrame(self.list).set_index("rec_index")
+
     def show_keys(self):
-        print("List of recordings: Recording number - Rat ID - Seesion number - Recording type ")
-        for i,recording in enumerate(self.list):
-            print(self.list[i])
+        print("Dataframe with recordings")
+        display(self.recording_list)
 
     def show_readme(self):
         readme_path = glob.glob(self.data_path + "readme" + "*.txt")[0]
         with open(readme_path, 'r') as fin:
             print(fin.read())
 
-    def plot_trajectory(self,recording_nbr=None, save_path=None, ax=None, ):
-        if  recording_nbr is None:
-            self.rat_id, self.sess, self.key  = self.best_session["rat_id"], self.best_session["sess"], self.best_session["record_type"]
-        else:
-            self.rat_id, self.sess, self.key = self.get_recorded_session(recording_nbr)
-        cell_data = self.data_per_animal[self.rat_id][self.sess]
-        position_data = cell_data["position"]
-        x1, y1 = position_data["posx"][:], position_data["posy"][:]
-        x = np.clip(x1, a_min=self.arena_limits[0, 0], a_max=self.arena_limits[0, 1])
-        y = np.clip(y1, a_min=self.arena_limits[1, 0], a_max=self.arena_limits[1, 1])
-        cmap = mpl.cm.get_cmap("plasma")
-        time_array = position_data["post"][:]
-        norm = plt.Normalize(0, np.size(x))
-        arena_width = self.arena_limits[0, 0] - self.arena_limits[0, 1]
-        arena_depth = self.arena_limits[1, 0] - self.arena_limits[1, 1]
-        if arena_width == arena_depth:
-            if ax is None:
-                f, ax = plt.subplots(1, 1, figsize=(10, 8))
-        if arena_width > arena_depth:
-            if ax is None:
-                f, ax = plt.subplots(1, 1, figsize=(np.round((arena_width / arena_depth)) * 8, 8))
-        if arena_depth > arena_width:
-            if ax is None:
-                f, ax = plt.subplots(1, 1, figsize=(8, np.round((arena_depth / arena_width)) * 8))
+    def get_recorded_session(self, recording_index=None):
+        if recording_index is None:
+            recording_index = self.best_recording_index
+        list_item = self.recording_list.iloc[recording_index]
+        rat_id, sess, recorded_vars = list_item["rat_id"], list_item["session"], list_item["recorded_vars"]
+        return rat_id, sess, recorded_vars
 
-        ax.plot([self.arena_limits[0, 0], self.arena_limits[0, 0]], [self.arena_limits[1, 0], self.arena_limits[1, 1]],
-                "C3", lw=3)
-        ax.plot([self.arena_limits[0, 1], self.arena_limits[0, 1]],
-                [self.arena_limits[1, 0], self.arena_limits[1, 1]], "C3", lw=3)
+    def get_recording_data(self, recording_index=None):
+        if recording_index is None:
+            recording_index = self.best_recording_index
+        if type(recording_index) is list or type(recording_index) is tuple:
+            data_list = []
+            for ind in recording_index:
+                rat_id, sess, rec_vars = self.get_recorded_session(ind)
+                session_data = self.data_per_animal[rat_id][sess]
+                data_list.append(session_data)
+            return data_list
+        else:
+            rat_id, sess, rec_vars = self.get_recorded_session(recording_index)
+            session_data = self.data_per_animal[rat_id][sess]
+            return session_data, rec_vars
+
+    def _find_tetrode(self, rev_vars):
+        tetrode_id = next(
+            var_name for var_name in rev_vars if (var_name != 'position') and (("t" in var_name) or ("T" in var_name)))
+        return tetrode_id
+
+    def get_tetrode_data(self, session_data, tetrode_id):
+        position_data = session_data["position"]
+        x1, y1 = position_data["posx"][:, 0], position_data["posy"][:, 0]
+        x2, y2 = x1, y1
+        # Selecting positional data
+        x = np.clip(x2, a_min=self.arena_limits[0, 0], a_max=self.arena_limits[0, 1])
+        y = np.clip(y2, a_min=self.arena_limits[1, 0], a_max=self.arena_limits[1, 1])
+        time_array = position_data["post"][:]
+        tetrode_data = session_data[tetrode_id]
+        test_spikes = tetrode_data["ts"][:, ]
+        test_spikes = test_spikes[:, 0]
+        time_array = time_array[:, 0]
+        return time_array, test_spikes, x, y
+
+    def plot_recording_tetr(self, recording_index=None, save_path=None, ax=None, tetrode_id=None):
+        session_data, rev_vars = self.get_recording_data(recording_index)
+        if tetrode_id is None:
+            tetrode_id = self._find_tetrode(rev_vars)
+
+        arena_width = self.arena_limits[0, 1] - self.arena_limits[0, 0]
+        arena_depth = self.arena_limits[1, 1] - self.arena_limits[1, 0]
+
+        time_array, test_spikes, x, y = self.get_tetrode_data(session_data, tetrode_id)
+
+        if ax is None:
+            f, ax = plt.subplots(1, 1, figsize=(10, 8))
+
+        scale_ratio = 2  # To discretize space
+        h, binx, biny = get_2D_ratemap(time_array, test_spikes, x, y, x_size=int(arena_width/scale_ratio),
+                                       y_size=int(arena_depth/scale_ratio), filter_result=True)
+        sc = ax.imshow(h, cmap='jet')
+        cbar = plt.colorbar(sc, ax=ax, ticks=[np.min(h), np.max(h)], orientation="horizontal")
+        cbar.ax.set_xlabel('Firing rate', fontsize=12)
+        cbar.ax.set_xticklabels([np.round(np.min(h)), np.round(np.max(h))], fontsize=12)
+        ax.set_title(tetrode_id)
+        ax.set_ylabel('width', fontsize=16)
+        ax.set_xlabel('depth', fontsize=16)
+        ax.set_xticks([])
+        ax.set_yticks([])
+
+        if not save_path is None:
+            plt.savefig(save_path, bbox_inches="tight")
+            plt.close("all")
+        else:
+            return ax
+
+    def plot_trajectory(self, recording_index=None, save_path=None, ax=None, plot_every=20):
+        session_data, rev_vars = self.get_recording_data(recording_index)
+        tetrode_id = self._find_tetrode(rev_vars)
+
+
+        time_array, test_spikes, x, y = self.get_tetrode_data(session_data, tetrode_id)
+        print("debug")
+
+        arena_width = self.arena_limits[0, 1] - self.arena_limits[0, 0]
+        arena_depth = self.arena_limits[1, 1] - self.arena_limits[1, 0]
+        if ax is None:
+            f, ax = plt.subplots(1, 1, figsize=(10, 8))
+
         ax.plot([self.arena_limits[0, 0], self.arena_limits[0, 0]],
+                [self.arena_limits[1, 0], self.arena_limits[1, 1]], "C3", lw=3)
+        ax.plot([self.arena_limits[0, 1], self.arena_limits[0, 1]],
                 [self.arena_limits[1, 0], self.arena_limits[1, 1]], "C3", lw=3)
         ax.plot([self.arena_limits[0, 0], self.arena_limits[0, 1]],
                 [self.arena_limits[1, 1], self.arena_limits[1, 1]], "C3", lw=3)
         ax.plot([self.arena_limits[0, 0], self.arena_limits[0, 1]],
                 [self.arena_limits[1, 0], self.arena_limits[1, 0]], "C3", lw=3)
 
-        i = 0
-        len_x = np.ones(len(x) - 1)
+        cmap = mpl.cm.get_cmap("plasma")
+        norm = plt.Normalize(0, np.size(x))
+
         aux_x = []
         aux_y = []
-        for k in len_x:
-            x_ = [x[i], x[i + 1]]
-            y_ = [y[i], y[i + 1]]
-            aux_x.append(x[i])
-            aux_y.append(y[i])
-            i = i + 1
-            sc = ax.plot(x_, y_, "-", color=cmap(norm(i)), alpha=0.6, linewidth=1)
+        for i in range(len(x)):
+            if i % plot_every == 0:
+                if i + plot_every >= len(x):
+                    break
+                x_ = [x[i], x[i + plot_every]]
+                y_ = [y[i], y[i + plot_every]]
+                aux_x.append(x[i])
+                aux_y.append(y[i])
+                sc = ax.plot(x_, y_, "-", color=cmap(norm(i)), alpha=0.6, linewidth=1)
         ax.set_xticks([])
         ax.set_yticks([])
         ax.set_ylabel('width')
         ax.set_xlabel('depth')
         ax.set_title("position")
-        sc = ax.scatter(aux_x, aux_y, c=np.arange(len(x) - 1), vmin=0, vmax=len(x), cmap="plasma", alpha=0.6, s=0.1)
+
+        cmap = mpl.cm.get_cmap("plasma")
+        norm = plt.Normalize(0, np.size(x))
+        sc = ax.scatter(aux_x, aux_y, c=np.arange(len(aux_x)), vmin=0, vmax=len(x), cmap="plasma", alpha=0.6, s=0.1)
 
         cbar = plt.colorbar(sc, ax=ax, ticks=[0, len(x)])
         cbar.ax.set_ylabel('N steps', rotation=270, fontsize=12)
         cbar.ax.set_yticklabels([0, len(x)], fontsize=12)
+        ax.set_xlim([np.amin([x.min(), y.min()])-1.0, np.amax([x.max(), y.max()])+1.0])
+        ax.set_ylim([np.amin([x.min(), y.min()])-1.0, np.amax([x.max(), y.max()])+1.0])
 
-    def get_recorded_session(self, recording_nbr):
-        list_item = self.list[recording_nbr]
-        rat_id, sess, cell = list_item["rat_id"], list_item["sess"], list_item["record_type"]
-        return rat_id, sess, cell
-
-    def plot_recording_tetr(self, recording_nbr=None, save_path=None, ax=None, ):
-        if  recording_nbr is None:
-            self.rat_id, self.sess, self.key  = self.best_session["rat_id"], self.best_session["sess"], self.best_session["record_type"]
-        else:
-            self.rat_id, self.sess, self.key = self.get_recorded_session(recording_nbr)
-        if self.key == 'EEG' or self.key == 'EG2' or self.key== 'EG3' or self.key == 'EG4' or self.key== 'c1 2' or self.key == 'G 2' or self.key == 'OS 2' or self.key =='G2 2' or self.key=='c2 2' or self.key=='c4 2':
-            print(' You have selected a '+ self.key + ' recording. You need to select a tetrode recording')
-        else:
-            cell_data = self.data_per_animal[self.rat_id][self.sess]
-            position_data = cell_data["position"]
-            x1, y1 = position_data["posx"][:, 0], position_data["posy"][:, 0]
-            x2, y2 = x1, y1
-            # Selecting positional data
-            x = np.clip(x2, a_min=self.arena_limits[0, 0], a_max=self.arena_limits[0, 1])
-            y = np.clip(y2, a_min=self.arena_limits[1, 0], a_max=self.arena_limits[1, 1])
-            time_array = position_data["post"][:]
-            arena_width = self.arena_limits[0, 0] - self.arena_limits[0, 1]
-            arena_depth = self.arena_limits[1, 0] - self.arena_limits[1, 1]
-
-            if arena_width == arena_depth:
-                if ax is None:
-                    f, ax = plt.subplots(1, 1, figsize=(10, 8))
-            if arena_width > arena_depth:
-                if ax is None:
-                    f, ax = plt.subplots(1, 1, figsize=(np.round((arena_width / arena_depth)) * 8, 8))
-            if arena_depth > arena_width:
-                if ax is None:
-                    f, ax = plt.subplots(1, 1, figsize=(8, np.round((arena_depth / arena_width)) * 8))
-
-            tetrode_data = cell_data[self.key]
-            test_spikes = tetrode_data["ts"][:]
-            test_spikes = test_spikes[:, 0]
-            time_array = time_array[:, 0]
-
-
-            h, binx, biny = get_2D_ratemap(time_array, test_spikes, x, y, filter_result=True)
-            sc = ax.imshow(h, cmap='jet')
-            cbar = plt.colorbar(sc, ax=ax, ticks=[np.min(h), np.max(h)])
-            cbar.ax.set_ylabel('Firing rate', rotation=270, fontsize=16)
-            cbar.ax.set_yticklabels([np.round(np.min(h)), np.round(np.max(h))], fontsize=16)
-            ax.set_title(self.key)
-            ax.set_ylabel('width')
-            ax.set_xlabel('depth')
-            ax.set_xticks([])
-            ax.set_yticks([])
-
-            if not save_path is None:
-                plt.savefig(save_path, bbox_inches="tight")
-                plt.close("all")
-            else:
-                return ax
-
-    def set_behavioral_data(self, recording_nbr=None,tolerance=1e-10):
-        arena_limits = np.array([[-50, 50], [-50, 50]])
-        if recording_nbr is None:
-            self.rat_id, self.sess, self.key = self.best_session["rat_id"], self.best_session["sess"], self.best_session[
-                "record_type"]
-        else:
-            self.rat_id, self.sess, self.key = self.get_recorded_session(recording_nbr)
-        rat_id  =self.rat_id
-        session=self.sess
-        cell_data = self.data_per_animal[rat_id][session]
-        position_data = cell_data["position"]
-    
-        # Selecting positional data
-        x1, y1 = position_data["posx"][:], position_data["posy"][:]
-        # Selecting positional data
-        x = np.clip(x1, a_min=-200, a_max=200)
-        y = np.clip(y1, a_min=-20, a_max=20)
-        time_array = position_data["post"][:]
-
-        position = np.stack([x, y], axis=1) # Convert to cm
-        head_direction = np.diff(position, axis=0)
-        head_direction = head_direction/np.sqrt(np.sum(head_direction**2, axis=1) + tolerance)[..., np.newaxis]
-        self.arena_limits = arena_limits
-        self.position = position
-        self.head_direction = head_direction
-        self.time = time_array
-               
 
 class SargoliniData(object):
 
@@ -248,41 +229,21 @@ class SargoliniData(object):
         return arena_limits, position, head_direction
 
 
-class FullSargoliniData(object):
+class FullSargoliniData(FullHaftingData):
 
-    def __init__(self, data_path=None, recroding_nbr=None, experiment_name="FullSargoliniData", verbose=False,):
+    def __init__(self, data_path=None, recording_index=None, experiment_name="FullSargoliniData", verbose=False):
+        super().__init__(data_path=data_path, recording_index=recording_index,
+                         experiment_name=experiment_name, verbose=verbose)
+
+    def _find_data_path(self, data_path):
         if data_path is None:
             self.data_path = os.path.join(sehec.__path__[0], "envs/experiments/Sargolini2006/raw_data_sample/")
         else:
             self.data_path = data_path
-        print("Data path ", self.data_path)
-        self.experiment_name = experiment_name
-        self.show_readme()
-        self._load_data()
-        self.list = []
-        l = 0
-        for i, rat_id in enumerate(self.data_per_animal):
-            rat_id = list(self.data_per_animal.keys())
-            for j, sess in enumerate(self.data_per_animal[rat_id[i]]):
-                sess = list(self.data_per_animal[rat_id[i]])
-                for k, cell in enumerate(self.data_per_animal[rat_id[i]][sess[j]]):
-                    if cell != 'position':
-                        cells=list(self.data_per_animal[rat_id[i]][sess[j]])
-                        self.list.append({"recording_nbr": l, "rat_id": rat_id[i], "sess": sess[j], "record_type": cells[k]})
-                        l = l + 1
-        if recroding_nbr is None:
-            self.rat_id, self.sess, key = self.best_session["rat_id"], self.best_session["sess"], self.best_session[
-                    "record_type"]
-        else:
-            self.rat_id, self.sess, self.key = self.get_recorded_session(recording_nbr)
-        if verbose:
-            self.show_readme()
-            self.show_keys()
-        self.set_behavioral_data()
 
     def _load_data(self):
-        self.best_session = self.best_session ={'recording_nbr': 20, "rat_id": "11016", "sess": "31010502", "record_type": "T8C2"}
-        # self.best_session = {"rat_id": "10704", "sess": "20060402"}
+        self.best_recording_index = 0
+        # self.best_session = {"rat_id": "10704", "session": "20060402"}
         self.arena_limits = np.array([[-50.0, 50.0], [-50.0, 50.0]])
 
         data_path_list = glob.glob(self.data_path + "*.mat")
@@ -313,169 +274,18 @@ class FullSargoliniData(object):
                     else:
                         self.data_per_animal[m_id][sess][session_info] = cleaned_data
 
-    def show_keys(self):
-        print("List of recordings: Recording number - Rat ID - Seesion number - Recording type ")
-        for i,recording in enumerate(self.list):
-            print(self.list[i])
-
-
-    def show_readme(self):
-        readme_path = glob.glob(self.data_path + "readme" + "*.txt")[0]
-        with open(readme_path, 'r') as fin:
-            print(fin.read())
-
-    def plot_trajectory(self, recording_nbr=None, save_path=None, ax=None,):
-        if recording_nbr is None:
-            self.rat_id, self.sess, self.key = self.best_session["rat_id"], self.best_session["sess"], self.best_session["record_type"]
-        else:
-            self.rat_id, self.sess,self.key = self.get_recorded_session(recording_nbr)
-        cell_data = self.data_per_animal[self.rat_id][self.sess]
-        position_data = cell_data["position"]
+    def get_tetrode_data(self, session_data, tetrode_id):
+        position_data = session_data["position"]
         x1, y1 = position_data["posx"][:, 0], position_data["posy"][:, 0]
-        if len(position_data["posy2"]) != 0:
-            x2, y2 = position_data["posy2"][:, 0], position_data["posy2"][:, 0]
-        else:
-            x2, y2 = x1, y1
+        x2, y2 = x1, y1
         # Selecting positional data
-        x = np.mean(np.stack([x1, x2], axis=1), axis=1)
-        y = np.mean(np.stack([y1, y2], axis=1), axis=1)
-        x = np.clip(x, a_min=self.arena_limits[0, 0], a_max=self.arena_limits[0, 1])
-        y = np.clip(y, a_min=self.arena_limits[1, 0], a_max=self.arena_limits[1, 1])
-        cmap = mpl.cm.get_cmap("plasma")
-        time_array = position_data["post"][:, 0]
-        norm = plt.Normalize(0, np.size(x))
-        arena_width=self.arena_limits[0, 0]-self.arena_limits[0, 1]
-        arena_depth = self.arena_limits[1, 0] - self.arena_limits[1, 1]
-        if arena_width==arena_depth:
-            if ax is None:
-                f, ax = plt.subplots(1, 1, figsize=(10, 8))
-        if arena_width> arena_depth:
-            if ax is None:
-                f, ax = plt.subplots(1, 1, figsize=(np.round((arena_width/arena_depth))*8, 8))
-        if arena_depth> arena_width:
-            if ax is None:
-                f, ax = plt.subplots(1, 1, figsize=(8,np.round((arena_depth/arena_width))*8))
-
-        ax.plot([self.arena_limits[0, 0],self.arena_limits[0, 0]],[self.arena_limits[1, 0],self.arena_limits[1, 1]] ,"C3", lw=3)
-        ax.plot([self.arena_limits[0, 1], self.arena_limits[0, 1]],
-                   [self.arena_limits[1, 0], self.arena_limits[1, 1]], "C3", lw=3)
-        ax.plot([self.arena_limits[0, 0], self.arena_limits[0, 0]],
-                   [self.arena_limits[1, 0], self.arena_limits[1, 1]], "C3", lw=3)
-        ax.plot([self.arena_limits[0, 0], self.arena_limits[0, 1]],
-                   [self.arena_limits[1, 1], self.arena_limits[1, 1]], "C3", lw=3)
-        ax.plot([self.arena_limits[0, 0], self.arena_limits[0, 1]],
-                   [self.arena_limits[1, 0], self.arena_limits[1, 0]], "C3", lw=3)
-
-        i=0
-        len_x=np.ones(len(x)-1)
-        aux_x = []
-        aux_y = []
-        for k in len_x:
-            x_ = [x[i],x[i+1]]
-            y_ = [y[i],y[i+1]]
-            aux_x.append(x[i])
-            aux_y.append(y[i])
-            i = i + 1
-            sc=ax.plot(x_, y_, "-", color=cmap(norm(i)), alpha=0.6,linewidth=1)
-        ax.set_xticks([])
-        ax.set_yticks([])
-        ax.set_ylabel('width')
-        ax.set_xlabel('depth')
-        ax.set_title("position")
-        sc = ax.scatter(aux_x, aux_y, c=np.arange(len(x)-1),vmin=0, vmax=len(x), cmap="plasma", alpha=0.6,s=0.1 )
-
-        cbar = plt.colorbar(sc, ax=ax, ticks=[0, len(x)])
-        cbar.ax.set_ylabel('N steps', rotation=270, fontsize=12)
-        cbar.ax.set_yticklabels([0, len(x)], fontsize=12)
-
-    def get_recorded_session(self,recording_nbr):
-        list_item = self.list[recording_nbr]
-        rat_id, sess ,cell= list_item["rat_id"],  list_item["sess"], list_item["record_type"]
-        return  rat_id, sess,cell
-
-    def plot_recording_tetr(self, recording_nbr=None, save_path=None, ax=None, ):
-        if recording_nbr is None:
-            self.rat_id, self.sess, self.key = self.best_session["rat_id"], self.best_session["sess"], self.best_session["record_type"]
-        else:
-            self.rat_id, self.sess,self.key = self.get_recorded_session(recording_nbr)
-        if self.key == 'EEG' or self.key == 'EGF':
-            print(' You have selected a ' + self.key + ' recording. You need to select a tetrode recording')
-        else:
-            cell_data = self.data_per_animal[self.rat_id][self.sess]
-            position_data = cell_data["position"]
-            x1, y1 = position_data["posx"][:, 0], position_data["posy"][:, 0]
-            if len(position_data["posy2"]) != 0:
-                x2, y2 = position_data["posy2"][:, 0], position_data["posy2"][:, 0]
-            else:
-                x2, y2 = x1, y1
-            # Selecting positional data
-            x = np.mean(np.stack([x1, x2], axis=1), axis=1)
-            y = np.mean(np.stack([y1, y2], axis=1), axis=1)
-            x = np.clip(x, a_min=self.arena_limits[0, 0], a_max=self.arena_limits[0, 1])
-            y = np.clip(y, a_min=self.arena_limits[1, 0], a_max=self.arena_limits[1, 1])
-            time_array = position_data["post"][:, 0]
-            arena_width = self.arena_limits[0, 0] - self.arena_limits[0, 1]
-            arena_depth = self.arena_limits[1, 0] - self.arena_limits[1, 1]
-
-            if arena_width==arena_depth:
-                if ax is None:
-                    f, ax = plt.subplots(1, 1, figsize=(10, 8))
-            if arena_width> arena_depth:
-                if ax is None:
-                    f, ax = plt.subplots(1, 1, figsize=(np.round((arena_width/arena_depth))*8, 8))
-            if arena_depth> arena_width:
-                if ax is None:
-                    f, ax = plt.subplots(1, 1, figsize=(8,np.round((arena_depth/arena_width))*8))
-
-            test_spikes = cell_data[self.key][:, 0]
-            h, binx, biny = get_2D_ratemap(time_array, test_spikes, x, y, filter_result=True)
-            sc=ax.imshow(h,cmap='jet')
-            cbar = plt.colorbar(sc, ax=ax,ticks = [np.min(h), np.max(h)])
-            cbar.ax.set_ylabel('Firing rate', rotation=270, fontsize=16)
-            cbar.ax.set_yticklabels([np.round(np.min(h)), np.round(np.max(h))], fontsize=16)
-            ax.set_title(self.key)
-            ax.set_ylabel('width')
-            ax.set_xlabel('depth')
-            ax.set_xticks([])
-            ax.set_yticks([])
-
-            if not save_path is None:
-                plt.savefig(save_path, bbox_inches="tight")
-                plt.close("all")
-            else:
-                return ax
-
-
-    def set_behavioral_data(self, rat_id=None, recording_nbr=None):
-        arena_limits = np.array([[-50, 50], [-50, 50]])
-        if recording_nbr is None:
-            self.rat_id, self.sess, self.key = self.best_session["rat_id"], self.best_session["sess"], self.best_session[
-                "record_type"]
-        else:
-            self.rat_id, self.sess, self.key = self.get_recorded_session(recording_nbr)
-        rat_id = self.rat_id
-        session = self.sess
-        cell_data = self.data_per_animal[rat_id][session]
-        position_data = cell_data["position"]
-        x1, y1 = position_data["posx"][:, 0], position_data["posy"][:, 0]
-        if len(position_data["posy2"]) != 0:
-            x2, y2 = position_data["posy2"][:, 0], position_data["posy2"][:, 0]
-        else:
-            x2, y2 = x1, y1
-
-        # Selecting positional data
-        x = np.mean(np.stack([x1, x2], axis=1), axis=1)
-        y = np.mean(np.stack([y1, y2], axis=1), axis=1)
-        x = np.clip(x, a_min=self.arena_limits[0, 0], a_max=self.arena_limits[0, 1])
-        y = np.clip(y, a_min=self.arena_limits[1, 0], a_max=self.arena_limits[1, 1])
-        time_array = position_data["post"][:, 0]
-        position = np.stack([x, y], axis=1) # Convert to cm
-        head_direction = np.diff(position, axis=0)
-        head_direction = head_direction/np.sqrt(np.sum(head_direction**2, axis=1))[..., np.newaxis]
-        self.arena_limits = arena_limits
-        self.position = position
-        self.head_direction = head_direction
-        self.time = time_array
+        x = np.clip(x2, a_min=self.arena_limits[0, 0], a_max=self.arena_limits[0, 1])
+        y = np.clip(y2, a_min=self.arena_limits[1, 0], a_max=self.arena_limits[1, 1])
+        time_array = position_data["post"][:]
+        tetrode_data = session_data[tetrode_id]
+        test_spikes = tetrode_data[:, 0]
+        time_array = time_array[:, 0]
+        return time_array, test_spikes, x, y
 
 
 def clean_data(data, keep_headers=False):
@@ -517,10 +327,21 @@ def get_2D_ratemap(time_array, spikes, x, y, x_size=50, y_size=50, filter_result
 
 
 if __name__ == "__main__":
-    data = FullHaftingData(verbose=True)
-    data.plot_trajectory(22)
-    data.plot_recording_tetr(22)
+    # print("initializing hafting")
+    # data = FullHaftingData(verbose=True)
+    # print("plotting_tragectory")
+    # data.plot_trajectory(2)
+    # print("plotting_recording")
+    # data.plot_recording_tetr(2)
+    # plt.show()
 
+    print("initializing sargolini")
+    data = FullSargoliniData(verbose=True)
+    print("plotting_tragectory")
+    data.plot_trajectory(2)
+    print("plotting_recording")
+    data.plot_recording_tetr(2)
+    plt.show()
 
 
 
