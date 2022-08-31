@@ -12,12 +12,12 @@ The agent can be thought as the animal performing the task in the experiment.  A
 
 ## 2.Model Implemented 
 
-  1. [The Tolman-Eichenbaum machine](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/sehec/models/TEM)
+  1. [The Tolman-Eichenbaum machine](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/sehec/agent/TEM)
   
  
-  2. [The hippocampus as a predictive map](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/sehec/models/SRKim.py)
+  2. [The hippocampus as a predictive map](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/sehec/agent/SRKim.py)
 
-  4. [Learning place cells, grid cells and invariances with excitatory and inhibitory plasticity](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/sehec/models/weber_and_sprekeler.py)
+  4. [Learning place cells, grid cells and invariances with excitatory and inhibitory plasticity](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/sehec/agent/weber_and_sprekeler.py)
 
 Each of the models are implemented in a jupyter notebook in  [Examples](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/examples) to facilitate the intereraction.
 
@@ -25,7 +25,7 @@ Each of the models are implemented in a jupyter notebook in  [Examples](https://
 
   1. Create a file that indicates the appropirate reference to the model
 
-  2. Create a class to run the model following the template shown in the [modelcore.py](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/models/core.py) and the [Style Guide](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/Documents).
+  2. Create a class to run the model following the template shown in the [modelcore.py](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/agent/core.py) and the [Style Guide](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/Documents).
   
   3. Create a [Examples](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/examples)  jupyter notebook for the new model where you can run the model in a chosen environement with selected experimental data
   
