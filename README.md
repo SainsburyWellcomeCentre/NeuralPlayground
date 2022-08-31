@@ -26,7 +26,7 @@ pip install -e .
 ```
 
 ## 3. Project
-Please refere to the [ROADMAP](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/documents/ROADMAP.md) to understand the state of the project and get an idea of the direction it is going in.  This open-source software was built to be collaborative and lasting. We hope that the framework will be simple enough to be adopted by a great number of neuroscientists, eventually guiding the path to the computational understanding of the HEC mechanisms. We follow reproducible, inclusive, and collaborative project design guidelines All relevant documents can be found in [Documents](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/documents/)
+Please refere to the [ROADMAP](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/documents/road_map.md) to understand the state of the project and get an idea of the direction it is going in. This open-source software was built to be collaborative and lasting. We hope that the framework will be simple enough to be adopted by a great number of neuroscientists, eventually guiding the path to the computational understanding of the HEC mechanisms. We follow reproducible, inclusive, and collaborative project design guidelines All relevant documents can be found in [Documents](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/documents/)
 
 #### How to run a single model
 You will find in the [Examples](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/examples) file a simple implementation of each single model and in a single Environment. The Agent and Environment class can be initialised to use data from an experiment. These two classes are allowed to interact to reproduce the full experimental setting. 
@@ -64,7 +64,7 @@ Refere to the README.md files found in each the modules for further details on h
 
 ### 5. Cite 
 
-See [Citation](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/documents/CITATION.cff) for correct citation of this framework. 
+See [Citation](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/documents/Citation.cff) for correct citation of this framework. 
 
 ## Contributors ✨
 
