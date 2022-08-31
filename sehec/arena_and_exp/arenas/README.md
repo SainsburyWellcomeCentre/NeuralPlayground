@@ -30,7 +30,7 @@ Before sending a pull request make sure you have:
 
 1. Checked the Lisencing frameworks. 
 
-2. Followed the [Style Guide](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/Documents).
+2. Followed the [Style Guide](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/documents/style_guide).
 
 3. Implemented and ran [Test](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/tests).
 
