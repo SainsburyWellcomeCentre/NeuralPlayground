@@ -31,30 +31,30 @@ Please refere to the [Road map](https://github.com/ClementineDomine/EHC_model_co
 #### How to run a single model
 You will find in the [Examples](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/examples) file a simple implementation of each single model and in a single Environment. The Agent and Environment class can be initialised to use data from an experiment. These two classes are allowed to interact to reproduce the full experimental setting. 
 
-#### How to Run the ([Comparaison Board]())
+#### How to Run the ([Comparaison Board](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/comparaison_board))
 
-A second way to work with the framework is through the [Comparison board](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/comparison_board). This tool empowers the users to flexibly choose the models, Environments, experiments, metrics and plot they would like to run. The initialisation of the   are automatized in the background. 
+A second way to work with the framework is through the [Comparison board](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/comparaison_board). This tool empowers the users to flexibly choose the models, Environments, experiments, metrics and plot they would like to run. The initialisation of the   are automatized in the background. 
 
 ## 4. I-want-to-Contribute
 
 There are many ways to contribute to the [sehec](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec). 
 
- 1. Implement an hippocampal and entorhinal cortex models of your choice. ([Agent](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/agent))
+ 1. Implement an hippocampal and entorhinal cortex models of your choice. [Agent](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/agent)
     
- 2. Add functionality to the Comparison Board to compare results to real experimental data. ([Comparaison Board](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/comparison_board))
+ 2. Add functionality to the Comparison Board to compare results to real experimental data. [Comparaison Board](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/comparaison_board)
     
- 3. Work on improving the environment ([Environement](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/envs/arena))
+ 3. Work on improving the arena [Arena](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/arena_and_exp/arenas)
     
- 4. Add an experimental data set ([Experiment](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/envs/experiments))
+ 4. Add an experimental data set [Experiment](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/arena_and_exp/Experiments)
 
 All contribution should be sumbited through a pull request that we will later acess. 
 Before sending a pull request make sure you have: 
 
 1. Checked the Lisencing frameworks. 
 
-2. Followed them [Style Guide](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/Documents).
+2. Followed them [Style Guide](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/documents/style_guide).
 
-3. Implemented and ran [Test](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/test).
+3. Implemented and ran [Test](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/tests).
 
 4. Commented your work 
     
