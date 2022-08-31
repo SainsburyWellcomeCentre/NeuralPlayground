@@ -23,7 +23,7 @@ Here are listed the mile stone achived by the project team
     > [Batch Environements](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/sehec/envs/arenas/TEM_env.py)
     
 3. Agent
-      > [”Learning place cells, grid cells and invariances with excitatory and inhibitory”, Weber et al,2018](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/examples/agent_examples/weber_2018_example.ipynb)
+      > [”Learning place cells, grid cells and invariances with excitatory and inhibitory”, Weber et al, 2018](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/examples/agent_examples/weber_2018_example.ipynb)
 
      > [”A general model of hippocampal and dorsal striatal learning and decision making”,Stachenfeld et al, 2018](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/examples/agent_examples/stachenfeld_2018_examples.ipynb)
      
@@ -31,12 +31,12 @@ Here are listed the mile stone achived by the project team
  
    
 4. Experiments 
-    > [”Conjunctive Representation of Position, Direction, and Velocity in Entorhinal Cortex”, Sargolini et al. 2006.](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/envs/experiments/Sargolini2006)
+    > [”Conjunctive Representation of Position, Direction, and Velocity in Entorhinal Cortex”, Sargolini et al, 2006](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/envs/experiments/Sargolini2006)
  
-    > [”Hippocampus-independent phase precession in entorhinal grid cells”, Hafting et al 2008](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/envs/experiments/Hafting2008)
+    > [”Hippocampus-independent phase precession in entorhinal grid cells”, Hafting et al, 2008](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/envs/experiments/Hafting2008)
 
 
-    > [”Integration of grid maps in merged environments”, Wernle et al 2018](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/envs/experiments/Wernle2018)
+    > [”Integration of grid maps in merged environments”, Wernle et al, 2018](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/envs/experiments/Wernle2018)
   
 5. Comparaison Board  
    
