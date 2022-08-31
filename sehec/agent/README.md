@@ -12,12 +12,11 @@ The agent can be thought as the animal performing the task in the experiment.  A
 
 ## 2.Model Implemented 
 
-  1. [The Tolman-Eichenbaum machine](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/sehec/agent/TEM)
+  1. [The Tolman-Eichenbaum machine](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/sehec/agent/whittington_2020.py)
   
- 
-  2. [The hippocampus as a predictive map](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/sehec/agent/SRKim.py)
+  2. [The hippocampus as a predictive map](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/sehec/agent/Stachenfeld_2018.py)
 
-  4. [Learning place cells, grid cells and invariances with excitatory and inhibitory plasticity](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/sehec/agent/weber_and_sprekeler.py)
+  3. [Learning place cells, grid cells and invariances with excitatory and inhibitory plasticity](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/sehec/agent/Weber_2018.py)
 
 Each of the models are implemented in a jupyter notebook in  [Examples](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/examples) to facilitate the intereraction.
 
