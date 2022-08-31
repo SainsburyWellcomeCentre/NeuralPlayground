@@ -24,7 +24,7 @@ Each of the models are implemented in a jupyter notebook in  [Examples](https://
 
   1. Create a file that indicates the appropirate reference to the model
 
-  2. Create a class to run the model following the template shown in the [modelcore.py](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/agent/core.py) and the [Style Guide](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/Documents).
+  2. Create a class to run the model following the template shown in the [modelcore.py](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/sehec/agent/modelcore.py) and the [Style Guide](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/documents/style_guide).
   
   3. Create a [Examples](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/examples)  jupyter notebook for the new model where you can run the model in a chosen environement with selected experimental data
   
@@ -34,9 +34,9 @@ All contribution should be sumbited through a pull request that we will later ac
 Before sending a pull request make sure you have:
 1. Checked the Lisencing frameworks. 
 
-2. Followed the [Style Guide](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/Documents).
+2. Followed the [Style Guide](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/documents/style_guide).
 
-3. Implemented and ran [Test](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/test).
+3. Implemented and ran [Test](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/tests).
 
 4. Commented your work 
         
