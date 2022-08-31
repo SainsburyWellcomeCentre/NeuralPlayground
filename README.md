@@ -39,13 +39,13 @@ A second way to work with the framework is through the [Comparison board](https:
 
 There are many ways to contribute to the [sehec](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec). 
 
- 1. Implement an hippocampal and entorhinal cortex models of your choice. ([Agent](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/agent))
+ 1. Implement an hippocampal and entorhinal cortex models of your choice. [Agent](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/agent)
     
  2. Add functionality to the Comparison Board to compare results to real experimental data. [Comparaison Board](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/comparaison_board)
     
- 3. Work on improving the arena ([Environement](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/arena_and_exp/arenas))
+ 3. Work on improving the arena [Arena](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/arena_and_exp/arenas)
     
- 4. Add an experimental data set ([Experiment](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/arena_and_exp/Experiments))
+ 4. Add an experimental data set [Experiment](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/arena_and_exp/Experiments)
 
 All contribution should be sumbited through a pull request that we will later acess. 
 Before sending a pull request make sure you have: 
