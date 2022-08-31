@@ -21,7 +21,7 @@ the Environments through the projects, adding experimental specifications
 
 ## 3. How-to-Contribute
 
-1. Create an environment class to following the template shown in the [Env_Core](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/sehec/arena_and_exp/envcore.py) and the [Style Guide](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/documents/style_guide). 
+1. Create an environment class to following the template shown in the [Env_Core](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/sehec/arena_and_exp/env_core.py) and the [Style Guide](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/documents/style_guide). 
 
 2. Record your contribution.
 
