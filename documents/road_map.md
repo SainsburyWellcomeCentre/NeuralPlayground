@@ -31,12 +31,12 @@ Here are listed the mile stone achived by the project team
  
    
 4. Experiments 
-    > [”Conjunctive Representation of Position, Direction, and Velocity in Entorhinal Cortex”, Sargolini et al, 2006](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/arena_and_exp/experiments/Sargolini_2006)
+    > [”Conjunctive Representation of Position, Direction, and Velocity in Entorhinal Cortex”, Sargolini et al, 2006](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/arena_and_exp/Experiments/sargolini_2006)
  
-    > [”Hippocampus-independent phase precession in entorhinal grid cells”, Hafting et al, 2008](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/arena_and_exp/experiments/Hafting_2008)
+    > [”Hippocampus-independent phase precession in entorhinal grid cells”, Hafting et al, 2008](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/arena_and_exp/Experiments/hafting_2008)
 
 
-    > [”Integration of grid maps in merged environments”, Wernle et al, 2018](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/arena_and_exp/experiments/Wernle_2018)
+    > [”Integration of grid maps in merged environments”, Wernle et al, 2018](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/arena_and_exp/Experiments/wernle_2018/nn_Data%2BCode)
   
 5. Comparaison Board  
    
