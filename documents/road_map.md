@@ -25,9 +25,9 @@ Here are listed the mile stone achived by the project team
 3. Agent
       > [Learning place cells, grid cells and invariances with excitatory and   inhibitory. Weber, 2018 ](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/examples/Agent_examples/weber_2018_example.ipynb)
 
-     > [A general model of hippocampal and dorsal striatal learning and decision making. Stachenfeld,2018](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/examples/Agent_examples/stachenfeld_2018_examples.ipynb)
+     > [A general model of hippocampal and dorsal striatal learning and decision making. Stachenfeld,2018](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/examples/agent_examples/stachenfeld_2018_examples.ipynb)
      
-     > [The Tolman-Eichenbaum Machine: Unifying Space and Relational Memory through Generalization in the Hippocampal Formation. Whittington, 2020](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/examples/Agent_examples/whittington_2020_examples.ipynb)
+     > [The Tolman-Eichenbaum Machine: Unifying Space and Relational Memory through Generalization in the Hippocampal Formation. Whittington, 2020](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/examples/agent_examples/whittington_2020_examples.ipynb)
  
    
 4. Experiments 
