@@ -33,15 +33,15 @@ You will find in the [Examples](https://github.com/ClementineDomine/EHC_model_co
 
 #### How to Run the ([Comparaison Board]())
 
-A second way to work with the framework is through the [Comparison board](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/crossrun). This tool empowers the users to flexibly choose the models, Environments, experiments, metrics and plot they would like to run. The initialisation of the   are automatized in the background. 
+A second way to work with the framework is through the [Comparison board](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/comparison_board). This tool empowers the users to flexibly choose the models, Environments, experiments, metrics and plot they would like to run. The initialisation of the   are automatized in the background. 
 
 ## 4. I-want-to-Contribute
 
 There are many ways to contribute to the [sehec](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec). 
 
- 1. Implement an hippocampal and entorhinal cortex models of your choice. ([Agent](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/models))
+ 1. Implement an hippocampal and entorhinal cortex models of your choice. ([Agent](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/agent))
     
- 2. Add functionality to the Comparison Board to compare results to real experimental data. ([Comparaison Board](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/crossrun))
+ 2. Add functionality to the Comparison Board to compare results to real experimental data. ([Comparaison Board](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/comparison_board))
     
  3. Work on improving the environment ([Environement](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/envs/arena))
     
