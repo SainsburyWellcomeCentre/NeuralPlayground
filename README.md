@@ -26,14 +26,14 @@ pip install -e .
 ```
 
 ## 3. Project
-Please refere to the [ROADMAP](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/documents/road_map.md) to understand the state of the project and get an idea of the direction it is going in. This open-source software was built to be collaborative and lasting. We hope that the framework will be simple enough to be adopted by a great number of neuroscientists, eventually guiding the path to the computational understanding of the HEC mechanisms. We follow reproducible, inclusive, and collaborative project design guidelines All relevant documents can be found in [Documents](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/documents/)
+Please refere to the [Road map](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/documents/road_map.md) to understand the state of the project and get an idea of the direction it is going in. This open-source software was built to be collaborative and lasting. We hope that the framework will be simple enough to be adopted by a great number of neuroscientists, eventually guiding the path to the computational understanding of the HEC mechanisms. We follow reproducible, inclusive, and collaborative project design guidelines All relevant documents can be found in [Documents](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/documents/)
 
 #### How to run a single model
 You will find in the [Examples](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/examples) file a simple implementation of each single model and in a single Environment. The Agent and Environment class can be initialised to use data from an experiment. These two classes are allowed to interact to reproduce the full experimental setting. 
 
 #### How to Run the ([Comparaison Board]())
 
-A second way to work with the framework is through the [Comparison board](). This tool empowers the users to flexibly choose the models, Environments, experiments, metrics and plot they would like to run. The initialisation of the   are automatized in the background. 
+A second way to work with the framework is through the [Comparison board](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/crossrun). This tool empowers the users to flexibly choose the models, Environments, experiments, metrics and plot they would like to run. The initialisation of the   are automatized in the background. 
 
 ## 4. I-want-to-Contribute
 
@@ -41,11 +41,11 @@ There are many ways to contribute to the [sehec](https://github.com/ClementineDo
 
  1. Implement an hippocampal and entorhinal cortex models of your choice. ([Agent](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/models))
     
- 2. Add functionality to the Comparison Board to compare results to real experimental data. ([Comparaison Board]())
+ 2. Add functionality to the Comparison Board to compare results to real experimental data. ([Comparaison Board](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/crossrun))
     
  3. Work on improving the environment ([Environement](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/envs/arena))
     
- 4. Add an experimental data set ([Experiment](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/envs/experiment))
+ 4. Add an experimental data set ([Experiment](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/envs/experiments))
 
 All contribution should be sumbited through a pull request that we will later acess. 
 Before sending a pull request make sure you have: 
