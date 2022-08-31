@@ -14,12 +14,12 @@ We use open-source data of the experiment to replicate the experimental conditio
 ## 2. Experiment-Implemented
 
 We use the following data sets:
- > [”Conjunctive Representation of Position, Direction, and Velocity in Entorhinal Cortex” Sargolini et al. 2006.](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/arena_and_exp/experiments/Sargolini2006)
+ > [”Conjunctive Representation of Position, Direction, and Velocity in Entorhinal Cortex” Sargolini et al. 2006.](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/arena_and_exp/experiments/sargolini_2006)
 
- > [”Hippocampus-independent phase precession in entorhinal grid cells”, Hafting et al 2008](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/arena_and_exp/experiments/Hafting2008)
+ > [”Hippocampus-independent phase precession in entorhinal grid cells”, Hafting et al 2008](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/arena_and_exp/experiments/hafting_2008)
    
    
- > [”Integration of grid maps in merged environments”, Wernle et al, 2018](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/arena_and_exp/experiments/Wernle2018)
+ > [”Integration of grid maps in merged environments”, Wernle et al, 2018](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/arena_and_exp/experiments/wernle_2018)
    
 One of our goals is to expand this list to add more experiments that are relevant to this literature and that are publicly available.
 
