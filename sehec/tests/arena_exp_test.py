@@ -1,8 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from ..arena.simple2d import Simple2D, Sargolini2006, BasicSargolini2006, Hafting2008
-from ..arena.connected_rooms import ConnectedRooms
-from ..arena.merging_rooms import MergingRoom2D
+from ..arenas.simple2d import Simple2D, Sargolini2006, BasicSargolini2006, Hafting2008
+from ..arenas.connected_rooms import ConnectedRooms
+from ..arenas.merging_rooms import MergingRoom2D
 import pytest
 from ..utils import RandomAgent
 

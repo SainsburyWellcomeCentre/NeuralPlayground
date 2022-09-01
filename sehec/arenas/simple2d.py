@@ -1,6 +1,6 @@
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-from sehec.arena.arena_core import Environment
+from sehec.arenas.arena_core import Environment
 import numpy as np
 from ..experiments.behavioral_data import SargoliniData, FullSargoliniData, FullHaftingData
 from ..utils import check_crossing_wall
