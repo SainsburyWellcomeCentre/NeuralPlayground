@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-from sehec.crossrun.default_run import default_run
+from sehec.comparison_board.default_run import default_run
 import sys
 
 if __name__ == "__main__":

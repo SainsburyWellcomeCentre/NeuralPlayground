@@ -1,6 +1,6 @@
 import sehec
 from sehec.experimentconfig import cfg
-from sehec.crossrun.default_run import *
+from sehec.comparison_board.default_run import *
 import os
 import glob
 import shutil

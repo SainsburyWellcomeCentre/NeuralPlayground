@@ -17,8 +17,8 @@ import numpy as np
 from scipy.stats import multivariate_normal
 from tqdm import tqdm
 
-from .modelcore import NeuralResponseModel
-from ..envs.arenas.simple2d import Simple2D, Sargolini2006, BasicSargolini2006
+from .agent_core import NeuralResponseModel
+from ..arena.simple2d import Simple2D, Sargolini2006, BasicSargolini2006
 
 
 class SR(NeuralResponseModel):

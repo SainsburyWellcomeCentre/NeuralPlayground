@@ -1,5 +1,5 @@
-from sehec.crossrun.crossrun import CrossRun
-from sehec.models.modelcore import NeuralResponseModel
+from sehec.comparison_board.crossrun import CrossRun
+from sehec.agent.agent_core import NeuralResponseModel
 from sehec.vis.user_interface import ResultsInterface
 
 if __name__ == "__main__":
