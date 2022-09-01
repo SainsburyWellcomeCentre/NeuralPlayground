@@ -5,17 +5,17 @@ We are following to the best of our abilities the [PEP8](https://www.python.org/
 
 The Genreal convention is as follows:
 
-Class variable : NameOfClass
+> Class variable : NameOfClass
 
-Function/Methods/Variable: 
+> Function/Methods/Variable: 
         Private: _name_private_function
         Public:  name_public_function
         
-File name: name_file
+> File name: name_file
 
-Agent/Experiments: author_date
+> Agent/Experiments: author_date
 
-Examples: name_examples
+> Examples: name_examples
 
                                                 
 
