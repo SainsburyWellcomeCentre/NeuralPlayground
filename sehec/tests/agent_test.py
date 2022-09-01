@@ -2,10 +2,10 @@ import sys
 from tqdm import tqdm
 import numpy as np
 import matplotlib.pyplot as plt
-from ..envs.arenas.simple2d import Simple2D, Sargolini2006, Hafting2008,BasicSargolini2006
-from ..models.weber_and_sprekeler import ExcInhPlasticity
-from ..models.SRKim import SR
-from ..models.modelcore import NeuralResponseModel
+from ..arena.simple2d import Simple2D, Sargolini2006, Hafting2008,BasicSargolini2006
+from ..agent.weber_2018 import ExcInhPlasticity
+from ..agent.stachenfeld_2018 import SR
+from ..agent.agent_core import NeuralResponseModel
 import pytest
 
 
