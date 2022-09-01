@@ -144,7 +144,7 @@ cfg = Config(config_id="### Full Configuration ###",
              model2=SR_model)
 
 custom_classes = Config(config_id="Custom_class_paths",
-                        custom_classes_path=["from sehec.agent.stachenfeld_2018 import SR",])
+                        custom_classes_path=["from sehec.agents.stachenfeld_2018 import SR",])
 
 if __name__ == "__main__":
 
