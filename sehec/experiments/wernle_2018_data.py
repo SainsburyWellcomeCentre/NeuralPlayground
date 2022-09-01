@@ -5,6 +5,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import scipy.io as sio
 import numpy as np
+import sehec
 from scipy.ndimage import gaussian_filter1d, gaussian_filter
 from scipy.interpolate import interp1d
 
@@ -14,9 +15,12 @@ class WernleData(object):
     The data can be obtained from https://doi.org/10.11582/2017.00023
     """
 
-    def __init__(self, data_path, experiment_name="MergingRoomData", verbose=False):
+    def __init__(self, data_path=None, experiment_name="MergingRoomData", verbose=False):
         self.experiment_name = experiment_name
-        self.data_path = data_path
+        if data_path==None:
+            self.data_path = os.path.join(sehec.__path__[0], "experiments/wernle_2018/")
+        else:
+            self.data_path = data_path
         self.inner_path = "nn_Data+Code/data/"
         self.cmap = "jet"
         self._load_data()
@@ -255,32 +259,3 @@ class OnlineRateMap(object):
         filtered_ratemap[nan_indexes] = np.nan
         return filtered_ratemap
 
-
-if __name__ == "__main__":
-    data_path = "Wernle2018/"
-    data = WernleData(data_path=data_path, verbose=True)
-    data.plot_development(n_cells=4, time_interval=(0, 5), skip_every=10)
-    data.plot_cell_comparison()
-    plt.show()
-
-    print("debug")
-
-    f, ax = plt.subplots(4, 6, figsize=(4*6, 4*4))
-    for j in range(4):
-        spikes = data.spikes_AB[j+5, 0][:, 0]
-        pos = data.pos_AB[j+5, 0]
-        ratemap = OnlineRateMap(spikes=spikes, position=pos, size=(100, 100))
-        for i in range(6):
-            rm = ratemap.get_ratemap(t_end=((i+1)*5)*60, t_init=0, interp_factor=1)
-            ax[j, i].imshow(rm, cmap="jet")
-
-    f, ax = plt.subplots(4, 6, figsize=(4*6, 4*4))
-    for j in range(4):
-        spikes = data.spikes_AB[j+5, 0][:, 0]
-        pos = data.pos_AB[j+5, 0]
-        ratemap = OnlineRateMap(spikes=spikes, position=pos, size=(100, 100))
-        for i in range(6):
-            rm = ratemap.update_ratemap(dt=5*60, interp_factor=1)
-            ax[j, i].imshow(rm, cmap="jet")
-
-    plt.show()

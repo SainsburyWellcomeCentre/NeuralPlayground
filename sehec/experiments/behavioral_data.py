@@ -26,7 +26,7 @@ class FullHaftingData(object):
 
     def _find_data_path(self, data_path):
         if data_path is None:
-            self.data_path = os.path.join(sehec.__path__[0], "arena_and_exp/experiments/hafting_2008/")
+            self.data_path = os.path.join(sehec.__path__[0], "experiments/hafting_2008/")
         else:
             self.data_path = data_path
 
@@ -205,7 +205,7 @@ class SargoliniData(object):
 
     def __init__(self, experiment_name='Sargolini_2006_Data', data_path=None):
         if data_path is None:
-            self.data_path = os.path.join(sehec.__path__[0], "arena_and_exp/experiments/sargolini_2006")
+            self.data_path = os.path.join(sehec.__path__[0], "experiments/sargolini_2006")
         else:
             self.data_path = data_path
         self.arena_limits, self.position, self.head_direction = self.get_sargolini_data()
@@ -237,7 +237,7 @@ class FullSargoliniData(FullHaftingData):
 
     def _find_data_path(self, data_path):
         if data_path is None:
-            self.data_path = os.path.join(sehec.__path__[0], "arena_and_exp/experiments/sargolini_2006/raw_data_sample/")
+            self.data_path = os.path.join(sehec.__path__[0], "experiments/sargolini_2006/raw_data_sample/")
         else:
             self.data_path = data_path
 
