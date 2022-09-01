@@ -16,11 +16,11 @@ Here are listed the mile stone achived by the project team
 1. Literature Review
 
 2. Environement
-    > [Implement Any 2D Environment](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/sehec/arena_and_exp/arenas/simple2d.py)
+    > [Implement Any 2D Environment](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/sehec/arenas/simple2d.py)
     
-    > [Merging room](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/sehec/arena_and_exp/arenas/connected_rooms.py) 
+    > [Merging room](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/sehec/arenas/connected_rooms.py) 
     
-    > [Batch Environements](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/sehec/arena_and_exp/arenas/TEM_env.py)
+    > [Batch Environements](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/sehec/arenas/TEM_env.py)
     
 3. Agent
       > [”Learning place cells, grid cells and invariances with excitatory and inhibitory”, Weber et al, 2018](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/examples/agent_examples/weber_2018_example.ipynb)
@@ -31,12 +31,12 @@ Here are listed the mile stone achived by the project team
  
    
 4. Experiments 
-    > [”Conjunctive Representation of Position, Direction, and Velocity in Entorhinal Cortex”, Sargolini et al, 2006](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/arena_and_exp/Experiments/sargolini_2006)
+    > [”Conjunctive Representation of Position, Direction, and Velocity in Entorhinal Cortex”, Sargolini et al, 2006](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/experiments/sargolini_2006)
  
-    > [”Hippocampus-independent phase precession in entorhinal grid cells”, Hafting et al, 2008](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/arena_and_exp/Experiments/hafting_2008)
+    > [”Hippocampus-independent phase precession in entorhinal grid cells”, Hafting et al, 2008](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/experiments/hafting_2008)
 
 
-    > [”Integration of grid maps in merged environments”, Wernle et al, 2018](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/arena_and_exp/Experiments/wernle_2018/nn_Data%2BCode)
+    > [”Integration of grid maps in merged environments”, Wernle et al, 2018](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/experiments/wernle_2018/nn_Data%2BCode)
   
 5. Comparaison Board  
    
