@@ -8,6 +8,7 @@ import numpy as np
 import sehec
 from scipy.ndimage import gaussian_filter1d, gaussian_filter
 from scipy.interpolate import interp1d
+from sehec.utils import get_2D_ratemap, OnlineRateMap
 
 
 class WernleData(object):
@@ -56,22 +57,18 @@ class WernleData(object):
         # The following is the recording progression of grid cell patterns for 19 different cells
         # over 10 different rats
 
-        #
         self.ratemap_dev = sio.loadmat(os.path.join(self.data_path, self.inner_path,
                                                     r"Figure 4/ratemapsDevelopment.mat"))["ratemapsDevelopment"]
 
-
         self.pos_A_B = sio.loadmat(os.path.join(self.data_path, self.inner_path,
                                                 r"Figure 4/posA_B.mat"))["posA_B"]
-        singlerun = self.pos_A_B[0,0]
+        singlerun = self.pos_A_B[0, 0]
         print(singlerun)
         for i, pos in enumerate(singlerun):
             if pos[2] > 0:
                 if singlerun[i+1000, 2] > 0:
                     print("Switch room at: ", pos)
                     break
-            
-
 
         self.pos_AB = sio.loadmat(os.path.join(self.data_path, self.inner_path,
                                                r"Figure 4/posAB.mat"))["posAB"]
@@ -124,138 +121,4 @@ class WernleData(object):
             cbar.ax.set_ylabel("Time [min]", rotation=270, labelpad=12)
         return ax
 
-
-class OnlineRateMap(object):
-
-    def __init__(self, spikes, position, size=(100, 100), x_range=(-100, 100), y_range=(-100, 100)):
-        """
-        Creates a ratemap where it is possible to distinguish firing rate and traversed position at the same time
-
-        Parameters
-        ----------
-        spikes : ndarray
-            (n_spikes,) shaped array with times of spikes for a single cell
-        position : ndarray
-            (timestamps, 3) shaped array with timestamp time in seconds,
-             position in x-dim on column 2 and y-dim on column 2 for each timestamp
-        size : tuple
-            (2,) shaped tupple with the size of the desired ratemap
-        x_range : tuple
-            (2,) shaped tuple with limits on x-dim
-        y_range
-            (2,) shaped tuple with limits on y-dim
-        """
-        self.ratemap = np.empty(shape=size)
-        self.ratemap[:] = np.nan
-        self.size = size
-        self.x_range = x_range
-        self.y_range = y_range
-        self.x_pos_bins = np.linspace(x_range[0], x_range[1], num=size[0]+1)
-        self.y_pos_bins = np.linspace(y_range[0], y_range[1], num=size[1]+1)
-        self.spikes = spikes
-        self.position = position
-        self.last_t_end = 0
-        self.last_t_init = 0
-
-    def get_ratemap(self, t_end, t_init=0, interp_factor=10):
-        """
-        Computes the ratemap using given spike train (self.spikes) and position (self.position)
-
-        Parameters
-        ----------
-        t : float
-            maximum time of recording to consider for the ratemap
-        t_init : float
-            starting time of recording to consider for the ratemap, default set to 0
-        Returns
-        -------
-        ratemap : ndarray
-            updated ratemap for times between t_init and t
-        """
-
-        # Get spikes and position within the range
-        pos = self.position[np.logical_and(self.position[:, 0] >= t_init, self.position[:, 0] < t_end), :]
-
-        # Interpolate position for smooth plot
-        if interp_factor != 1:
-            t = pos[:, 0]
-            x = pos[:, 1]
-            y = pos[:, 2]
-            t_inter = np.linspace(np.amin(t), np.amax(t), num=len(t)*interp_factor, endpoint=False)
-            fx = interp1d(t, x)
-            fy = interp1d(t, y)
-            x_inter = fx(t_inter)
-            y_inter = fy(t_inter)
-            pos = np.stack([t_inter, x_inter, y_inter], axis=1)
-
-        spk = self.spikes[np.logical_and(self.spikes >= t_init, self.spikes < t_end)]
-
-        h_spk, bin_spk = np.histogram(spk, bins=np.linspace(t_init, t_end, num=pos.shape[0]+1))
-
-        # Convert position to indexes in the ratemap
-        x_index = (pos[:, 1] - self.x_range[0])/(self.x_range[1]-self.x_range[0])*self.size[1]
-        y_index = (pos[:, 2] - self.y_range[0])/(self.y_range[1]-self.y_range[0])*self.size[0]
-        x_index, y_index = x_index.astype(int), y_index.astype(int)
-
-        # update ratemap pixels
-        for pos_i in range(len(x_index)):
-            t = pos[pos_i, 0]
-            ratemap_val = self.ratemap[y_index[pos_i], x_index[pos_i]]
-            if np.isnan(ratemap_val):
-                self.ratemap[y_index[pos_i], x_index[pos_i]] = 0
-            self.ratemap[y_index[pos_i], x_index[pos_i]] += h_spk[pos_i]
-
-        smooth_ratemap = self.get_smooth_ratemap()
-
-        self.last_t_init = t_init
-        self.last_t_end = t_end
-        return smooth_ratemap
-
-    def update_ratemap(self, dt, interp_factor=1):
-        t_init = self.last_t_init
-        t_end = self.last_t_end + dt
-        pos = self.position[np.logical_and(self.position[:, 0] >= t_init, self.position[:, 0] < t_end), :]
-
-        # Interpolate position for smooth plot
-        if interp_factor != 1:
-            t = pos[:, 0]
-            x = pos[:, 1]
-            y = pos[:, 2]
-            t_inter = np.linspace(np.amin(t), np.amax(t), num=len(t)*interp_factor, endpoint=False)
-            fx = interp1d(t, x)
-            fy = interp1d(t, y)
-            x_inter = fx(t_inter)
-            y_inter = fy(t_inter)
-            pos = np.stack([t_inter, x_inter, y_inter], axis=1)
-
-        spk = self.spikes[np.logical_and(self.spikes >= t_init, self.spikes < t_end)]
-
-        h_spk, bin_spk = np.histogram(spk, bins=np.linspace(t_init, t_end, num=pos.shape[0]+1))
-
-        # Convert position to indexes in the ratemap
-        x_index = (pos[:, 1] - self.x_range[0])/(self.x_range[1]-self.x_range[0])*self.size[1]
-        y_index = (pos[:, 2] - self.y_range[0])/(self.y_range[1]-self.y_range[0])*self.size[0]
-        x_index, y_index = x_index.astype(int), y_index.astype(int)
-
-        # update ratemap pixels
-        for pos_i in range(len(x_index)):
-            t = pos[pos_i, 0]
-            ratemap_val = self.ratemap[y_index[pos_i], x_index[pos_i]]
-            if np.isnan(ratemap_val):
-                self.ratemap[y_index[pos_i], x_index[pos_i]] = 0
-            self.ratemap[y_index[pos_i], x_index[pos_i]] += h_spk[pos_i]
-
-        smooth_ratemap = self.get_smooth_ratemap()
-
-        self.last_t_init = t_init
-        self.last_t_end = t_end
-        return smooth_ratemap
-
-    def get_smooth_ratemap(self):
-        nan_indexes = np.isnan(self.ratemap)
-        aux_ratemap = np.copy(self.ratemap)
-        aux_ratemap[nan_indexes] = 0
-        filtered_ratemap = gaussian_filter(aux_ratemap, 3.5)
-        filtered_ratemap[nan_indexes] = np.nan
-        return filtered_ratemap
 
