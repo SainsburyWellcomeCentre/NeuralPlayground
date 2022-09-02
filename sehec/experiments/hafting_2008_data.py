@@ -20,7 +20,7 @@ class FullHaftingData(object):
         self.rat_id, self.sess, self.rec_vars = self.get_recorded_session(recording_index)
         if verbose:
             self.show_readme()
-            self.show_keys()
+            self.show_data()
 
     def _find_data_path(self, data_path):
         if data_path is None:
@@ -59,13 +59,16 @@ class FullHaftingData(object):
         l = 0
         for rat_id, rat_sess in self.data_per_animal.items():
             for sess, recorded_vars in rat_sess.items():
-                self.list.append( {"rec_index": l, "rat_id": rat_id, "session": sess,
+                self.list.append({"rec_index": l, "rat_id": rat_id, "session": sess,
                                    "recorded_vars": list(recorded_vars.keys())})
                 l += 1
         self.recording_list = pd.DataFrame(self.list).set_index("rec_index")
 
-    def show_keys(self):
+    def show_data(self, full_dataframe=False):
         print("Dataframe with recordings")
+        if full_dataframe:
+            pd.set_option('display.max_rows', None)
+            pd.set_option('display.max_columns', None)
         display(self.recording_list)
 
     def show_readme(self):
@@ -115,6 +118,16 @@ class FullHaftingData(object):
         return time_array, test_spikes, x, y
 
     def plot_recording_tetr(self, recording_index=None, save_path=None, ax=None, tetrode_id=None):
+        if type(recording_index) is list or type(recording_index) is tuple:
+            axis_list = []
+            for ind in recording_index:
+                ind_axis = self.plot_recording_tetr(ind, save_path=save_path, ax=ax, tetrode_id=None)
+                axis_list.append(ind_axis)
+            return axis_list
+
+        if ax is None:
+            f, ax = plt.subplots(1, 1, figsize=(10, 8))
+
         session_data, rev_vars = self.get_recording_data(recording_index)
         if tetrode_id is None:
             tetrode_id = self._find_tetrode(rev_vars)
@@ -124,17 +137,18 @@ class FullHaftingData(object):
 
         time_array, test_spikes, x, y = self.get_tetrode_data(session_data, tetrode_id)
 
-        if ax is None:
-            f, ax = plt.subplots(1, 1, figsize=(10, 8))
-
         scale_ratio = 2  # To discretize space
         h, binx, biny = get_2D_ratemap(time_array, test_spikes, x, y, x_size=int(arena_width/scale_ratio),
                                        y_size=int(arena_depth/scale_ratio), filter_result=True)
+
+        self._make_tetrode_plot(h, ax, tetrode_id, save_path)
+
+    def _make_tetrode_plot(self, h, ax, title, save_path):
         sc = ax.imshow(h, cmap='jet')
         cbar = plt.colorbar(sc, ax=ax, ticks=[np.min(h), np.max(h)], orientation="horizontal")
         cbar.ax.set_xlabel('Firing rate', fontsize=12)
         cbar.ax.set_xticklabels([np.round(np.min(h)), np.round(np.max(h))], fontsize=12)
-        ax.set_title(tetrode_id)
+        ax.set_title(title)
         ax.set_ylabel('width', fontsize=16)
         ax.set_xlabel('depth', fontsize=16)
         ax.set_xticks([])
@@ -147,17 +161,24 @@ class FullHaftingData(object):
             return ax
 
     def plot_trajectory(self, recording_index=None, save_path=None, ax=None, plot_every=20):
+        if type(recording_index) is list or type(recording_index) is tuple:
+            axis_list = []
+            for ind in recording_index:
+                ind_axis = self.plot_trajectory(ind, save_path=save_path, ax=ax, plot_every=plot_every)
+                axis_list.append(ind_axis)
+            return axis_list
+
+        if ax is None:
+            f, ax = plt.subplots(1, 1, figsize=(10, 8))
+
         session_data, rev_vars = self.get_recording_data(recording_index)
         tetrode_id = self._find_tetrode(rev_vars)
 
-
         time_array, test_spikes, x, y = self.get_tetrode_data(session_data, tetrode_id)
         print("debug")
+        self._make_trajectory_plot(x, y, ax, plot_every)
 
-        arena_width = self.arena_limits[0, 1] - self.arena_limits[0, 0]
-        arena_depth = self.arena_limits[1, 1] - self.arena_limits[1, 0]
-        if ax is None:
-            f, ax = plt.subplots(1, 1, figsize=(10, 8))
+    def _make_trajectory_plot(self, x, y, ax, plot_every):
 
         ax.plot([self.arena_limits[0, 0], self.arena_limits[0, 0]],
                 [self.arena_limits[1, 0], self.arena_limits[1, 1]], "C3", lw=3)

@@ -4,7 +4,7 @@ import scipy.io as sio
 import glob
 import matplotlib.pyplot as plt
 import sehec
-from hafting_2008_data import FullHaftingData
+from sehec.experiments.hafting_2008_data import FullHaftingData
 from sehec.utils import clean_data
 
 
