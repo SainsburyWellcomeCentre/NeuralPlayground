@@ -7,6 +7,7 @@ import pandas as pd
 import sehec
 import matplotlib as mpl
 from IPython.display import display
+from sehec.utils import clean_data, get_2D_ratemap
 
 
 class FullHaftingData(object):

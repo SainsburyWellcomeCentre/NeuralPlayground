@@ -2,11 +2,10 @@ import os.path
 import numpy as np
 import scipy.io as sio
 import glob
-from scipy.interpolate import interp1d
 import matplotlib.pyplot as plt
-from scipy.ndimage import gaussian_filter
 import sehec
 from hafting_2008_data import FullHaftingData
+from sehec.utils import clean_data
 
 
 class SargoliniData(object):
@@ -94,44 +93,6 @@ class FullSargoliniData(FullHaftingData):
         test_spikes = tetrode_data[:, 0]
         time_array = time_array[:, 0]
         return time_array, test_spikes, x, y
-
-
-def clean_data(data, keep_headers=False):
-    aux_dict = {}
-    for key, val in data.items():
-        if isinstance(val, bytes) or isinstance(val, str) or key == "__globals__":
-            if keep_headers:
-                aux_dict[key] = val
-            continue
-        else:
-
-            if not np.isnan(val).any():
-                aux_dict[key] = val
-            else:
-                # Interpolate nans
-                x_range = np.linspace(0, 1, num=len(val))
-                nan_indexes = np.logical_not(np.isnan(val))[:, 0]
-                clean_x = x_range[nan_indexes]
-                clean_val = np.array(val)[nan_indexes, 0]
-                # print(clean_x.shape, clean_val.shape)
-                f = interp1d(clean_x, clean_val, kind='cubic', fill_value="extrapolate")
-                aux_dict[key] = f(x_range)[..., np.newaxis]
-    return aux_dict
-
-
-def get_2D_ratemap(time_array, spikes, x, y, x_size=50, y_size=50, filter_result=False):
-    x_spikes, y_spikes = [], []
-    for s in spikes:
-        array_pos = np.argmin(np.abs(time_array-s))
-        x_spikes.append(x[array_pos])
-        y_spikes.append(y[array_pos])
-    x_spikes = np.array(x_spikes)
-    y_spikes = np.array(y_spikes)
-    h, binx, biny = np.histogram2d(x_spikes, y_spikes, bins=(x_size, y_size))
-    if filter_result:
-        h = gaussian_filter(h, sigma=2)
-
-    return h.T, binx, biny
 
 
 if __name__ == "__main__":
