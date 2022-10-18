@@ -1,8 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from ..arenas.simple2d import Simple2D, Sargolini2006, BasicSargolini2006, Hafting2008
-from ..arenas.connected_rooms import ConnectedRooms
-from ..arenas.merging_rooms import MergingRoom2D
+from ..arenas import Environment, Simple2D, Sargolini2006, Hafting2008, ConnectedRooms, MergingRoom2D
 import pytest
 from ..utils import RandomAgent
 
@@ -41,29 +39,16 @@ class TestSimple2D(object):
         init_env[0].plot_trajectory()
 
 
-class TestBasicSargolini2006(TestSimple2D):
-    @pytest.fixture
-    def init_env(self):
-        data_path = "../envs/experiments/Sargolini2006/"
-        env = BasicSargolini2006(data_path=data_path,
-                                 time_step_size=0.1,
-                                 agent_step_size=None)
-        return [env, ]
-
-    def test_init_env(self, init_env):
-        assert isinstance(init_env[0], BasicSargolini2006)
-
-
 class TestSargolini2006(TestSimple2D):
     @pytest.fixture
     def init_env(self):
         data_path = "../envs/experiments/Sargolini2006/raw_data_sample/"
 
-        session = {"rat_id": "11016", "sess": "31010502"}
+        # session = {"rat_id": "11016", "sess": "31010502"}
 
         env = Sargolini2006(data_path=data_path,
                             verbose=True,
-                            session=session,
+                            # session=session,
                             time_step_size=None,
                             agent_step_size=None)
         return [env, ]
@@ -79,11 +64,11 @@ class TestHafting2008(TestSimple2D):
     @pytest.fixture
     def init_env(self):
         data_path = "../envs/experiments/Hafting2008/"
-        session = {"rat_id": "11015", "sess": "13120410", "cell_id": "t5c1"}
+        # session = {"rat_id": "11015", "sess": "13120410", "cell_id": "t5c1"}
 
         env = Hafting2008(data_path=data_path,
                           verbose=True,
-                          session=session,
+                          # session=session,
                           time_step_size=None, agent_step_size=None)
         return [env, ]
 

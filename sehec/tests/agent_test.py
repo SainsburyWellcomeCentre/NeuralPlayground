@@ -2,7 +2,7 @@ import sys
 from tqdm import tqdm
 import numpy as np
 import matplotlib.pyplot as plt
-from ..arenas.simple2d import Simple2D, Sargolini2006, Hafting2008,BasicSargolini2006
+from ..arenas.simple2d import Simple2D, Sargolini2006, Hafting2008, BasicSargolini2006
 from ..agents.weber_2018 import ExcInhPlasticity
 from ..agents.stachenfeld_2018 import SR
 from ..agents.agent_core import NeuralResponseModel
