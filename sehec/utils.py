@@ -4,7 +4,7 @@ from scipy.ndimage import gaussian_filter
 from scipy.interpolate import interp1d
 
 
-def check_crossing_wall(pre_state, new_state, wall, wall_closenes=1e-5):
+def check_crossing_wall(pre_state, new_state, wall, wall_closenes=1e-5, tolerance=1e-9):
     """
 
     Parameters
@@ -30,7 +30,10 @@ def check_crossing_wall(pre_state, new_state, wall, wall_closenes=1e-5):
     # Check if the line of the wall and the line between the states cross
     A = np.stack([np.diff(wall, axis=0)[0, :], -new_state+pre_state], axis=1)
     b = pre_state - wall[0, :]
-    intersection = np.linalg.inv(A) @ b
+    try:
+        intersection = np.linalg.inv(A) @ b
+    except:
+        intersection = np.linalg.inv(A + np.identity(A.shape[0]) * tolerance) @ b
     smaller_than_one = intersection <= 1
     larger_than_zero = intersection >= 0
 

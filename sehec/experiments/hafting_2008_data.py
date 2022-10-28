@@ -62,6 +62,7 @@ class FullHaftingData(object):
                 self.list.append({"rec_index": l, "rat_id": rat_id, "session": sess,
                                    "recorded_vars": list(recorded_vars.keys())})
                 l += 1
+        print("debug")
         self.recording_list = pd.DataFrame(self.list).set_index("rec_index")
 
     def show_data(self, full_dataframe=False):
