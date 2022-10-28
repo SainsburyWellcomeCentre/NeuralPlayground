@@ -42,13 +42,11 @@ class TestSimple2D(object):
 class TestSargolini2006(TestSimple2D):
     @pytest.fixture
     def init_env(self):
-        data_path = "../envs/experiments/Sargolini2006/raw_data_sample/"
+        # data_path = "../envs/experiments/Sargolini2006/raw_data_sample/"
 
         # session = {"rat_id": "11016", "sess": "31010502"}
 
-        env = Sargolini2006(data_path=data_path,
-                            verbose=True,
-                            # session=session,
+        env = Sargolini2006(verbose=True,
                             time_step_size=None,
                             agent_step_size=None)
         return [env, ]

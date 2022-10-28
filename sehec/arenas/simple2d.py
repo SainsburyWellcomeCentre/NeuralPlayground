@@ -414,7 +414,7 @@ class Sargolini2006(Simple2D):
         The reward that the animal recieves in this state
 
         """
-    def __init__(self, data_path="sargolini2006/", environment_name="Sargolini2006", session=None, verbose=False,
+    def __init__(self, data_path=None, environment_name="Sargolini2006", session=None, verbose=False,
                  random_steps=False, **env_kwargs):
         """  Initialise the class
 
@@ -436,10 +436,10 @@ class Sargolini2006(Simple2D):
                 agent_step_size*global_step_number will give a measure of the distance in the experimental setting
         """
         self.data_path = data_path
-        self.verbose= verbose
+        self.verbose = verbose
         self.environment_name = environment_name
         self.session = session
-        self.data = FullSargoliniData(data_path=self.data_path, experiment_name=self.environment_name, verbose=verbose, session=session)
+        self.data = FullSargoliniData(data_path=self.data_path, verbose=verbose)
         self.arena_limits = self.data.arena_limits
         self.arena_x_limits, self.arena_y_limits = self.arena_limits[0, :], self.arena_limits[1, :]
         env_kwargs["arena_x_limits"] = self.arena_x_limits
@@ -472,7 +472,7 @@ class Sargolini2006(Simple2D):
         """
         if not sess is None:
             self.data = FullSargoliniData(data_path=self.data_path, experiment_name=self.environment_name,
-                                          verbose=self.verbose, session=sess)
+                                          verbose=self.verbose)
         if self.random_steps:
             return super().reset()
 
