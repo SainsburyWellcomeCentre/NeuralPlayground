@@ -2,19 +2,16 @@ import sys
 from tqdm import tqdm
 import numpy as np
 import matplotlib.pyplot as plt
-from ..arenas.simple2d import Simple2D, Sargolini2006, Hafting2008, BasicSargolini2006
-from ..agents.weber_2018 import ExcInhPlasticity
-from ..agents.stachenfeld_2018 import SR
-from ..agents.agent_core import NeuralResponseModel
+from ..arenas import BasicSargolini2006
+from ..agents import ExcInhPlasticity
+from ..agents import SR
+from ..agents import NeuralResponseModel
 import pytest
 
 
 @pytest.fixture
 def get_environment():
-    data_path = "../envs/experiments/Sargolini2006/"
-    env = BasicSargolini2006(data_path=data_path,
-                             time_step_size=0.1,
-                             agent_step_size=None)
+    env = BasicSargolini2006()
     return [env, ]
 
 
@@ -22,12 +19,12 @@ class Testmodelcore(object):
 
     @pytest.fixture
     def init_model(self, get_environment):
-        agent= NeuralResponseModel()
+        agent = NeuralResponseModel()
 
         return [agent, ]
 
     def test_init_model(self, init_model):
-        assert isinstance(init_model[0],NeuralResponseModel)
+        assert isinstance(init_model[0], NeuralResponseModel)
 
     def test_agent_interaction(self, init_model, get_environment):
         env = get_environment[0]

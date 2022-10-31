@@ -10,15 +10,12 @@ Check examples/SRexample.ipynb
 import sys
 sys.path.append("../")
 
-import numpy as np
-import random
+
 import matplotlib.pyplot as plt
 import numpy as np
-from scipy.stats import multivariate_normal
-from tqdm import tqdm
+
 
 from .agent_core import NeuralResponseModel
-from ..arenas import Simple2D, Sargolini2006, BasicSargolini2006
 
 
 class SR(NeuralResponseModel):
