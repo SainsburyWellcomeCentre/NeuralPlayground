@@ -1,5 +1,5 @@
-from sehec.experiments import FullSargoliniData
-from sehec.arenas import Sargolini2006
+from sehec.experiments import FullSargoliniData, SargoliniData
+from sehec.arenas import Sargolini2006, BasicSargolini2006
 
 if __name__ == "__main__":
 
@@ -9,8 +9,12 @@ if __name__ == "__main__":
 
     data_path = None#"../envs/experiments/Sargolini2006/raw_data_sample/"
 
-    env = Sargolini2006(data_path=data_path,
-                        verbose=True,
-                        time_step_size=None,
-                        agent_step_size=None)
+    simple_sarg = SargoliniData()
+
+    env = BasicSargolini2006()
+
+    env = FullSargoliniData(data_path=data_path,
+                            verbose=True)
+
+    env = Sargolini2006()
 

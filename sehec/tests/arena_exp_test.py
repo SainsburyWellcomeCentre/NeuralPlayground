@@ -55,16 +55,16 @@ class TestSargolini2006(TestSimple2D):
         assert isinstance(init_env[0], Sargolini2006)
 
     def test_session_plot(self, init_env):
-        init_env[0].data.plot_session()
+        init_env[0].data.plot_trajectory()
 
 
 class TestHafting2008(TestSimple2D):
     @pytest.fixture
     def init_env(self):
-        data_path = "../envs/experiments/Hafting2008/"
+        # data_path = "../envs/experiments/Hafting2008/"
         # session = {"rat_id": "11015", "sess": "13120410", "cell_id": "t5c1"}
 
-        env = Hafting2008(data_path=data_path,
+        env = Hafting2008(data_path=None,
                           verbose=True,
                           # session=session,
                           time_step_size=None, agent_step_size=None)
