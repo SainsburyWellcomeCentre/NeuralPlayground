@@ -4,3 +4,5 @@ tqdm
 scipy
 pandas
 deepdiff
+ipython
+jupyter
