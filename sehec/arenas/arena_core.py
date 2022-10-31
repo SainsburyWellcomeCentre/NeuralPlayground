@@ -21,9 +21,12 @@ class Environment(object):
                Size of the time step relative to real time
         """
         self.environment_name = environment_name
+        if "time_step_size" in env_kwargs:
+            self.time_step_size = env_kwargs["time_step_size"]  # All environments should have this (second units)
+        else:
+            self.time_step_size = 1.0
         self.env_kwargs = env_kwargs  # Variables to manipulate environment
         self.metadata = {"env_kwargs": env_kwargs}  # Define within each subclass for specific environments
-        self.time_step_size = env_kwargs["time_step_size"]  # All environments should have this (second units)
         self.state = np.array([])
         self.history = []
         self.global_steps = 0

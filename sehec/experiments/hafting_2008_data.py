@@ -18,6 +18,7 @@ class FullHaftingData(object):
         self._load_data()
         self._create_dataframe()
         self.rat_id, self.sess, self.rec_vars = self.get_recorded_session(recording_index)
+        self.get_tetrode_data()
         if verbose:
             self.show_readme()
             self.show_data()
@@ -104,7 +105,11 @@ class FullHaftingData(object):
             var_name for var_name in rev_vars if (var_name != 'position') and (("t" in var_name) or ("T" in var_name)))
         return tetrode_id
 
-    def get_tetrode_data(self, session_data, tetrode_id):
+    def get_tetrode_data(self, session_data=None, tetrode_id=None, tolerance=1e-10):
+        if session_data is None:
+            session_data, rev_vars = self.get_recording_data(recording_index=0)
+            tetrode_id = self._find_tetrode(rev_vars)
+
         position_data = session_data["position"]
         x1, y1 = position_data["posx"][:, 0], position_data["posy"][:, 0]
         x2, y2 = x1, y1
@@ -116,6 +121,12 @@ class FullHaftingData(object):
         test_spikes = tetrode_data["ts"][:, ]
         test_spikes = test_spikes[:, 0]
         time_array = time_array[:, 0]
+
+        self.position = np.stack([x1, y1], axis=1) * 100
+        head_direction = np.diff(self.position, axis=0)
+        head_direction = head_direction/np.sqrt(np.sum(head_direction**2, axis=1) + tolerance)[..., np.newaxis]
+        self.head_direction = head_direction
+
         return time_array, test_spikes, x, y
 
     def plot_recording_tetr(self, recording_index=None, save_path=None, ax=None, tetrode_id=None):

@@ -13,6 +13,7 @@ class SargoliniData(object):
     def __init__(self, experiment_name='Sargolini_2006_Data', data_path=None):
         if data_path is None:
             self.data_path = os.path.join(sehec.__path__[0], "experiments/sargolini_2006")
+            # print(self.data_path)
         else:
             self.data_path = data_path
         self.arena_limits, self.position, self.head_direction = self.get_sargolini_data()
@@ -30,7 +31,7 @@ class SargoliniData(object):
             x_position = np.concatenate([x_position, aux_x])
             y_position = np.concatenate([y_position, aux_y])
 
-        position = np.stack([x_position, y_position], axis=1)*100 # Convert to cm
+        position = np.stack([x_position, y_position], axis=1) * 100  # Convert to cm
         head_direction = np.diff(position, axis=0)
         head_direction = head_direction/np.sqrt(np.sum(head_direction**2, axis=1) + tolerance)[..., np.newaxis]
         return arena_limits, position, head_direction
@@ -81,7 +82,10 @@ class FullSargoliniData(FullHaftingData):
                     else:
                         self.data_per_animal[m_id][sess][session_info] = cleaned_data
 
-    def get_tetrode_data(self, session_data, tetrode_id):
+    def get_tetrode_data(self, session_data=None, tetrode_id=None, tolerance=1e-10):
+        if session_data is None:
+            session_data, rev_vars = self.get_recording_data(recording_index=0)
+            tetrode_id = self._find_tetrode(rev_vars)
         position_data = session_data["position"]
         x1, y1 = position_data["posx"][:, 0], position_data["posy"][:, 0]
         x2, y2 = x1, y1
@@ -92,6 +96,12 @@ class FullSargoliniData(FullHaftingData):
         tetrode_data = session_data[tetrode_id]
         test_spikes = tetrode_data[:, 0]
         time_array = time_array[:, 0]
+
+        self.position = np.stack([x, y], axis=1) * 100
+        head_direction = np.diff(self.position, axis=0)
+        head_direction = head_direction/np.sqrt(np.sum(head_direction**2, axis=1) + tolerance)[..., np.newaxis]
+        self.head_direction = head_direction
+
         return time_array, test_spikes, x, y
 
 

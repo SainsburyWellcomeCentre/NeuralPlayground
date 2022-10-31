@@ -44,14 +44,14 @@ class BasicSargolini2006(Simple2D):
         The reward that the animal recieves in this state
               """
 
-    def __init__(self, data_path="Sargolini2006/", environment_name="Sargolini2006", **env_kwargs):
+    def __init__(self, data_path=None, environment_name="Sargolini2006", **env_kwargs):
         """ Initialise the class
 
         Parameters
         ----------
         env_kwargs: dict
             Dictionary with parameters of the experiment Sargolini 2006 https://doi.org/10.1126/science.1125572
-            time_step_size:float
+            time_step_size: float
                 Time_step_size*global_step_number will give a measure of the time in the experimental setting (s)
             agent_step_size: float
                 agent_step_size*global_step_number will give a measure of the distance in the experimental setting
@@ -69,6 +69,7 @@ class BasicSargolini2006(Simple2D):
         env_kwargs["arena_x_limits"] = self.arena_x_limits
         env_kwargs["arena_y_limits"] = self.arena_y_limits
         env_kwargs["agent_step_size"] = 1/50  # In seconds
+        # env_kwargs["time_step_size"] = 1/50
         super().__init__(environment_name, **env_kwargs)
         self.metadata["doi"] = "https://doi.org/10.1126/science.1125572"
         self.total_number_of_steps = self.data.position.shape[0]
