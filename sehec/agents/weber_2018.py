@@ -17,7 +17,6 @@ from scipy.stats import multivariate_normal
 from tqdm import tqdm
 
 from .agent_core import NeuralResponseModel
-from ..arenas.simple2d import Simple2D, Sargolini2006, BasicSargolini2006
 
 
 class ExcInhPlasticity(NeuralResponseModel):
