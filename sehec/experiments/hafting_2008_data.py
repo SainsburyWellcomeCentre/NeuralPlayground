@@ -10,7 +10,7 @@ from IPython.display import display
 from sehec.utils import clean_data, get_2D_ratemap
 
 
-class FullHaftingData(object):
+class Hafting2008Data(object):
 
     def __init__(self, data_path=None, recording_index=None, experiment_name="FullHaftingData", verbose=False,):
         self.experiment_name = experiment_name
@@ -63,7 +63,6 @@ class FullHaftingData(object):
                 self.list.append({"rec_index": l, "rat_id": rat_id, "session": sess,
                                    "recorded_vars": list(recorded_vars.keys())})
                 l += 1
-        print("debug")
         self.recording_list = pd.DataFrame(self.list).set_index("rec_index")
 
     def show_data(self, full_dataframe=False):
@@ -72,6 +71,7 @@ class FullHaftingData(object):
             pd.set_option('display.max_rows', None)
             pd.set_option('display.max_columns', None)
         display(self.recording_list)
+        return self.recording_list
 
     def show_readme(self):
         readme_path = glob.glob(self.data_path + "readme" + "*.txt")[0]
@@ -93,12 +93,12 @@ class FullHaftingData(object):
             for ind in recording_index:
                 rat_id, sess, rec_vars = self.get_recorded_session(ind)
                 session_data = self.data_per_animal[rat_id][sess]
-                data_list.append(session_data)
+                data_list.append([session_data, rec_vars, {"rat_id": rat_id, "session": sess}])
             return data_list
         else:
             rat_id, sess, rec_vars = self.get_recorded_session(recording_index)
             session_data = self.data_per_animal[rat_id][sess]
-            return session_data, rec_vars
+            return session_data, rec_vars, {"rat_id": rat_id, "sess": sess}
 
     def _find_tetrode(self, rev_vars):
         tetrode_id = next(
@@ -107,7 +107,7 @@ class FullHaftingData(object):
 
     def get_tetrode_data(self, session_data=None, tetrode_id=None, tolerance=1e-10):
         if session_data is None:
-            session_data, rev_vars = self.get_recording_data(recording_index=0)
+            session_data, rev_vars, rat_info = self.get_recording_data(recording_index=0)
             tetrode_id = self._find_tetrode(rev_vars)
 
         position_data = session_data["position"]
@@ -140,7 +140,7 @@ class FullHaftingData(object):
         if ax is None:
             f, ax = plt.subplots(1, 1, figsize=(10, 8))
 
-        session_data, rev_vars = self.get_recording_data(recording_index)
+        session_data, rev_vars, rat_info = self.get_recording_data(recording_index)
         if tetrode_id is None:
             tetrode_id = self._find_tetrode(rev_vars)
 
@@ -154,6 +154,7 @@ class FullHaftingData(object):
                                        y_size=int(arena_depth/scale_ratio), filter_result=True)
 
         self._make_tetrode_plot(h, ax, tetrode_id, save_path)
+        return h, binx, biny
 
     def _make_tetrode_plot(self, h, ax, title, save_path):
         sc = ax.imshow(h, cmap='jet')
@@ -183,12 +184,13 @@ class FullHaftingData(object):
         if ax is None:
             f, ax = plt.subplots(1, 1, figsize=(10, 8))
 
-        session_data, rev_vars = self.get_recording_data(recording_index)
+        session_data, rev_vars, rat_info = self.get_recording_data(recording_index)
         tetrode_id = self._find_tetrode(rev_vars)
 
         time_array, test_spikes, x, y = self.get_tetrode_data(session_data, tetrode_id)
-        print("debug")
         self._make_trajectory_plot(x, y, ax, plot_every)
+
+        return x, y, time_array
 
     def _make_trajectory_plot(self, x, y, ax, plot_every):
 
@@ -215,8 +217,8 @@ class FullHaftingData(object):
                 aux_x.append(x[i])
                 aux_y.append(y[i])
                 sc = ax.plot(x_, y_, "-", color=cmap(norm(i)), alpha=0.6, linewidth=1)
-        ax.set_xticks([])
-        ax.set_yticks([])
+        # ax.set_xticks([])
+        # ax.set_yticks([])
         ax.set_ylabel('width')
         ax.set_xlabel('depth')
         ax.set_title("position")

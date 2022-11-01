@@ -4,7 +4,7 @@ import scipy.io as sio
 import glob
 import matplotlib.pyplot as plt
 import sehec
-from sehec.experiments.hafting_2008_data import FullHaftingData
+from sehec.experiments import Hafting2008Data
 from sehec.utils import clean_data
 
 
@@ -37,7 +37,7 @@ class SargoliniData(object):
         return arena_limits, position, head_direction
 
 
-class FullSargoliniData(FullHaftingData):
+class Sargolini2006Data(Hafting2008Data):
 
     def __init__(self, data_path=None, recording_index=None, experiment_name="FullSargoliniData", verbose=False):
         super().__init__(data_path=data_path, recording_index=recording_index,
@@ -84,7 +84,7 @@ class FullSargoliniData(FullHaftingData):
 
     def get_tetrode_data(self, session_data=None, tetrode_id=None, tolerance=1e-10):
         if session_data is None:
-            session_data, rev_vars = self.get_recording_data(recording_index=0)
+            session_data, rev_vars, rat_info = self.get_recording_data(recording_index=0)
             tetrode_id = self._find_tetrode(rev_vars)
         position_data = session_data["position"]
         x1, y1 = position_data["posx"][:, 0], position_data["posy"][:, 0]

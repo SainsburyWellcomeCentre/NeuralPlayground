@@ -10,10 +10,10 @@ import warnings
 from scipy.ndimage import gaussian_filter1d, gaussian_filter
 from scipy.interpolate import interp1d
 from sehec.utils import get_2D_ratemap, OnlineRateMap
-from sehec.experiments.hafting_2008_data import FullHaftingData
+from sehec.experiments.hafting_2008_data import Hafting2008Data
 
 
-class WernleData(FullHaftingData):
+class Wernle20118Data(Hafting2008Data):
     """ Data wrapper for https://www.nature.com/articles/s41593-017-0036-6
     The data can be obtained from https://doi.org/10.11582/2017.00023
     """
@@ -110,15 +110,16 @@ class WernleData(FullHaftingData):
                                      "posy": self.pos_A_B[sess_index, 0][:, 2],
                                      "speed_index": self.pos_A_B[sess_index, 0][:, 4],
                                      "spikes": self.spikes_AB[sess_index, 0][:, 0]}
-
-                    data_list.append(sess_data)
+                    rev_vars = list(sess_data.keys()) + ["dev", ]
+                    data_list.append([sess_data, rev_vars, {"sess_index": sess_index}])
 
                 elif session_info["recorded_vars"] == "ratemap":
                     sess_index = session_info["session"]
+                    rev_vars = ["ratemap",]
                     if session_info["before_merge"]:
-                        data_list.append({"ratemap": self.ratemap[sess_index, 0]})
+                        data_list.append([{"ratemap": self.ratemap[sess_index, 0]}, rev_vars, {"sess_index": sess_index}])
                     else:
-                        data_list.append({"ratemap": self.ratemap[sess_index, 1]})
+                        data_list.append([{"ratemap": self.ratemap[sess_index, 1]}, rev_vars, {"sess_index": sess_index}])
 
             return data_list
 
@@ -139,7 +140,7 @@ class WernleData(FullHaftingData):
                                  "speed_index": self.pos_A_B[sess_index, 0][:, 3],
                                  "spikes": self.spikes_AB[sess_index, 0][:, 0]}
                 rev_vars = list(sess_data.keys()) + ["dev", ]
-                return sess_data, rev_vars
+                return sess_data, rev_vars, {"sess_index": sess_index}
 
             elif session_info["recorded_vars"] == "ratemap":
                 sess_index = session_info["session"]
@@ -148,7 +149,7 @@ class WernleData(FullHaftingData):
                 else:
                     sess_data = {"ratemap": self.ratemap[sess_index, 1]}
                 rev_vars = "ratemap"
-                return sess_data, rev_vars
+                return sess_data, rev_vars, {"sess_index": sess_index}
 
     def plot_recording_tetr(self, recording_index=None, save_path=None, ax=None, tetrode_id=None):
         if type(recording_index) is list or type(recording_index) is tuple:

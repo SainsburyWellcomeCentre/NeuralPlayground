@@ -2,7 +2,6 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 from sehec.arenas.arena_core import Environment
 import numpy as np
-from ..experiments.sargolini_2006_data import SargoliniData, FullSargoliniData, FullHaftingData
 from ..utils import check_crossing_wall
 
 
