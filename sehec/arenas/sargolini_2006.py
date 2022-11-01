@@ -1,5 +1,5 @@
 from sehec.arenas import Simple2D
-from sehec.experiments import SargoliniData, FullSargoliniData
+from sehec.experiments import SargoliniData, Sargolini2006Data
 import numpy as np
 
 
@@ -201,7 +201,7 @@ class Sargolini2006(Simple2D):
         self.verbose = verbose
         self.environment_name = environment_name
         self.session = session
-        self.data = FullSargoliniData(data_path=self.data_path, verbose=verbose)
+        self.data = Sargolini2006Data(data_path=self.data_path, verbose=verbose)
         self.arena_limits = self.data.arena_limits
         self.arena_x_limits, self.arena_y_limits = self.arena_limits[0, :], self.arena_limits[1, :]
         env_kwargs["arena_x_limits"] = self.arena_x_limits
@@ -233,7 +233,7 @@ class Sargolini2006(Simple2D):
                 Vector of the x and y coordinate of the animal head position in the environment
         """
         if not sess is None:
-            self.data = FullSargoliniData(data_path=self.data_path, experiment_name=self.environment_name,
+            self.data = Sargolini2006Data(data_path=self.data_path, experiment_name=self.environment_name,
                                           verbose=self.verbose)
         if self.random_steps:
             return super().reset()
