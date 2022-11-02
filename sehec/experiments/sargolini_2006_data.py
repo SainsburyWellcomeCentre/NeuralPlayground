@@ -100,6 +100,7 @@ class Sargolini2006Data(Hafting2008Data):
 
 
 if __name__ == "__main__":
+
     # print("initializing hafting")
     # data = FullHaftingData(verbose=True)
     # print("plotting_tragectory")
@@ -109,12 +110,12 @@ if __name__ == "__main__":
     # plt.show()
 
     print("initializing sargolini")
-    data = FullSargoliniData(verbose=True)
-    print("plotting_tragectory")
-    data.plot_trajectory(2)
-    print("plotting_recording")
-    data.plot_recording_tetr(2)
-    plt.show()
+    # data = FullSargoliniData(verbose=True)
+    # print("plotting_tragectory")
+    # data.plot_trajectory(2)
+    # print("plotting_recording")
+    # data.plot_recording_tetr(2)
+    # plt.show()
 
 
 
