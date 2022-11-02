@@ -18,10 +18,20 @@ class Hafting2008Data(object):
         self._load_data()
         self._create_dataframe()
         self.rat_id, self.sess, self.rec_vars = self.get_recorded_session(recording_index)
-        self.get_tetrode_data()
+        self.set_animal_data()
         if verbose:
             self.show_readme()
             self.show_data()
+
+    def set_animal_data(self, recording_index=0, tolerance=1e-10):
+        session_data, rev_vars, rat_info = self.get_recording_data(recording_index)
+        tetrode_id = self._find_tetrode(rev_vars)
+        time_array, test_spikes, x, y = self.get_tetrode_data(session_data, tetrode_id)
+
+        self.position = np.stack([x, y], axis=1) * 100
+        head_direction = np.diff(self.position, axis=0)
+        head_direction = head_direction/np.sqrt(np.sum(head_direction**2, axis=1) + tolerance)[..., np.newaxis]
+        self.head_direction = head_direction
 
     def _find_data_path(self, data_path):
         if data_path is None:
@@ -105,7 +115,7 @@ class Hafting2008Data(object):
             var_name for var_name in rev_vars if (var_name != 'position') and (("t" in var_name) or ("T" in var_name)))
         return tetrode_id
 
-    def get_tetrode_data(self, session_data=None, tetrode_id=None, tolerance=1e-10):
+    def get_tetrode_data(self, session_data=None, tetrode_id=None):
         if session_data is None:
             session_data, rev_vars, rat_info = self.get_recording_data(recording_index=0)
             tetrode_id = self._find_tetrode(rev_vars)
@@ -121,11 +131,6 @@ class Hafting2008Data(object):
         test_spikes = tetrode_data["ts"][:, ]
         test_spikes = test_spikes[:, 0]
         time_array = time_array[:, 0]
-
-        self.position = np.stack([x1, y1], axis=1) * 100
-        head_direction = np.diff(self.position, axis=0)
-        head_direction = head_direction/np.sqrt(np.sum(head_direction**2, axis=1) + tolerance)[..., np.newaxis]
-        self.head_direction = head_direction
 
         return time_array, test_spikes, x, y
 
