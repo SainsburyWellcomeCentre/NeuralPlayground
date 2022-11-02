@@ -82,7 +82,7 @@ class Sargolini2006Data(Hafting2008Data):
                     else:
                         self.data_per_animal[m_id][sess][session_info] = cleaned_data
 
-    def get_tetrode_data(self, session_data=None, tetrode_id=None, tolerance=1e-10):
+    def get_tetrode_data(self, session_data=None, tetrode_id=None):
         if session_data is None:
             session_data, rev_vars, rat_info = self.get_recording_data(recording_index=0)
             tetrode_id = self._find_tetrode(rev_vars)
@@ -96,12 +96,6 @@ class Sargolini2006Data(Hafting2008Data):
         tetrode_data = session_data[tetrode_id]
         test_spikes = tetrode_data[:, 0]
         time_array = time_array[:, 0]
-
-        self.position = np.stack([x, y], axis=1) * 100
-        head_direction = np.diff(self.position, axis=0)
-        head_direction = head_direction/np.sqrt(np.sum(head_direction**2, axis=1) + tolerance)[..., np.newaxis]
-        self.head_direction = head_direction
-
         return time_array, test_spikes, x, y
 
 

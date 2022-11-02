@@ -28,6 +28,21 @@ class Wernle20118Data(Hafting2008Data):
         else:
             self.data_path = data_path
 
+    def set_animal_data(self, recording_index=0, tolerance=1e-10):
+        session_data, rev_vars, rat_info = self.get_recording_data(recording_index)
+
+        if type(rev_vars) is list:
+            time_array, x, y = session_data["time"], session_data["posx"], session_data["posy"]
+        else:
+            warnings.warn("This index does not have position data")
+            return
+        pass
+
+        self.position = np.stack([x, y], axis=1) * 100
+        head_direction = np.diff(self.position, axis=0)
+        head_direction = head_direction/np.sqrt(np.sum(head_direction**2, axis=1) + tolerance)[..., np.newaxis]
+        self.head_direction = head_direction
+
     def _load_data(self):
         """
         This method loads the recording data of the paper generating the following attributes.
@@ -71,16 +86,15 @@ class Wernle20118Data(Hafting2008Data):
         self.spikes_AB = sio.loadmat(os.path.join(self.data_path, self.inner_path,
                                                   r"Figure 4/spkAB.mat"))["spkAB"]
         self.arena_limits = np.array([[-100, 100], [-100, 100]])
-        print("debug")
 
     def _create_dataframe(self):
         self.list = []
         rec_index = 0
 
         for i in range(self.ratemap_dev.shape[0]):
-            self.list.append({"rec_index": rec_index, "session": i, "recorded_vars": ["time", "posx", "posy", "speed_index", "spikes"], "before_merge": False})
+            self.list.append({"rec_index": rec_index, "session": i, "recorded_vars": ["time", "posx", "posy", "speed_index", "spikes", "ratemap_dev"], "before_merge": False})
             rec_index += 1
-            self.list.append({"rec_index": rec_index, "session": i, "recorded_vars": ["time", "posx", "posy", "speed_index"], "before_merge": True})
+            self.list.append({"rec_index": rec_index, "session": i, "recorded_vars": ["time", "posx", "posy", "speed_index", "ratemap_dev"], "before_merge": True})
             rec_index += 1
 
         for i in range(self.ratemap.shape[0]):
@@ -102,14 +116,15 @@ class Wernle20118Data(Hafting2008Data):
                         sess_data = {"time": self.pos_A_B[sess_index, 0][:, 0],
                                      "posx": self.pos_A_B[sess_index, 0][:, 1],
                                      "posy": self.pos_A_B[sess_index, 0][:, 2],
-                                     "speed_index": self.pos_A_B[sess_index, 0][:, 4]}
-
+                                     "speed_index": self.pos_A_B[sess_index, 0][:, 3],
+                                     "ratemap_dev": self.ratemap_dev[sess_index, 0]}
                     else:
-                        sess_data = {"time": self.pos_A_B[sess_index, 0][:, 0],
-                                     "posx": self.pos_A_B[sess_index, 0][:, 1],
-                                     "posy": self.pos_A_B[sess_index, 0][:, 2],
-                                     "speed_index": self.pos_A_B[sess_index, 0][:, 4],
-                                     "spikes": self.spikes_AB[sess_index, 0][:, 0]}
+                        sess_data = {"time": self.pos_AB[sess_index, 0][:, 0],
+                                     "posx": self.pos_AB[sess_index, 0][:, 1],
+                                     "posy": self.pos_AB[sess_index, 0][:, 2],
+                                     "speed_index": self.pos_AB[sess_index, 0][:, 3],
+                                     "spikes": self.spikes_AB[sess_index, 0][:, 0],
+                                     "ratemap_dev": self.ratemap_dev[sess_index, 1]}
                     rev_vars = list(sess_data.keys()) + ["dev", ]
                     data_list.append([sess_data, rev_vars, {"sess_index": sess_index}])
 
@@ -131,14 +146,15 @@ class Wernle20118Data(Hafting2008Data):
                     sess_data = {"time": self.pos_A_B[sess_index, 0][:, 0],
                                  "posx": self.pos_A_B[sess_index, 0][:, 1],
                                  "posy": self.pos_A_B[sess_index, 0][:, 2],
-                                 "speed_index": self.pos_A_B[sess_index, 0][:, 3]}
-
-                else:
-                    sess_data = {"time": self.pos_A_B[sess_index, 0][:, 0],
-                                 "posx": self.pos_A_B[sess_index, 0][:, 1],
-                                 "posy": self.pos_A_B[sess_index, 0][:, 2],
                                  "speed_index": self.pos_A_B[sess_index, 0][:, 3],
-                                 "spikes": self.spikes_AB[sess_index, 0][:, 0]}
+                                 "ratemap_dev": self.ratemap_dev[sess_index, 0]}
+                else:
+                    sess_data = {"time": self.pos_AB[sess_index, 0][:, 0],
+                                 "posx": self.pos_AB[sess_index, 0][:, 1],
+                                 "posy": self.pos_AB[sess_index, 0][:, 2],
+                                 "speed_index": self.pos_AB[sess_index, 0][:, 3],
+                                 "spikes": self.spikes_AB[sess_index, 0][:, 0],
+                                 "ratemap_dev": self.ratemap_dev[sess_index, 1]}
                 rev_vars = list(sess_data.keys()) + ["dev", ]
                 return sess_data, rev_vars, {"sess_index": sess_index}
 
@@ -161,7 +177,7 @@ class Wernle20118Data(Hafting2008Data):
         if ax is None:
             f, ax = plt.subplots(1, 1, figsize=(10, 8))
 
-        session_data, rev_vars = self.get_recording_data(recording_index)
+        session_data, rev_vars, rat_info = self.get_recording_data(recording_index)
 
         arena_width = self.arena_limits[0, 1] - self.arena_limits[0, 0]
         arena_depth = self.arena_limits[1, 1] - self.arena_limits[1, 0]
@@ -215,7 +231,7 @@ class Wernle20118Data(Hafting2008Data):
         else:
             n_cells = 1
             session_index = [session_index, ]
-        f, ax = plt.subplots(n_cells, 2, figsize=(4, 4*n_cells))
+        f, ax = plt.subplots(n_cells, 2, figsize=(7, 4*n_cells))
         for i in range(n_cells):
             ax[i, 0].imshow(self.ratemap[session_index[i], 0])
             ax[i, 1].imshow(self.ratemap[session_index[i], 1])
@@ -231,7 +247,7 @@ class Wernle20118Data(Hafting2008Data):
         else:
             pos = self.pos_A_B[:n_cells, 0]
 
-        f, ax = plt.subplots(n_cells, 1, figsize=(3, 4*n_cells))
+        f, ax = plt.subplots(1, n_cells, figsize=(4*n_cells, 3))
         for cell in range(n_cells):
             pos_i = pos[cell]
             init_sample = int(pos_i.shape[0] * (time_interval[0]*60.0)/(np.amax(pos_i[:, 0])))
@@ -265,7 +281,7 @@ class Wernle20118Data(Hafting2008Data):
 
 
 if __name__ == "__main__":
-    data = WernleData()
+    data = Wernle20118Data()
     data.show_data()
     # data.plot_recording_tetr(3)
     # data.plot_trajectory(3)
