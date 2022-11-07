@@ -4,7 +4,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="sehec",
+    name="neuralplayground",
     version="0.0.1",
     author="clem_domine_rod_carrasco",
     author_email="rodrigo.carrasco.davis@gmail.com",
