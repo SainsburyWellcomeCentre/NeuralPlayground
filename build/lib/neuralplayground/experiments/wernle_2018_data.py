@@ -13,7 +13,7 @@ from neuralplayground.utils import get_2D_ratemap, OnlineRateMap
 from neuralplayground.experiments.hafting_2008_data import Hafting2008Data
 
 
-class Wernle20118Data(Hafting2008Data):
+class Wernle2018Data(Hafting2008Data):
     """ Data wrapper for https://www.nature.com/articles/s41593-017-0036-6
     The data can be obtained from https://doi.org/10.11582/2017.00023
     """
@@ -281,7 +281,7 @@ class Wernle20118Data(Hafting2008Data):
 
 
 if __name__ == "__main__":
-    data = Wernle20118Data()
+    data = Wernle2018Data()
     data.show_data()
     # data.plot_recording_tetr(3)
     # data.plot_trajectory(3)

@@ -1,10 +1,6 @@
 import pickle
-from datetime import datetime
 import os
 import sys
-import io
-from io import StringIO
-from contextlib import redirect_stdout
 import pandas as pd
 from neuralplayground.available_classes import import_classes
 import_list = import_classes()
@@ -66,7 +62,7 @@ def default_run(save_path=None):
 
 
 if __name__ == "__main__":
-    from neuralplayground.experimentconfig import cfg
+    from neuralplayground.comparison_board.experimentconfig import cfg
     print(cfg.config_tree())
 
     default_run(sub_exp_config=cfg.model1.exp_1.sub_exp_1)

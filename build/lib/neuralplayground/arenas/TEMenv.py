@@ -192,79 +192,16 @@ class TEMenv(Environment):
         """
         self.global_steps += 1
         allowed = []
-        # observations = np.zeros(shape=(self.pars['batch_size'], 1, self.pars['t_episode'] + 1))
-        # observations1 = np.zeros(shape=(self.pars['batch_size'], 2, self.pars['t_episode'] + 1))
-        # rewards = []
-        #
-        # actions1 = np.zeros((self.pars['batch_size'], 2, self.pars['t_episode']))
-        # direcs = np.zeros(shape=(self.pars['batch_size'], 4, self.pars['t_episode']))
-        # direcs1 = np.zeros(shape=(self.pars['batch_size'], 4, self.pars['t_episode']))
 
         adjs, trans = self.make_environment()
 
         for batch in range(self.pars['batch_size']):
-            room_width = self.pars['widths'][batch]
-            room_depth = self.pars['widths'][batch]
-            batch_history = []
             if np.isnan(self.last_states[batch]).any():
-                # self.state1 = [round(random.uniform(-room_width / 2, room_width / 2)),
-                               # round(random.uniform(-room_depth / 2, room_depth / 2))]
                 allowed_states = np.where(np.sum(adjs[batch], 1) > 0)[0]
                 allowed.append(allowed_states)
                 self.state = int(np.random.choice(allowed_states))
             else:
                 self.state = int(self.last_states[batch])
-                # self.state1 = self.last_states1[batch]
-
-            # observations[batch, 0, 0] = self.state
-            # # observations1[batch, :, 0] = self.state1
-            #
-            # for step in range(self.pars['t_episode']):
-            #     available = np.where(trans[batch][int(observations[batch, 0, step]), :] > 0)[0].astype(int)
-            #     new_state = np.random.choice(available)
-            #
-            #     if adjs[batch][int(observations[batch, 0, step]), new_state] == 1:
-            #         observations[batch, 0, step + 1] = new_state
-            #     else:
-            #         observations[batch, 0, step + 1] = int(cp.deepcopy(observations[0, step]))
-            #
-            #     prev_dir, _ = rectangle_relation(observations[batch, 0, step], observations[batch, 0, step + 1],
-            #                                      room_width, room_depth)
-            #     if prev_dir < 4:
-            #         direcs[batch, prev_dir, step] = 1
-            #     # Generate action from given policy
-            #     # action1, direc1 = policy()
-            #     # actions1[batch, :, step] = action1
-            #     # direcs1[batch, :, step] = direc1
-            #
-            #     # Determine state transitioned to
-            #     # new_state1 = [self.state1[n] + self.pars['agent_step_size'] * i for n, i in enumerate(action1)]
-            #
-            #     # while any(new_state1 > room_width / 2) or any(new_state1 < -room_width / 2):
-            #     #     action1, direc1 = policy()
-            #     #     actions1[batch, :, step] = action1
-            #     #     direcs1[batch, :, step] = direc1
-            #     #     new_state1 = [self.state1[n] + self.pars['agent_step_size'] * i for n, i in enumerate(action1)]
-            #
-            #     reward = 0  # If you get reward, it should be coded here
-            #     transition = {"action": prev_dir, "state": self.state, "next_state": new_state,
-            #                   "reward": reward, "step": self.global_steps}
-            #     batch_history.append(transition)
-            #     self.state = new_state
-            #     # self.state1 = new_state1
-            #     observation = self.make_observation()
-            #
-            #     # observations1[batch, :, step + 1] = self.state1
-            #     rewards.append(reward)
-            #
-            # if index == n_walk - 1:
-            #     self.last_states[batch] = np.nan
-            #     # self.last_states1[batch] = np.nan
-            # else:
-            #     self.last_states[batch] = self.state
-            #     # self.last_states1[batch] = self.state1
-            #
-            # self.history.append(batch_history)
 
         return adjs, trans, allowed
 

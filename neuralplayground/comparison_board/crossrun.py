@@ -1,5 +1,4 @@
 import neuralplayground
-from neuralplayground.experimentconfig import cfg
 from neuralplayground.comparison_board.default_run import *
 import os
 import glob
@@ -7,7 +6,8 @@ import shutil
 import pickle
 
 
-class CrossRun(object):
+class RunConfig(object):
+    #  TODO: Change name from CrossRun to something else "RUN_CROSS_CONFIG"
 
     def __init__(self, config_file=None, results_path="../results", reload_experiment=True):
         print("Init cross run")

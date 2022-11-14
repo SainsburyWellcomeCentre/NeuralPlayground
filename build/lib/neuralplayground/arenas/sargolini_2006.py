@@ -213,7 +213,7 @@ class Sargolini2006(Simple2D):
         self.total_number_of_steps = self.data.position.shape[0]
         self.state_dims_labels = ["x_pos", "y_pos", "head_direction_x", "head_direction_y"]
 
-    def reset(self, sess=None):
+    def reset(self):
         """  Reset the environment variables
 
         Parameters
@@ -232,9 +232,6 @@ class Sargolini2006(Simple2D):
             self.head_dir: ndarray (env_dim,)
                 Vector of the x and y coordinate of the animal head position in the environment
         """
-        if not sess is None:
-            self.data = Sargolini2006Data(data_path=self.data_path, experiment_name=self.environment_name,
-                                          verbose=self.verbose)
         if self.random_steps:
             return super().reset()
 

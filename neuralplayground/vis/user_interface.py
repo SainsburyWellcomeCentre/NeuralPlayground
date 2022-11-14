@@ -1,10 +1,9 @@
 import neuralplayground
-from neuralplayground.experimentconfig import cfg
+from neuralplayground.comparison_board.experimentconfig import cfg
 from bokeh.models import Panel, Tabs
-from bokeh.plotting import figure, gridplot
+from bokeh.plotting import figure
 from bokeh.layouts import row, column
 from bokeh.io import show
-import bokeh
 import os
 import glob
 from neuralplayground.vis.set_of_frames import model_summary, foraging_plot, training_curves, grid_cell_comparison

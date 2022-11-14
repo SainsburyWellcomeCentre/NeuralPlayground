@@ -3,8 +3,8 @@ import numpy as np
 from copy import deepcopy
 import neuralplayground
 import os
-from neuralplayground.arena.simple2d import BasicSargolini2006, Sargolini2006
-from neuralplayground.agent.weber_2018 import ExcInhPlasticity
+from neuralplayground.arenas import BasicSargolini2006, Sargolini2006
+from neuralplayground.agents import ExcInhPlasticity
 
 
 class Config(object):
@@ -147,5 +147,4 @@ custom_classes = Config(config_id="Custom_class_paths",
                         custom_classes_path=["from neuralplayground.agents.stachenfeld_2018 import SR",])
 
 if __name__ == "__main__":
-
-    print(cfg.config_tree())
+    print(cfg.get_config_tree())

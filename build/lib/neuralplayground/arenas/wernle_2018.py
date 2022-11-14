@@ -1,9 +1,10 @@
 import numpy as np
 from .simple2d import Simple2D
+from ..experiments.wernle_2018_data import Wernle2018Data
 
 
-class MergingRoom2D(Simple2D):
-    def __init__(self, environment_name="MergingRoom", merge_time=100, switch_time=50, **env_kwargs):
+class Wernle2018(Simple2D):
+    def __init__(self, environment_name="MergingRoom", merge_time=100, switch_time=50, verbose=False, **env_kwargs):
         self.environment_name = environment_name
         env_kwargs["arena_x_limits"] = np.array([-100, 100])
         env_kwargs["arena_y_limits"] = np.array([-100, 100])
@@ -11,6 +12,7 @@ class MergingRoom2D(Simple2D):
         self.merge_time = (merge_time*60) / self.time_step_size
         self.switch_time = (switch_time*60) / self.time_step_size
         self.run_full_experiment = True
+        self.data = Wernle2018Data(data_path=self.data_path, verbose=verbose)
         super().__init__(environment_name, **env_kwargs)
         self.AB_id = "AB"
         self.A_id = "A"
