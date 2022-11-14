@@ -1,6 +1,6 @@
-from sehec.comparison_board.crossrun import CrossRun
-from sehec.agent.agent_core import NeuralResponseModel
-from sehec.vis.user_interface import ResultsInterface
+from neuralplayground.comparison_board.crossrun import CrossRun
+from neuralplayground.agent.agent_core import NeuralResponseModel
+from neuralplayground.vis.user_interface import ResultsInterface
 
 if __name__ == "__main__":
     results_path = "./test_crossrun_results"
