@@ -15,10 +15,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-from .agent_core import NeuralResponseModel
+from .agent_core import AgentCore
 
 
-class SR(NeuralResponseModel):
+class SR(AgentCore):
     """
     Implementation for SR 2017 by Kimberly L. Stachenfeld1,2,*, Matthew M. Botvinick1,3, and Samuel J. Gershman4
     The hippocampus as a predictive map

@@ -1,4 +1,4 @@
-from neuralplayground.experimentconfig import custom_classes
+from neuralplayground.comparison_board.experimentconfig import custom_classes
 
 
 def import_classes():

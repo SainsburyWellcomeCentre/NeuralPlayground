@@ -16,10 +16,10 @@ import numpy as np
 from scipy.stats import multivariate_normal
 from tqdm import tqdm
 
-from .agent_core import NeuralResponseModel
+from .agent_core import AgentCore
 
 
-class ExcInhPlasticity(NeuralResponseModel):
+class ExcInhPlasticity(AgentCore):
     """
     Implementation for Weber and Sprekeler 2018
     Learning place cells, grid cells and invariances with excitatory and inhibitory plasticity

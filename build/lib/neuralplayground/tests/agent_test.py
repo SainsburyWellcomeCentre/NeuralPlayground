@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from ..arenas import BasicSargolini2006
 from ..agents import ExcInhPlasticity
 from ..agents import SR
-from ..agents import NeuralResponseModel
+from ..agents import AgentCore
 import pytest
 
 
@@ -19,12 +19,12 @@ class Testmodelcore(object):
 
     @pytest.fixture
     def init_model(self, get_environment):
-        agent = NeuralResponseModel()
+        agent = AgentCore()
 
         return [agent, ]
 
     def test_init_model(self, init_model):
-        assert isinstance(init_model[0], NeuralResponseModel)
+        assert isinstance(init_model[0], AgentCore)
 
     def test_agent_interaction(self, init_model, get_environment):
         env = get_environment[0]

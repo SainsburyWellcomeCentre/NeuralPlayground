@@ -56,11 +56,6 @@ def create_circular_wall(center, radius, n_walls=100):
     return list_of_segments
 
 
-class RandomAgent(object):
-    def act(self, observation):
-        return np.random.normal(scale=0.1, size=(2,))
-
-
 def inheritors(klass):
     subclasses = set()
     work = [klass]

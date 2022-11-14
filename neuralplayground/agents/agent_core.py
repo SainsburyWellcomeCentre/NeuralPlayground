@@ -90,3 +90,8 @@ class AgentCore(object):
             return True
         else:
             return False
+
+
+class RandomAgent(AgentCore):
+    def act(self, observation):
+        return np.random.normal(scale=0.1, size=(2,))

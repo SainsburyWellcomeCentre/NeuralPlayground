@@ -15,7 +15,7 @@ import inspect
 from tqdm import tqdm
 
 from .agent_core import NeuralResponseModel
-from sehec.models.TEM.parameters import *
+from ..agents.TEM_extras.TEM_parameters import *
 
 fu_co = layer.fully_connected
 eps = 1e-8
@@ -78,7 +78,11 @@ class TEM(NeuralResponseModel):
         calculate accuracy of sensory predictions
     """
     def __init__(self, model_name="TEM", **mod_kwargs):
+        self.reset(model_name, **mod_kwargs)
+
+    def reset(self, model_name, **mod_kwargs):
         """
+        Erase all memory from the model, initialize all relevant parameters and build from scratch.
         Important Parameters (for full list see parameters.py)
         ----------
         model_name : str
@@ -114,6 +118,8 @@ class TEM(NeuralResponseModel):
         self.pars_orig = self.pars.copy()
         self.gen_path, self.train_path, self.model_path, self.save_path, self.script_path = make_directories()
         self.logger = make_logger(self.gen_path)
+        self.obs_history = []
+        self.index = 0
 
         save_params(self.pars, self.save_path, self.script_path)
 
@@ -135,9 +141,6 @@ class TEM(NeuralResponseModel):
                                       shape=(self.pars['batch_size'], self.pars['p_size'], self.pars['p_size']),
                                       name='rnn_')
         self.g_ = tf.placeholder(tf.float32, shape=(self.pars['batch_size'], self.pars['g_size']), name='g_')
-        # self.x = tf.unstack(self.x1, axis=2)
-        # self.d = tf.unstack(self.d0, axis=2)
-        # self.s_vis = tf.unstack(self.s_visi, axis=1)
 
         # Inputs for TEM
         self.seq_pos = None
@@ -227,12 +230,6 @@ class TEM(NeuralResponseModel):
         self.state = np.array(self.state)
         self.last_states = np.empty(shape=(self.pars['batch_size'], 1))
         self.last_states[:] = np.nan
-
-    def reset(self):
-        """Erase all memory from the model, initialize all relevant parameters and build from scratch """
-        self.obs_history = []
-        self.index = 0
-        self.__init__()
 
     def initialise_hebbian(self):
         # Initialise Hebbian matrices for memory retrieval
@@ -372,6 +369,8 @@ class TEM(NeuralResponseModel):
         rewards: ndarray,
             rewards gained for current chunk
         """
+        self.n_walk = 200
+
         observations = np.zeros(shape=(self.pars['batch_size'], 1, self.pars['t_episode'] + 1))
         direcs = np.zeros(shape=(self.pars['batch_size'], 4, self.pars['t_episode']))
         rewards = []
@@ -403,11 +402,10 @@ class TEM(NeuralResponseModel):
                     direcs[batch, prev_dir, step] = 1
 
                 reward = 0  # If you get reward, it should be coded here
-                transition = {"action": prev_dir, "state": self.state, "next_state": new_state,
-                              "reward": reward, "step": self.global_steps}
+                transition = {"action": direcs[batch, :, step], "state": self.state, 
+                              "next_state": new_state, "reward": reward, "step": self.global_steps}
                 batch_history.append(transition)
                 self.state = new_state
-
                 rewards.append(reward)
 
             if index == self.n_walk - 1:
@@ -592,10 +590,6 @@ class TEM(NeuralResponseModel):
         grads = optimizer.compute_gradients(cost_all)
         capped_grads = [(tf.clip_by_norm(grad, 2), var) if grad is not None else (grad, var) for grad, var in grads]
         self.train_op_all = optimizer.apply_gradients(capped_grads)
-
-        # # Reset Hebbian weights & model variables at the end of training iteration
-        # if index == self.pars['n_walk'] - 1:
-        #     self.training_reset()
 
         return self.x_, self.p, self.g
 
@@ -1252,40 +1246,6 @@ class TEM(NeuralResponseModel):
         self.A_inv = tf.clip_by_value(self.A_inv, -self.pars['hebb_mat_max'], self.pars['hebb_mat_max'])
 
         return
-
-
-# def direction_pars(pars_orig, pars, n_restart):
-#     n_envs = len(pars['widths'])
-#     b_s = int(pars['batch_size'])
-#     # Choose self.pars for current stage of training
-#     rn = np.random.randint(low=-pars['seq_jitter'], high=pars['seq_jitter'])
-#     n_restart = np.maximum(n_restart - pars['curriculum_steps'], pars['restart_min'])
-#
-#     pars['direc_bias_env'] = [0 for _ in range(n_envs)]
-#
-#     # Make choice for each env
-#     choices = []
-#     for env in range(n_envs):
-#         choice = np.random.choice(pars['poss_behaviours'])
-#
-#         choices.append(choice)
-#
-#         if choice == 'normal':
-#             pars['direc_bias_env'][env] = pars_orig['direc_bias']
-#         else:
-#             raise Exception('Not a correct possible behaviour')
-#
-#     # Choose which of batch gets no_direc or not - 1 is no_direc, 0 is with direc
-#     no_direc_batch = np.ones(pars['batch_size'])
-#     for batch in range(b_s):
-#         env = pars['diff_env_batches_envs'][batch]
-#         choice = choices[env]
-#         if choice == 'normal':
-#             no_direc_batch[batch] = 0
-#         else:
-#             no_direc_batch[batch] = 1
-#
-#     return pars, rn, n_restart, no_direc_batch
 
 
 def direction(action):

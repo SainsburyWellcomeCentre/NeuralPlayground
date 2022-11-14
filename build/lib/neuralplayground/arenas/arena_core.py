@@ -57,10 +57,10 @@ class Environment(object):
             Define within each subclass for specific environments
             Variable containing the state of the environment (eg.position in the environment)
         """
-        observation = self.make_observation() # Build sensory info from current state
+        observation = self.make_observation()  # Build sensory info from current state
         reward = 0
         # state should be updated as well
-        return observation, self.state, reward
+        return observation, self.state, reward, action
 
     def reset(self):
         """ Re-initialize state. Returns observation and re-setted state
