@@ -18,7 +18,7 @@ import numpy as np
 from .agent_core import AgentCore
 
 
-class SR(AgentCore):
+class Stachenfeld2018(AgentCore):
     """
     Implementation for SR 2017 by Kimberly L. Stachenfeld1,2,*, Matthew M. Botvinick1,3, and Samuel J. Gershman4
     The hippocampus as a predictive map

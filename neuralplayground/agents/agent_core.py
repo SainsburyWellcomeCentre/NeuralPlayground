@@ -99,7 +99,7 @@ class RandomAgent(AgentCore):
         super().__init__()
         self.step_size = step_size
 
-    def act(self, observation):
+    def act(self, obs):
         return np.random.normal(scale=self.step_size, size=(2,))
 
 
