@@ -19,7 +19,7 @@ from tqdm import tqdm
 from .agent_core import AgentCore
 
 
-class ExcInhPlasticity(AgentCore):
+class Weber2018(AgentCore):
     """
     Implementation for Weber and Sprekeler 2018
     Learning place cells, grid cells and invariances with excitatory and inhibitory plasticity
