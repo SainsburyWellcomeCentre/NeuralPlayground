@@ -8,6 +8,7 @@ import pickle
 from deepdiff import DeepDiff
 import os
 import pandas as pd
+from scipy.stats import levy_stable
 
 
 class AgentCore(object):
@@ -93,5 +94,26 @@ class AgentCore(object):
 
 
 class RandomAgent(AgentCore):
+
+    def __init__(self, step_size=1):
+        super().__init__()
+        self.step_size = step_size
+
     def act(self, observation):
-        return np.random.normal(scale=0.1, size=(2,))
+        return np.random.normal(scale=self.step_size, size=(2,))
+
+
+class LevyFlightAgent(RandomAgent):
+
+    def __init__(self, alpha=0.3, beta=1, loc=1.0, scale=0.8, step_size=0.3, max_step_size=50):
+        super().__init__(step_size=step_size)
+        self.levy = levy_stable(alpha, beta, loc=loc, scale=scale)
+        self.alpha = alpha
+        self.beta = beta
+        self.max_step_size = max_step_size
+
+    def act(self, obs):
+        direction = super().act(obs)
+        direction = direction / np.sqrt(np.sum(direction ** 2)) * self.step_size
+        r = np.clip(self.levy.rvs(), a_min=0, a_max=self.max_step_size)
+        return r * direction
