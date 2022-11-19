@@ -103,7 +103,7 @@ class Hafting2008(Simple2D):
         observation = self.make_observation()
         return observation, self.state
 
-    def step(self, action):
+    def step(self, action, normalize_step=False, skip_every=10):
         """ Increment the global step count of the agent in the environment
         and updates the position of the agent according to the recordings of the specific chosen session
         (Action is ignored in this case)
@@ -125,11 +125,14 @@ class Hafting2008(Simple2D):
             Array of the observation of the agent in the environment ( Could be modified as the environments are evolves)
 
         """
-        if self.global_steps >= self.data.position.shape[0]-1:
-            self.global_steps = 0
+        if self.use_agent_steps:
+            return super().step(action)
+        if self.global_steps*skip_every >= self.data.position.shape[0]-1:
+            self.global_steps = np.random.choice(np.arange(skip_every))
         self.global_time = self.global_steps*self.agent_step_size
         reward = 0  # If you get reward, it should be coded here
-        new_state = self.data.position[self.global_steps, :], self.data.head_direction[self.global_steps, :]
+        new_state = self.data.position[self.global_steps*(skip_every), :], \
+                    self.data.head_direction[self.global_steps*(skip_every), :]
         new_state = np.concatenate(new_state)
         transition = {"action": action, "state": self.state, "next_state": new_state,
                       "reward": reward, "step": self.global_steps}

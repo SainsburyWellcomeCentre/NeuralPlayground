@@ -129,7 +129,7 @@ class Simple2D(Environment):
         observation = self.make_observation()
         return observation, self.state
 
-    def step(self, action):
+    def step(self, action, normalize_step=False):
         """ Increment the global step count of the agent in the environment and updates the position of the agent according 
         to the recordings of the specific chosen session (Action is ignored in this case)
 
@@ -151,8 +151,11 @@ class Simple2D(Environment):
 
         """
         self.global_steps += 1
-        action = action/np.linalg.norm(action)
-        new_state = self.state + self.agent_step_size*action
+        if normalize_step:
+            action = action/np.linalg.norm(action)
+            new_state = self.state + self.agent_step_size*action
+        else:
+            new_state = self.state + action
         new_state, valid_action = self.validate_action(self.state, action, new_state)
         reward = 0  # If you get reward, it should be coded here
         transition = {"action": action, "state": self.state, "next_state": new_state,
@@ -229,8 +232,8 @@ class Simple2D(Environment):
                 aux_y.append(s[1])
                 ax.plot(x_, y_, "-", color=cmap(norm(i)), alpha=0.6)
 
-            ax.set_xticks([])
-            ax.set_yticks([])
+            # ax.set_xticks([])
+            # ax.set_yticks([])
             sc = ax.scatter(aux_x, aux_y, c=np.arange(len(aux_x)), vmin=0, vmax=len(aux_x), cmap="plasma", alpha=0.6, s=0.1)
             cbar = plt.colorbar(sc, ax=ax,ticks = [0, len(state_history)])
             cbar.ax.set_ylabel('N steps', rotation=270,fontsize=16)
