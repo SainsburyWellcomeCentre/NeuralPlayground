@@ -6,6 +6,8 @@ from ..arenas import BasicSargolini2006
 from ..agents import ExcInhPlasticity
 from ..agents import SR
 from ..agents import AgentCore
+from ..agents import TEM
+from ..agents.TEM_extras import TEM_parameters
 import pytest
 
 
@@ -110,3 +112,22 @@ class TestSR(Testmodelcore):
     def test_plot_sr_sum(self, init_model):
         sr_sum = init_model[0].successor_rep_sum()
         init_model[0].plot_eigen(sr_sum, save_path=None)
+
+
+class TestTEM(Testmodelcore):
+
+    @pytest.fixture
+    def init_model(self, get_environment):
+        env_name = "TEMenv"
+        mod_name = "TEM"
+        pars = TEM_parameters.default_parameters()
+
+        env = get_environment[0]
+        agent = TEM(mod_name=mod_name, **pars)
+
+        adjs, trans, allowed = env.step()
+        n_walk, _ = agent.update(adjs, trans, allowed, 0, 0)
+        for j in range(n_walk - 1):
+            # RL Loop
+            adjs, trans, allowed = env.step()
+            _, history = agent.update(adjs, trans, allowed, j+1, 0)
