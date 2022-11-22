@@ -187,7 +187,7 @@ class Hafting2008Data(object):
             return axis_list
 
         if ax is None:
-            f, ax = plt.subplots(1, 1, figsize=(10, 8))
+            f, ax = plt.subplots(1, 1, figsize=(8, 6))
 
         session_data, rev_vars, rat_info = self.get_recording_data(recording_index)
         tetrode_id = self._find_tetrode(rev_vars)
@@ -197,7 +197,7 @@ class Hafting2008Data(object):
 
         return x, y, time_array
 
-    def _make_trajectory_plot(self, x, y, ax, plot_every):
+    def _make_trajectory_plot(self, x, y, ax, plot_every, fontsize=24):
 
         ax.plot([self.arena_limits[0, 0], self.arena_limits[0, 0]],
                 [self.arena_limits[1, 0], self.arena_limits[1, 1]], "C3", lw=3)
@@ -221,19 +221,21 @@ class Hafting2008Data(object):
                 y_ = [y[i], y[i + plot_every]]
                 aux_x.append(x[i])
                 aux_y.append(y[i])
-                sc = ax.plot(x_, y_, "-", color=cmap(norm(i)), alpha=0.6, linewidth=1)
+                sc = ax.plot(x_, y_, "-", color=cmap(norm(i)), alpha=0.6) #linewidth=1)
         # ax.set_xticks([])
         # ax.set_yticks([])
-        ax.set_ylabel('width')
-        ax.set_xlabel('depth')
-        ax.set_title("position")
+        ax.set_ylabel('width', fontsize=fontsize)
+        ax.set_xlabel('depth', fontsize=fontsize)
+        ax.set_title("position", fontsize=fontsize)
+        ax.grid()
 
         cmap = mpl.cm.get_cmap("plasma")
         norm = plt.Normalize(0, np.size(x))
         sc = ax.scatter(aux_x, aux_y, c=np.arange(len(aux_x)), vmin=0, vmax=len(x), cmap="plasma", alpha=0.6, s=0.1)
 
         cbar = plt.colorbar(sc, ax=ax, ticks=[0, len(x)])
-        cbar.ax.set_ylabel('N steps', rotation=270, fontsize=12)
-        cbar.ax.set_yticklabels([0, len(x)], fontsize=12)
+        cbar.ax.tick_params(labelsize=fontsize)
+        cbar.ax.set_ylabel('N steps', rotation=270, fontsize=fontsize)
+        cbar.ax.set_yticklabels([0, len(x)], fontsize=fontsize)
         ax.set_xlim([np.amin([x.min(), y.min()])-1.0, np.amax([x.max(), y.max()])+1.0])
         ax.set_ylim([np.amin([x.min(), y.min()])-1.0, np.amax([x.max(), y.max()])+1.0])

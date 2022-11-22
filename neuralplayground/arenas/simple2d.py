@@ -235,9 +235,9 @@ class Simple2D(Environment):
             # ax.set_xticks([])
             # ax.set_yticks([])
             sc = ax.scatter(aux_x, aux_y, c=np.arange(len(aux_x)), vmin=0, vmax=len(aux_x), cmap="plasma", alpha=0.6, s=0.1)
-            cbar = plt.colorbar(sc, ax=ax,ticks = [0, len(state_history)])
-            cbar.ax.set_ylabel('N steps', rotation=270,fontsize=16)
-            cbar.ax.set_yticklabels([0,len(state_history)],fontsize=16)
+            cbar = plt.colorbar(sc, ax=ax, ticks=[0, len(state_history)])
+            cbar.ax.set_ylabel('N steps', rotation=270, fontsize=16)
+            cbar.ax.set_yticklabels([0, len(state_history)], fontsize=16)
         if return_figure:
             return f, ax
         else:
