@@ -8,9 +8,15 @@ import neuralplayground
 import matplotlib as mpl
 from IPython.display import display
 from neuralplayground.utils import clean_data, get_2D_ratemap
+from .experiment_core import Experiment
 
 
-class Hafting2008Data(object):
+class Hafting2008Data(Experiment):
+    """ Data class for Hafting et al. 2008. https://www.nature.com/articles/nature06957
+        The data can be obtained from https://archive.norstore.no/pages/public/datasetDetail.jsf?id=C43035A4-5CC5-44F2-B207-126922523FD9
+        This class only consider animal raw animal trajectories and neural recordings
+        This class is also used for Sargolini2006Data due to similir data structure
+    """
 
     def __init__(self, data_path=None, recording_index=None, experiment_name="FullHaftingData", verbose=False,):
         self.experiment_name = experiment_name

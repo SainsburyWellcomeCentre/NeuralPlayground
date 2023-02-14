@@ -77,7 +77,10 @@ class SargoliniDataTrajectory(Experiment):
 
 
 class Sargolini2006Data(Hafting2008Data):
-
+    """ Data class for sargolini et al. 2006. https://www.science.org/doi/10.1126/science.1125572
+        The data can be obtained from https://archive.norstore.no/pages/public/datasetDetail.jsf?id=8F6BE356-3277-475C-87B1-C7A977632DA7
+        This class only consider animal raw animal trajectories and neural recordings
+    """
     def __init__(self, data_path=None, recording_index=None, experiment_name="FullSargoliniData", verbose=False):
         super().__init__(data_path=data_path, recording_index=recording_index,
                          experiment_name=experiment_name, verbose=verbose)
