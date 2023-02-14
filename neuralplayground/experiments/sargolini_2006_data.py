@@ -2,27 +2,65 @@ import os.path
 import numpy as np
 import scipy.io as sio
 import glob
-import matplotlib.pyplot as plt
 import neuralplayground
 from neuralplayground.experiments import Hafting2008Data
 from neuralplayground.utils import clean_data
+from neuralplayground.experiments import Experiment
 
 
-class SargoliniData(object):
+class SargoliniDataTrajectory(Experiment):
+    """ Data class for sargolini et al. 2006. https://www.science.org/doi/10.1126/science.1125572
+        The data can be obtained from https://archive.norstore.no/pages/public/datasetDetail.jsf?id=8F6BE356-3277-475C-87B1-C7A977632DA7
+        This class only consider animal trajectory pre-processed by the authors.
+    """
 
-    def __init__(self, experiment_name='Sargolini_2006_Data', data_path=None):
+    def __init__(self, experiment_name: str = 'Sargolini_2006_Data', data_path: str = None):
+        """ SargoliniData Class Init
+
+        Parameters
+        ----------
+        experiment_name: str
+            string to identify object in case of multiple instances
+        data_path: str
+            if None, load the data sample in the package, load the specific dataset otherwise
+        """
+        self.experiment_name = experiment_name
         if data_path is None:
+            # Set data_path to the data directory within the package
             self.data_path = os.path.join(neuralplayground.__path__[0], "experiments/sargolini_2006")
-            # print(self.data_path)
         else:
             self.data_path = data_path
-        self.arena_limits, self.position, self.head_direction = self.get_sargolini_data()
+        # Sort the data in data_path
+        self.arena_limits, self.position, self.head_direction, self.time_span = self._get_sargolini_data()
 
-    def get_sargolini_data(self, tolerance=1e-10):
+    def _get_sargolini_data(self, tolerance: float = 1e-10):
+        """ Load and concatenate animal trajectories from data pre-processed by the authors
+
+        Parameters
+        ----------
+        tolerance: float
+            Small constant to avoid dividing by zero when estimating head direction
+
+        Returns
+        -------
+        arena_limits: ndarray (2, 2)
+            first row x limits of the arena, second row y limits of the arena, in cm
+        position: ndarray (n, 2)
+            first column is x pos in cm, second column is y pos in cm, n is the number of sampled positions
+        head_direction: ndarray (n-1, 2)
+            directional vector with estimated head direction from position derivative
+        time_span: ndarray (n, )
+            time stamp per measurement assuming 50Hz of sampling rate
+        """
+        # Arena limits in cm, sampling rate in Hz, both from the original experiment
         arena_limits = np.array([[-50, 50], [-50, 50]])
+        self.sampling_rate = 50
+
+        # Listing files with trajectories
         filenames_x = os.path.join(self.data_path, "sargolini_x_pos_")
         filenames_y = os.path.join(self.data_path, "sargolini_y_pos_")
 
+        # Filing array from files
         x_position = np.array([])
         y_position = np.array([])
         for i in range(61):
@@ -31,10 +69,11 @@ class SargoliniData(object):
             x_position = np.concatenate([x_position, aux_x])
             y_position = np.concatenate([y_position, aux_y])
 
-        position = np.stack([x_position, y_position], axis=1) * 100  # Convert to cm
-        head_direction = np.diff(position, axis=0)
+        position = np.stack([x_position, y_position], axis=1) * 100  # Convert to cm, originally in meters
+        head_direction = np.diff(position, axis=0)  # Head direction from derivative of position
         head_direction = head_direction/np.sqrt(np.sum(head_direction**2, axis=1) + tolerance)[..., np.newaxis]
-        return arena_limits, position, head_direction
+        time_span = np.arange(head_direction.shape[0])*(1/self.sampling_rate)
+        return arena_limits, position, head_direction, time_span
 
 
 class Sargolini2006Data(Hafting2008Data):

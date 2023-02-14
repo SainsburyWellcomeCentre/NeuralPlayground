@@ -1,4 +1,3 @@
-from abc import ABC, abstractmethod
 import numpy as np
 import pickle
 import os
@@ -9,7 +8,7 @@ from deepdiff import DeepDiff
 class Environment(object):
     """Main environment class"""
     def __init__(self, environment_name="default_env", **env_kwargs):
-        """ Initialisation of the class
+        """ Initialisation of Environment class
 
         Parameters
         ----------

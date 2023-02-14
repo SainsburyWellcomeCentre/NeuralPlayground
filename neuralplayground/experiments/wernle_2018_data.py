@@ -14,7 +14,7 @@ from neuralplayground.experiments.hafting_2008_data import Hafting2008Data
 
 
 class Wernle2018Data(Hafting2008Data):
-    """ Data wrapper for https://www.nature.com/articles/s41593-017-0036-6
+    """ Data class for https://www.nature.com/articles/s41593-017-0036-6
     The data can be obtained from https://doi.org/10.11582/2017.00023
     """
 
@@ -231,10 +231,10 @@ class Wernle2018Data(Hafting2008Data):
         else:
             n_cells = 1
             session_index = [session_index, ]
-        f, ax = plt.subplots(n_cells, 2, figsize=(7, 4*n_cells))
+        f, ax = plt.subplots(n_cells, 2, figsize=(8, 5*n_cells))
         for i in range(n_cells):
-            ax[i, 0].imshow(self.ratemap[session_index[i], 0])
-            ax[i, 1].imshow(self.ratemap[session_index[i], 1])
+            ax[i, 0].imshow(self.ratemap[session_index[i], 0], cmap="jet")
+            ax[i, 1].imshow(self.ratemap[session_index[i], 1], cmap="jet")
             ax[i, 0].axhline(y=50, color="white")
             ax[i, 1].axhline(y=50, color="white", linestyle="--")
         ax[0, 0].set_title("Before merging")
