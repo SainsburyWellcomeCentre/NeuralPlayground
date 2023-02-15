@@ -136,6 +136,7 @@ class Hafting2008Data(Experiment):
         ----------
         recording_index: int
             recording identifier, index in pandas dataframe with listed data
+
         Returns
         -------
         rat_id: str
@@ -210,6 +211,7 @@ class Hafting2008Data(Experiment):
             if None, the session used corresponds to the default recording index
         tetrode_id:
             tetrode id in the corresponding session
+
         Returns
         -------
         time_array: ndarray (n_samples,)
@@ -322,6 +324,27 @@ class Hafting2008Data(Experiment):
         return h, binx, biny
 
     def _make_tetrode_plot(self, h, ax, title, save_path):
+        """ plot function with formating of ratemap plot
+
+        Parameters
+        ----------
+        h: ndarray (nybins, nxbins)
+            Number of spikes falling on each bin through the recorded session, nybins number of bins in y axis,
+            nxbins number of bins in x axis
+        ax: mpl.axes._subplots.AxesSubplot (matplotlib axis from subplots)
+            axis from subplot from matplotlib where the ratemap will be plotted.
+        title: str
+            plot title, tetrode id by default when called
+        save_path: str, list of str, tuple of str
+            saving path of the generated figure, if None, no figure is saved
+
+        Returns
+        -------
+        ax: mpl.axes._subplots.AxesSubplot (matplotlib axis from subplots)
+            Modified axis where ratemap is plotted
+        """
+
+        # Formating ratemap plot
         sc = ax.imshow(h, cmap='jet')
         cbar = plt.colorbar(sc, ax=ax, ticks=[np.min(h), np.max(h)], orientation="horizontal")
         cbar.ax.set_xlabel('Firing rate', fontsize=12)
@@ -332,20 +355,61 @@ class Hafting2008Data(Experiment):
         ax.set_xticks([])
         ax.set_yticks([])
 
+        # Save if save_path is not None
         if not save_path is None:
             plt.savefig(save_path, bbox_inches="tight")
             plt.close("all")
+            return ax
         else:
             return ax
 
-    def plot_trajectory(self, recording_index=None, save_path=None, ax=None, plot_every=20):
+    def plot_trajectory(self, recording_index: Union[int, tuple, list] = None,
+                        save_path: Union[str, tuple, list] = None,
+                        ax: Union[mpl.axes._subplots.AxesSubplot, tuple, list] = None,
+                        plot_every: int = 20):
+        """ Plot animal trajectory from a given recording index, corresponding to a recording session
+
+        Parameters
+        ----------
+        recording_index: int, tuple of ints, list of ints
+            recording index to plot spike ratemap, if list or tuple, it will recursively call this function
+            to make a plot per recording index. If this argument is list or tuple, the rest of variables must
+            be list or tuple with their respective types, or keep the default None value.
+        save_path: str, list of str, tuple of str
+            saving path of the generated figure, if None, no figure is saved
+        ax: mpl.axes._subplots.AxesSubplot (matplotlib axis from subplots), list of ax, or tuple of ax
+            axis or list of axis from subplot from matplotlib where the ratemap will be plotted.
+            If None, ax is generated with default options.
+        plot_every: int
+            time steps skipped to make the plot to reduce cluttering
+
+        Returns
+        -------
+        x: ndarray (n_samples,)
+            x position throughout recording of the given session
+        y: ndarray (n_samples,)
+            y position throughout recording of the given session
+        time_array: ndarray (n_samples,)
+            array with the timestamps in seconds per position of the given session
+
+        """
         if type(recording_index) is list or type(recording_index) is tuple:
             axis_list = []
-            for ind in recording_index:
-                ind_axis = self.plot_trajectory(ind, save_path=save_path, ax=ax, plot_every=plot_every)
+            for i, ind in enumerate(recording_index):
+                # Checking if rest of variables are default or list values
+                if save_path is not None:
+                    save_path_i = None
+                else:
+                    save_path_i = save_path[i]
+                if ax is not None:
+                    ax_i = ax[0]
+                else:
+                    ax_i = None
+                ind_axis = self.plot_trajectory(ind, save_path=save_path_i, ax=ax_i, plot_every=plot_every)
                 axis_list.append(ind_axis)
             return axis_list
 
+        # Generate axis in case ax is None
         if ax is None:
             f, ax = plt.subplots(1, 1, figsize=(8, 6))
 
@@ -353,12 +417,34 @@ class Hafting2008Data(Experiment):
         tetrode_id = self._find_tetrode(rev_vars)
 
         time_array, test_spikes, x, y = self.get_tetrode_data(session_data, tetrode_id)
+        # Helper function to format the trajectory plot
         self._make_trajectory_plot(x, y, ax, plot_every)
 
         return x, y, time_array
 
-    def _make_trajectory_plot(self, x, y, ax, plot_every, fontsize=24):
+    def _make_trajectory_plot(self, x, y, ax, plot_every, fontsize = 24):
+        """
 
+        Parameters
+        ----------
+        x: ndarray (n_samples,)
+            x position throughout recording of the given session
+        y: ndarray (n_samples,)
+            y position throughout recording of the given session
+        ax: mpl.axes._subplots.AxesSubplot (matplotlib axis from subplots)
+            axis from subplot from matplotlib where the ratemap will be plotted.
+        plot_every: int
+            time steps skipped to make the plot to reduce cluttering
+        fontsize: int
+            fontsize of labels in the plot
+
+        Returns
+        -------
+        ax: mpl.axes._subplots.AxesSubplot (matplotlib axis from subplots)
+            Modified axis where the trajectory is plotted
+        """
+
+        # Plotting borders of the arena
         ax.plot([self.arena_limits[0, 0], self.arena_limits[0, 0]],
                 [self.arena_limits[1, 0], self.arena_limits[1, 1]], "C3", lw=3)
         ax.plot([self.arena_limits[0, 1], self.arena_limits[0, 1]],
@@ -368,6 +454,7 @@ class Hafting2008Data(Experiment):
         ax.plot([self.arena_limits[0, 0], self.arena_limits[0, 1]],
                 [self.arena_limits[1, 0], self.arena_limits[1, 0]], "C3", lw=3)
 
+        # Setting colormap of trajectory
         cmap = mpl.cm.get_cmap("plasma")
         norm = plt.Normalize(0, np.size(x))
 
@@ -381,9 +468,9 @@ class Hafting2008Data(Experiment):
                 y_ = [y[i], y[i + plot_every]]
                 aux_x.append(x[i])
                 aux_y.append(y[i])
-                sc = ax.plot(x_, y_, "-", color=cmap(norm(i)), alpha=0.6) #linewidth=1)
-        # ax.set_xticks([])
-        # ax.set_yticks([])
+                sc = ax.plot(x_, y_, "-", color=cmap(norm(i)), alpha=0.6)
+
+        # Setting plot labels
         ax.set_ylabel('width', fontsize=fontsize)
         ax.set_xlabel('depth', fontsize=fontsize)
         ax.set_title("position", fontsize=fontsize)
@@ -393,9 +480,11 @@ class Hafting2008Data(Experiment):
         norm = plt.Normalize(0, np.size(x))
         sc = ax.scatter(aux_x, aux_y, c=np.arange(len(aux_x)), vmin=0, vmax=len(x), cmap="plasma", alpha=0.6, s=0.1)
 
+        # Setting colorbar to show number of sampled (time steps) recorded
         cbar = plt.colorbar(sc, ax=ax, ticks=[0, len(x)])
         cbar.ax.tick_params(labelsize=fontsize)
         cbar.ax.set_ylabel('N steps', rotation=270, fontsize=fontsize)
         cbar.ax.set_yticklabels([0, len(x)], fontsize=fontsize)
         ax.set_xlim([np.amin([x.min(), y.min()])-1.0, np.amax([x.max(), y.max()])+1.0])
         ax.set_ylim([np.amin([x.min(), y.min()])-1.0, np.amax([x.max(), y.max()])+1.0])
+        return ax
