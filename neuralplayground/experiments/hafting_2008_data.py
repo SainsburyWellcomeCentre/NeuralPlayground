@@ -64,7 +64,7 @@ class Hafting2008Data(Experiment):
     def _load_data(self):
         """ Parse data according to specific data format
         if you are a user check the notebook examples """
-        self.best_recording_index = 4  # Nice session with nice recording as default
+        self.best_recording_index = 4  # Nice session recording as default
         # Arena limits from the experimental setting, first row x limits, second row y limits, in cm
         self.arena_limits = np.array([[-200, 200], [-20, 20]])
         data_path_list = glob.glob(self.data_path + "*.mat")
