@@ -45,12 +45,15 @@ class Hafting2008Data(Experiment):
             self.show_data()
 
     def set_animal_data(self, recording_index: int = 0, tolerance: float = 1e-10):
+        """Set position and head direction to be used by the Arena Class later"""
         session_data, rev_vars, rat_info = self.get_recording_data(recording_index)
         tetrode_id = self._find_tetrode(rev_vars)
         time_array, test_spikes, x, y = self.get_tetrode_data(session_data, tetrode_id)
 
+        # Position from meters to cm
         self.position = np.stack([x, y], axis=1) * 100
         head_direction = np.diff(self.position, axis=0)
+        # Compute head direction from position derivative
         head_direction = head_direction/np.sqrt(np.sum(head_direction**2, axis=1) + tolerance)[..., np.newaxis]
         self.head_direction = head_direction
 
@@ -244,7 +247,7 @@ class Hafting2008Data(Experiment):
 
     def plot_recording_tetr(self, recording_index: Union[int, tuple, list] = None,
                             save_path: Union[str, tuple, list] = None,
-                            ax: Union[mpl.axes._subplots.AxesSubplot, tuple, list] = None,
+                            ax: Union[mpl.axes.Axes, tuple, list] = None,
                             tetrode_id: Union[str, tuple, list] = None,
                             bin_size: float = 2.0):
         """ Plot tetrode ratemap from spike data for a given recording index or a list of recording index.
@@ -365,7 +368,7 @@ class Hafting2008Data(Experiment):
 
     def plot_trajectory(self, recording_index: Union[int, tuple, list] = None,
                         save_path: Union[str, tuple, list] = None,
-                        ax: Union[mpl.axes._subplots.AxesSubplot, tuple, list] = None,
+                        ax: Union[mpl.axes.Axes, tuple, list] = None,
                         plot_every: int = 20):
         """ Plot animal trajectory from a given recording index, corresponding to a recording session
 
