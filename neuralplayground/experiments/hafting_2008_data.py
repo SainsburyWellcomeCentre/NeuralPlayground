@@ -147,7 +147,24 @@ class Hafting2008Data(Experiment):
         rat_id, sess, recorded_vars = list_item["rat_id"], list_item["session"], list_item["recorded_vars"]
         return rat_id, sess, recorded_vars
 
-    def get_recording_data(self, recording_index=None):
+    def get_recording_data(self, recording_index: int = None):
+        """ Get experimental data for a given recordin index
+
+        Parameters
+        ----------
+        recording_index: int
+            recording identifier, index in pandas dataframe with listed data
+
+        Returns
+        -------
+        session_data: dict
+            Dictionary with recorded raw data from the session of the respective recording index
+            Format of this data follows original readme from the authors of the experiments
+        rec_vars: list of str
+            keys of session_data dict
+        identifiers: dict
+            Dictionary with rat_id and session_id of the returned session data
+        """
         if recording_index is None:
             recording_index = self.best_recording_index
         if type(recording_index) is list or type(recording_index) is tuple:
@@ -160,7 +177,8 @@ class Hafting2008Data(Experiment):
         else:
             rat_id, sess, rec_vars = self.get_recorded_session(recording_index)
             session_data = self.data_per_animal[rat_id][sess]
-            return session_data, rec_vars, {"rat_id": rat_id, "sess": sess}
+            identifiers = {"rat_id": rat_id, "sess": sess}
+            return session_data, rec_vars, identifiers
 
     def _find_tetrode(self, rev_vars):
         tetrode_id = next(

@@ -63,7 +63,7 @@ class BasicSargolini2006(Simple2D):
 
         self.data_path = data_path
         self.environment_name = environment_name
-        self.data = SargoliniData(data_path=self.data_path, experiment_name=self.environment_name)
+        self.data = SargoliniDataTrajectory(data_path=self.data_path, experiment_name=self.environment_name)
         self.arena_limits = self.data.arena_limits
         self.arena_x_limits, self.arena_y_limits = self.arena_limits[0, :], self.arena_limits[1, :]
         env_kwargs["arena_x_limits"] = self.arena_x_limits
