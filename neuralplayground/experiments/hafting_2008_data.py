@@ -18,7 +18,21 @@ class Hafting2008Data(Experiment):
         This class is also used for Sargolini2006Data due to similir data structure
     """
 
-    def __init__(self, data_path=None, recording_index=None, experiment_name="FullHaftingData", verbose=False,):
+    def __init__(self, data_path: str = None, recording_index: int = None,
+                 experiment_name: str = "FullHaftingData", verbose: bool = False):
+        """ Hafting2008Data Init
+
+        Parameters
+        ----------
+        data_path: str
+            if None, load the data sample in the package, else load data from given path
+        recording_index: int
+            if None, load data from default recording index
+        experiment_name: str
+            string to identify object in case of multiple instances
+        verbose:
+            if True, it will print original readme and data structure when initializing this object
+        """
         self.experiment_name = experiment_name
         self._find_data_path(data_path)
         self._load_data()
@@ -40,12 +54,15 @@ class Hafting2008Data(Experiment):
         self.head_direction = head_direction
 
     def _find_data_path(self, data_path):
+        """Set self.data_path to the data directory within the package"""
         if data_path is None:
             self.data_path = os.path.join(neuralplayground.__path__[0], "experiments/hafting_2008/")
         else:
             self.data_path = data_path
 
     def _load_data(self):
+        """ Parse data according to specific data format
+        if you are a user check the notebook examples """
         self.best_recording_index = 4
         self.arena_limits = np.array([[-200, 200], [-20, 20]])
         data_path_list = glob.glob(self.data_path + "*.mat")
@@ -72,6 +89,7 @@ class Hafting2008Data(Experiment):
                     self.data_per_animal[m_id][sess][session_info] = cleaned_data
 
     def _create_dataframe(self):
+        """ Generate dataframe for easy display and access of data """
         self.list = []
         l = 0
         for rat_id, rat_sess in self.data_per_animal.items():
@@ -81,7 +99,19 @@ class Hafting2008Data(Experiment):
                 l += 1
         self.recording_list = pd.DataFrame(self.list).set_index("rec_index")
 
-    def show_data(self, full_dataframe=False):
+    def show_data(self, full_dataframe: bool = False):
+        """ Print of available data
+
+        Parameters
+        ----------
+        full_dataframe: bool
+            if True, it will show all available data, a small sample otherwise
+
+        Returns
+        -------
+        recording_list: Pandas dataframe
+            List of available data, columns with rat_id, recording session and recorded variables
+        """
         print("Dataframe with recordings")
         if full_dataframe:
             pd.set_option('display.max_rows', None)
@@ -90,11 +120,27 @@ class Hafting2008Data(Experiment):
         return self.recording_list
 
     def show_readme(self):
+        """ Print original readme of the dataset """
         readme_path = glob.glob(self.data_path + "readme" + "*.txt")[0]
         with open(readme_path, 'r') as fin:
             print(fin.read())
 
-    def get_recorded_session(self, recording_index=None):
+    def get_recorded_session(self, recording_index: int = None):
+        """ Get identifiers to sort the experimental data
+
+        Parameters
+        ----------
+        recording_index: int
+            recording identifier, index in pandas dataframe with listed data
+        Returns
+        -------
+        rat_id: str
+            rat identifier from experiment
+        sess: str
+            recording session identifier from experiment
+        recorded_vars: list of str
+            Variables recorded from a given session
+        """
         if recording_index is None:
             recording_index = self.best_recording_index
         list_item = self.recording_list.iloc[recording_index]

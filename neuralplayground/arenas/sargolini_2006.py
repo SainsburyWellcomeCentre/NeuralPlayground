@@ -1,5 +1,5 @@
 from neuralplayground.arenas import Simple2D
-from neuralplayground.experiments import SargoliniData, Sargolini2006Data
+from neuralplayground.experiments import SargoliniDataTrajectory, Sargolini2006Data
 import numpy as np
 
 

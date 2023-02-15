@@ -22,7 +22,7 @@ class SargoliniDataTrajectory(Experiment):
         experiment_name: str
             string to identify object in case of multiple instances
         data_path: str
-            if None, load the data sample in the package, load the specific dataset otherwise
+            if None, load the data sample in the package, else load data from given path
         """
         self.experiment_name = experiment_name
         if data_path is None:
