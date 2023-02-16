@@ -7,8 +7,6 @@ import scipy.io as sio
 import numpy as np
 import neuralplayground
 import warnings
-from scipy.ndimage import gaussian_filter1d, gaussian_filter
-from scipy.interpolate import interp1d
 from neuralplayground.utils import get_2D_ratemap, OnlineRateMap
 from neuralplayground.experiments.hafting_2008_data import Hafting2008Data
 
@@ -18,19 +16,36 @@ class Wernle2018Data(Hafting2008Data):
     The data can be obtained from https://doi.org/10.11582/2017.00023
     """
 
-    def __init__(self, data_path=None, recording_index=None, experiment_name="Wernle2018", verbose=False):
+    def __init__(self, data_path: str = None, recording_index: int = None,
+                 experiment_name: str = "FullWernleData", verbose: bool = False):
+        """ Wernle2018Data init, just initializing parent class Hafting2008Data
+
+        Parameters
+        ----------
+        data_path: str
+            if None, load the data sample in the package, else load data from given path
+        recording_index: int
+            if None, load data from default recording index
+        experiment_name: str
+            string to identify object in case of multiple instances
+        verbose:
+            if True, it will print original readme and data structure when initializing this object
+        """
         super().__init__(data_path=data_path, recording_index=recording_index,
                          experiment_name=experiment_name, verbose=verbose)
 
     def _find_data_path(self, data_path):
+        """Set self.data_path to the data directory within the package"""
         if data_path is None:
             self.data_path = os.path.join(neuralplayground.__path__[0], "experiments/wernle_2018/")
         else:
             self.data_path = data_path
 
-    def set_animal_data(self, recording_index=0, tolerance=1e-10):
+    def set_animal_data(self, recording_index: int = 0, tolerance: float = 1e-10):
+        """Set position and head direction to be used by the Arena Class later"""
         session_data, rev_vars, rat_info = self.get_recording_data(recording_index)
 
+        # Some of the recorded data in the list do not include positional data
         if type(rev_vars) is list:
             time_array, x, y = session_data["time"], session_data["posx"], session_data["posy"]
         else:
@@ -38,8 +53,10 @@ class Wernle2018Data(Hafting2008Data):
             return
         pass
 
+        # Position from meters to cm
         self.position = np.stack([x, y], axis=1) * 100
         head_direction = np.diff(self.position, axis=0)
+        # Compute head direction from position derivative
         head_direction = head_direction/np.sqrt(np.sum(head_direction**2, axis=1) + tolerance)[..., np.newaxis]
         self.head_direction = head_direction
 
@@ -48,7 +65,7 @@ class Wernle2018Data(Hafting2008Data):
         This method loads the recording data of the paper generating the following attributes.
         For further details refer to the readme of the original repo for the paper with the variable description.
 
-        Returns
+        Returns (set the following attributes)
         -------
         self.ratemap : ndarray
             (128 x 2) where each element is a 100x100 ratemap from 10 different rats

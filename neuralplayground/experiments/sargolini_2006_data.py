@@ -79,25 +79,42 @@ class SargoliniDataTrajectory(Experiment):
 class Sargolini2006Data(Hafting2008Data):
     """ Data class for sargolini et al. 2006. https://www.science.org/doi/10.1126/science.1125572
         The data can be obtained from https://archive.norstore.no/pages/public/datasetDetail.jsf?id=8F6BE356-3277-475C-87B1-C7A977632DA7
-        This class only consider animal raw animal trajectories and neural recordings
+        This class only consider animal raw animal trajectories and neural recordings.
     """
-    def __init__(self, data_path=None, recording_index=None, experiment_name="FullSargoliniData", verbose=False):
+    def __init__(self, data_path: str = None, recording_index: int = None,
+                 experiment_name: str = "FullSargoliniData", verbose: bool = False):
+        """ Sargolini2006Data init, just initializing parent class Hafting2008Data
+
+        Parameters
+        ----------
+        data_path: str
+            if None, load the data sample in the package, else load data from given path
+        recording_index: int
+            if None, load data from default recording index
+        experiment_name: str
+            string to identify object in case of multiple instances
+        verbose:
+            if True, it will print original readme and data structure when initializing this object
+        """
         super().__init__(data_path=data_path, recording_index=recording_index,
                          experiment_name=experiment_name, verbose=verbose)
 
-    def _find_data_path(self, data_path):
+    def _find_data_path(self, data_path: str):
+        """Set self.data_path to the data directory within the package"""
         if data_path is None:
             self.data_path = os.path.join(neuralplayground.__path__[0], "experiments/sargolini_2006/raw_data_sample/")
         else:
             self.data_path = data_path
 
     def _load_data(self):
-        self.best_recording_index = 0
-        # self.best_session = {"rat_id": "10704", "session": "20060402"}
+        """ Parse data according to specific data format
+        if you are a user check the notebook examples """
+        self.best_recording_index = 0  # Nice session recording as default
+        # Arena limits from the experimental setting, first row x limits, second row y limits, in cm
         self.arena_limits = np.array([[-50.0, 50.0], [-50.0, 50.0]])
-
         data_path_list = glob.glob(self.data_path + "*.mat")
         mice_ids = np.unique([dp.split("/")[-1][:5] for dp in data_path_list])
+        # Initialize data dictionary, later handled by this object itself (so don't worry about this)
         self.data_per_animal = {}
         for m_id in mice_ids:
             m_paths_list = glob.glob(self.data_path + m_id + "*.mat")
@@ -115,6 +132,7 @@ class Sargolini2006Data(Hafting2008Data):
                     else:
                         session_info = cell_id
                     r_path = glob.glob(self.data_path + m_id + "-" + sess + "*" + cell_id + "*.mat")
+                    # Interpolate to replace NaNs and stuff
                     cleaned_data = clean_data(sio.loadmat(r_path[0]))
                     if cell_id != "_POS" and not cell_id in ["_EEG", "_EGF"]:
                         try:
@@ -124,7 +142,27 @@ class Sargolini2006Data(Hafting2008Data):
                     else:
                         self.data_per_animal[m_id][sess][session_info] = cleaned_data
 
-    def get_tetrode_data(self, session_data=None, tetrode_id=None):
+    def get_tetrode_data(self, session_data: str = None, tetrode_id: str = None):
+        """ Return time stamp, position and spikes for a given session and tetrode
+
+        Parameters
+        ----------
+        session_data: str
+            if None, the session used corresponds to the default recording index
+        tetrode_id:
+            tetrode id in the corresponding session
+
+        Returns
+        -------
+        time_array: ndarray (n_samples,)
+            array with the timestamps in seconds per position of the given session
+        test_spikes: ndarray (n_spikes,)
+            spike times in seconds of the given session
+        x: ndarray (n_samples,)
+            x position throughout recording of the given session
+        y: ndarray (n_samples,)
+            y position throughout recording of the given session
+        """
         if session_data is None:
             session_data, rev_vars, rat_info = self.get_recording_data(recording_index=0)
             tetrode_id = self._find_tetrode(rev_vars)
@@ -138,6 +176,7 @@ class Sargolini2006Data(Hafting2008Data):
         tetrode_data = session_data[tetrode_id]
         test_spikes = tetrode_data[:, 0]
         time_array = time_array[:, 0]
+
         return time_array, test_spikes, x, y
 
 
