@@ -7,7 +7,7 @@ from neuralplayground.utils import check_crossing_wall
 
 class Simple2D(Environment):
     """
-    Methods
+    Methods (Some in addition to Environment class)
     ----------
     __init__(self, environment_name="2DEnv", **env_kwargs):
         Initialise the class
@@ -16,11 +16,13 @@ class Simple2D(Environment):
     step(self, action):
         Increment the global step count of the agent in the environment and moves the agent in a random direction with a fixed step size
     plot_trajectory(self, history_data=None, ax=None):
-        Plot the Trajectory of the agent in the environment
+        Plot the Trajectory of the agent in the environment. In addition to environment class.
+    _create_default_walls(self):
+        Generates outer border of the 2D environment based on the arena limits
 
     Attributes (Some in addition to the Environment class)
     ----------
-    state: array
+    state: ndarray
         Contains the x, y coordinate of the position and head direction of the agent (will be further developed)
         head_direction: ndarray
                 Contains the x and y Coordinates of the position
@@ -39,13 +41,10 @@ class Simple2D(Environment):
     observation: ndarray
         Fully observable environment, make_observation returns the state
         Array of the observation of the agent in the environment (Could be modified as the environments are evolves)
-    action: ndarray (env_dim,env_dim)
-        Array containing the action of the agent
-        In this case the delta_x and detla_y increment to the respective coordinate x and y of the position
     agent_step_size: float
          Size of the step when executing movement, agent_step_size*global_steps will give a measure of the total distance traversed by the agent
      """
-    def __init__(self, environment_name="2DEnv", **env_kwargs):
+    def __init__(self, environment_name: str = "2DEnv", **env_kwargs):
         """ Initialise the class
 
         Parameters
@@ -226,8 +225,6 @@ class Simple2D(Environment):
                 aux_y.append(s[1])
                 ax.plot(x_, y_, "-", color=cmap(norm(i)), alpha=0.6)
 
-            # ax.set_xticks([])
-            # ax.set_yticks([])
             sc = ax.scatter(aux_x, aux_y, c=np.arange(len(aux_x)), vmin=0, vmax=len(aux_x), cmap="plasma", alpha=0.6, s=0.1)
             cbar = plt.colorbar(sc, ax=ax, ticks=[0, len(state_history)])
             cbar.ax.set_ylabel('N steps', rotation=270, fontsize=16)

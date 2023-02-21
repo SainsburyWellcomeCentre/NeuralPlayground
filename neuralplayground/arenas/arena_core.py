@@ -17,13 +17,13 @@ class Environment(object):
     step(self, action):
         Runs the environment dynamics. Given some action, return observation, new state and reward.
     reset(self):
-        Re-initialize state. Returns observation and re-setted state
+        Re-initialize state and global counters. Returns observation and re-setted state
     save_environment(self, save_path: str):
         Save current variables of the object to re-instantiate the environment later
     restore_environment(self, save_path: str):
         Restore environment saved using save_environment method
     get_trajectory_data(self):
-        Return interaction history
+        Returns interaction history
 
     Attributes
     ----------
@@ -178,6 +178,7 @@ class Environment(object):
         """
         reward = 0
         return reward
+
 
 if __name__ == "__main__":
     env = Environment(environment_name="test_environment", time_step_size=0.5, one_kwarg_argument=10)
