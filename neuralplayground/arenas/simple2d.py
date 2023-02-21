@@ -2,7 +2,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 from neuralplayground.arenas.arena_core import Environment
 import numpy as np
-from ..utils import check_crossing_wall
+from neuralplayground.utils import check_crossing_wall
 
 
 class Simple2D(Environment):
@@ -18,15 +18,15 @@ class Simple2D(Environment):
     plot_trajectory(self, history_data=None, ax=None):
         Plot the Trajectory of the agent in the environment
 
-    Attribute
+    Attributes (Some in addition to the Environment class)
     ----------
-    self.state: array
+    state: array
         Contains the x, y coordinate of the position and head direction of the agent (will be further developed)
         head_direction: ndarray
                 Contains the x and y Coordinates of the position
         position: ndarray
                 Contains the x and y Coordinates of the position
-    self.history: dict
+    history: list of dicts
         Saved history over simulation steps (action, state, new_state, reward, global_steps)
     global_steps: int
         Counter of the number of steps in the environment
@@ -35,20 +35,15 @@ class Simple2D(Environment):
     room_depth: int
         Size of the environment in the y direction
     metadata: dict
-        Dictionary containing the metadata of the children experiment
-            doi: str
-                Add the reference to the experiemental results
+        Dictionary containing the metadata
     observation: ndarray
         Fully observable environment, make_observation returns the state
         Array of the observation of the agent in the environment (Could be modified as the environments are evolves)
     action: ndarray (env_dim,env_dim)
         Array containing the action of the agent
         In this case the delta_x and detla_y increment to the respective coordinate x and y of the position
-    reward: int
-        The reward that the animal recieves in this state
     agent_step_size: float
          Size of the step when executing movement, agent_step_size*global_steps will give a measure of the total distance traversed by the agent
-
      """
     def __init__(self, environment_name="2DEnv", **env_kwargs):
         """ Initialise the class
@@ -72,7 +67,6 @@ class Simple2D(Environment):
         """
         super().__init__(environment_name, **env_kwargs)
         self.metadata = {"env_kwargs": env_kwargs}
-        # self.room_width, self.room_depth = env_kwargs["room_width"], env_kwargs["room_depth"]
         self.arena_x_limits, self.arena_y_limits = env_kwargs["arena_x_limits"], env_kwargs["arena_y_limits"]
         self.arena_limits = np.array([[self.arena_x_limits[0], self.arena_x_limits[1]],
                                       [self.arena_y_limits[0], self.arena_y_limits[1]]])
@@ -129,7 +123,7 @@ class Simple2D(Environment):
         observation = self.make_observation()
         return observation, self.state
 
-    def step(self, action, normalize_step=False):
+    def step(self, action: np.ndarray, normalize_step: bool = False):
         """ Increment the global step count of the agent in the environment and updates the position of the agent according 
         to the recordings of the specific chosen session (Action is ignored in this case)
 
@@ -141,10 +135,10 @@ class Simple2D(Environment):
 
         Returns
         -------
-        reward: int
-            The reward that the animal recieves in this state
-        new_state: tuple
-            Update the state with the updated vector of coordinate x and y of position and head directions espectively
+        reward: float
+            The reward that the animal receives in this state
+        new_state: ndarray
+            Update the state with the updated vector of coordinate x and y of position and head directions respectively
         observation: ndarray
             Fully observable environment, make_observation returns the state
             Array of the observation of the agent in the environment ( Could be modified as the environments are evolves)
@@ -157,7 +151,7 @@ class Simple2D(Environment):
         else:
             new_state = self.state + action
         new_state, valid_action = self.validate_action(self.state, action, new_state)
-        reward = 0  # If you get reward, it should be coded here
+        reward = self.reward_function(action, self.state)  # If you get reward, it should be coded here
         transition = {"action": action, "state": self.state, "next_state": new_state,
                       "reward": reward, "step": self.global_steps}
         self.history.append(transition)

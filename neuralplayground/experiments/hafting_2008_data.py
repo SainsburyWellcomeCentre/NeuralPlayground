@@ -16,7 +16,7 @@ class Hafting2008Data(Experiment):
     """ Data class for Hafting et al. 2008. https://www.nature.com/articles/nature06957
         The data can be obtained from https://archive.norstore.no/pages/public/datasetDetail.jsf?id=C43035A4-5CC5-44F2-B207-126922523FD9
         This class only consider animal raw animal trajectories and neural recordings
-        This class is also used for Sargolini2006Data due to similir data structure
+        This class is also used for Sargolini2006Data due to its similar data structure
     """
 
     def __init__(self, data_path: str = None, recording_index: int = None,

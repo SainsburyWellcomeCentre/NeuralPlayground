@@ -1,6 +1,6 @@
 """
 Base class for models that can interact with environments in this repo
-Any EHC model should inherit this class in order to interact with environments and compare against experimental results
+Any neuralplayground model should inherit this class in order to interact with environments and compare against experimental results
 We expect to make profound changes in this module as we add more EHC model to the repo
 """
 import numpy as np
