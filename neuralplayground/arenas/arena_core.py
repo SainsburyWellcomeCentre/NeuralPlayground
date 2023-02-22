@@ -49,10 +49,10 @@ class Environment(object):
         ----------
         environment_name: str
             environment name for the specific instantiation of the object
-        env_kwargs
+        env_kwargs: dict
             Define within each subclass for specific environments
             time_step_size: float
-               Size of the time step relative to real time
+               Size of the time step in seconds
         """
         self.environment_name = environment_name
         if "time_step_size" in env_kwargs.keys():
@@ -80,26 +80,34 @@ class Environment(object):
         return self.state
 
     def step(self, action=None):
-        """ Runs the environment dynamics.
-        Given some action, return observation, new state and reward
+        """ Runs the environment dynamics. Increasing global counters.
+        Given some action, return observation, new state and reward.
+
+        Parameters
+        ----------
+        action:
+            Abstract argument representing the action from the agent
 
         Returns
         -------
-        reward: int
-            The reward that the animal receives in this state transition
         observation:
             Define within each subclass for specific environments
             Any set of observation that is made by the agent in the environment (position, visual features,...)
         self.state:
             Define within each subclass for specific environments
             Variable containing the state of the environment (eg.position in the environment)
+        reward: int
+            The reward that the animal receives in this state transition
         """
         observation = self.make_observation()  # Build sensory info from current state
         reward = self.reward_function(action, self.state)
-        self.global_steps += 1
-        self.global_time += self.time_step_size
+        self._increase_global_step()
         # state should be updated as well
         return observation, self.state, reward
+
+    def _increase_global_step(self):
+        self.global_steps += 1
+        self.global_time += self.time_step_size
 
     def reset(self):
         """ Re-initialize state. Returns observation and re-setted state
