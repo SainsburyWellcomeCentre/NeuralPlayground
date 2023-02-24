@@ -5,10 +5,10 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="neuralplayground",
-    version="0.0.1",
-    author="clem_domine_rod_carrasco",
+    version="0.7bN",
+    author="Clementine Domine and Rodrigo Carrasco-Davis",
     author_email="rodrigo.carrasco.davis@gmail.com",
-    description="A Standardized Environment for Hippocampus and Entorhinal Cortex models",
+    description="NeuralPlayground: A Standardised Environment for Evaluating Models of Hippocampus and Entorhinal Cortex",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/ClementineDomine/EHC_model_comparison",
