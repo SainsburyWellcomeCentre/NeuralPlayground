@@ -1,5 +1,5 @@
 from neuralplayground.arenas import Simple2D
-from neuralplayground.experiments import SargoliniData, Sargolini2006Data
+from neuralplayground.experiments import SargoliniDataTrajectory, Sargolini2006Data
 import numpy as np
 
 
@@ -63,7 +63,7 @@ class BasicSargolini2006(Simple2D):
 
         self.data_path = data_path
         self.environment_name = environment_name
-        self.data = SargoliniData(data_path=self.data_path, experiment_name=self.environment_name)
+        self.data = SargoliniDataTrajectory(data_path=self.data_path, experiment_name=self.environment_name)
         self.arena_limits = self.data.arena_limits
         self.arena_x_limits, self.arena_y_limits = self.arena_limits[0, :], self.arena_limits[1, :]
         env_kwargs["arena_x_limits"] = self.arena_x_limits
@@ -177,7 +177,7 @@ class Sargolini2006(Simple2D):
 
         """
     def __init__(self, data_path=None, environment_name="Sargolini2006", session=None, verbose=False,
-                 random_steps=False, **env_kwargs):
+                 use_agent_steps=False, **env_kwargs):
         """  Initialise the class
 
         Parameters
@@ -207,7 +207,7 @@ class Sargolini2006(Simple2D):
         env_kwargs["arena_x_limits"] = self.arena_x_limits
         env_kwargs["arena_y_limits"] = self.arena_y_limits
         env_kwargs["agent_step_size"] = 1/50  # In seconds
-        self.random_steps = random_steps
+        self.use_agent_steps = use_agent_steps
         super().__init__(environment_name, **env_kwargs)
         self.metadata["doi"] = "https://doi.org/10.1126/science.1125572"
         self.total_number_of_steps = self.data.position.shape[0]
@@ -232,7 +232,7 @@ class Sargolini2006(Simple2D):
             self.head_dir: ndarray (env_dim,)
                 Vector of the x and y coordinate of the animal head position in the environment
         """
-        if self.random_steps:
+        if self.use_agent_steps:
             return super().reset()
 
         self.global_steps = 0
@@ -244,7 +244,7 @@ class Sargolini2006(Simple2D):
         observation = self.make_observation()
         return observation, self.state
 
-    def step(self, action, skip_every=10):
+    def step(self, action, normalize_step=False, skip_every=10):
         """ Increment the global step count of the agent in the environment and updates the position of the agent according
         to the recordings of the specific chosen session (Action is ignored in this case)
 
@@ -265,7 +265,7 @@ class Sargolini2006(Simple2D):
             Array of the observation of the agent in the environment ( Could be modified as the environments are evolves)
 
         """
-        if self.random_steps:
+        if self.use_agent_steps:
             return super().step(action)
         if self.global_steps*skip_every >= self.data.position.shape[0]-1:
             self.global_steps = np.random.choice(np.arange(skip_every))

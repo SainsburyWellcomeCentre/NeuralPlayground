@@ -26,6 +26,7 @@ neuralplayground/comparison_board/default_routine_script.py
 neuralplayground/comparison_board/default_run.py
 neuralplayground/comparison_board/experimentconfig.py
 neuralplayground/experiments/__init__.py
+neuralplayground/experiments/experiment_core.py
 neuralplayground/experiments/hafting_2008_data.py
 neuralplayground/experiments/sargolini_2006_data.py
 neuralplayground/experiments/wernle_2018_data.py

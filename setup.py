@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="neuralplayground",
-    version="0.7bN",
+    version="0.7b.0",
     author="Clementine Domine and Rodrigo Carrasco-Davis",
     author_email="rodrigo.carrasco.davis@gmail.com",
     description="NeuralPlayground: A Standardised Environment for Evaluating Models of Hippocampus and Entorhinal Cortex",
