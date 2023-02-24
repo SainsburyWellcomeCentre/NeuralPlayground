@@ -18,6 +18,13 @@ This framework will allow neuroscientists to easily contrast the different hippo
 We create this framework with the perspective that the neuroscience community should be able to continue its development by increasing the databases of model and experimental results without our intervention. Therefore, the software is made easy to use, facilitating future growth. This new environment will revolutionize how theoretical models are proposed in neuroscience and push for easy access and implementation of new ideas.
 
 ## 2. Installation
+You can create a new environment using conda, and the yml file with all the right 
+dependencies by running
+```
+conda env create --name NPG --file=requirements.yml
+conda activate NPG
+```
+
 For now, install using pip for local editing and testing
 ```
 pip install --upgrade setuptools wheel 

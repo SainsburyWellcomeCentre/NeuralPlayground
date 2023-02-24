@@ -169,7 +169,7 @@ dependencies:
   - requests=2.28.1=py310h06a4308_0
   - scipy=1.10.0=py310hd5efca6_0
   - send2trash=1.8.0=pyhd3eb1b0_1
-  - setuptools=65.6.3=py310h06a4308_0
+  - setuptools=67.4.0=pyhd8ed1ab_0
   - sip=6.6.2=py310h6a678d5_0
   - six=1.16.0=pyhd3eb1b0_1
   - sniffio=1.2.0=py310h06a4308_1
@@ -191,7 +191,7 @@ dependencies:
   - wcwidth=0.2.5=pyhd3eb1b0_0
   - webencodings=0.5.1=py310h06a4308_1
   - websocket-client=0.58.0=py310h06a4308_4
-  - wheel=0.37.1=pyhd3eb1b0_0
+  - wheel=0.38.4=pyhd8ed1ab_0
   - widgetsnbextension=3.5.2=py310h06a4308_0
   - xz=5.2.10=h5eee18b_1
   - zeromq=4.3.4=h2531618_0
