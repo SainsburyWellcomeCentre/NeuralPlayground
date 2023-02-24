@@ -11,7 +11,7 @@ setuptools.setup(
     description="NeuralPlayground: A Standardised Environment for Evaluating Models of Hippocampus and Entorhinal Cortex",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/ClementineDomine/EHC_model_comparison",
+    url="https://github.com/ClementineDomine/NeuralPlayground",
     packages=setuptools.find_packages(),
     classifiers=(
         "Programming Language :: Python :: 3",
