@@ -186,14 +186,14 @@ class Simple2D(Environment):
         new_state: (2,) 2d-ndarray
             corrected new state. If it is not crossing the wall, then the new_state stays the same, if the state cross the
             wall, new_state will be corrected to a valid place without crossing the wall
-        valid_action: bool
-            True if the change in state did not cross a wall
+        crossed_wall: bool
+            True if the change in state crossed a wall and was corrected
         """
-        valid_action = True
+        crossed_wall = False
         for wall in self.wall_list:
-            new_state, new_valid_action = check_crossing_wall(pre_state=pre_state, new_state=new_state, wall=wall)
-            valid_action = new_valid_action and valid_action
-        return new_state, valid_action
+            new_state, crossed = check_crossing_wall(pre_state=pre_state, new_state=new_state, wall=wall)
+            crossed_wall = crossed or crossed_wall
+        return new_state, crossed_wall
 
     def plot_trajectory(self, history_data: list = None, ax=None, return_figure: bool = False):
         """ Plot the Trajectory of the agent in the environment
