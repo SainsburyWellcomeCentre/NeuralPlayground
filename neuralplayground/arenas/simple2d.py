@@ -74,10 +74,11 @@ class Simple2D(Environment):
         self.room_depth = np.diff(self.arena_y_limits)[0]
         self.agent_step_size = env_kwargs["agent_step_size"]
         self.state_dims_labels = ["x_pos", "y_pos"]
-        self.reset()
         self._create_default_walls()
         self._create_custom_walls()
         self.wall_list = self.default_walls + self.custom_walls
+        self.state_dims_labels = ["x_pos", "y_pos"]
+        self.reset()
 
     def _create_default_walls(self):
         """ Generate walls to limit the arena based on the limits given in kwargs when initializing the object.
@@ -105,6 +106,7 @@ class Simple2D(Environment):
 
     def reset(self, random_state: bool = False, custom_state: np.ndarray = None):
         """ Reset the environment variables
+
         Parameters
         ----------
         random_state: bool
@@ -118,10 +120,11 @@ class Simple2D(Environment):
             Because this is a fully observable environment, make_observation returns the state of the environment
             Array of the observation of the agent in the environment (Could be modified as the environments are evolves)
 
-        self.state: ndarray (env_dim,)
+        self.state: ndarray (2,)
             Vector of the x and y coordinate of the position of the animal in the environment
         """
         self.global_steps = 0
+        self.global_time = 0
         self.history = []
         if random_state:
             self.state = [np.random.uniform(low=self.arena_limits[0, 0], high=self.arena_limits[0, 1]),
@@ -231,7 +234,7 @@ class Simple2D(Environment):
         for wall in self.custom_walls:
             ax.plot(wall[:, 0], wall[:, 1], "C0", lw=3)
 
-        # Make plot of possitions
+        # Make plot of positions
         if len(history_data) != 0:
             state_history = [s["state"] for s in history_data]
             next_state_history = [s["next_state"] for s in history_data]
@@ -242,6 +245,7 @@ class Simple2D(Environment):
             norm = plt.Normalize(0, len(state_history))
 
             aux_x = []
+            aux_y = []
             aux_y = []
             for i, s in enumerate(state_history):
                 x_ = [s[0], next_state_history[i][0]]

@@ -107,7 +107,7 @@ class Hafting2008Data(Experiment):
         self.recording_list = pd.DataFrame(self.list).set_index("rec_index")
 
     def show_data(self, full_dataframe: bool = False):
-        """ Print of available data
+        """ Print of available data recorded in the experiment
 
         Parameters
         ----------
