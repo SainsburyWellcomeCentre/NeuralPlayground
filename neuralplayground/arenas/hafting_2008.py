@@ -2,6 +2,7 @@ import copy
 from neuralplayground.arenas import Simple2D
 import numpy as np
 from neuralplayground.experiments import Hafting2008Data
+from typing import Union
 
 
 class Hafting2008(Simple2D):
@@ -16,38 +17,17 @@ class Hafting2008(Simple2D):
        Increment the global step count of the agent in the environment and updates the position of the agent according
        to the recordings of the specific chosen session
 
-    Attribute
-    ----------
-    self.state: array
-        Contains the x, y coordinate of the position and head direction of the agent (will be further developed)
-        head_direction: ndarray
-            Contains the x and y Coordinates of the position
-        position: ndarray
-            Contains the x and y Coordinates of the position
-    self.history: dict
-        Saved history over simulation steps (action, state, new_state, reward, global_steps)
-    global_steps: int
-        Counter of the number of steps in the environment
-    room_width: int
-        Size of the environment in the x direction
-    room_depth: int
-        Size of the environment in the y direction
-    metadata: dict
-        Dictionary containing the metadata of the children experiment
-            doi: str
-                Add the reference to the experiemental results
-    observation: ndarray
-        Fully observable environment, make_observation returns the state
-        Array of the observation of the agent in the environment (Could be modified as the environments are evolves)
-    action: ndarray (env_dim,env_dim)
-        Array containing the action of the agent
-        In this case the delta_x and detla_y increment to the respective coordinate x and y of the position
-    reward: int
-        The reward that the animal recieves in this state
-
+    Attribute (In addition to the ones in Simple2D class)
+    ---------
+    use_behavioral_data: bool
+        If True, then uses the animal trajectories recorded in Hafting 2008
+    experiment: neuralplayground.experiments.Hafting2008Data
+        Experiment class object with neural recordings and animal trajectories
     """
+
     def __init__(self, use_behavioral_data: bool = False, data_path: str = None, recording_index: int = None,
-                 environment_name: str = "Hafting2008", verbose: bool = False, **env_kwargs):
+                 environment_name: str = "Hafting2008", verbose: bool = False, experiment_class=Hafting2008Data,
+                 **env_kwargs):
         """ Initialise the class
 
         Parameters
@@ -63,6 +43,8 @@ class Hafting2008(Simple2D):
             Name of the specific instantiation of the Hafting2008 class
         verbose:
             Set to True to show the information of the class
+        experiment_class:
+            Experiment class to be initialized
         env_kwargs: dict
             Leave empty in this class, the arena parameters and sampling values are set to resemble the experiment
             For full control over these parameters use Simple2D class
@@ -71,8 +53,8 @@ class Hafting2008(Simple2D):
         self.data_path = data_path
         self.environment_name = environment_name
         self.use_behavioral_data = use_behavioral_data
-        self.experiment = Hafting2008Data(data_path=self.data_path, experiment_name=self.environment_name,
-                                          verbose=verbose, recording_index=recording_index)
+        self.experiment = experiment_class(data_path=self.data_path, experiment_name=self.environment_name,
+                                           verbose=verbose, recording_index=recording_index)
         self.arena_limits = self.experiment.arena_limits
         self.arena_x_limits, self.arena_y_limits = self.arena_limits[0, :], self.arena_limits[1, :]
         env_kwargs["arena_x_limits"] = self.arena_x_limits
@@ -139,6 +121,22 @@ class Hafting2008(Simple2D):
         """
         self.experiment.show_data(full_dataframe=full_dataframe)
 
+    def plot_recording_tetr(self, recording_index: Union[int, tuple, list] = None,
+                            save_path: Union[str, tuple, list] = None,
+                            ax: Union[mpl.axes.Axes, tuple, list] = None,
+                            tetrode_id: Union[str, tuple, list] = None,
+                            bin_size: float = 2.0):
+        """ Check plot_recording_tetrode method from neuralplayground.experiments.Hafting2008Data """
+        return self.experiment.plot_recording_tetr(recording_index, save_path, ax, tetrode_id, bin_size)
+
+    def plot_recorded_trajectory(self, recording_index: Union[int, tuple, list] = None,
+                                 save_path: Union[str, tuple, list] = None,
+                                 ax: Union[mpl.axes.Axes, tuple, list] = None,
+                                 plot_every: int = 20):
+        """ Check plot_trajectory method from neuralplayground.experiments.Hafting2008Data """
+        return self.experiment.plot_trajectory(recording_index=recording_index, save_path=save_path,
+                                               ax=ax, plot_every=plot_every)
+
     def step(self, action: np.ndarray, normalize_step: bool = False, skip_every: int = 10):
         """ Runs the environment dynamics. Increasing global counters.
         Given some action, return observation, new state and reward.
@@ -174,8 +172,8 @@ class Hafting2008(Simple2D):
         self.global_time = self.global_steps*self.time_step_size
 
         # New state as "skip every" steps after the current one in the recording
-        new_state = self.experiment.position[self.global_steps * (skip_every), :], \
-            self.experiment.head_direction[self.global_steps * (skip_every), :]
+        new_state = self.experiment.position[self.global_steps * skip_every, :], \
+            self.experiment.head_direction[self.global_steps * skip_every, :]
         new_state = np.concatenate(new_state)
 
         # Inferring action from recording
