@@ -3,6 +3,7 @@ from neuralplayground.arenas import Simple2D
 import numpy as np
 from neuralplayground.experiments import Hafting2008Data
 from typing import Union
+import matplotlib as mpl
 
 
 class Hafting2008(Simple2D):
