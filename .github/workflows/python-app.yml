@@ -29,4 +29,4 @@ jobs:
     - name: Test with pytest
       run: |
         cd neuralplayground/tests
-        pytest -v *_test.py
+        $CONDA/bin/pytest -v *_test.py
