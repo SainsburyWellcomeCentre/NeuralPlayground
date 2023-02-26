@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 # from neuralplayground.experiments import SargoliniDataTrajectory
-# from neuralplayground.experiments import Hafting2008Data
+from neuralplayground.experiments import Hafting2008Data
 from neuralplayground.experiments import Wernle2018Data
 
 from neuralplayground.utils import check_crossing_wall
@@ -11,7 +11,7 @@ def plot_movement(pre_state, new_state, ax, valid):
     ax.plot([pre_state[0], new_state[0]], [pre_state[1], new_state[1]], label=str(valid))
 
 
-def test_walls():
+def trying_walls():
     wall = np.array([[0, 0],
                      [1, 1]])
 
@@ -34,9 +34,10 @@ def test_walls():
 
 if __name__ == "__main__":
     # data = SargoliniDataTrajectory()
-    # data = Hafting2008Data()
-    #data = Wernle2018Data()
-    test_walls()
+    data = Hafting2008Data()
+    data.plot_recording_tetr()
+    # data = Wernle2018Data()
+    # trying_walls()
 
 
     print("debug")
