@@ -10,6 +10,7 @@
 * [3 The Project](#3-Project)
 * [4 How to Contribute](#4-I-want-to-Contribute)
 * [5 Cite ](#5-Cite)
+* [6 Lisence ](#6-Lisence)
 
 ## 1. Introduction
 
@@ -66,6 +67,10 @@ Refer to the README.md files found in each of the modules for further details on
 ### 5. Cite 
 
 See [Citation](https://github.com/ClementineDomine/NeuralPlayground/blob/main/documents/citation.cff) for the correct citation of this framework. 
+
+### 6. Lisence
+
+More details about the liscence can be found [Lisence](https://github.com/ClementineDomine/NeuralPlayground/blob/main/documents/lisence.md)
 
 ## Contributors ✨
 
