@@ -7,7 +7,8 @@ import matplotlib as mpl
 
 
 class Hafting2008(Simple2D):
-    """
+    """ Arena resembling Hafting2008 experimental setting
+
     Methods
     ----------
     __init__
@@ -42,7 +43,7 @@ class Hafting2008(Simple2D):
             if None, load data from default recording index of corresponding experiment class
         environment_name: str
             Name of the specific instantiation of the Hafting2008 class
-        verbose:
+        verbose: bool
             Set to True to show the information of the class
         experiment_class:
             Experiment class to be initialized
