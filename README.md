@@ -34,7 +34,7 @@ pip install -e .
 ```
 
 ## 3. Project
-Please refer to the [Road map](https://github.com/ClementineDomine/NeuralPlayground/blob/main/documents/road_map.md) to understand the state of the project and get an idea of the direction it is going in. This open-source software was built to be collaborative and lasting. We hope that the framework will be simple enough to be adopted by a great number of neuroscientists, eventually guiding the path to the computational understanding of the HEC mechanisms. We follow reproducible, inclusive, and collaborative project design guidelines. All relevant documents can be found in [Documents](https://github.com/ClementineDomine/NeuralPlayground/blob/main/documents/)
+Please refer to the [Road map](https://github.com/ClementineDomine/NeuralPlayground/blob/main/documents/road_map.md) to understand the state of the project and get an idea of the direction it is going in. This open-source software was built to be collaborative and lasting. We hope that the framework will be simple enough to be adopted by a great number of neuroscientists, eventually guiding the path to the computational understanding of the HEC mechanisms. We follow reproducible, inclusive, and collaborative project design guidelines. All relevant documents can be found in [Documents](https://github.com/ClementineDomine/NeuralPlayground/blob/main/documents/).
 
 #### How to run a single model
 You will find in the [Examples](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples) file a simple implementation of every single model in a single Environment. The Agent and Environment class can be initialised to use data from an experiment. These two classes are allowed to interact to reproduce the full experimental setting. 
@@ -43,11 +43,11 @@ You will find in the [Examples](https://github.com/ClementineDomine/NeuralPlaygr
 
 There are many ways to contribute to the [NeuralPlayground](https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground). 
 
- 1. Implement a hippocampal and entorhinal cortex model of your choice. [Agent](https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground/agents)
+ 1. Implement a hippocampal and entorhinal cortex [Agent](https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground/agents) of your choice. 
      
- 2. Work on improving the arena [Arena](https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground/arenas)
+ 2. Work on improving the [Arena](https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground/arenas).
     
- 3. Add an experimental data set [Experiment](https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground/experiments)
+ 3. Add an [Experiment](https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground/experiments) al data set. 
 
 All contributions should be submitted through a pull request that we will later access. 
 Before sending a pull request, make sure you have the following: 
@@ -58,7 +58,7 @@ Before sending a pull request, make sure you have the following:
 
 3. Implemented and ran [Test](https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground/tests).
 
-4. Commented your work 
+4. Commented your work. 
     
 All contributions to the repository are acknowledged through the all-contributors bot and in a future publication.
 Refer to the README.md files found in each of the modules for further details on how to contribute to them.
@@ -70,7 +70,7 @@ See [Citation](https://github.com/ClementineDomine/NeuralPlayground/blob/main/do
 
 ### 6. Lisence
 
-More details about the liscence can be found at [Lisence](https://github.com/ClementineDomine/NeuralPlayground/blob/main/documents/lisence.md)
+More details about the liscence can be found at [Lisence](https://github.com/ClementineDomine/NeuralPlayground/blob/main/documents/lisence.md).
 
 ## Contributors ✨
 
