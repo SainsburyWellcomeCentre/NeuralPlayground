@@ -1,5 +1,17 @@
 
-# Arena and Experiment
+# Examples
 
-The Arena module is seprated in two submodules, the [Arena](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/arenas) and the [Experiment](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/experiments).
-This is done because the Environment class can be initialised to use data from an experiment. 
+The Examples section is organised in modules.
+
+## Agent
+
+
+
+## Arena
+
+You will find example Jupyternotebook demonstrating how to build the different arena architectures(both static and dynamical arenas). 
+
+
+## Experiment
+
+You will fins show how to esally access each of the data sets. Each data set as a respective jupyter notbook. 
