@@ -21,9 +21,9 @@ One of our goals is to expand this list to add more experiments that are relevan
 
 ## 3. How-to-Contribute
 
-1. Create a directory where to download and store the data.
+1. Create a directory where to download and store the data with name author_data.
 
-2. Create a class to read/filter the data following the template shown in the [Experiment_core](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/experiments/experiment_core.py).
+2. Create a class to read/filter with name  author_data_data the data following the template shown in the [Experiment_core](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/experiments/experiment_core.py). In particular, the new data class could inherits from the base Hafting_2008, whihc has implemented some basic functions.
 
 3. Cite the data appropriately.
 
