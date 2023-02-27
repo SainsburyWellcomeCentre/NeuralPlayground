@@ -1,4 +1,3 @@
-(contributors-record-highlights)=
 # Record of Contributions
 
 Taken from the Turing Way.
