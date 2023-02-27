@@ -1,9 +1,9 @@
 # Agent: The standardised environment for the hippocampus and entorhinal cortex models.
 
-
 * [1 Introduction](#1-Introduction)
-* [2 Model Implemented](#2-Model-Implemented )
+* [2 Model Implemented](#2-Model-Implemented)
 * [3 How to Contribute](#3-How-to-Contribute)
+
 
 ## 1.Introduction
 
