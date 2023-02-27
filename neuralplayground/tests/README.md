@@ -10,8 +10,8 @@ Anytime you submit a pull request, make sure you include tests.
 
 ## 2. Arena-Test
 
-Create a new test class inheriting from the TestSimple2D Class.
+Create a new test class inheriting from the [Agent_test](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/tests/agent_test.py) Class.
 
 ## 3. Agent-Test
 
-Create a new test class inheriting from the Testmodelcore Class.
+Create a new test class inheriting from the [Arena_test](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/tests/arena_test.py) Class.
