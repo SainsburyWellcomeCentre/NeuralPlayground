@@ -13,8 +13,7 @@
 * [6 Lisence ](#6-Lisence)
 
 ## 1. Introduction
-The abstract representation of space has been extensively studied in the hippocampus and entorhi-
-nal cortex in part due to the easy monitoring of the task and neural recording. A growing variety
+The abstract representation of space has been extensively studied in the hippocampus and entorhinal cortex in part due to the easy monitoring of the task and neural recording. A growing variety
 of theoretical models have been proposed to capture the rich neural and behavioral phenomena
 associated with these circuits. However, objective comparison of these theories against each other
 and against empirical data is difficult. 
@@ -22,14 +21,11 @@ and against empirical data is difficult.
 To address this gap, we present an open-source standardised
 software framework - NeuralPlayground - to enable adudication between models of hippocampus
 and entorhinal cortex. This Python software package offers a reproducible way to compare models
-against a centralised library of published experimental results, including neural recordings and ani-
-mal behavior. The framework currently contains implementations of three Agents, as well as three
+against a centralised library of published experimental results, including neural recordings and animal behavior. The framework currently contains implementations of three Agents, as well as three
 Experiments providing simple interfaces to publicly available neural and behavioral data. It also
 contains a customizable 2-dimensional Arena (continuous and discrete) able to produce common
 experimental environments which the agents can move in and interact with and a Comparison tool
-to facilitate systematic comparisons by enabling users to pick from any Agent, Arena, Experi-
-ments. Each modules can also be used separately, allowing flexible access to influential models and
-data sets. 
+to facilitate systematic comparisons by enabling users to pick from any Agent, Arena, Experiments. Each modules can also be used separately, allowing flexible access to influential models and data sets. 
 
 All together, we hope our framework, available at [github.com/NeuralPlayground](https://github.com/ClementineDomine/NeuralPlayground/), offers
 a foundation that the community will build upon, working toward a shared standardized, open, and
