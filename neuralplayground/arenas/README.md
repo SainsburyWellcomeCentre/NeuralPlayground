@@ -4,7 +4,7 @@
 * [2 Arena Implemented](#2-Arena-Implemented)
 * [3 How to Contribute](#3-How-to-Contribute)
 
-## 1.Introduction
+## 1. Introduction
 
 Arena provides an environment in which an agent can explore and potentially learn
 over time, reproducing aspects of the physical layout of an experimental paradigm in which behavioral
@@ -14,7 +14,7 @@ or cycles to be added. Dynamical arenas such as the merging room experiment in W
 al. (2018) can also be implemented. Each specific environment implemented to resemble an experimental setting should be created as a subclassof the main environment class. The Environment can be initialised with data from the real-life experiments. We will work toward improving each of
 the Environments through the projects, adding experimental specifications
 
-## 2.Arena-Implemented
+## 2. Arena-Implemented
 
 1. [Any 2D Environmement](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/arenas/simple2d.py)
 2. [Merging Room](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/arenas/connected_rooms.py)
