@@ -70,7 +70,7 @@ See [Citation](https://github.com/ClementineDomine/NeuralPlayground/blob/main/do
 
 ### 6. Lisence
 
-More details about the liscence can be found [Lisence](https://github.com/ClementineDomine/NeuralPlayground/blob/main/documents/lisence.md)
+More details about the liscence can be found at [Lisence](https://github.com/ClementineDomine/NeuralPlayground/blob/main/documents/lisence.md)
 
 ## Contributors ✨
 
