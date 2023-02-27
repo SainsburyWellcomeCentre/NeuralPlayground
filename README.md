@@ -71,7 +71,7 @@ Refere to the README.md files found in each the modules for further details on h
 
 ### 5. Cite 
 
-See [Citation](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/documents/Citation.cff) for correct citation of this framework. 
+See [Citation](https://github.com/ClementineDomine/NeuralPlayground/blob/main/documents/citation.cff) for correct citation of this framework. 
 
 ## Contributors ✨
 
