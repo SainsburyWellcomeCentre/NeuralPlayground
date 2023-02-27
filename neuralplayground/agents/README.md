@@ -20,13 +20,13 @@ with their surroundings (i.e. the environment). An agent receives observations f
 
   3. [Learning place cells, grid cells and invariances with excitatory and inhibitory plasticity](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/agents/weber_2018.py)
 
-Each of the models are implemented in a jupyter notebook in  [Examples](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples) to facilitate the intereraction.
+Each of the models are implemented in a jupyter notebook in [Examples](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples) to facilitate the intereraction.
 
 ## 3.How-to-Contribute
 
   1. Create a file that indicates the appropirate reference to the model
 
-  2. Create a class to run the model following the template shown in the [Modelcore.py](https://github.com/ClementineDomine/NeuralPlayground/blob/main/NeuralPlayground/agent/agent_core.py) and the [Style Guide](https://github.com/ClementineDomine/NeuralPlayground/tree/main/documents/style_guide.md).
+  2. Create a class to run the model following the template shown in the [Agent_core.py](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/agents/agent_core.py) and the [Style Guide](https://github.com/ClementineDomine/NeuralPlayground/tree/main/documents/style_guide.md).
   
   3. Create a [Examples](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples)  jupyter notebook for the new model where you can run the model in a chosen environement with selected experimental data
   
