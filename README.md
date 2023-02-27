@@ -62,14 +62,14 @@ There are many ways to contribute to the [NeuralPlayground](https://github.com/C
      
  2. Work on improving the [Arena](https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground/arenas).
     
- 3. Add an [Experimental](https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground/experiments)data set. 
+ 3. Add an [Experimental](https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground/experiments) data set. 
 
 All contributions should be submitted through a pull request that we will later access. 
 Before sending a pull request, make sure you have the following: 
 
 1. Checked the Licensing frameworks. 
 
-2. Followed the [PEP8](https://www.python.org/dev/peps/pep-0008/) and [numpy docstring](https://numpydoc.readthedocs.io/en/latest/format.html). More details found in [Style Guide](https://github.com/ClementineDomine/NeuralPlayground/tree/main/documents/style_guide/style_guide.md).
+2. Followed the [PEP8](https://www.python.org/dev/peps/pep-0008/) and [numpy docstring](https://numpydoc.readthedocs.io/en/latest/format.html). More details found in [Style Guide](https://github.com/ClementineDomine/NeuralPlayground/tree/main/documents/style_guide.md).
 
 3. Implemented and ran [Test](https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground/tests).
 
