@@ -1,4 +1,3 @@
-
 # ROADMAP
 
 * [1. Introduction](#1-Introduction)
@@ -11,11 +10,11 @@ This document will serve as a ROADMAP for the project.
 
 ## 2. Achieved
 
-Here are listed the mile stone achived by the project team
+Here are listed the milestone achieved by the project team
 
 1. Literature Review
 
-2. Environement
+2. Environment
     > [Implement Any 2D Environment](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/sehec/arenas/simple2d.py)
     
     > [Merging room](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/sehec/arenas/connected_rooms.py) 
@@ -23,49 +22,44 @@ Here are listed the mile stone achived by the project team
     > [Batch Environements](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/sehec/arenas/TEM_env.py)
     
 3. Agent
-      > [”Learning place cells, grid cells and invariances with excitatory and inhibitory”, Weber et al, 2018](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/examples/agent_examples/weber_2018_example.ipynb)
+      > [" Learning place cells, grid cells and invariances with excitatory and inhibitory", Weber et al, 2018](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/examples/agent_examples/weber_2018_example.ipynb)
 
-     > [”A general model of hippocampal and dorsal striatal learning and decision making”, Stachenfeld et al, 2018](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/examples/agent_examples/stachenfeld_2018_examples.ipynb)
+     > [" A general model of hippocampal and dorsal striatal learning and decision making", Stachenfeld et al, 2018](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/examples/agent_examples/stachenfeld_2018_examples.ipynb)
      
-     > [”The Tolman-Eichenbaum Machine: Unifying Space and Relational Memory through Generalization in the Hippocampal Formation”, Whittington et al, 2020](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/examples/agent_examples/whittington_2020_examples.ipynb)
+     > [" The Tolman-Eichenbaum Machine: Unifying Space and Relational Memory through Generalization in the Hippocampal Formation", Whittington et al, 2020](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/examples/agent_examples/whittington_2020_examples.ipynb)
  
    
 4. Experiments 
-    > [”Conjunctive Representation of Position, Direction, and Velocity in Entorhinal Cortex”, Sargolini et al, 2006](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/experiments/sargolini_2006)
+    > [" Conjunctive Representation of Position, Direction, and Velocity in Entorhinal Cortex", Sargolini et al, 2006](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/experiments/sargolini_2006)
  
-    > [”Hippocampus-independent phase precession in entorhinal grid cells”, Hafting et al, 2008](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/experiments/hafting_2008)
+    > [" Hippocampus-independent phase precession in entorhinal grid cells", Hafting et al, 2008](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/experiments/hafting_2008)
 
 
-    > [”Integration of grid maps in merged environments”, Wernle et al, 2018](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/experiments/wernle_2018/nn_Data%2BCode)
+    > [" Integration of grid maps in merged environments", Wernle et al, 2018](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/experiments/wernle_2018/nn_Data%2BCode)
   
-5. Comparaison Board  
    
-Congratulation Team !
+Congratulation Team!
 
 
 ## 3. Future
 
-1. Literature Review
-
-2. Environement
-     > Implement Any 3D Environment, add sensory stimuli.
+1. Environment
+    *Insert suggestion here*
     
-3. Agent
-      > Implement an hippocampal and entorhinal cortex models of your choice (eg. Tolman-Eichenbaum Machine (TEM). Whittington, 2020, An oscillatory interference model of grid cell firing. Burgess, 2007).
+2. Agent
+    *Insert suggestion here*
+    
+3. Experiments 
+      *Insert suggestion here*
       
-      >  Devellope a new model.
-   
-4. Experiments 
-    > Add Experimental Data (eg. Barry et al., 2012, Chen et al., 2018).
+4. Comparison Board  
+    *Insert suggestion here*
 
-      
-5. Comparaison Board  
-    > Add comparison metric (eg. Grid Score, Corrolation score ...).
+5. Public Access
+    *Insert suggestion here*
+  
 
-6. Public Access
-    > Web-site, Public Server.
-
-Let's go Team ! 
+Let's go Team! 
 
 
     
