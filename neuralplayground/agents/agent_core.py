@@ -94,13 +94,31 @@ class AgentCore(object):
 
 
 class RandomAgent(AgentCore):
+    """ Simple agent with random trajectories """
+    def __init__(self, step_size: float = 1):
+        """ Initialization
 
-    def __init__(self, step_size=1):
+        Parameters
+        ----------
+        step_size: float
+            Standard deviation of normal distribution where the step in x, y coordinates is sampled
+        """
         super().__init__()
         self.step_size = step_size
 
     def act(self, obs):
-        return np.random.normal(scale=self.step_size, size=(2,))
+        """ The base model executes a random action from a normal distribution
+        Parameters
+        ----------
+        obs
+            Whatever observation from the environment class needed to choose the right action
+        Returns
+        -------
+        d_pos: nd.array (2,)
+            position variation to compute next position
+        """
+        d_pos = np.random.normal(scale=self.step_size, size=(2,))
+        return d_pos
 
 
 class LevyFlightAgent(RandomAgent):
