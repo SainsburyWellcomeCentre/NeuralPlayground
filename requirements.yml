@@ -1,5 +1,7 @@
 name: NPG
 channels:
+  - conda-forge
+  - anaconda
   - defaults
 dependencies:
   - scipy
