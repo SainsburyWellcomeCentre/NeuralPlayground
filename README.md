@@ -54,7 +54,7 @@ Before sending a pull request, make sure you have the following:
 
 1. Checked the Licensing frameworks. 
 
-2. Followed them [Style Guide](https://github.com/ClementineDomine/NeuralPlayground/tree/main/documents/style_guide).
+2. Followed them [Style Guide](https://github.com/ClementineDomine/NeuralPlayground/tree/main/documents/style_guide/style_guide.md).
 
 3. Implemented and ran [Test](https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground/tests).
 
