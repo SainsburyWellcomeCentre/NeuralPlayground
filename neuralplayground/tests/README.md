@@ -9,9 +9,7 @@ When you commit code to your repository, you can continuously build and test the
 Anytime you submit a pull request, make sure you include tests.
 
 ## 2. Arena-Test
-
-Create a new test class inheriting from the [Agent_test](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/tests/agent_test.py) Class.
+Create a new test class inheriting from the 'Testmodelcore' class as shown in the [Agent_test](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/tests/agent_test.py).
 
 ## 3. Agent-Test
-
-Create a new test class inheriting from the [Arena_test](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/tests/arena_test.py) Class.
+Create a new test class inheriting from the 'TestSimple2D' class as shown in [Arena_test](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/tests/arena_test.py).
