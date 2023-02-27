@@ -7,12 +7,11 @@
 ## 1. Introduction
 
 Arena provides an environment in which an agent can explore and potentially learn
-over time, reproducing aspects of the physical layout of an experimental paradigm in which behavioral
-and neural data were collected. Any two-dimensional discrete and continuous Arenas can be built
+over time, reproducing aspects of the physical layout of an experimental paradigm in which behavioral and neural data were collected. Any two-dimensional discrete and continuous Arenas can be built
 using walls as construction units. This allows complex experimental architectures such as connected rooms, T-mazes
-or cycles to be added. Dynamical arenas such as the merging room experiment in Wernle et
-al. (2018) can also be implemented. Each specific environment implemented to resemble an experimental setting should be created as a subclassof the main environment class. The Environment can be initialised with data from the real-life experiments. We will work toward improving each of
-the Environments through the projects, adding experimental specifications
+or cycles to be added. Dynamical arenas, such as the merging room experiment in Wernle et
+al. (2018) can also be implemented. Each specific environment implemented to resemble an experimental setting should be created as a subclass of the main environment class. The Environment can be initialised with data from real-life experiments. We will work toward improving each of
+the Environments through the projects, adding experimental specifications.
 
 ## 2. Arena-Implemented
 
@@ -21,14 +20,14 @@ the Environments through the projects, adding experimental specifications
 
 ## 3. How-to-Contribute
 
-1. Create an environment class to following the template shown in the [Arena_Core](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/arenas/arena_core.py) and the [Style Guide](https://github.com/ClementineDomine/NeuralPlayground/tree/main/documents/style_guide.md). 
+1. Create an environment class following the template shown in the [Arena_Core](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/arenas/arena_core.py) and the [Style Guide](https://github.com/ClementineDomine/NeuralPlayground/tree/main/documents/style_guide.md). 
 
 2. Record your contribution.
 
-All contribution should be sumbited through a pull request that we will later acess. 
-Before sending a pull request make sure you have: 
+All contributions should be submitted through a pull request that we will later access. 
+Before sending a pull request, make sure you have the following: 
 
-1. Checked the Lisencing frameworks. 
+1. Checked the Licensing frameworks. 
 
 2. Followed the [Style Guide](https://github.com/ClementineDomine/NeuralPlayground/tree/main/documents/style_guide.md).
 
@@ -36,5 +35,4 @@ Before sending a pull request make sure you have:
 
 4. Commented your work 
     
-All contributions to the repository are acknowledged through the all-contributors bot and in future publicaiton.
-
+All contributions to the repository are acknowledged through the all-contributors bot and in a future publication.
