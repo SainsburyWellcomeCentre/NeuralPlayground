@@ -1,9 +1,9 @@
 # Agent: The standardised environment for the hippocampus and entorhinal cortex models.
 
 
-* [1. Introduction](#1-Introduction)
-* [2. Model Implemented  ](#2-ModelImplemented )
-* [3. How to Contribute](#5-HowtoContribute)
+* [1 Introduction](#1-Introduction)
+* [2 Model Implemented](#2-Model-Implemented )
+* [3 How to Contribute](#3-How-to-Contribute)
 
 ## 1.Introduction
 
@@ -12,7 +12,7 @@ with their surroundings (i.e. the environment). An agent receives observations f
 (reward, visual cues, etc) and uses these to take an action which in turn will update both its state and the state of the environment, generating new observations. More generally, the Agent can be thought of as an animal performing the task in the simulated experiment. All agent types will be given a set of abilities that are summarised in the agent’s main class.  Each different model developed can be easily implemented asa subclass of the main one.  
 
 
-## 2.Model Implemented 
+## 2.Model-Implemented 
 
   1. [The Tolman-Eichenbaum machine](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/agents/whittington_2020.py)
   
@@ -22,7 +22,7 @@ with their surroundings (i.e. the environment). An agent receives observations f
 
 Each of the models are implemented in a jupyter notebook in  [Examples](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples) to facilitate the intereraction.
 
-## 3.How to Contribute
+## 3.How-to-Contribute
 
   1. Create a file that indicates the appropirate reference to the model
 
