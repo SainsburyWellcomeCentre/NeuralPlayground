@@ -1,4 +1,4 @@
-# Experiment:
+# Experiment
 
 * [1. Introduction](#1-Introduction)
 * [2. Experiment Implemented](#2-Experiment-Implemented)
