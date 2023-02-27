@@ -67,7 +67,7 @@ Refer to the README.md files found in each of the modules for further details on
 
 ### 5. Cite 
 
-See [Citation](https://github.com/ClementineDomine/NeuralPlayground/blob/main/documents/Citation.cff) for the correct citation of this framework. 
+See [Citation](https://github.com/ClementineDomine/NeuralPlayground/blob/main/documents/citation.cff) for the correct citation of this framework. 
 
 ## Contributors ✨
 
