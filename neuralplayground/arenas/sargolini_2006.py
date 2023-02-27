@@ -8,9 +8,11 @@ class Sargolini2006(Hafting2008):
     """
     Methods
     ----------
-    __init__(self, data_path="sargolini2006/", environment_name="Sargolini2006", session=None, verbose=False, **env_kwargs):
+    __init__(self, use_behavioral_data: bool = False, data_path: str = None, recording_index: int = None,
+                 environment_name: str = "Sargolini2006", verbose: bool = False, experiment_class=Sargolini2006Data,
+                 **env_kwargs):
          Initialise the class
-    reset(self, sess=None):
+    reset(self):
         Reset the environment variables
     step(self, action):
         Increment the global step count of the agent in the environment and updates the position of the agent according
