@@ -1,4 +1,4 @@
-# Experiment: The  standardised environment for the hippocampus and entorhinal cortex models. 
+# Experiment:
 
 
 * [1. Introduction](#1-Introduction)
@@ -7,19 +7,16 @@
 
 ## 1. Introduction
 
-We use open-source data of the experiment to replicate the experimental condition.
-
- We hope to assess the performance of the models against a set of selected experimental observations, roughly categorized as qualitative and quantitative evidence.
+This class gives access to open-source experimental data (neural recording, behaviours, etc.) through various plotting functions and visualisations of experimental measurements. Each data set is organised in recordings session with an attributed recording number (rec index), given in list at the initialisation of the class. It is possible to plot a selected tetrode (select the index in the list) recording $.plot_{}recording_{}tetr(index)$, the trajectory recording within the arena $.plot_{}trajectory(index)$ and  get access to the experimental details call $.show_{}keys()$.
 
 ## 2. Experiment-Implemented
 
 We use the following data sets:
- > [”Conjunctive Representation of Position, Direction, and Velocity in Entorhinal Cortex” Sargolini et al. 2006.](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/experiments/sargolini_2006)
+ > [”Conjunctive Representation of Position, Direction, and Velocity in Entorhinal Cortex” Sargolini et al. 2006.](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/experiments/sargolini_2006_data.py)
 
- > [”Hippocampus-independent phase precession in entorhinal grid cells”, Hafting et al 2008](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/experiments/hafting_2008)
+ > [”Hippocampus-independent phase precession in entorhinal grid cells”, Hafting et al 2008](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/experiments/hafting_2008_data.py)
    
-   
- > [”Integration of grid maps in merged environments”, Wernle et al, 2018](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/experiments/wernle_2018)
+ > [”Integration of grid maps in merged environments”, Wernle et al, 2018](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/experiments/wernle_2018_data.py)
    
 One of our goals is to expand this list to add more experiments that are relevant to this literature and that are publicly available.
 
@@ -27,9 +24,9 @@ One of our goals is to expand this list to add more experiments that are relevan
 
 1. Create a file that indicates where to download the data.
 
-2. Create a class to read/filter the data following the template shown in the [Behavior_data](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/sehec/experiments/behavioral_data.py).
+2. Create a class to read/filter the data following the template shown in the [Experiment_core](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/experiments/experiment_core.py).
 
-3. Cite the Data approrialty.
+3. Cite the data approrialty.
 
 4. Create an environement Class for the experiment
 
@@ -40,9 +37,9 @@ All contribution should be sumbited through a pull request that we will later ac
 Before sending a pull request make sure you have:
 1. Checked the Lisencing frameworks. 
 
-2. Followed the [Style Guide](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/documents/style_guide).
+2. Followed the [Style Guide](https://github.com/ClementineDomine/NeuralPlayground/tree/main/documents/style_guide.md).
 
-3. Implemented and ran [Test](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/tests).
+3. Implemented and ran [Test](https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground/tests).
 
 4. Commented your work 
 
