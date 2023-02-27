@@ -1,5 +1,7 @@
 """
-From https://doi.org/10.1016/j.cub.2015.02.037
+Class building arena as
+"Grid Cells Form a Global Representation of Connected Environments"
+Carpenter et al. 2015
 """
 
 import numpy as np
@@ -8,16 +10,17 @@ from .simple2d import Simple2D
 
 class ConnectedRooms(Simple2D):
     """
-    Simulation from https://doi.org/10.1016/j.cub.2015.02.037
-    Grid Cells Form a Global Representation of Connected Environments
+    Simulated environment from https://doi.org/10.1016/j.cub.2015.02.037.
+    Default parameters from experimental setting.
     """
-    def __init__(self, environment_name="ConnectedRooms", corridor_ysize=40.0, singleroom_ysize=90.0,
-                 singleroom_xsize=90, door_size=10.0, **env_kwargs):
+    def __init__(self, environment_name: str = "ConnectedRooms", corridor_ysize: float = 40.0,
+                 singleroom_ysize: float = 90.0, singleroom_xsize: float = 90, door_size: float = 10.0,
+                 **env_kwargs):
         """
         Parameters
         ----------
-        environment_name : string
-            name of the environment
+        environment_name: str
+            Name of the specific instantiation of the ConnectedRooms class
         corridor_ysize : float
             corridor size from the paper, default 40.0 cm
         singleroom_ysize : float
@@ -26,7 +29,12 @@ class ConnectedRooms(Simple2D):
             x-size of one of the rooms, default 90.0 cm
         door_size : float
             door size from room to corridor, default 10 cm
-        env_kwargs
+        env_kwargs: dict
+            time_step_size: float
+                time_step_size * global_steps will give a measure of the time in the experimental setting
+            agent_step_size: float
+                Step size used when the action is a direction in x,y coordinate (normalize false in step())
+                Agent_step_size * global_step_number will give a measure of the distance in the experimental setting
         """
 
         self.corridor_ysize = corridor_ysize

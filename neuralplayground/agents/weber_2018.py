@@ -384,7 +384,7 @@ class Weber2018(AgentCore):
         ax[0].set_title("Exc rates", fontsize=14)
         ax[1].imshow(inh_im, cmap="Blues")
         ax[1].set_title("Inh rates", fontsize=14)
-        im = ax[2].imshow(r_out_im)
+        im = ax[2].imshow(r_out_im, cmap="jet")
         ax[2].set_title("Out rate", fontsize=14)
         cbar = plt.colorbar(im, ax=ax[2])
 

@@ -1,6 +1,6 @@
 """
 Base class for models that can interact with environments in this repo
-Any EHC model should inherit this class in order to interact with environments and compare against experimental results
+Any neuralplayground model should inherit this class in order to interact with environments and compare against experimental results
 We expect to make profound changes in this module as we add more EHC model to the repo
 """
 import numpy as np
@@ -8,6 +8,7 @@ import pickle
 from deepdiff import DeepDiff
 import os
 import pandas as pd
+from scipy.stats import levy_stable
 
 
 class AgentCore(object):
@@ -93,5 +94,44 @@ class AgentCore(object):
 
 
 class RandomAgent(AgentCore):
-    def act(self, observation):
-        return np.random.normal(scale=0.1, size=(2,))
+
+    def __init__(self, step_size=1):
+        super().__init__()
+        self.step_size = step_size
+
+    def act(self, obs):
+        return np.random.normal(scale=self.step_size, size=(2,))
+
+
+class LevyFlightAgent(RandomAgent):
+
+    def __init__(self, alpha=0.3, beta=1, loc=1.0, scale=0.8, step_size=0.3, max_action_size=50, max_step_size=10):
+        super().__init__(step_size=step_size)
+        self.levy = levy_stable(alpha, beta, loc=loc, scale=scale)
+        self.alpha = alpha
+        self.beta = beta
+        self.max_action_size = max_action_size
+        self.max_step_size = max_step_size
+        self.action_buffer = []
+
+    def _act(self, obs):
+        direction = super().act(obs)
+        direction = direction / np.sqrt(np.sum(direction ** 2)) * self.step_size
+        r = np.clip(self.levy.rvs(), a_min=0, a_max=self.max_action_size)
+        return r * direction
+
+    def act(self, obs):
+        if len(self.action_buffer) > 0:
+            action = self.action_buffer.pop()
+            return action
+        else:
+            action = self._act(obs)
+            action_size = np.sqrt(np.sum(action**2))
+            normalized_action = action/action_size
+            if action_size > self.max_step_size:
+                n_sub_steps = int(np.ceil(action_size/self.max_action_size))
+                sub_actions = [normalized_action for i in range(n_sub_steps)]
+                self.action_buffer += sub_actions
+                return self.action_buffer.pop()
+            else:
+                return action

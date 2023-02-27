@@ -3,8 +3,8 @@ from tqdm import tqdm
 import numpy as np
 import matplotlib.pyplot as plt
 from ..arenas import BasicSargolini2006
-from ..agents import ExcInhPlasticity
-from ..agents import SR
+from ..agents import Weber2018
+from ..agents import Stachenfeld2018
 from ..agents import AgentCore
 import pytest
 
@@ -65,14 +65,14 @@ class TestExcInhPlasticity(Testmodelcore):
         agent_step_size = 0.1
         env = get_environment[0]
 
-        agent = ExcInhPlasticity(model_name=model_name, exc_eta=exc_eta, inh_eta=inh_eta, sigma_exc=sigma_exc,
+        agent = Weber2018(model_name=model_name, exc_eta=exc_eta, inh_eta=inh_eta, sigma_exc=sigma_exc,
                                  sigma_inh=sigma_inh, Ne=Ne, Ni=Ni, agent_step_size=agent_step_size, ro=1,
                                  Nef=Nef, Nif=Nif, room_width=env.room_width, room_depth=env.room_depth,
                                  alpha_i=alpha_i, alpha_e=alpha_e, we_init=we_init, wi_init=wi_init)
         return [agent, ]
 
     def test_init_model(self, init_model):
-        assert isinstance(init_model[0], ExcInhPlasticity)
+        assert isinstance(init_model[0], Weber2018)
 
     def test_plot_rates(self, init_model):
         init_model[0].plot_rates()
@@ -92,12 +92,12 @@ class TestSR(Testmodelcore):
         env = get_environment[0]
 
         twoDvalue = True
-        agent = SR(discount=discount, t_episode=t_episode, n_episode=n_episode, threshold=threshold, lr_td=lr_td,
+        agent = Stachenfeld2018(discount=discount, t_episode=t_episode, n_episode=n_episode, threshold=threshold, lr_td=lr_td,
                    room_width=env.room_width, room_depth=env.room_depth, state_density=state_density, twoD=twoDvalue)
         return [agent, ]
 
     def test_init_model(self, init_model):
-        assert isinstance(init_model[0], SR)
+        assert isinstance(init_model[0], Stachenfeld2018)
 
     def test_plot_sr_ground_truth(self, init_model):
         sr = init_model[0].update_successor_rep()  # Choose your type of Update
