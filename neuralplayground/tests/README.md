@@ -6,12 +6,12 @@
 
 ## 1. Introduction
 When you commit code to your repository, you can continuously build and test the code to make sure that the commit doesn't introduce errors.
-Anytime you submit a pull request make sure you included tests.
+Anytime you submit a pull request, make sure you include tests.
 
-## 2.  Add Env Test
+## 2. Env-Test
 
-Create a new test class inhireting from the TestSimple2D Class.
+Create a new test class inheriting from the TestSimple2D Class.
 
-## 3. Add Agent Test
+## 3. Agent-Test
 
-Create a new test class inhireting from the Testmodelcore Class.
+Create a new test class inheriting from the Testmodelcore Class.
