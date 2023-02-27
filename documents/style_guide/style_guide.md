@@ -1,7 +1,7 @@
 
 # Style Guide 
 
-We are following to the best of our abilities the [PEP8](https://www.python.org/dev/peps/pep-0008/) Style convention. Note: Pycharm has an inbuild checking framework that will help you follow the style guide. 
+We are following to the best of our abilities the [PEP8](https://www.python.org/dev/peps/pep-0008/) and [numpy docstring](https://numpydoc.readthedocs.io/en/latest/format.html) style convention. Note: Pycharm has an inbuild checking framework that will help you follow the style guide. 
 
 The Genreal convention is as follows:
 
