@@ -1,18 +1,17 @@
-# Agent: The standardised environment for the hippocampus and entorhinal cortex models.
+# Agent
 
 * [1 Introduction](#1-Introduction)
 * [2 Model Implemented](#2-Model-Implemented)
 * [3 How to Contribute](#3-How-to-Contribute)
 
 
-## 1.Introduction
+## 1. Introduction
 
 This class includes a set of functions that control the ways intelligent systems interact
-with their surroundings (i.e. the environment). An agent receives observations from the environment
-(reward, visual cues, etc) and uses these to take an action which in turn will update both its state and the state of the environment, generating new observations. More generally, the Agent can be thought of as an animal performing the task in the simulated experiment. All agent types will be given a set of abilities that are summarised in the agent’s main class.  Each different model developed can be easily implemented asa subclass of the main one.  
+with their surroundings (i.e., the environment). An agent receives observations from the environment (reward, visual cues, etc.) and uses these to take an action which in turn will update both its state and the state of the environment, generating new observations. More generally, the Agent can be thought of as an animal performing the task in the simulated experiment. All agent types will be given a set of abilities that are summarised in the agent’s main class. Each different model developed can be easily implemented as a subclass of the main one.  
 
 
-## 2.Model-Implemented 
+## 2. Model-Implemented 
 
   1. [The Tolman-Eichenbaum machine](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/agents/whittington_2020.py)
   
@@ -20,22 +19,22 @@ with their surroundings (i.e. the environment). An agent receives observations f
 
   3. [Learning place cells, grid cells and invariances with excitatory and inhibitory plasticity](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/agents/weber_2018.py)
 
-Each of the models are implemented in a jupyter notebook in [Examples](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples) to facilitate the intereraction.
+Each of the models are implemented in a jupyter notebook in [Examples](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples) to facilitate the interaction.
 
-## 3.How-to-Contribute
+## 3. How-to-Contribute
 
-  1. Create a file that indicates the appropirate reference to the model
+  1. Create a file that indicates the appropriate reference to the model
 
   2. Create a class to run the model following the template shown in the [Agent_core.py](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/agents/agent_core.py) and the [Style Guide](https://github.com/ClementineDomine/NeuralPlayground/tree/main/documents/style_guide.md).
   
-  3. Create a [Examples](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples)  jupyter notebook for the new model where you can run the model in a chosen environement with selected experimental data
+  3. Create a [Examples](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples) jupyter notebook for the new model where you can run the model in a chosen environment with selected experimental data
   
   3. Record your contribution
 
-All contribution should be sumbited through a pull request that we will later acess. 
-Before sending a pull request make sure you have:
+All contributions should be submitted through a pull request that we will later access. 
+Before sending a pull request, make sure you have the following:
 
-1. Checked the Lisencing frameworks. 
+1. Checked the Licensing frameworks. 
 
 2. Followed the [Style Guide](https://github.com/ClementineDomine/NeuralPlayground/tree/main/documents/style_guide.md).
 
@@ -43,6 +42,4 @@ Before sending a pull request make sure you have:
 
 4. Commented your work 
         
-All contributions to the repository are acknowledged through the all-contributors bot and in future publicaiton.
-
-
+All contributions to the repository are acknowledged through the all-contributors bot and in a future publication.
