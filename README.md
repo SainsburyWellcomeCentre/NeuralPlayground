@@ -43,12 +43,10 @@ You will find in the [Examples](https://github.com/ClementineDomine/NeuralPlaygr
 There are many ways to contribute to the [NeuralPlayground](https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground). 
 
  1. Implement a hippocampal and entorhinal cortex model of your choice. [Agent](https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground/agents)
+     
+ 2. Work on improving the arena [Arena](https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground/arenas)
     
- 2. Add functionality to the Comparison Board to compare results to real experimental data. [Comparison Board](https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground/comparison_board)
-    
- 3. Work on improving the arena [Arena](https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground/arenas)
-    
- 4. Add an experimental data set [Experiment](https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground/experiments)
+ 3. Add an experimental data set [Experiment](https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground/experiments)
 
 All contributions should be submitted through a pull request that we will later access. 
 Before sending a pull request, make sure you have the following: 
