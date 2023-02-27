@@ -38,11 +38,6 @@ Please refer to the [Road map](https://github.com/ClementineDomine/NeuralPlaygro
 #### How to run a single model
 You will find in the [Examples](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples) file a simple implementation of every single model in a single Environment. The Agent and Environment class can be initialised to use data from an experiment. These two classes are allowed to interact to reproduce the full experimental setting. 
 
-#### How to Run the ([Comparison Board](https://github.com/ClementineDomine/NeuralPlayground/tree/main/NeuralPlayground/comparison_board))
-
-A second way to work with the framework is through the [Comparison board](https://github.com/ClementineDomine/NeuralPlayground
-/tree/main/NeuralPlayground/comparison_board). This tool empowers the users to flexibly choose the models, Environments, experiments, metrics, and plots they would like to run. The initialisation of the runs are automatized in the background. 
-
 ## 4. I-want-to-Contribute
 
 There are many ways to contribute to the [NeuralPlayground](https://github.com/ClementineDomine/NeuralPlayground/tree/main/NeuralPlayground). 
