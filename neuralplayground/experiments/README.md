@@ -1,13 +1,12 @@
 # Experiment:
 
-
 * [1. Introduction](#1-Introduction)
 * [2. Experiment Implemented](#2-Experiment-Implemented)
 * [3. How to Contribute](#3-How-to-Contribute)
 
 ## 1. Introduction
 
-This class gives access to open-source experimental data (neural recording, behaviours, etc.) through various plotting functions and visualisations of experimental measurements. Each data set is organised in recordings session with an attributed recording number (rec index), given in list at the initialisation of the class. It is possible to plot a selected tetrode (select the index in the list) recording $.plot_{}recording_{}tetr(index)$, the trajectory recording within the arena $.plot_{}trajectory(index)$ and  get access to the experimental details call $.show_{}keys()$.
+This class gives access to open-source experimental data (neural recording, behaviours, etc.) through various plotting functions and visualisations of experimental measurements. Each data set is organised in recordings session with an attributed recording number (rec index), given in a list at the initialisation of the class. It is possible to plot a selected tetrode (select the index in the list) recording $.plot_{}recording_{}tetr(index)$, the trajectory recording within the arena $.plot_{}trajectory(index)$ and get access to the experimental details call $.show_{}keys()$.
 
 ## 2. Experiment-Implemented
 
@@ -22,20 +21,18 @@ One of our goals is to expand this list to add more experiments that are relevan
 
 ## 3. How-to-Contribute
 
-1. Create a file that indicates where to download the data.
+1. Create a directory where to download and store the data.
 
 2. Create a class to read/filter the data following the template shown in the [Experiment_core](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/experiments/experiment_core.py).
 
-3. Cite the data approrialty.
+3. Cite the data appropriately.
 
-4. Create an environement Class for the experiment
-
-5. Record your contribution
+4. Record your contribution
 
 
-All contribution should be sumbited through a pull request that we will later acess. 
-Before sending a pull request make sure you have:
-1. Checked the Lisencing frameworks. 
+All contributions should be submitted through a pull request that we will later access. 
+Before sending a pull request, make sure you have the following:
+1. Checked the Licensing frameworks. 
 
 2. Followed the [Style Guide](https://github.com/ClementineDomine/NeuralPlayground/tree/main/documents/style_guide.md).
 
@@ -43,7 +40,7 @@ Before sending a pull request make sure you have:
 
 4. Commented your work 
 
-All contributions to the repository are acknowledged through the all-contributors bot and in future publicaiton.
+All contributions to the repository are acknowledged through the all-contributors bot and in future publications.
 
 
 
