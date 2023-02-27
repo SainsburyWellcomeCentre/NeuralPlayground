@@ -13,10 +13,27 @@
 * [6 Lisence ](#6-Lisence)
 
 ## 1. Introduction
+The abstract representation of space has been extensively studied in the hippocampus and entorhi-
+nal cortex in part due to the easy monitoring of the task and neural recording. A growing variety
+of theoretical models have been proposed to capture the rich neural and behavioral phenomena
+associated with these circuits. However, objective comparison of these theories against each other
+and against empirical data is difficult. 
 
-This framework will allow neuroscientists to easily contrast the different hippocampus and entorhinal cortex models against experimental observations. This new tool aims at standardising the methods of building and comparing models and reporting empirical evidence. The code is constructed of two main classes, an agent class, and an environment class. The agent can be thought of as the animal performing the experiment, and the environment is where the animal navigates and performs a task. These two classes are allowed to interact to reproduce the full experimental setting.
+To address this gap, we present an open-source standardised
+software framework - NeuralPlayground - to enable adudication between models of hippocampus
+and entorhinal cortex. This Python software package offers a reproducible way to compare models
+against a centralised library of published experimental results, including neural recordings and ani-
+mal behavior. The framework currently contains implementations of three Agents, as well as three
+Experiments providing simple interfaces to publicly available neural and behavioral data. It also
+contains a customizable 2-dimensional Arena (continuous and discrete) able to produce common
+experimental environments which the agents can move in and interact with and a Comparison tool
+to facilitate systematic comparisons by enabling users to pick from any Agent, Arena, Experi-
+ments. Each modules can also be used separately, allowing flexible access to influential models and
+data sets. 
 
-We create this framework with the perspective that the neuroscience community should be able to continue its development by increasing the databases of models and experimental results without our intervention. Therefore, the software is made easy to use, facilitating future growth. This new environment will revolutionize how theoretical models are proposed in neuroscience and push for easy access and implementation of new ideas.
+All together, we hope our framework, available at [github.com/NeuralPlayground](https://github.com/ClementineDomine/NeuralPlayground/), offers
+a foundation that the community will build upon, working toward a shared standardized, open, and
+reproducible computational understanding of the hippocampus and entorhinal cortex.
 
 ## 2. Installation
 You can create a new environment using conda, and the yml file with all the right 
@@ -34,10 +51,12 @@ pip install -e .
 ```
 
 ## 3. Project
-Please refer to the [Road map](https://github.com/ClementineDomine/NeuralPlayground/blob/main/documents/road_map.md) to understand the state of the project and get an idea of the direction it is going in. This open-source software was built to be collaborative and lasting. We hope that the framework will be simple enough to be adopted by a great number of neuroscientists, eventually guiding the path to the computational understanding of the HEC mechanisms. We follow reproducible, inclusive, and collaborative project design guidelines. All relevant documents can be found in [Documents](https://github.com/ClementineDomine/NeuralPlayground/blob/main/documents/).
+
+Try our package! We are gathering opinions to focus our efforts on improving aspects of the code, or adding new features, so if you tell us what you would like to have we might just implement it ;) Please refer to the [Road map](https://github.com/ClementineDomine/NeuralPlayground/blob/main/documents/road_map.md) to understand the state of the project and get an idea of the direction it is going in. This open-source software was built to be collaborative and lasting. We hope that the framework will be simple enough to be adopted by a great number of neuroscientists, eventually guiding the path to the computational understanding of the HEC mechanisms. We follow reproducible, inclusive, and collaborative project design guidelines. All relevant documents can be found in [Documents](https://github.com/ClementineDomine/NeuralPlayground/blob/main/documents/).
 
 #### How to run a single model
-You will find in the [Examples](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples) file a simple implementation of every single model in a single Environment. The Agent and Environment class can be initialised to use data from an experiment. These two classes are allowed to interact to reproduce the full experimental setting. 
+
+You will find in the [Examples](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples) file a simple implementation of every single model in a single Environment. 
 
 ## 4. I-want-to-Contribute
 
@@ -54,7 +73,7 @@ Before sending a pull request, make sure you have the following:
 
 1. Checked the Licensing frameworks. 
 
-2. Followed them [Style Guide](https://github.com/ClementineDomine/NeuralPlayground/tree/main/documents/style_guide/style_guide.md).
+2. Followed the [PEP8](https://www.python.org/dev/peps/pep-0008/) and [numpy docstring](https://numpydoc.readthedocs.io/en/latest/format.html). More details found in [Style Guide (https://github.com/ClementineDomine/NeuralPlayground/tree/main/documents/style_guide/style_guide.md).
 
 3. Implemented and ran [Test](https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground/tests).
 
