@@ -10,6 +10,7 @@ neuralplayground.egg-info/top_level.txt
 neuralplayground/agents/__init__.py
 neuralplayground/agents/agent_core.py
 neuralplayground/agents/stachenfeld_2018.py
+neuralplayground/agents/torch_TEM.py
 neuralplayground/agents/weber_2018.py
 neuralplayground/agents/whittington_2020.py
 neuralplayground/arenas/TEMenv.py
@@ -19,6 +20,7 @@ neuralplayground/arenas/connected_rooms.py
 neuralplayground/arenas/hafting_2008.py
 neuralplayground/arenas/sargolini_2006.py
 neuralplayground/arenas/simple2d.py
+neuralplayground/arenas/torch_TEM_env.py
 neuralplayground/arenas/wernle_2018.py
 neuralplayground/comparison_board/__init__.py
 neuralplayground/comparison_board/crossrun.py
