@@ -3,7 +3,7 @@
 [![All Contributors](https://img.shields.io/badge/all_contributors-5-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
-
+📩 email: neuralplayground.gmail.com
 
 * [1 Introduction](#1-Introduction)
 * [2 Installation ](#2-Installation)
