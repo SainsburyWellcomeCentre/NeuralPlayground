@@ -21,9 +21,9 @@ One of our goals is to expand this list to add more experiments that are relevan
 
 ## 3. How-to-Contribute
 
-1. Create a directory where to download and store the data with the name author_data.
+1. Create a directory where to download and store the data with name author_data.
 
-2. Create a class to read/filter with the name author_date_data the data following the template shown in the [Experiment_core](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/experiments/experiment_core.py). The [Experiment_core](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/experiments/experiment_core.py) is not specific to allow for various data format. For 2D environments, the new data class could inherit from the base Hafting_2008, which has implemented some basic functions providing that they share similar data structures.
+2. Create a class to read/filter with name  author_date_data the data following the template shown in the [Experiment_core](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/experiments/experiment_core.py). The [Experiment_core](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/experiments/experiment_core.py) is not specfidc to allow for various data format. For 2D enviroment, the new data class could inherits from the base Hafting_2008, which has implemented some basic functions providing that they share similar data structure.
 
 3. Create or add to [Examples](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples/experimental_examples/) jupyter notebook for the new experiment.
 
