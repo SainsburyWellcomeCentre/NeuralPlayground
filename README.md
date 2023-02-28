@@ -31,8 +31,9 @@ reproducible computational understanding of the hippocampus and entorhinal corte
 You can create a new environment using conda, and the yml file with all the right 
 dependencies by running
 ```
-conda env create --name NPG --file=requirements.yml
-conda activate NPG
+conda env create --name NPG
+conda install pip
+pip install -r requirements.txt
 ```
 
 For now, install using pip for local editing and testing
