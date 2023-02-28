@@ -26,7 +26,7 @@ Each of the models are implemented in a jupyter notebook in [Examples](https://g
   1. Create a file that indicates the appropriate reference to the model
 
   2. Create a class to run the model following the template shown in the [Agent_core.py](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/agents/agent_core.py) and the [Style Guide](https://github.com/ClementineDomine/NeuralPlayground/tree/main/documents/style_guide.md). 
-  When buildind a new model create a file named anthor_date.py.
+  When building a new model, create a file named anthor_date.py.
   
   3. Create or add to [Examples](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples/agent_examples/) jupyter notebook for the new model where you can run the model in a chosen environment with selected experimental data
   
