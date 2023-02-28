@@ -355,6 +355,7 @@ class Hafting2008Data(Experiment):
         ax.set_title(title)
         ax.set_ylabel('width', fontsize=16)
         ax.set_xlabel('depth', fontsize=16)
+        ax.grid(False)
         ax.set_xticks([])
         ax.set_yticks([])
 
@@ -480,7 +481,7 @@ class Hafting2008Data(Experiment):
         ax.set_ylabel('width', fontsize=fontsize)
         ax.set_xlabel('depth', fontsize=fontsize)
         ax.set_title("position", fontsize=fontsize)
-        ax.grid()
+        ax.grid(False)
 
         cmap = mpl.cm.get_cmap("plasma")
         norm = plt.Normalize(0, np.size(x))
