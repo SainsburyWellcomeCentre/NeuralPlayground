@@ -63,7 +63,7 @@ class AgentCore(object):
     def update(self):
         pass
 
-    def save_agent(self, save_path):
+    def save_agent(self, save_path: str):
         """ Save current state and information in general to re-instantiate the environment
 
         Parameters
@@ -75,7 +75,7 @@ class AgentCore(object):
                     open(os.path.join(save_path), "wb"),
                     pickle.HIGHEST_PROTOCOL)
 
-    def restore_agent(self, save_path):
+    def restore_agent(self, save_path: str):
         """ Restore saved environment
 
         Parameters
@@ -95,7 +95,7 @@ class AgentCore(object):
 
 class RandomAgent(AgentCore):
     """ Simple agent with random trajectories """
-    def __init__(self, step_size: float = 1):
+    def __init__(self, step_size: float = 1.0):
         """ Initialization
 
         Parameters
