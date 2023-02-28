@@ -27,7 +27,7 @@ Each of the models is implemented in a jupyter notebook in [Examples](https://gi
 
   2. Create a class to run the model following the template shown in the [Agent_core.py](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/agents/agent_core.py) and the [Style Guide](https://github.com/ClementineDomine/NeuralPlayground/tree/main/documents/style_guide.md).
   
-  3. Create a [Examples](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples) jupyter notebook for the new model where you can run the model in a chosen environment with selected experimental data
+  3. Create a [Examples](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples/agent_examples) jupyter notebook for the new model where you can run the model in a chosen environment with selected experimental data
   
   3. Record your contribution
 
