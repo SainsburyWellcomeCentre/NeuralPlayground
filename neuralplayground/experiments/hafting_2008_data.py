@@ -359,11 +359,10 @@ class Hafting2008Data(Experiment):
         ax.set_yticks([])
 
         # Save if save_path is not None
-        if not save_path is None:
-            plt.savefig(save_path, bbox_inches="tight")
-            plt.close("all")
+        if save_path is None:
             return ax
         else:
+            plt.savefig(save_path, bbox_inches="tight")
             return ax
 
     def plot_trajectory(self, recording_index: Union[int, tuple, list] = None,
@@ -422,7 +421,11 @@ class Hafting2008Data(Experiment):
         time_array, test_spikes, x, y = self.get_tetrode_data(session_data, tetrode_id)
         # Helper function to format the trajectory plot
         self._make_trajectory_plot(x, y, ax, plot_every)
-
+        # Save if save_path is not None
+        if save_path is None:
+            pass
+        else:
+            plt.savefig(save_path, bbox_inches="tight")
         return x, y, time_array
 
     def _make_trajectory_plot(self, x, y, ax, plot_every, fontsize = 24):
