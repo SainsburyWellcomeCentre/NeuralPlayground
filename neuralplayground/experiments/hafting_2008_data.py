@@ -353,8 +353,8 @@ class Hafting2008Data(Experiment):
         cbar.ax.set_xlabel('Firing rate', fontsize=12)
         cbar.ax.set_xticklabels([np.round(np.min(h)), np.round(np.max(h))], fontsize=12)
         ax.set_title(title)
-        ax.set_ylabel('width', fontsize=16)
-        ax.set_xlabel('depth', fontsize=16)
+        ax.set_xlabel('width', fontsize=16)
+        ax.set_ylabel('depth', fontsize=16)
         ax.set_xticks([])
         ax.set_yticks([])
 
@@ -477,8 +477,8 @@ class Hafting2008Data(Experiment):
                 sc = ax.plot(x_, y_, "-", color=cmap(norm(i)), alpha=0.6)
 
         # Setting plot labels
-        ax.set_ylabel('width', fontsize=fontsize)
-        ax.set_xlabel('depth', fontsize=fontsize)
+        ax.set_xlabel('width', fontsize=fontsize)
+        ax.set_ylabel('depth', fontsize=fontsize)
         ax.set_title("position", fontsize=fontsize)
         ax.grid()
 

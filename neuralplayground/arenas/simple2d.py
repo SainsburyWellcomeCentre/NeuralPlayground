@@ -198,7 +198,7 @@ class Simple2D(Environment):
             crossed_wall = crossed or crossed_wall
         return new_state, crossed_wall
 
-    def plot_trajectory(self, history_data: list = None, ax=None, return_figure: bool = False):
+    def plot_trajectory(self, history_data: list = None, ax=None, return_figure: bool = False, save_path: str = None):
         """ Plot the Trajectory of the agent in the environment
 
         Parameters
@@ -209,6 +209,8 @@ class Simple2D(Environment):
             axis from subplot from matplotlib where the trajectory will be plotted.
         return_figure: bool
             If true, it will return the figure variable generated to make the plot
+        save_path: str, list of str, tuple of str
+            saving path of the generated figure, if None, no figure is saved
 
         Returns
         -------
@@ -258,6 +260,9 @@ class Simple2D(Environment):
             cbar = plt.colorbar(sc, ax=ax, ticks=[0, len(state_history)])
             cbar.ax.set_ylabel('N steps', rotation=270, fontsize=16)
             cbar.ax.set_yticklabels([0, len(state_history)], fontsize=16)
+
+        if save_path is not None:
+            plt.savefig(save_path, bbox_inches="tight")
 
         if return_figure:
             return ax, f
