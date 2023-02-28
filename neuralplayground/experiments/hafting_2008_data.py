@@ -287,9 +287,9 @@ class Hafting2008Data(Experiment):
             for i, ind in enumerate(recording_index):
                 # Checking if rest of variables are default or list values
                 if save_path is not None:
-                    save_path_i = None
-                else:
                     save_path_i = save_path[i]
+                else:
+                    save_path_i = None
                 if ax is not None:
                     ax_i = ax[0]
                 else:
@@ -401,9 +401,9 @@ class Hafting2008Data(Experiment):
             for i, ind in enumerate(recording_index):
                 # Checking if rest of variables are default or list values
                 if save_path is not None:
-                    save_path_i = None
-                else:
                     save_path_i = save_path[i]
+                else:
+                    save_path_i = None
                 if ax is not None:
                     ax_i = ax[0]
                 else:
