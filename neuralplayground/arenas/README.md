@@ -21,8 +21,8 @@ the Environments through the projects, adding experimental specifications.
 ## 3. How-to-Contribute
 
 1. Create an environment class following the template shown in the [Arena_Core](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/arenas/arena_core.py) and the [Style Guide](https://github.com/ClementineDomine/NeuralPlayground/tree/main/documents/style_guide.md). 
-Any two dimentional arena should inherit from the 2D simple [Simple2d](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/arenas/simple2d.py) which has inbuild functions for 2dimentional environments.
-To build 2D experimental arena, create a file named anthor_data.py as a child class of 2D simple.
+Any 2D arena should inherit from the 2D simple [Simple2d](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/arenas/simple2d.py), which has inbuild functions for 2dimentional environments.
+To build a 2D experimental arena, create a file named anthor_data.py as a child class of 2D simple.
 
 2. Record your contribution.
 
