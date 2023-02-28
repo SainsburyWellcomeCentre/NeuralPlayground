@@ -110,7 +110,7 @@ class RandomAgent(AgentCore):
         """ The base model executes a random action from a normal distribution
         Parameters
         ----------
-        obs
+        obs:
             Whatever observation from the environment class needed to choose the right action
         Returns
         -------
@@ -122,8 +122,34 @@ class RandomAgent(AgentCore):
 
 
 class LevyFlightAgent(RandomAgent):
+    """ Based on https://en.wikipedia.org/wiki/L%C3%A9vy_flight
+    and https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.levy_stable.html#scipy.stats.levy_stable
+    Still experimental, need hyperparameter tuning and perhaps some momentum"""
+    def __init__(self, alpha: float = 0.3, beta: float = 1, loc: float = 1.0, scale: float = 0.8,
+                 step_size: float = 0.3, max_action_size: float = 50, max_step_size: float = 10):
+        """ Initializing levy flight agent
+        From original documentation:
+        The probability density above is defined in the “standardized” form. To shift and/or scale the distribution
+        use the loc and scale parameters. Specifically, levy_stable.pdf(x, alpha, beta, loc, scale) is identically
+        equivalent to levy_stable.pdf(y, alpha, beta) / scale with y = (x - loc) / scale. Note that shifting the
+        location of a distribution does not make it a “noncentral” distribution; noncentral generalizations of some
+        distributions are available in separate classes.
 
-    def __init__(self, alpha=0.3, beta=1, loc=1.0, scale=0.8, step_size=0.3, max_action_size=50, max_step_size=10):
+        Parameters
+        ----------
+        alpha, beta: float
+            Levy flight distribution parameters
+        loc: float
+            bias of the standardized form
+        scale: float
+            scaling of the standardized form
+        step_size: float
+            direction scaling
+        max_action_size: float
+            maximum size of sampled step from levy distribution
+        max_step_size: float
+            maximum step size when multiplying max_action_size and step_size
+        """
         super().__init__(step_size=step_size)
         self.levy = levy_stable(alpha, beta, loc=loc, scale=scale)
         self.alpha = alpha
@@ -133,16 +159,50 @@ class LevyFlightAgent(RandomAgent):
         self.action_buffer = []
 
     def _act(self, obs):
+        """ Auxiliary action method to compute
+
+        Parameters
+        ----------
+        obs:
+            Whatever observation from the environment class needed to choose the right action
+
+        Returns
+        -------
+        d_pos: nd.array (2,)
+            position variation to compute next position
+        """
+        # Pick direction
         direction = super().act(obs)
+        # Normalize direction to step size
         direction = direction / np.sqrt(np.sum(direction ** 2)) * self.step_size
+        # Sample step size
         r = np.clip(self.levy.rvs(), a_min=0, a_max=self.max_action_size)
-        return r * direction
+        # Return step size from levy in a random direction
+        d_pos = r * direction
+        return d_pos
 
     def act(self, obs):
+        """ Sample levy flight steps. If steps are too large (action_size > max_step_size),
+        it will divide it in several steps in the same direction.
+
+        Parameters
+        ----------
+        obs:
+            Whatever observation from the environment class needed to choose the right action
+
+        Returns
+        -------
+        d_pos: nd.array (2,)
+            position variation to compute next position
+        """
         if len(self.action_buffer) > 0:
             action = self.action_buffer.pop()
             return action
         else:
+            """
+            Divide actions into multiple steps in the same direction
+            (Need to refactor this feature)
+            """
             action = self._act(obs)
             action_size = np.sqrt(np.sum(action**2))
             normalized_action = action/action_size
