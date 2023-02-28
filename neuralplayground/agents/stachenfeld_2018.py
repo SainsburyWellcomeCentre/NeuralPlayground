@@ -12,6 +12,7 @@ sys.path.append("../")
 
 
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 import numpy as np
 
 
@@ -80,7 +81,7 @@ class Stachenfeld2018(AgentCore):
         Plot the matrix and the 4 largest modes of its eigen-decomposition
     """
 
-    def __init__(self, model_name="SR", **mod_kwargs):
+    def __init__(self, model_name: str = "SR", **mod_kwargs):
         """
         Parameters
         ----------
@@ -148,7 +149,7 @@ class Stachenfeld2018(AgentCore):
         self.inital_obs_variable = None
         self.obs_history = []  # Reset observation history
 
-    def obs_to_state(self, pos):
+    def obs_to_state(self, pos: np.ndarray):
         """
         Converts the agent's position in the environment to the agent's position in the SR-agent state space.
 
@@ -196,7 +197,7 @@ class Stachenfeld2018(AgentCore):
         self.next_state = self.obs_to_state(obs)
         return action
 
-    def get_T_from_M(self, M):
+    def get_T_from_M(self, M: np.ndarray):
         """
         Compute the transition matrix from the computationally simulated successor matrix M
         Parameters
@@ -212,8 +213,7 @@ class Stachenfeld2018(AgentCore):
         T = (1/self.gamma)*np.linalg.inv(M)@(M-np.eye(self.n_state))
         return T
 
-    def create_transmat(self, state_density, name_env, plotting_variable=True):
-
+    def create_transmat(self, state_density: float, name_env: str, plotting_variable: bool = True):
         """
         Creates the normalised transition matrix for a rectangular environment '2D_env'
 
@@ -234,7 +234,6 @@ class Stachenfeld2018(AgentCore):
          """
 
         if name_env == '2D_env':
-
             adjmat_triu = np.zeros((self.n_state, self.n_state))
             node_layout = np.arange(self.n_state).reshape(self.l, self.w)
             x_coord = np.linspace(0, np.min([self.l / self.w, 1]), num=self.l)
@@ -371,8 +370,8 @@ class Stachenfeld2018(AgentCore):
 
         return srmat_full
 
-    def plot_transition(self,matrix, save_path=None, ax=None):
-        """"
+    def plot_transition(self, matrix: np.ndarray, save_path: str = None, ax: mpl.axes.Axes = None):
+        """
         Plot the input matrix and compare it to the transition matrix from the rectangular environment states space (rectangular- transmat).
         (If a new state space type is added please update this function)
         Parameters
@@ -382,7 +381,6 @@ class Stachenfeld2018(AgentCore):
         save_path: string
             Path to save the plot
         """
-
         evals, evecs = np.linalg.eig(matrix)
         if ax is None:
             f, ax = plt.subplots(1,2, figsize=(14, 5))
@@ -393,7 +391,7 @@ class Stachenfeld2018(AgentCore):
             plt.close("all")
         return ax
 
-    def plot_eigen(self,matrix, save_path, ax=None):
+    def plot_eigen(self, matrix: np.ndarray, save_path: str, ax: mpl.axes.Axes = None):
         """"
         Plot the matrix and the 4 largest modes of its eigen-decomposition
 
