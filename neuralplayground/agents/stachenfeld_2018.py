@@ -166,6 +166,7 @@ class Stachenfeld2018(AgentCore):
 
         """
         node_layout = np.arange(self.n_state).reshape(self.l, self.w)
+    
         diff = self.xy_combinations - pos[np.newaxis, ...]
         dist = np.sum(diff ** 2, axis=1)
         index = np.argmin(dist)
@@ -213,7 +214,7 @@ class Stachenfeld2018(AgentCore):
         T = (1/self.gamma)*np.linalg.inv(M)@(M-np.eye(self.n_state))
         return T
 
-    def create_transmat(self, state_density: float, name_env: str, plotting_variable: bool = True):
+    def create_transmat(self, state_density: float, name_env: str, plotting_variable: bool = False):
         """
         Creates the normalised transition matrix for a rectangular environment '2D_env'
 
@@ -266,7 +267,7 @@ class Stachenfeld2018(AgentCore):
 
         if plotting_variable==True:
             f, ax = plt.subplots(1, 1, figsize=(14, 5))
-            ax.imshow(self.transmat_norm, interpolation='nearest')
+            ax.imshow(self.transmat_norm, interpolation='nearest',cmap='jet')
 
         return self.transmat_norm
 
@@ -384,14 +385,14 @@ class Stachenfeld2018(AgentCore):
         evals, evecs = np.linalg.eig(matrix)
         if ax is None:
             f, ax = plt.subplots(1,2, figsize=(14, 5))
-            ax[0].imshow(self.transmat_norm)
-            ax[1].imshow(matrix)
+            ax[0].imshow(self.transmat_norm,cmap='jet')
+            ax[1].imshow(matrix,cmap='jet')
         if not save_path is None:
             plt.savefig(save_path, bbox_inches="tight")
             plt.close("all")
         return ax
 
-    def plot_eigen(self, matrix: np.ndarray, save_path: str, ax: mpl.axes.Axes = None):
+    def plot_eigen(self, matrix: np.ndarray, eigen: np.ndarray , save_path: str, ax: mpl.axes.Axes = None):
         """"
         Plot the matrix and the 4 largest modes of its eigen-decomposition
 
@@ -399,27 +400,33 @@ class Stachenfeld2018(AgentCore):
         ----------
         matrix: array
             The matrix that will be plotted
+        eigen:  np.ndarray
+            Which eigenvectors you would like to plot
         save_path: string
             Path to save the plot
         """
+       
         evals, evecs = np.linalg.eig(matrix)
+    
         if ax is None:
             f, ax = plt.subplots(1, 5, figsize=(14, 5))
-            ax[0].imshow(matrix)
-            evecs_0 = evecs[:, 1].reshape(self.w, self.l).real
-            ax[1].imshow(evecs_0)
-            evecs_1 = evecs[:, 2].reshape(self.w, self.l).real
-            ax[2].imshow(evecs_1)
-            evecs_2 = evecs[:, 3].reshape(self.w, self.l).real
-            ax[3].imshow(evecs_2)
-            evecs_3 = evecs[:, 5].reshape(self.w, self.l).real
-            ax[4].imshow(evecs_3)
-            im = ax[4].imshow(evecs_3)
+            ax[0].imshow(matrix,cmap='jet')
+            evecs_0 = evecs[:, eigen[0]].reshape(self.w, self.l).real
+            ax[1].imshow(evecs_0,cmap='jet')
+            evecs_1 = evecs[:, eigen[1]].reshape(self.w, self.l).real
+            ax[2].imshow(evecs_1,cmap='jet')
+            evecs_2 = evecs[:, eigen[2]].reshape(self.w, self.l).real
+            ax[3].imshow(evecs_2,cmap='jet')
+            evecs_3 = evecs[:, eigen[3]].reshape(self.w, self.l).real
+            ax[4].imshow(evecs_3,cmap='jet')
+            im = ax[4].imshow(evecs_3,cmap='jet')
             cbar = plt.colorbar(im, ax=ax[4])
-
-        if not save_path is None:
+        if save_path is None:
+            
+            pass  
+        else:
+            
             plt.savefig(save_path, bbox_inches="tight")
-            plt.close("all")
         return ax
 
 
