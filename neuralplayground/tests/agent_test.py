@@ -101,12 +101,13 @@ class TestSR(Testmodelcore):
 
     def test_plot_sr_ground_truth(self, init_model):
         sr = init_model[0].update_successor_rep()  # Choose your type of Update
-        init_model[0].plot_eigen(sr, save_path=None)
+        init_model[0].plot_eigen(sr, eigen=(0,), save_path=None)
+        init_model[0].plot_eigen(sr, eigen=(0, 1), save_path=None)
 
     def test_plot_sr_td(self, init_model):
         sr_td = init_model[0].update_successor_rep_td_full()  # Choose your type of Update
-        init_model[0].plot_eigen(sr_td, save_path=None)
+        init_model[0].plot_eigen(sr_td, eigen=[0], save_path=None)
 
     def test_plot_sr_sum(self, init_model):
         sr_sum = init_model[0].successor_rep_sum()
-        init_model[0].plot_eigen(sr_sum, save_path=None)
+        init_model[0].plot_eigen(sr_sum, eigen=[0], save_path=None)

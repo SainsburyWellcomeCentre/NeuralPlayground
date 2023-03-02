@@ -392,7 +392,7 @@ class Stachenfeld2018(AgentCore):
             plt.close("all")
         return ax
 
-    def plot_eigen(self, matrix: np.ndarray, eigen: np.ndarray , save_path: str, ax: mpl.axes.Axes = None):
+    def plot_eigen(self, matrix: np.ndarray, save_path: str, eigen=(0, 1), ax: mpl.axes.Axes = None):
         """"
         Plot the matrix and the 4 largest modes of its eigen-decomposition
 
@@ -409,18 +409,16 @@ class Stachenfeld2018(AgentCore):
         evals, evecs = np.linalg.eig(matrix)
     
         if ax is None:
-            f, ax = plt.subplots(1, 5, figsize=(14, 5))
-            ax[0].imshow(matrix,cmap='jet')
-            evecs_0 = evecs[:, eigen[0]].reshape(self.w, self.l).real
-            ax[1].imshow(evecs_0,cmap='jet')
-            evecs_1 = evecs[:, eigen[1]].reshape(self.w, self.l).real
-            ax[2].imshow(evecs_1,cmap='jet')
-            evecs_2 = evecs[:, eigen[2]].reshape(self.w, self.l).real
-            ax[3].imshow(evecs_2,cmap='jet')
-            evecs_3 = evecs[:, eigen[3]].reshape(self.w, self.l).real
-            ax[4].imshow(evecs_3,cmap='jet')
-            im = ax[4].imshow(evecs_3,cmap='jet')
-            cbar = plt.colorbar(im, ax=ax[4])
+            f, ax = plt.subplots(1, len(eigen), figsize=(4*len(eigen), 5))
+            if len(eigen) == 1:
+                im = ax.imshow(matrix, cmap='jet')
+                evecs_0 = evecs[:, eigen[0]].reshape(self.w, self.l).real
+                cbar = plt.colorbar(im, ax=ax)
+            else:
+                for i, eig in enumerate(eigen):
+                    im = ax[i].imshow(matrix,cmap='jet')
+                    evecs_0 = evecs[:, eig].reshape(self.w, self.l).real
+                cbar = plt.colorbar(im, ax=ax[i])
         if save_path is None:
             
             pass  
