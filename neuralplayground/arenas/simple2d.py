@@ -134,7 +134,7 @@ class Simple2D(Environment):
         self.state = np.array(self.state)
 
         if custom_state is not None:
-            self.state = custom_state
+            self.state =  np.array(custom_state)
         # Fully observable environment, make_observation returns the state
         observation = self.make_observation()
         return observation, self.state
