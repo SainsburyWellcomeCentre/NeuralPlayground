@@ -30,6 +30,10 @@ class AgentCore(object):
     def __init__(self, model_name="default_model", **mod_kwargs):
         self.model_name = model_name
         self.mod_kwargs = mod_kwargs
+        if "agent_step_size" in mod_kwargs.keys():
+            self.agent_step_size = mod_kwargs["agent_step_size"]
+        else:
+            self.agent_step_size = 1.0
         self.metadata = {"mod_kwargs": mod_kwargs}
         self.obs_history = []
         self.global_steps = 0
@@ -42,22 +46,26 @@ class AgentCore(object):
         """ Function that returns some representation that will be compared against real experimental data """
         pass
         
-    def act(self, obs):
+    def act(self, obs, policy_func=None):
         """
         The base model executes a random action from a normal distribution
         Parameters
         ----------
         obs
-            Whatever observation from the environment class needed to choose the right action
+            Observation from the environment class needed to choose the right action
+        policy_func
+            Arbitrary function that represents a custom policy that receives and observation and gives an action
         Returns
         -------
         action: float
             action value which in this case is random number draw from a Gaussian
         """
         self.obs_history.append(obs)
-        if len(self.obs_history) >= 1000:  # reset every 1000
-            self.obs_history = [obs, ]
-        action = np.random.normal(scale=0.1, size=(2,))
+        # if len(self.obs_history) >= 1000:  # reset every 1000
+        self.obs_history = [obs, ]
+        if policy_func is not None:
+            return policy_func(obs)
+        action = np.random.normal(scale=self.agent_step_size, size=(2,))
         return action
 
     def update(self):

@@ -5,7 +5,7 @@
 
 ## 1. Introduction
 When you commit code to your repository, you can continuously build and test the code to make sure that the commit doesn't introduce errors.
-Anytime you submit a pull request, make sure you include tests.
+Anytime you submit a pull request, make sure you include tests, and try them using ```pytest``` in this directory. 
 
 
 ## 2.How-to-Contribute

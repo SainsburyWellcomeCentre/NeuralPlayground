@@ -160,6 +160,7 @@ class Weber2018(AgentCore):
         """
         self.global_steps = 0  # Reset global steps
         self.obs_history = []  # Reset observation history
+        self.grad_history = []
         # Initialize weights
         self.wi = np.random.uniform(low=self.wi_init-0.05*self.wi_init,
                                     high=self.wi_init+0.05*self.wi_init, size=(self.Ni,))
@@ -385,7 +386,7 @@ class Weber2018(AgentCore):
         ax[0].set_title("Exc rates", fontsize=14)
         ax[1].imshow(inh_im, cmap="Blues")
         ax[1].set_title("Inh rates", fontsize=14)
-        im = ax[2].imshow(r_out_im, cmap="jet")
+        im = ax[2].imshow(r_out_im.T, cmap="jet")
         ax[2].set_title("Out rate", fontsize=14)
         cbar = plt.colorbar(im, ax=ax[2])
 

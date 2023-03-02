@@ -52,7 +52,7 @@ Try our package! We are gathering opinions to focus our efforts on improving asp
 
 Each module can be used separately to easily explore and analyze experimental data and better understand any implemented model. Additionally, different Arenas can be initialised with artificial architectures or with data from real-life experiments. We provide examples of module instantiation in the detailed jupyter notebooks found in [Examples_experiment](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples/experimental_examples), [Examples_arena](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples/arena_examples) and [Examples_agents](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples/agent_examples). 
 
-#### How to run interacting modules
+#### How to run interactions between modules
 
 As shown in the jupyter notebooks [Examples](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples/agent_examples), the Agent can interact with an Arena in a standard RL framework. The first step is to initialise an Agent and Arena of your choice. The Agent can be thought of as the animal performing the Experiment and the Arena as the experimental setting where the animal navigates and performs a task. 
 
@@ -75,7 +75,7 @@ Before sending a pull request, make sure you have the following:
 
 3. Implemented and ran [Test](https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground/tests).
 
-4. Commented your work. 
+4. Comment your work. 
     
 All contributions to the repository are acknowledged through the all-contributors bot and in a future publication.
 Refer to the README.md files found in each of the modules for further details on how to contribute to them.
@@ -87,7 +87,7 @@ See [Citation](https://github.com/ClementineDomine/NeuralPlayground/blob/main/do
 
 ### 6. License
 
-More details about the license can be found at [Lisence](https://github.com/ClementineDomine/NeuralPlayground/blob/main/documents/lisence.md).
+More details about the license can be found at [Licence](https://github.com/ClementineDomine/NeuralPlayground/blob/main/documents/lisence.md).
 
 
 ## Contributors ✨

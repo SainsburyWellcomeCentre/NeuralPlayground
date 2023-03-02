@@ -19,10 +19,16 @@ richer perceptual inputs and flexibility to analyze and run simulations.
 
 Check the [arena examples notebook](https://github.com/ClementineDomine/NeuralPlayground/blob/main/examples/arena_examples/arena_examples.ipynb) for further explanation.
 
-## 2. Arena-Implemented
-
-1. [Any 2D Environmement](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/arenas/simple2d.py)
-2. [Merging Room](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/arenas/wernle_2018.py)
+## 2. Arenas-Implemented
+1. For now, all arenas are [2D environments](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/arenas/simple2d.py) where 
+agents can navigate. These arenas can have arbitrary shaped walls as explained in the [jupyter notebook](https://github.com/ClementineDomine/NeuralPlayground/blob/main/examples/arena_examples/arena_examples.ipynb) with 
+examples.
+2. Some of the arenas are based on a real experimental settings, setting the parameters of the arena
+to resemble the physical dimensions of the arena used in the real experiment. These arenas also
+load the experimental data automatically and have some extra methods to plot and use the experimental data
+from the corresponding experiments. These classes are [Hafting2008](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/arenas/hafting_2008.py), 
+[Sargolini2006](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/arenas/sargolini_2006.py)
+and [Wernle2018](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/arenas/wernle_2018.py) where the arena change throughout the experiment.
 
 ## 3. How-to-Contribute
 
