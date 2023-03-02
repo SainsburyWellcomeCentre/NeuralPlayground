@@ -3,8 +3,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import random
 from .simple2d import Simple2D
-from ..agents.TEM_extras.torch_TEM_parameters import parameters
-from ..agents.TEM_extras.torch_TEM_utils import *
+from ..agents.TEM_extras.TEM_parameters import parameters
+from ..agents.TEM_extras.TEM_utils import *
 
 pars_orig = parameters()
 pars = pars_orig.copy()
@@ -15,6 +15,16 @@ class TEM_env(Simple2D):
         super().__init__(environment_name, **env_kwargs)
         # Variables for discretised (SR) state space
         self.state_density = pars['state_density']
+        self.n_states = (self.room_width * self.room_depth) * self.state_density
+        self.resolution_w = int(self.state_density * self.room_width)
+        self.resolution_d = int(self.state_density * self.room_depth)
+        self.x_array = np.linspace(-self.room_width / 2 + 0.5, self.room_width / 2 - 0.5, num=self.resolution_w)
+        self.y_array = np.linspace(self.room_depth / 2 - 0.5, -self.room_depth / 2 + 0.5, num=self.resolution_d)
+        self.mesh = np.array(np.meshgrid(self.x_array, self.y_array))
+        self.xy_combination = np.array(np.meshgrid(self.x_array, self.y_array)).T
+        self.ws = int(self.room_width * self.state_density)
+        self.hs = int(self.room_depth * self.state_density)
+        self.node_layout = np.arange(self.n_states).reshape(self.room_width, self.room_depth)
 
     def batch_reset(self, normalize_step=False, random_state=False, custom_state=None):
         self.generate_objects()
@@ -49,14 +59,16 @@ class TEM_env(Simple2D):
             action_batch = []
             for i in range(n_walk):
                 self.local_steps += 1
-                if normalize_step:
-                    action = self.action_policy()
-                    new_state = self.states[batch] + [self.agent_step_size * direction for direction in action]
-                else:
-                    action = self.action_policy()
-                    new_state = self.states[batch] + action
-                new_state, valid_action = self.validate_action(self.states[batch], action, new_state)
-                state_batch.append(new_state)
+                valid_action = True
+                while valid_action:
+                    if normalize_step:
+                        action = self.action_policy()
+                        new_state = self.states[batch] + [self.agent_step_size * direction for direction in action]
+                    else:
+                        action = self.action_policy()
+                        new_state = self.states[batch] + action
+                    new_state, valid_action = self.validate_action(self.states[batch], action, new_state)
+                state_batch.append(self.states[batch].copy())
                 action_batch.append(action)
                 reward = 0  # If you get reward, it should be coded here
                 transition = {"action": action, "state": self.states[batch].copy(), "next_state": new_state,
@@ -68,7 +80,7 @@ class TEM_env(Simple2D):
             self.history[batch].extend(self.batch_history)
 
         # Discretise (x,y) walk information
-        locations = self.walk_locations(all_states)
+        locations = self.walk(all_states)
         self.full_walk.append(locations)
         # Convert action vectors to action values
         action_values = self.step_to_actions(all_actions)
@@ -78,11 +90,8 @@ class TEM_env(Simple2D):
         return locations, observations, action_values
 
     def action_policy(self):
-        arrow = [[0, 1], [0, -1], [1, 0], [-1, 0]]
-        action = np.random.normal(scale=0.1, size=(2,))
-        diff = action - arrow
-        dist = np.sum(diff ** 2, axis=1)
-        index = np.argmin(dist)
+        arrow = [[0, 0], [0, 1], [0, -1], [1, 0], [-1, 0]]
+        index = np.random.choice(len(arrow))
         action = arrow[index]
         return action
 
@@ -94,9 +103,9 @@ class TEM_env(Simple2D):
                     poss_objects[i][j] = 1
         self.objects = []
         for batch in range(pars['batch_size']):
-            env_objects = np.zeros(shape=(pars['n_states_world'][batch], pars['n_x']))
+            env_objects = np.zeros(shape=(self.n_states, pars['n_x']))
             # Generate landscape of objects in each environment
-            for i in range(pars['n_states_world'][batch]):
+            for i in range(self.n_states):
                 rand = random.randint(0, pars['n_x'] - 1)
                 env_objects[i, :] = poss_objects[rand]
             self.objects.append(env_objects)
@@ -110,42 +119,26 @@ class TEM_env(Simple2D):
             observations.append(env_observations)
         return observations
 
-    def walk_locations(self, positions):
+    def walk(self, positions):
         locations = []
-        self.resolutions = [int(self.state_density * width) for width in pars['widths']]
-        self.x_arrays = [np.linspace(-pars['widths'][i] / 2, pars['widths'][i] / 2, num=self.resolutions[i])
-                         for i in range(pars['batch_size'])]
-        self.meshes = [np.array(np.meshgrid(self.x_arrays[i], self.x_arrays[i])) for i in
-                       range(pars['batch_size'])]
-        self.xy_combinations = [self.meshes[i].T.reshape(-1, 2) for i in range(pars['batch_size'])]
-        self.ws = [int(pars['widths'][i] * self.state_density) for i in range(pars['batch_size'])]
-        node_layouts = [np.arange(pars['n_states_world'][i]).reshape(pars['widths'][i], pars['widths'][i]) for i in
-                        range(pars['batch_size'])]
-
-        positions = np.transpose(np.asarray(positions), (1, 0, 2))
-        for i, step in enumerate(positions):
-            step_list = []
-            for j, env_step in enumerate(step):
-                node_layout = node_layouts[j]
-                diff = self.xy_combinations[j] - env_step[np.newaxis, ...]
-                dist = np.sum(diff ** 2, axis=1)
-                index = np.argmin(dist)
-                step_list.append({'id':index, 'shiny':None})
-            locations.append(step_list)
-        return locations
+        for step in positions:
+            env_locations = []
+            for env_step in step:
+                index = self.discretise(env_step)
+                env_locations.append({'id':index, 'shiny':None})
+            locations.append(env_locations)
+        return list(np.transpose(np.array(locations)))
 
     def step_to_actions(self, actions):
         action_values = []
-        actions = np.reshape(actions, (pars['n_rollout'], pars['batch_size'], 2))
+        # actions = np.reshape(actions, (pars['n_rollout'], pars['batch_size'], 2))
         poss_values = [[0,0],[0,-1],[0,1],[-1,0],[1,0]]
-        for i in range(pars['n_rollout']):
+        for steps in actions:
             step_list = []
-            for j in range(pars['batch_size']):
-                action = actions[i][j]
+            for action in steps:
                 step_list.append(poss_values.index(list(action)))
             action_values.append(step_list)
-        return action_values
-
+        return [[step[i] for step in action_values] for i in range(pars['n_rollout'])]
     def generate_test_environment(self):
         shiny = None if pars['shiny_rate'] ==0 else 0
         self.n_states = (self.room_width*self.room_depth)*self.state_density
@@ -159,7 +152,7 @@ class TEM_env(Simple2D):
 
         locations = self.generate_locations(np.reshape(all_pos, (n_x*n_y, 2)))
 
-        return locations, pars['n_actions'], self.n_states, pars['n_x'], shiny
+        return locations, 5, self.n_states, pars['n_x'], shiny
 
     def generate_test_objects(self):
         poss_objects = np.zeros(shape=(pars['n_x'], pars['n_x']))
@@ -213,7 +206,7 @@ class TEM_env(Simple2D):
                     probs.append(1)
                 else:
                     probs.append(0)
-                transitions.append(transition)
+                transitions.append(transition.tolist())
             probs = [prob / len(valid_next_locs) for prob in probs]
             action_dict = [{'id': k, 'transition': transitions[k], 'probability': probs[k]} for k in  range(len(poss_actions))]
 
