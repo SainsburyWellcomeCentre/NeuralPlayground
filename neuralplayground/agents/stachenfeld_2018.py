@@ -411,13 +411,13 @@ class Stachenfeld2018(AgentCore):
         if ax is None:
             f, ax = plt.subplots(1, len(eigen), figsize=(4*len(eigen), 5))
             if len(eigen) == 1:
-                im = ax.imshow(matrix, cmap='jet')
                 evecs_0 = evecs[:, eigen[0]].reshape(self.w, self.l).real
+                im = ax.imshow(evecs_0, cmap='jet')
                 cbar = plt.colorbar(im, ax=ax)
             else:
                 for i, eig in enumerate(eigen):
-                    im = ax[i].imshow(matrix,cmap='jet')
                     evecs_0 = evecs[:, eig].reshape(self.w, self.l).real
+                    im = ax[i].imshow(evecs_0,cmap='jet')
                 cbar = plt.colorbar(im, ax=ax[i])
         if save_path is None:
             
