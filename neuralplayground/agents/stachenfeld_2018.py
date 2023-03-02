@@ -196,6 +196,7 @@ class Stachenfeld2018(AgentCore):
         index = np.argmin(dist)
         action = arrow[index]
         self.next_state = self.obs_to_state(obs)
+        action = np.array(action)
         return action
 
     def get_T_from_M(self, M: np.ndarray):
