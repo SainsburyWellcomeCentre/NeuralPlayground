@@ -237,6 +237,11 @@ class Simple2D(Environment):
         for wall in self.custom_walls:
             ax.plot(wall[:, 0], wall[:, 1], "C0", lw=3)
 
+        # Making the trajectory plot roughly square to show structure of the arena better
+        lower_lim, upper_lim = np.amin(self.arena_limits), np.amax(self.arena_limits)
+        ax.set_xlim([lower_lim, upper_lim])
+        ax.set_ylim([lower_lim, upper_lim])
+
         # Make plot of positions
         if len(history_data) != 0:
             state_history = [s["state"] for s in history_data]
