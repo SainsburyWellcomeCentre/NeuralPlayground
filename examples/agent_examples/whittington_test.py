@@ -32,8 +32,8 @@ torch.manual_seed(0)
 
 # Choose which trained model to load
 date = '2023-03-02' # 2020-10-13 run 0 for successful node agent
-run = '5'
-index = '490'
+run = '7'
+index = '1800'
 path = '/nfs/nhome/live/lhollingsworth/Documents/NeuralPlayground/NPG/EHC_model_comparison/examples/Summaries2/'
 OG_path = '/nfs/nhome/live/lhollingsworth/Documents/NeuralPlayground/Summaries/'
 

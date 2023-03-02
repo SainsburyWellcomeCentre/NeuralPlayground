@@ -89,7 +89,10 @@ def plot_map(environment, values, ax=None, min_val=None, max_val=None, num_cols=
     plotvals = np.floor((values - min_val) / (max_val - min_val) * num_cols) if max_val != min_val else np.ones(
         values.shape)
     # Calculate radius of location circles based on how many nodes there are
-    radius = 2*(0.01 + 1/(10*np.sqrt(environment[2]))) if radius is None else radius
+    if shape == 'square':
+        radius = 1 / np.sqrt(environment[2]) if radius is None else radius
+    else:
+        radius = 2*(0.01 + 1/(10*np.sqrt(environment[2]))) if radius is None else radius
     # Initialise empty axis
     ax = initialise_axes(ax)
     # Create empty list of location patches and action patches
@@ -114,6 +117,8 @@ def plot_map(environment, values, ax=None, min_val=None, max_val=None, num_cols=
                         action_patches.append(action_patch(location, loc_to, radius, action_cm(action['id'])))
     # After drawing all locations, add shiny patches
     for location in environment[0]:
+        x_new = (location['x'] + 5) / 10
+        y_new = (location['y'] + 5) / 10
         # For shiny locations, add big red patch to indicate shiny
         if location['shiny']:
             # Create square patch for location

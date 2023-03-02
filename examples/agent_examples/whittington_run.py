@@ -1,9 +1,4 @@
-import numpy as np
-import torch
-import time
 import matplotlib.pyplot as plt
-import os, shutil
-import tqdm
 from neuralplayground.arenas.torch_TEM_env import TEM_env
 from neuralplayground.agents.whittington_2020 import TEM
 import neuralplayground.agents.TEM_extras.TEM_parameters as parameters
@@ -28,10 +23,8 @@ agent = TEM(model_name=mod_name, params=params)
 
 walk, obs, actions = env.batch_reset(normalize_step=False, random_state=True)
 for i in range(params['train_it']):
-    print(i)
     agent.act(i, walk, obs, actions)
     walk, obs, actions = env.batch_step(normalize_step=False)
-    
 
 ax = env.plot_batch_trajectory()
 fontsize = 18
