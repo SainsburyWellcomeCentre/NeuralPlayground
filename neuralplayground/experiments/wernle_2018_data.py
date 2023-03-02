@@ -253,9 +253,9 @@ class Wernle2018Data(Hafting2008Data):
             for i, ind in enumerate(recording_index):
                 # Checking if rest of variables are default or list values
                 if save_path is not None:
-                    save_path_i = None
-                else:
                     save_path_i = save_path[i]
+                else:
+                    save_path_i = None
                 if ax is not None:
                     ax_i = ax[0]
                 else:
@@ -302,6 +302,11 @@ class Wernle2018Data(Hafting2008Data):
         sess_index = self.recording_list.iloc[recording_index]["session"]
         # Use auxiliary function to make the plot
         self._make_tetrode_plot(h, ax, "sess_index_"+str(sess_index)+"_"+merged_mssg, save_path)
+        # Save if save_path is not None
+        if save_path is None:
+            pass
+        else:
+            plt.savefig(save_path, bbox_inches="tight")
         # Return ratemap values, x bin limits and y bin limits
         return h, binx, biny
 
@@ -340,9 +345,9 @@ class Wernle2018Data(Hafting2008Data):
             for i, ind in enumerate(recording_index):
                 # Checking if rest of variables are default or list values
                 if save_path is not None:
-                    save_path_i = None
-                else:
                     save_path_i = save_path[i]
+                else:
+                    save_path_i = None
                 if ax is not None:
                     ax_i = ax[0]
                 else:
@@ -368,7 +373,10 @@ class Wernle2018Data(Hafting2008Data):
 
         # Helper function to format the trajectory plot
         ax = self._make_trajectory_plot(x, y, ax, plot_every)
-
+        if save_path is None:
+            pass
+        else:
+            plt.savefig(save_path, bbox_inches="tight")
         return x, y, time_array
 
     def plot_merging_comparison(self, session_index: Union[int, list, tuple]):

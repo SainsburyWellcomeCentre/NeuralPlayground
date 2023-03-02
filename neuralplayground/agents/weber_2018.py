@@ -12,6 +12,7 @@ import sys
 import numpy as np
 import random
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 import numpy as np
 from scipy.stats import multivariate_normal
 from tqdm import tqdm
@@ -79,7 +80,7 @@ class Weber2018(AgentCore):
         Plot current rates and an example of inhibitory and excitatory neuron
     """
 
-    def __init__(self, model_name="ExcitInhibitoryplastic", **mod_kwargs):
+    def __init__(self, model_name: str = "ExcitInhibitoryplastic", **mod_kwargs):
         """
         Refer to Table 1 and Table 2 from the paper for best parameter selection
 
@@ -159,6 +160,7 @@ class Weber2018(AgentCore):
         """
         self.global_steps = 0  # Reset global steps
         self.obs_history = []  # Reset observation history
+        self.grad_history = []
         # Initialize weights
         self.wi = np.random.uniform(low=self.wi_init-0.05*self.wi_init,
                                     high=self.wi_init+0.05*self.wi_init, size=(self.Ni,))
@@ -177,7 +179,7 @@ class Weber2018(AgentCore):
 
         self.init_we_sum = np.sqrt(np.sum(self.we**2))  # Keep track of normalization constant
 
-    def generate_tuning_curves(self, n_curves, cov_scale, Nf, alpha):
+    def generate_tuning_curves(self, n_curves: int, cov_scale: float, Nf: int, alpha: float):
         """
         Generate tuning curves as a combination of Gaussians
         for a given number of neurons, covariance, number of Gaussian per tuning curve and height
@@ -222,7 +224,7 @@ class Weber2018(AgentCore):
         cell_list = np.array(cell_list)
         return function_list, cell_list
 
-    def get_output_rates(self, pos):
+    def get_output_rates(self, pos: np.ndarray):
         """
         Compute firing rate of the output neuron for the specific position, equation 1
 
@@ -243,7 +245,7 @@ class Weber2018(AgentCore):
         r_out = np.clip(r_out, a_min=0, a_max=np.amax(r_out))
         return r_out
 
-    def get_rates(self, cell_list, pos):
+    def get_rates(self, cell_list: np.ndarray, pos: np.ndarray):
         """
         Get firing rate if input neurons at the given position by finding the pixel that is closest
         to the position given
@@ -284,7 +286,7 @@ class Weber2018(AgentCore):
         r_out = np.clip(r_out, a_min=0, a_max=np.amax(r_out))
         return r_out
 
-    def update(self, exc_normalization=True, pos=None):
+    def update(self, exc_normalization: bool = True, pos: np.ndarray = None):
         """
         Update weights using hebbian plasticity according to equation 2 for excitatory weights
         and equation 3 for inhibitory weights for a given position
@@ -316,7 +318,7 @@ class Weber2018(AgentCore):
         self.we = np.clip(self.we, a_min=0, a_max=np.amax(self.we))  # Negative weights to zero
         self.wi = np.clip(self.wi, a_min=0, a_max=np.amax(self.wi))
 
-    def full_average_update(self, exc_normalization=True):
+    def full_average_update(self, exc_normalization: bool = True):
         """
         Update weights using hebbian plasticity according to equation 2 for excitatory weights
         and equation 3 for inhibitory weights for all available positions in the grid
@@ -343,7 +345,7 @@ class Weber2018(AgentCore):
         self.we = np.clip(self.we, a_min=0, a_max=np.amax(self.we))  # Negative weights to zero
         self.wi = np.clip(self.wi, a_min=0, a_max=np.amax(self.wi))
 
-    def full_update(self, exc_normalization=True):
+    def full_update(self, exc_normalization: bool = True):
         """
         Update weights using hebbian plasticity according to equation 2 for excitatory weights
         and equation 3, but using self.update function as a sub routine
@@ -358,7 +360,7 @@ class Weber2018(AgentCore):
         for i in range(self.xy_combinations.shape[0]):
             self.update(exc_normalization=exc_normalization, pos=xy_array[i, :])
 
-    def plot_rates(self, save_path=None, ax=None):
+    def plot_rates(self, save_path: str = None, ax: mpl.axes.Axes = None):
         """
         Plot current rates and an example of inhibitory and excitatory neuron
 
@@ -384,7 +386,7 @@ class Weber2018(AgentCore):
         ax[0].set_title("Exc rates", fontsize=14)
         ax[1].imshow(inh_im, cmap="Blues")
         ax[1].set_title("Inh rates", fontsize=14)
-        im = ax[2].imshow(r_out_im, cmap="jet")
+        im = ax[2].imshow(r_out_im.T, cmap="jet")
         ax[2].set_title("Out rate", fontsize=14)
         cbar = plt.colorbar(im, ax=ax[2])
 

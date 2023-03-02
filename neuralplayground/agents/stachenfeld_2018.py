@@ -12,6 +12,7 @@ sys.path.append("../")
 
 
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 import numpy as np
 
 
@@ -80,7 +81,7 @@ class Stachenfeld2018(AgentCore):
         Plot the matrix and the 4 largest modes of its eigen-decomposition
     """
 
-    def __init__(self, model_name="SR", **mod_kwargs):
+    def __init__(self, model_name: str = "SR", **mod_kwargs):
         """
         Parameters
         ----------
@@ -148,7 +149,7 @@ class Stachenfeld2018(AgentCore):
         self.inital_obs_variable = None
         self.obs_history = []  # Reset observation history
 
-    def obs_to_state(self, pos):
+    def obs_to_state(self, pos: np.ndarray):
         """
         Converts the agent's position in the environment to the agent's position in the SR-agent state space.
 
@@ -165,6 +166,7 @@ class Stachenfeld2018(AgentCore):
 
         """
         node_layout = np.arange(self.n_state).reshape(self.l, self.w)
+    
         diff = self.xy_combinations - pos[np.newaxis, ...]
         dist = np.sum(diff ** 2, axis=1)
         index = np.argmin(dist)
@@ -196,7 +198,7 @@ class Stachenfeld2018(AgentCore):
         self.next_state = self.obs_to_state(obs)
         return action
 
-    def get_T_from_M(self, M):
+    def get_T_from_M(self, M: np.ndarray):
         """
         Compute the transition matrix from the computationally simulated successor matrix M
         Parameters
@@ -212,8 +214,7 @@ class Stachenfeld2018(AgentCore):
         T = (1/self.gamma)*np.linalg.inv(M)@(M-np.eye(self.n_state))
         return T
 
-    def create_transmat(self, state_density, name_env, plotting_variable=True):
-
+    def create_transmat(self, state_density: float, name_env: str, plotting_variable: bool = False):
         """
         Creates the normalised transition matrix for a rectangular environment '2D_env'
 
@@ -234,7 +235,6 @@ class Stachenfeld2018(AgentCore):
          """
 
         if name_env == '2D_env':
-
             adjmat_triu = np.zeros((self.n_state, self.n_state))
             node_layout = np.arange(self.n_state).reshape(self.l, self.w)
             x_coord = np.linspace(0, np.min([self.l / self.w, 1]), num=self.l)
@@ -267,7 +267,7 @@ class Stachenfeld2018(AgentCore):
 
         if plotting_variable==True:
             f, ax = plt.subplots(1, 1, figsize=(14, 5))
-            ax.imshow(self.transmat_norm, interpolation='nearest')
+            ax.imshow(self.transmat_norm, interpolation='nearest',cmap='jet')
 
         return self.transmat_norm
 
@@ -371,8 +371,8 @@ class Stachenfeld2018(AgentCore):
 
         return srmat_full
 
-    def plot_transition(self,matrix, save_path=None, ax=None):
-        """"
+    def plot_transition(self, matrix: np.ndarray, save_path: str = None, ax: mpl.axes.Axes = None):
+        """
         Plot the input matrix and compare it to the transition matrix from the rectangular environment states space (rectangular- transmat).
         (If a new state space type is added please update this function)
         Parameters
@@ -382,18 +382,17 @@ class Stachenfeld2018(AgentCore):
         save_path: string
             Path to save the plot
         """
-
         evals, evecs = np.linalg.eig(matrix)
         if ax is None:
             f, ax = plt.subplots(1,2, figsize=(14, 5))
-            ax[0].imshow(self.transmat_norm)
-            ax[1].imshow(matrix)
+            ax[0].imshow(self.transmat_norm,cmap='jet')
+            ax[1].imshow(matrix,cmap='jet')
         if not save_path is None:
             plt.savefig(save_path, bbox_inches="tight")
             plt.close("all")
         return ax
 
-    def plot_eigen(self,matrix, save_path, ax=None):
+    def plot_eigen(self, matrix: np.ndarray, save_path: str, eigen=(0, 1), ax: mpl.axes.Axes = None):
         """"
         Plot the matrix and the 4 largest modes of its eigen-decomposition
 
@@ -401,27 +400,31 @@ class Stachenfeld2018(AgentCore):
         ----------
         matrix: array
             The matrix that will be plotted
+        eigen:  np.ndarray
+            Which eigenvectors you would like to plot
         save_path: string
             Path to save the plot
         """
+       
         evals, evecs = np.linalg.eig(matrix)
+    
         if ax is None:
-            f, ax = plt.subplots(1, 5, figsize=(14, 5))
-            ax[0].imshow(matrix)
-            evecs_0 = evecs[:, 1].reshape(self.w, self.l).real
-            ax[1].imshow(evecs_0)
-            evecs_1 = evecs[:, 2].reshape(self.w, self.l).real
-            ax[2].imshow(evecs_1)
-            evecs_2 = evecs[:, 3].reshape(self.w, self.l).real
-            ax[3].imshow(evecs_2)
-            evecs_3 = evecs[:, 5].reshape(self.w, self.l).real
-            ax[4].imshow(evecs_3)
-            im = ax[4].imshow(evecs_3)
-            cbar = plt.colorbar(im, ax=ax[4])
-
-        if not save_path is None:
+            f, ax = plt.subplots(1, len(eigen), figsize=(4*len(eigen), 5))
+            if len(eigen) == 1:
+                evecs_0 = evecs[:, eigen[0]].reshape(self.w, self.l).real
+                im = ax.imshow(evecs_0, cmap='jet')
+                cbar = plt.colorbar(im, ax=ax)
+            else:
+                for i, eig in enumerate(eigen):
+                    evecs_0 = evecs[:, eig].reshape(self.w, self.l).real
+                    im = ax[i].imshow(evecs_0,cmap='jet')
+                cbar = plt.colorbar(im, ax=ax[i])
+        if save_path is None:
+            
+            pass  
+        else:
+            
             plt.savefig(save_path, bbox_inches="tight")
-            plt.close("all")
         return ax
 
 

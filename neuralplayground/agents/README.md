@@ -1,45 +1,46 @@
-# Agent: The standardised environment for the hippocampus and entorhinal cortex models.
+# Agent
+
+* [1 Introduction](#1-Introduction)
+* [2 Model Implemented](#2-Model-Implemented)
+* [3 How to Contribute](#3-How-to-Contribute)
 
 
-* [1. Introduction](#1-Introduction)
-* [2. Model Implemented  ](#2-ModelImplemented )
-* [3. How to Contribute](#5-HowtoContribute)
+## 1. Introduction
 
-## 1.Introduction
-
-The agent can be thought as the animal performing the task in the experiment.  All agent types will be given a set ofabilities that are summarised in the agent’s main class.  Each different model developed can be easily implemented asa subclass of the main one.  The agent class has inbuilt methods to interact with the environment, where the specificprocess might vary from model to model, but the overall structure is the same.  Multiple variables can be given, fromthe environment to the agent, depending on the needs of the model. Some examples are position, velocity, the positionof the reward, visual cues, head direction, whiskers, smell, among others.  Roughly, the agent and environment classesfollows the structure in OpenAI Gym and DeepMind Lab, along with additional specific methods, such asgetneural responsefor agents, andplot experimental resultsfor environments.
+This class includes a set of functions that control the ways intelligent systems interact
+with their surroundings (i.e., the environment). An agent receives observations from the environment (reward, visual cues, etc.) and uses these to take an action which in turn will update both its state and the state of the environment, generating new observations. More generally, the Agent can be thought of as an animal performing the task in the simulated experiment. All agent types will be given a set of abilities that are summarised in the agent’s main class. Each different model developed can be easily implemented as a subclass of the main one.  
 
 
-## 2.Model Implemented 
+## 2. Models-Implemented 
 
-  1. [The Tolman-Eichenbaum machine](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/sehec/agents/whittington_2020.py)
+  1. [The Tolman-Eichenbaum machine](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/agents/whittington_2020.py)
   
-  2. [The hippocampus as a predictive map](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/sehec/agents/stachenfeld_2018.py)
+  2. [The hippocampus as a predictive map](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/agents/stachenfeld_2018.py)
 
-  3. [Learning place cells, grid cells and invariances with excitatory and inhibitory plasticity](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/sehec/agents/Weber_2018/)
+  3. [Learning place cells, grid cells and invariances with excitatory and inhibitory plasticity](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/agents/weber_2018.py)
 
-Each of the models are implemented in a jupyter notebook in  [Examples](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/examples) to facilitate the intereraction.
+Each of the these models are implemented in a jupyter notebook in [Examples](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples) to facilitate the interaction.
 
-## 3.How to Contribute
+## 3. How-to-Contribute
 
-  1. Create a file that indicates the appropirate reference to the model
+  1. Create a file that indicates the appropriate reference to the model
 
-  2. Create a class to run the model following the template shown in the [modelcore.py](https://github.com/ClementineDomine/EHC_model_comparison/blob/main/sehec/agent/agent_core.py) and the [Style Guide](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/documents/style_guide).
+  2. Create a class to run the model following the template shown in the [Agent_core.py](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/agents/agent_core.py) and the [Style Guide](https://github.com/ClementineDomine/NeuralPlayground/tree/main/documents/style_guide.md). 
+  When building a new model create a file named author_date.py.
   
-  3. Create a [Examples](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/examples)  jupyter notebook for the new model where you can run the model in a chosen environement with selected experimental data
+  3. Create or add to [Examples](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples/agent_examples/) jupyter notebook for the new model where you can run the model in a chosen environment with selected experimental data
   
-  3. Record your contribution
+  4. Record your contribution
 
-All contribution should be sumbited through a pull request that we will later acess. 
-Before sending a pull request make sure you have:
-1. Checked the Lisencing frameworks. 
+All contributions should be submitted through a pull request that we will later access. 
+Before sending a pull request, make sure you have the following:
 
-2. Followed the [Style Guide](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/documents/style_guide).
+1. Checked the Licensing frameworks. 
 
-3. Implemented and ran [Test](https://github.com/ClementineDomine/EHC_model_comparison/tree/main/sehec/tests).
+2. Followed the [Style Guide](https://github.com/ClementineDomine/NeuralPlayground/tree/main/documents/style_guide.md).
 
-4. Commented your work 
+3. Implemented and ran [Test](https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground/tests).
+
+4. Comment your work 
         
-All contributions to the repository are acknowledged through the all-contributors bot and in future publicaiton.
-
-
+All contributions to the repository are acknowledged through the all-contributors bot and in a future publication.

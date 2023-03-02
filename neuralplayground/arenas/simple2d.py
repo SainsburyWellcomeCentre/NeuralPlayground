@@ -134,7 +134,7 @@ class Simple2D(Environment):
         self.state = np.array(self.state)
 
         if custom_state is not None:
-            self.state = custom_state
+            self.state =  np.array(custom_state)
         # Fully observable environment, make_observation returns the state
         observation = self.make_observation()
         return observation, self.state
@@ -198,7 +198,8 @@ class Simple2D(Environment):
             crossed_wall = crossed or crossed_wall
         return new_state, crossed_wall
 
-    def plot_trajectory(self, history_data: list = None, ax=None, return_figure: bool = False):
+    def plot_trajectory(self, history_data: list = None, ax=None, return_figure: bool = False, save_path: str = None,
+                        plot_every: int = 10):
         """ Plot the Trajectory of the agent in the environment
 
         Parameters
@@ -209,6 +210,8 @@ class Simple2D(Environment):
             axis from subplot from matplotlib where the trajectory will be plotted.
         return_figure: bool
             If true, it will return the figure variable generated to make the plot
+        save_path: str, list of str, tuple of str
+            saving path of the generated figure, if None, no figure is saved
 
         Returns
         -------
@@ -246,18 +249,25 @@ class Simple2D(Environment):
 
             aux_x = []
             aux_y = []
-            aux_y = []
             for i, s in enumerate(state_history):
-                x_ = [s[0], next_state_history[i][0]]
-                y_ = [s[1], next_state_history[i][1]]
-                aux_x.append(s[0])
-                aux_y.append(s[1])
-                ax.plot(x_, y_, "-", color=cmap(norm(i)), alpha=0.6)
 
-            sc = ax.scatter(aux_x, aux_y, c=np.arange(len(aux_x)), vmin=0, vmax=len(aux_x), cmap="plasma", alpha=0.6, s=0.1)
+                if i % plot_every == 0:
+                    if i + plot_every >= len(state_history):
+                        break
+                    x_ = [s[0], state_history[i+plot_every][0]]
+                    y_ = [s[1], state_history[i+plot_every][1]]
+                    aux_x.append(s[0])
+                    aux_y.append(s[1])
+                    sc = ax.plot(x_, y_, "-", color=cmap(norm(i)), alpha=0.6)
+
+            sc = ax.scatter(aux_x, aux_y, c=np.arange(len(aux_x)), vmin=0, vmax=len(aux_x),
+                            cmap="plasma", alpha=0.6, s=0.1)
             cbar = plt.colorbar(sc, ax=ax, ticks=[0, len(state_history)])
             cbar.ax.set_ylabel('N steps', rotation=270, fontsize=16)
             cbar.ax.set_yticklabels([0, len(state_history)], fontsize=16)
+
+        if save_path is not None:
+            plt.savefig(save_path, bbox_inches="tight")
 
         if return_figure:
             return ax, f

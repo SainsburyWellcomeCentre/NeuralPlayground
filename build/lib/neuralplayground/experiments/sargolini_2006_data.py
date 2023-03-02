@@ -14,7 +14,7 @@ class SargoliniDataTrajectory(Experiment):
         This class only consider animal trajectory pre-processed by the authors.
     """
 
-    def __init__(self, experiment_name: str = 'Sargolini_2006_Data', data_path: str = None):
+    def __init__(self, experiment_name: str = 'Sargolini_2006_Data', data_path: str = None, **kwargs):
         """ SargoliniData Class Init
 
         Parameters

@@ -1,8 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from ..arenas import Environment, Simple2D, Sargolini2006, Hafting2008, ConnectedRooms, MergingRoom2D
+from ..arenas import Environment, Simple2D, Sargolini2006, Hafting2008, ConnectedRooms, Wernle2018
 import pytest
-from ..utils import RandomAgent
+from ..agents import RandomAgent
 
 
 class TestSimple2D(object):
@@ -55,7 +55,7 @@ class TestSargolini2006(TestSimple2D):
         assert isinstance(init_env[0], Sargolini2006)
 
     def test_session_plot(self, init_env):
-        init_env[0].data.plot_trajectory()
+        init_env[0].experiment.plot_trajectory()
 
 
 class TestHafting2008(TestSimple2D):
@@ -101,7 +101,7 @@ class TestMergingRoom2D(TestSimple2D):
         switch_time = 20
         n_steps = ((merging_time + switch_time) * 60) / time_step_size
 
-        env = MergingRoom2D(environment_name=env_name,
+        env = Wernle2018(environment_name=env_name,
                             merge_time=merging_time,
                             switch_time=switch_time,
                             time_step_size=time_step_size,
@@ -109,4 +109,4 @@ class TestMergingRoom2D(TestSimple2D):
         return [env, ]
 
     def test_init_env(self, init_env):
-        assert isinstance(init_env[0], MergingRoom2D)
+        assert isinstance(init_env[0], Wernle2018)

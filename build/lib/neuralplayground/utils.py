@@ -4,7 +4,9 @@ from scipy.ndimage import gaussian_filter
 from scipy.interpolate import interp1d
 
 
-def check_crossing_wall(pre_state, new_state, wall, wall_closenes=1e-5, tolerance=1e-9):
+def check_crossing_wall(pre_state: np.ndarray, new_state: np.ndarray,
+                        wall: np.ndarray, wall_closenes: float = 1e-5,
+                        tolerance: float = 1e-9):
     """
 
     Parameters
@@ -17,6 +19,8 @@ def check_crossing_wall(pre_state, new_state, wall, wall_closenes=1e-5, toleranc
         [[x1, y1], [x2, y2]] where (x1, y1) is on limit of the wall, (x2, y2) second limit of the wall
     wall_closenes : float
         how close the agent is allowed to be from the wall
+    tolerance: float
+        Small constant to avoid inverting a singular matrix
 
     Returns
     -------
@@ -45,7 +49,24 @@ def check_crossing_wall(pre_state, new_state, wall, wall_closenes=1e-5, toleranc
     return new_state, cross_wall
 
 
-def create_circular_wall(center, radius, n_walls=100):
+def create_circular_wall(center: np.ndarray, radius: float, n_walls: int = 100):
+    """ Generate a circular wall by discretizing the circle into many walls.
+
+    Parameters
+    ----------
+    center: ndarray (2,)
+        Center of the circular wall
+    radius: float
+        Radius of the circular wall
+    n_walls: int
+        Number of walls used to discretize the circle
+
+    Returns
+    -------
+    list_of_segments: list of walls
+        n_walls that creates a circle
+    """
+
     d_angle = 2*np.pi/n_walls
     list_of_segments = []
     for i in range(n_walls):
@@ -57,6 +78,7 @@ def create_circular_wall(center, radius, n_walls=100):
 
 
 def inheritors(klass):
+    """ Given a class, returns child classes (for future implementation of comparison board) """
     subclasses = set()
     work = [klass]
     while work:
@@ -69,6 +91,23 @@ def inheritors(klass):
 
 
 def clean_data(data, keep_headers=False):
+    """ For a dictionary with positional data, this function replace nans by interpolated positions
+    Used in data readers in the experiment classes
+
+    Parameters
+    ----------
+    data: dict
+        dictionary with values that might contain arrays with nans
+    keep_headers: bool
+        it will remove unwanted keys from the returned dictionary that are residuals of
+        loading .mat files
+        (sounds a bit cryptic, please check _load_data in experiment classes)
+
+    Returns
+    -------
+    aux_dict: dict
+        Modified dictionary with some keys removed and nans interpolated
+    """
     aux_dict = {}
     for key, val in data.items():
         if isinstance(val, bytes) or isinstance(val, str) or key == "__globals__":
@@ -76,7 +115,6 @@ def clean_data(data, keep_headers=False):
                 aux_dict[key] = val
             continue
         else:
-
             if not np.isnan(val).any():
                 aux_dict[key] = val
             else:
@@ -91,8 +129,39 @@ def clean_data(data, keep_headers=False):
     return aux_dict
 
 
-def get_2D_ratemap(time_array, spikes, x, y, x_size=50, y_size=50, filter_result=False):
+def get_2D_ratemap(time_array: np.ndarray, spikes: np.ndarray, x: np.ndarray, y: np.ndarray,
+                   x_size: float = 50, y_size: float = 50, filter_result: bool = False):
+    """
+    Parameters
+    ----------
+    time_array: ndarray (n_samples,)
+        array with the timestamps in seconds per position of the given session
+    spikes: ndarray (n_spikes,)
+        spike times in seconds of the given session
+    x: ndarray (n_samples,)
+        x position throughout recording of the given session
+    y: ndarray (n_samples,)
+        y position throughout recording of the given session
+    x_size: float
+        bin size in x dim
+    y_size: float
+        bin size in y dim
+    filter_result: bool
+        If true, it will smooth the ratemap using a gaussian filter
+
+    Returns
+    -------
+    h: ndarray (nybins, nxbins)
+        Number of spikes falling on each bin through the recorded session, nybins number of bins in y axis,
+        nxbins number of bins in x axis
+    binx: ndarray (nxbins +1,)
+        bin limits of the ratemap on the x axis
+    biny: ndarray (nybins +1,)
+        bin limits of the ratemap on the y axis
+    """
     x_spikes, y_spikes = [], []
+
+    # Find x, y position of each spike using spike times
     for s in spikes:
         array_pos = np.argmin(np.abs(time_array-s))
         x_spikes.append(x[array_pos])
@@ -100,9 +169,10 @@ def get_2D_ratemap(time_array, spikes, x, y, x_size=50, y_size=50, filter_result
     x_spikes = np.array(x_spikes)
     y_spikes = np.array(y_spikes)
     h, binx, biny = np.histogram2d(x_spikes, y_spikes, bins=(x_size, y_size))
+    # Gaussian filter
     if filter_result:
         h = gaussian_filter(h, sigma=2)
-
+    # Transpose to change row col coordinates to positions
     return h.T, binx, biny
 
 
@@ -237,5 +307,6 @@ class OnlineRateMap(object):
         aux_ratemap = np.copy(self.ratemap)
         aux_ratemap[nan_indexes] = 0
         filtered_ratemap = gaussian_filter(aux_ratemap, 3.5)
-        filtered_ratemap[nan_indexes] = np.nan
+        self.nan = np.nan
+        filtered_ratemap[nan_indexes] = self.nan
         return filtered_ratemap

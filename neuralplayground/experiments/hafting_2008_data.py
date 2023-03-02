@@ -287,9 +287,9 @@ class Hafting2008Data(Experiment):
             for i, ind in enumerate(recording_index):
                 # Checking if rest of variables are default or list values
                 if save_path is not None:
-                    save_path_i = None
-                else:
                     save_path_i = save_path[i]
+                else:
+                    save_path_i = None
                 if ax is not None:
                     ax_i = ax[0]
                 else:
@@ -353,17 +353,19 @@ class Hafting2008Data(Experiment):
         cbar.ax.set_xlabel('Firing rate', fontsize=12)
         cbar.ax.set_xticklabels([np.round(np.min(h)), np.round(np.max(h))], fontsize=12)
         ax.set_title(title)
+
         ax.set_ylabel('width', fontsize=16)
         ax.set_xlabel('depth', fontsize=16)
+        ax.grid(False)
+
         ax.set_xticks([])
         ax.set_yticks([])
 
         # Save if save_path is not None
-        if not save_path is None:
-            plt.savefig(save_path, bbox_inches="tight")
-            plt.close("all")
+        if save_path is None:
             return ax
         else:
+            plt.savefig(save_path, bbox_inches="tight")
             return ax
 
     def plot_trajectory(self, recording_index: Union[int, tuple, list] = None,
@@ -401,9 +403,9 @@ class Hafting2008Data(Experiment):
             for i, ind in enumerate(recording_index):
                 # Checking if rest of variables are default or list values
                 if save_path is not None:
-                    save_path_i = None
-                else:
                     save_path_i = save_path[i]
+                else:
+                    save_path_i = None
                 if ax is not None:
                     ax_i = ax[0]
                 else:
@@ -422,7 +424,11 @@ class Hafting2008Data(Experiment):
         time_array, test_spikes, x, y = self.get_tetrode_data(session_data, tetrode_id)
         # Helper function to format the trajectory plot
         self._make_trajectory_plot(x, y, ax, plot_every)
-
+        # Save if save_path is not None
+        if save_path is None:
+            pass
+        else:
+            plt.savefig(save_path, bbox_inches="tight")
         return x, y, time_array
 
     def _make_trajectory_plot(self, x, y, ax, plot_every, fontsize = 24):
@@ -474,10 +480,10 @@ class Hafting2008Data(Experiment):
                 sc = ax.plot(x_, y_, "-", color=cmap(norm(i)), alpha=0.6)
 
         # Setting plot labels
-        ax.set_ylabel('width', fontsize=fontsize)
-        ax.set_xlabel('depth', fontsize=fontsize)
+        ax.set_xlabel('width', fontsize=fontsize)
+        ax.set_ylabel('depth', fontsize=fontsize)
         ax.set_title("position", fontsize=fontsize)
-        ax.grid()
+        ax.grid(False)
 
         cmap = mpl.cm.get_cmap("plasma")
         norm = plt.Normalize(0, np.size(x))

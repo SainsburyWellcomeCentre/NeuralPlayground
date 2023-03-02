@@ -5,7 +5,8 @@ import copy
 
 
 class Sargolini2006(Hafting2008):
-    """
+    """ Arena resembling Sargolini2006 experimental setting
+
     Methods
     ----------
     __init__(self, use_behavioral_data: bool = False, data_path: str = None, recording_index: int = None,
@@ -18,7 +19,7 @@ class Sargolini2006(Hafting2008):
         Increment the global step count of the agent in the environment and updates the position of the agent according
         to the recordings of the specific chosen session
 
-     Attribute
+    Attributes
     ----------
     self.state: array
         Contains the x, y coordinate of the position and head direction of the agent (will be further developed)

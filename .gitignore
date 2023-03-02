@@ -46,3 +46,9 @@ environments/experiment_data/Hafting2008/
 
 *.pytest_cache*
 *test_crossrun_results*
+
+#Results
+*.pdf
+*.png
+
+
