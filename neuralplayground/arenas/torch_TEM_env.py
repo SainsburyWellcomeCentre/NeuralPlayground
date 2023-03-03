@@ -13,8 +13,11 @@ pars = pars_orig.copy()
 class TEM_env(Simple2D):
     def __init__(self, environment_name='TEM_env', **env_kwargs):
         super().__init__(environment_name, **env_kwargs)
+        self.room_width = abs(env_kwargs['arena_x_limits'][0] - env_kwargs['arena_x_limits'][1])
+        self.room_depth = abs(env_kwargs['arena_y_limits'][0] - env_kwargs['arena_y_limits'][1])
+        self.state_density = env_kwargs['state_density']
+
         # Variables for discretised (SR) state space
-        self.state_density = pars['state_density']
         self.n_states = (self.room_width * self.room_depth) * self.state_density
         self.resolution_w = int(self.state_density * self.room_width)
         self.resolution_d = int(self.state_density * self.room_depth)
@@ -27,12 +30,10 @@ class TEM_env(Simple2D):
         self.node_layout = np.arange(self.n_states).reshape(self.room_width, self.room_depth)
 
     def batch_reset(self, normalize_step=False, random_state=False, custom_state=None):
-        self.generate_objects()
-        self.full_walk = []
-        
         self.global_steps = 0
         self.history = [[] for _ in range(pars['batch_size'])]
         self.states = np.zeros(shape=(pars['batch_size'], 2))
+        locations = []
         for env in range(pars['batch_size']):
             if random_state:
                 self.states[env] = [np.random.uniform(low=self.arena_limits[0, 0], high=self.arena_limits[0, 1]),
@@ -44,101 +45,40 @@ class TEM_env(Simple2D):
             if custom_state is not None:
                 self.states[env] = custom_state
 
-        states, observations, actions = self.batch_step(normalize_step=normalize_step)
-        return states, observations, actions
+            locations.append(self.discretise(self.states[env]))
+        return self.states, locations
 
-    def batch_step(self, normalize_step=False):
-        n_walk = pars['n_rollout']
-        all_states = []
-        all_actions = []
-        self.global_steps += 1
-        for batch in range(pars['batch_size']):
-            self.batch_history = []
-            self.local_steps = 0
-            state_batch = []
-            action_batch = []
-            for i in range(n_walk):
-                self.local_steps += 1
-                valid_action = True
-                while valid_action:
-                    if normalize_step:
-                        action = self.action_policy()
-                        new_state = self.states[batch] + [self.agent_step_size * direction for direction in action]
-                    else:
-                        action = self.action_policy()
-                        new_state = self.states[batch] + action
-                    new_state, valid_action = self.validate_action(self.states[batch], action, new_state)
-                state_batch.append(self.states[batch].copy())
-                action_batch.append(action)
-                reward = 0  # If you get reward, it should be coded here
-                transition = {"action": action, "state": self.states[batch].copy(), "next_state": new_state,
-                              "reward": reward, "step": self.global_steps}
-                self.batch_history.append(transition)
-                self.states[batch] = new_state
-            all_states.append(state_batch)
-            all_actions.append(action_batch)
-            self.history[batch].extend(self.batch_history)
-
-        # Discretise (x,y) walk information
-        locations = self.walk(all_states)
-        self.full_walk.append(locations)
-        # Convert action vectors to action values
-        action_values = self.step_to_actions(all_actions)
-        # Make observations
-        observations = self.make_observations(locations)
-
-        return locations, observations, action_values
-
-    def action_policy(self):
-        arrow = [[0, 0], [0, 1], [0, -1], [1, 0], [-1, 0]]
-        index = np.random.choice(len(arrow))
-        action = arrow[index]
-        return action
-
-    def generate_objects(self):
-        poss_objects = np.zeros(shape=(pars['n_x'], pars['n_x']))
-        for i in range(pars['n_x']):
-            for j in range(pars['n_x']):
-                if j == i:
-                    poss_objects[i][j] = 1
-        self.objects = []
-        for batch in range(pars['batch_size']):
-            env_objects = np.zeros(shape=(self.n_states, pars['n_x']))
-            # Generate landscape of objects in each environment
-            for i in range(self.n_states):
-                rand = random.randint(0, pars['n_x'] - 1)
-                env_objects[i, :] = poss_objects[rand]
-            self.objects.append(env_objects)
-
-    def make_observations(self, locations):
+    def batch_step(self, actions, normalize_step=False):
         observations = []
-        for i, step in enumerate(locations):
-            env_observations = np.zeros(shape=(pars['batch_size'], pars['n_x']))
-            for j in range(pars['batch_size']):
-                env_observations[j] = self.objects[j][step[j]['id']]
-            observations.append(env_observations)
-        return observations
+        states = []
+        batch_history = []
+        all_allowed = True
+        for batch in range(pars['batch_size']):
+            if normalize_step:
+                action = actions[batch]
+                new_state = self.states[batch] + [self.agent_step_size * direction for direction in action]
+            else:
+                action = actions[batch]
+                new_state = self.states[batch] + action
+            new_state, valid_action = self.validate_action(self.states[batch], action, new_state)
+            reward = self.reward_function(action, self.states[batch])
+            transition = {"action": action, "state": self.states[batch].copy(), "next_state": new_state,
+                          "reward": reward, "step": self.global_steps}
+            batch_history.append(transition)
+            if valid_action:
+                all_allowed = False
+                observations.append([None, None])
+                states.append(None)
+            else:
+                observations.append(new_state)
+                states.append(self.discretise(new_state))
 
-    def walk(self, positions):
-        locations = []
-        for step in positions:
-            env_locations = []
-            for env_step in step:
-                index = self.discretise(env_step)
-                env_locations.append({'id':index, 'shiny':None})
-            locations.append(env_locations)
-        return list(np.transpose(np.array(locations)))
+        if all_allowed:
+            self.states = observations
+            (self.history[i].extend(batch_history[i]) for i in range(pars['batch_size']))
 
-    def step_to_actions(self, actions):
-        action_values = []
-        # actions = np.reshape(actions, (pars['n_rollout'], pars['batch_size'], 2))
-        poss_values = [[0,0],[0,-1],[0,1],[-1,0],[1,0]]
-        for steps in actions:
-            step_list = []
-            for action in steps:
-                step_list.append(poss_values.index(list(action)))
-            action_values.append(step_list)
-        return [[step[i] for step in action_values] for i in range(pars['n_rollout'])]
+        return observations, states
+
     def generate_test_environment(self):
         shiny = None if pars['shiny_rate'] ==0 else 0
         self.n_states = (self.room_width*self.room_depth)*self.state_density
