@@ -122,6 +122,7 @@ class TestWhittington2020(Testmodelcore):
         params = pars_orig.copy()
         mod_name = "TorchTEMTest"
         state_density = params['state_density']
+        env = get_environment[0]
         # Init environment
         agent = Whittington2020(model_name=mod_name, params=params,
             room_width=env.room_width, room_depth=env.room_depth,
