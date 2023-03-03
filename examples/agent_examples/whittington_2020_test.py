@@ -18,11 +18,13 @@ env_name = "env_test"
 n_envs = 1
 time_step_size = 1
 agent_step_size = 1
+state_density = params['state_density']
 
 # Init environment
 env = BatchEnvironment(environment_name=env_name,
               arena_x_limits=room_width,
               arena_y_limits=room_depth,
+              state_density=state_density,
               time_step_size=time_step_size,
               agent_step_size=agent_step_size)
 
@@ -33,7 +35,7 @@ torch.manual_seed(0)
 # Choose which trained model to load
 date = '2023-03-02' # 2020-10-13 run 0 for successful node agent
 run = '7'
-index = '1800'
+index = '19900'
 path = '/nfs/nhome/live/lhollingsworth/Documents/NeuralPlayground/NPG/EHC_model_comparison/examples/Summaries2/'
 OG_path = '/nfs/nhome/live/lhollingsworth/Documents/NeuralPlayground/Summaries/'
 

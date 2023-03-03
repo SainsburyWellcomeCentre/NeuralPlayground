@@ -40,7 +40,6 @@ class Whittington2020(AgentCore):
 
         self.n_walk = 0
         self.obs_history = []
-        self.walk_positions = []
         self.walk_actions = []
 
         self.initialise()
@@ -50,7 +49,6 @@ class Whittington2020(AgentCore):
         self.initialise()
         self.n_walk = 0
         self.obs_history = []
-        self.walk_positions = []
         self.walk_actions = []
 
     def act(self, positions, policy_func=None):
@@ -66,7 +64,6 @@ class Whittington2020(AgentCore):
                 actions.append(self.action_policy())
             self.walk_actions.append(actions)
             self.obs_history.append(positions)
-            self.walk_positions.append(positions)
             self.n_walk += 1
 
         elif not all_allowed:
@@ -79,12 +76,13 @@ class Whittington2020(AgentCore):
         return actions
 
     def update(self):
-        iter = len(self.obs_history)
+        iter = int((len(self.obs_history) / 20) - 1)
+        print(iter)
         self.global_steps += 1
-        positions = self.walk_positions
-        actions = self.walk_actions
+        positions = self.obs_history[-20:]
+        actions = self.walk_actions[-20:]
         self.walk_positions = []
-        self.walk_actions = []
+        self.walk_actions = [self.walk_actions[-1]]
         self.n_walk = 0
         # Discretise (x,y) walk information
         locations = self.walk(positions)
