@@ -4,8 +4,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from ..arenas import BasicSargolini2006
 from ..agents import Weber2018
+from ..agents import Whittington2020
 from ..agents import Stachenfeld2018
 from ..agents import AgentCore
+import neuralplayground.agents.whittington_2020_extras.whittington_2020_parameters as parameters
 import pytest
 
 
@@ -45,7 +47,7 @@ class Testmodelcore(object):
             total_iters += 1
 
 
-class TestExcInhPlasticity(Testmodelcore):
+class TestWeber2018(Testmodelcore):
 
     @pytest.fixture
     def init_model(self, get_environment):
@@ -78,7 +80,7 @@ class TestExcInhPlasticity(Testmodelcore):
         init_model[0].plot_rates()
 
 
-class TestSR(Testmodelcore):
+class TestStachenfeld2018(Testmodelcore):
 
     @pytest.fixture
     def init_model(self, get_environment):
@@ -111,3 +113,18 @@ class TestSR(Testmodelcore):
     def test_plot_sr_sum(self, init_model):
         sr_sum = init_model[0].successor_rep_sum()
         init_model[0].plot_eigen(sr_sum, eigen=(0,), save_path=None)
+
+class TestWhittington2020(Testmodelcore):
+
+    @pytest.fixture
+    def init_model(self, get_environment):
+        pars_orig = parameters.parameters()
+        params = pars_orig.copy()
+        mod_name = "TorchTEMTest"
+        state_density = params['state_density']
+        env = get_environment[0]
+        # Init environment
+        agent = Whittington2020(model_name=mod_name, params=params,
+            room_width=env.room_width, room_depth=env.room_depth,
+            state_density=state_density)
+        return [agent, ]
