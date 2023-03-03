@@ -36,12 +36,16 @@ class Whittington2020(AgentCore):
     ---------
          mod_kwargs : dict
 
+
+    Methods
+    ---------
+
     """
     def __init__(self, model_name: str = "TEM", **mod_kwargs):
         super().__init__()
         params = mod_kwargs['params']
-        self.room_width = abs(mod_kwargs['room_width'][0] - mod_kwargs['room_width'][1])
-        self.room_depth = abs(mod_kwargs['room_depth'][0] - mod_kwargs['room_depth'][1])
+        self.room_width = mod_kwargs['room_width']
+        self.room_depth = mod_kwargs['room_depth']
         self.state_density = mod_kwargs['state_density']
         self.pars = copy.deepcopy(params)
         self.tem = model.Model(self.pars)
@@ -196,7 +200,7 @@ class Whittington2020(AgentCore):
         # Create directories for storing all information about the current run
         self.run_path, self.train_path, self.model_path, self.save_path, self.script_path, self.envs_path = utils.make_directories()
         # Save all python files in current directory to script directory
-        shutil.copy2('/nfs/nhome/live/lhollingsworth/Documents/NeuralPlayground/NPG/EHC_model_comparison/neuralplayground/agents/whittington_2020_extras/whittington_2020_model.py',
+        shutil.copy2(os.path.abspath(os.path.join(os.getcwd(), os.pardir))+'/agents/whittington_2020_extras/whittington_2020_model.py',
                      os.path.join(self.model_path, 'whittington_2020_model.py'))
         # Save parameters
         np.save(os.path.join(self.save_path, 'params'), self.pars)

@@ -3,6 +3,7 @@ from tqdm import tqdm
 import numpy as np
 import matplotlib.pyplot as plt
 from ..arenas import BasicSargolini2006
+from ..arenas import BatchEnvironment
 from ..agents import Weber2018
 from ..agents import Whittington2020
 from ..agents import Stachenfeld2018
@@ -28,23 +29,7 @@ class Testmodelcore(object):
     def test_init_model(self, init_model):
         assert isinstance(init_model[0], AgentCore)
 
-    def test_agent_interaction(self, init_model, get_environment):
-        env = get_environment[0]
-        plot_every = 0
-        total_iters = 0
-        n_steps = 1
-        obs, state = env.reset()
-        obs = obs[:2]
-        # for i in tqdm(range(env.total_number_of_steps)):
-        for i in tqdm(range(n_steps)):
-            # Observe to choose an action
-            action = init_model[0].act(obs)
-            init_model[0].update()
-            # rate = agent.update()
-            # Run environment for given action
-            obs, state, reward = env.step(action)
-            obs = obs[:2]
-            total_iters += 1
+    
 
 
 class TestWeber2018(Testmodelcore):
@@ -78,6 +63,24 @@ class TestWeber2018(Testmodelcore):
 
     def test_plot_rates(self, init_model):
         init_model[0].plot_rates()
+        
+    def test_agent_interaction(self, init_model, get_environment):
+        env = get_environment[0]
+        plot_every = 0
+        total_iters = 0
+        n_steps = 1
+        obs, state = env.reset()
+        obs = obs[:2]
+        # for i in tqdm(range(env.total_number_of_steps)):
+        for i in tqdm(range(n_steps)):
+            # Observe to choose an action
+            action = init_model[0].act(obs)
+            init_model[0].update()
+            # rate = agent.update()
+            # Run environment for given action
+            obs, state, reward = env.step(action)
+            obs = obs[:2]
+            total_iters += 1
 
 
 class TestStachenfeld2018(Testmodelcore):
@@ -97,7 +100,25 @@ class TestStachenfeld2018(Testmodelcore):
         agent = Stachenfeld2018(discount=discount, t_episode=t_episode, n_episode=n_episode, threshold=threshold, lr_td=lr_td,
                    room_width=env.room_width, room_depth=env.room_depth, state_density=state_density, twoD=twoDvalue)
         return [agent, ]
-
+    
+    def test_agent_interaction(self, init_model, get_environment):
+        env = get_environment[0]
+        plot_every = 0
+        total_iters = 0
+        n_steps = 1
+        obs, state = env.reset()
+        obs = obs[:2]
+        # for i in tqdm(range(env.total_number_of_steps)):
+        for i in tqdm(range(n_steps)):
+            # Observe to choose an action
+            action = init_model[0].act(obs)
+            init_model[0].update()
+            # rate = agent.update()
+            # Run environment for given action
+            obs, state, reward = env.step(action)
+            obs = obs[:2]
+            total_iters += 1
+            
     def test_init_model(self, init_model):
         assert isinstance(init_model[0], Stachenfeld2018)
 
@@ -128,3 +149,5 @@ class TestWhittington2020(Testmodelcore):
             room_width=env.room_width, room_depth=env.room_depth,
             state_density=state_density)
         return [agent, ]
+    
+   
