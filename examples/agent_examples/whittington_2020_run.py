@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
-from neuralplayground.arenas.torch_TEM_env import TEM_env
-from neuralplayground.agents.whittington_2020 import TEM
-import neuralplayground.agents.TEM_extras.TEM_parameters as parameters
+from neuralplayground.arenas.batch_environment import BatchEnvironment
+from neuralplayground.agents.whittington_2020 import Whittington2020
+import neuralplayground.agents.whittington_2020_extras.whittington_2020_parameters as parameters
 
 pars_orig = parameters.parameters()
 params = pars_orig.copy()
@@ -21,14 +21,13 @@ env = TEM_env(environment_name=env_name,
               state_density=state_density,
               time_step_size=time_step_size,
               agent_step_size=agent_step_size)
-agent = TEM(model_name=mod_name, params=params,
+agent = Whittington2020(model_name=mod_name, params=params,
             room_width=room_width, room_depth=room_depth,
             state_density=state_density)
 
 positions, states = env.batch_reset(normalize_step=False, random_state=True)
 for i in range(params['train_it']):
     while agent.n_walk < params['n_rollout']:
-        print(agent.n_walk)
         actions = agent.act(positions)
         positions, states = env.batch_step(actions)
     agent.update()

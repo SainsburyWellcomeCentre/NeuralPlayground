@@ -11,10 +11,10 @@ import shutil
 from torch.utils.tensorboard import SummaryWriter
 
 # Custom modules
-import neuralplayground.agents.whittington_2020.whittington_2020_utils as utils
-import neuralplayground.agents.whittington_2020.whittington_2020_parameters as parameters
+import neuralplayground.agents.whittington_2020_extras.whittington_2020_utils as utils
+import neuralplayground.agents.whittington_2020_extras.whittington_2020_parameters as parameters
 from .agent_core import AgentCore
-import neuralplayground.agents.whittington_2020.whittington_2020_model as model
+import neuralplayground.agents.whittington_2020_extras.whittington_2020_model as model
 
 class Whittington2020(AgentCore):
     def __init__(self, model_name: str = "TEM", **mod_kwargs):
@@ -67,8 +67,6 @@ class Whittington2020(AgentCore):
             self.walk_actions.append(actions)
             self.obs_history.append(positions)
             self.walk_positions.append(positions)
-            print(actions)
-            print(positions)
             self.n_walk += 1
 
         elif not all_allowed:
@@ -108,7 +106,7 @@ class Whittington2020(AgentCore):
             param_group['lr'] = self.lr
 
         # Collect all information in walk variable
-        model_input = [[locations[i].tolist(), torch.from_numpy(np.reshape(observations, (20, 16, 45))[i]).type(torch.float32),
+        model_input = [[locations[i], torch.from_numpy(np.reshape(observations, (20, 16, 45))[i]).type(torch.float32),
                  np.reshape(action_values, (20, 16))[i].tolist()] for i in range(self.pars['n_rollout'])]
 
         forward = self.tem(model_input, self.prev_iter)

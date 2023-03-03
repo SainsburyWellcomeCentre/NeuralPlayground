@@ -4,10 +4,10 @@ import torch
 import glob
 import matplotlib.pyplot as plt
 from importlib import util
-from neuralplayground.arenas.torch_TEM_env import TEM_env
-from neuralplayground.agents.TEM_extras.TEM_parameters import parameters
-import neuralplayground.agents.TEM_extras.TEM_analyse as analyse
-import neuralplayground.agents.TEM_extras.TEM_plot as plot
+from neuralplayground.arenas.batch_environment import BatchEnvironment
+from neuralplayground.agents.whittington_2020_extras.whittington_2020_parameters import parameters
+import neuralplayground.agents.whittington_2020_extras.whittington_2020_analyse as analyse
+import neuralplayground.agents.whittington_2020_extras.whittington_2020_plot as plot
 
 pars_orig = parameters()
 params = pars_orig.copy()
@@ -20,7 +20,7 @@ time_step_size = 1
 agent_step_size = 1
 
 # Init environment
-env = TEM_env(environment_name=env_name,
+env = BatchEnvironment(environment_name=env_name,
               arena_x_limits=room_width,
               arena_y_limits=room_depth,
               time_step_size=time_step_size,

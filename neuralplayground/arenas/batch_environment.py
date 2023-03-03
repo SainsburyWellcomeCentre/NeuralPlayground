@@ -3,14 +3,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 import random
 from .simple2d import Simple2D
-from ..agents.TEM_extras.TEM_parameters import parameters
-from ..agents.TEM_extras.TEM_utils import *
+from ..agents.whittington_2020_extras.whittington_2020_parameters import parameters
+from ..agents.whittington_2020_extras.whittington_2020_utils import *
 
 pars_orig = parameters()
 pars = pars_orig.copy()
 
 
-class TEM_env(Simple2D):
+class BatchEnvironment(Simple2D):
     def __init__(self, environment_name='TEM_env', **env_kwargs):
         super().__init__(environment_name, **env_kwargs)
         self.room_width = abs(env_kwargs['arena_x_limits'][0] - env_kwargs['arena_x_limits'][1])
