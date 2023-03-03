@@ -1,7 +1,15 @@
-import copy
+"""
+Implementation for The Tolman-Eichenbaum Machine: Unifying space and relational memory through generalisation in the hippocampal formation
+James CR Whittington, Timothy H Muller, Shirley Mark, Guifen Chen, Caswell Barry, Neil Burgess, Timothy EJ Behrens
+
+This implementation can interact with environments from the package as shown in the examples jupyter notebook.
+Check examples/ Whittington_2019_example.ipynb
+"""
+
 import sys
 sys.path.append("../")
 
+import copy
 import numpy as np
 import torch
 import random
@@ -17,6 +25,18 @@ from .agent_core import AgentCore
 import neuralplayground.agents.whittington_2020_extras.whittington_2020_model as model
 
 class Whittington2020(AgentCore):
+    """
+    Implementation for The Tolman-Eichenbaum Machine: Unifying space and relational memory through generalisation in the hippocampal formation
+    James CR Whittington, Timothy H Muller, Shirley Mark, Guifen Chen, Caswell Barry, Neil Burgess, Timothy EJ Behrens
+
+    This implementation can interact with environments from the package as shown in the examples jupyter notebook.
+    Check examples/ Whittington_2019_example.ipynb
+    ----
+    Attributes
+    ---------
+         mod_kwargs : dict
+
+    """
     def __init__(self, model_name: str = "TEM", **mod_kwargs):
         super().__init__()
         params = mod_kwargs['params']
@@ -46,6 +66,14 @@ class Whittington2020(AgentCore):
         self.initialise()
 
     def reset(self):
+        """
+
+        Returns
+        -------
+        object
+
+
+        """
         self.tem = model.Model(self.pars)
         self.initialise()
         self.n_walk = 0

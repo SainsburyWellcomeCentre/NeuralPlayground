@@ -1,10 +1,10 @@
 """
-Implementation for SR 2017 by Kimberly L. Stachenfeld1,2,*, Matthew M. Botvinick1,3, and Samuel J. Gershman
+Implementation for 2017 by Kimberly L. Stachenfeld1,2,*, Matthew M. Botvinick1,3, and Samuel J. Gershman
 The hippocampus as a predictive map
 https://doi.org/10.1101/097170;
 
 This implementation can interact with environments from the package as shown in the examples jupyter notebook.
-Check examples/SRexample.ipynb
+Check examples/Stachenfeld_2018_example.ipynb
 """
 
 import sys
