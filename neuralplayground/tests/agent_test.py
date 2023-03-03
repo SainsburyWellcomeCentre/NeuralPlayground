@@ -126,8 +126,4 @@ class TestWhittington2020(Testmodelcore):
         agent = Whittington2020(model_name=mod_name, params=params,
             room_width=env.room_width, room_depth=env.room_depth,
             state_density=state_density)
-
         return [agent, ]
-
-    def test_init_model(self, init_model):
-        assert isinstance(init_model[0], Weber2018)
