@@ -1,15 +1,7 @@
-"""
-Implementation for The Tolman-Eichenbaum Machine: Unifying space and relational memory through generalisation in the hippocampal formation
-James CR Whittington, Timothy H Muller, Shirley Mark, Guifen Chen, Caswell Barry, Neil Burgess, Timothy EJ Behrens
-
-This implementation can interact with environments from the package as shown in the examples jupyter notebook.
-Check examples/ Whittington_2019_example.ipynb
-"""
-
+import copy
 import sys
 sys.path.append("../")
 
-import copy
 import numpy as np
 import torch
 import random
@@ -26,26 +18,67 @@ import neuralplayground.agents.whittington_2020_extras.whittington_2020_model as
 
 class Whittington2020(AgentCore):
     """
-    Implementation for The Tolman-Eichenbaum Machine: Unifying space and relational memory through generalisation in the hippocampal formation
-    James CR Whittington, Timothy H Muller, Shirley Mark, Guifen Chen, Caswell Barry, Neil Burgess, Timothy EJ Behrens
+        Implementation of TEM 2020 by James C.R. Whittington, Timothy H. Muller, Shirley Mark, Guifen Chen, Caswell Barry,
+        Neil Burgess, Timothy E.J. Behrens. The Tolman-Eichenbaum Machine: Unifying Space and Relational Memory through
+        Generalization in the Hippocampal Formation https://doi.org/10.1016/j.cell.2020.10.024.
+        ----
+        Attributes
+        ---------
+        mod_kwargs : dict
+            Model parameters
+            params: dict
+                contains the majority of parameters used by the model and environment
+            room_width: float
+                room width specified by the environment (see examples/examples/whittington_2020_example.ipynb)
+            room_depth: float
+                room depth specified by the environment (see examples/examples/whittington_2020_example.ipynb)
+            state_density: float
+                density of agent states (should be proportional to the step-size)
+            tem: class
+                TEM model
 
-    This implementation can interact with environments from the package as shown in the examples jupyter notebook.
-    Check examples/ Whittington_2019_example.ipynb
-    ----
-    Attributes
-    ---------
-         mod_kwargs : dict
-
-
-    Methods
-    ---------
-
-    """
+        Methods
+        ---------
+        reset(self):
+            initialise model and associated variables for training
+        def initialise(self):
+            generate random distribution of objects and intialise optimiser, logger and relevant variables
+        act(self, positions, policy_func):
+            generates batch of random actions to be passed into the environment. If the returned positions are allowed,
+            they are saved along with corresponding actions
+        update(self):
+            Perform forward pass of model and calculate losses and accuracies
+        action_policy(self):
+            random action policy that picks from [up, down, left right]
+        discretise(self, step):
+            convert (x,y) position into discrete location
+        walk(self, positions):
+            convert continuous positions into sequence of discrete locations
+        make_observations(self, locations):
+            observe what randomly distributed object is located at each position of a walk
+        step_to_actions(self, actions):
+            convert (x,y) action information into an integer value
+        """
     def __init__(self, model_name: str = "TEM", **mod_kwargs):
+        """
+        Parameters
+        ----------
+        model_name : str
+           Name of the specific instantiation of the ExcInhPlasticity class
+        mod_kwargs : dict
+            params: dict
+                contains the majority of parameters used by the model and environment
+            room_width: float
+                room width specified by the environment (see examples/examples/whittington_2020_example.ipynb)
+            room_depth: float
+                room depth specified by the environment (see examples/examples/whittington_2020_example.ipynb)
+            state_density: float
+                density of agent states (should be proportional to the step-size)
+        """
         super().__init__()
         params = mod_kwargs['params']
-        self.room_width = mod_kwargs['room_width']
-        self.room_depth = mod_kwargs['room_depth']
+        self.room_width = abs(mod_kwargs['room_width'][0] - mod_kwargs['room_width'][1])
+        self.room_depth = abs(mod_kwargs['room_depth'][0] - mod_kwargs['room_depth'][1])
         self.state_density = mod_kwargs['state_density']
         self.pars = copy.deepcopy(params)
         self.tem = model.Model(self.pars)
@@ -62,52 +95,65 @@ class Whittington2020(AgentCore):
         self.hs = int(self.room_depth * self.state_density)
         self.node_layout = np.arange(self.n_states).reshape(self.room_width, self.room_depth)
 
-        self.n_walk = 0
-        self.obs_history = []
-        self.walk_actions = []
-
-        self.initialise()
+        self.reset()
 
     def reset(self):
         """
-
-        Returns
-        -------
-        object
-
-
+        initialise model and associated variables for training, set n_walk=-1 initially to account for the lack of
+        actions at initialisation
         """
         self.tem = model.Model(self.pars)
         self.initialise()
-        self.n_walk = 0
+        self.n_walk = -1
         self.obs_history = []
         self.walk_actions = []
+        self.prev_actions = []
+        self.prev_positions = []
 
     def act(self, positions, policy_func=None):
+        """
+        The base model executes one of four action (up-down-right-left) with equal probability.
+        This is used to move on the rectangular environment states space (transmat).
+        This is done for a batch of 16 environments.
+        Parameters
+        ----------
+        positions: array (16,2)
+            Observation from the environment class needed to choose the right action (Here the position).
+        Returns
+        -------
+        action : array (16,2)
+            Action values (Direction of the agent step) in this case executes one of four action (up-down-right-left) with equal probability.
+        """
         all_allowed = True
-        actions = []
+        new_actions = []
         for pos in positions:
             if None in pos:
                 all_allowed = False
                 break
 
         if all_allowed:
+            self.walk_actions.append(self.prev_actions)
+            self.obs_history.append(self.prev_positions)
             for batch in range(self.pars['batch_size']):
-                actions.append(self.action_policy())
-            self.walk_actions.append(actions)
-            self.obs_history.append(positions)
+                new_actions.append(self.action_policy())
+            self.prev_actions = new_actions
+            self.prev_positions = positions
             self.n_walk += 1
 
         elif not all_allowed:
             for i, pos in enumerate(positions):
                 if None in pos:
-                    actions.append(self.action_policy())
+                    new_actions.append(self.action_policy())
                 else:
-                    actions.append(self.walk_actions[-1][i])
+                    new_actions.append(self.prev_actions[i])
+            self.prev_actions = new_actions
 
-        return actions
+        return new_actions
 
     def update(self):
+        """
+        Compute forward pass through model, updating weights, calculating TEM variables and collecting losses / accuracies
+        """
         iter = int((len(self.obs_history) / 20) - 1)
         print(iter)
         self.global_steps += 1
@@ -196,6 +242,9 @@ class Whittington2020(AgentCore):
             torch.save(self.tem.hyper, self.model_path + '/params_' + str(iter) + '.pt')
 
     def initialise(self):
+        """
+        Generate random distribution of objects for batch of environments. Initialise other
+        """
         self.generate_objects()
         # Create directories for storing all information about the current run
         self.run_path, self.train_path, self.model_path, self.save_path, self.script_path, self.envs_path = utils.make_directories()

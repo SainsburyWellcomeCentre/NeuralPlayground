@@ -82,6 +82,8 @@ occupation = analyse.location_occupation(forward, tem, environments)
 
 # Generate rate maps
 g, p = analyse.rate_map(forward, tem, environments)
+torch.save(g, 'full_g')
+torch.save(p, 'full_p')
 
 # Calculate accuracy leaving from and arriving to each location
 from_acc, to_acc = analyse.location_accuracy(forward, tem, environments)

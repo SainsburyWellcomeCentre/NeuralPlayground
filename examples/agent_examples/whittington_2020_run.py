@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 from neuralplayground.arenas.batch_environment import BatchEnvironment
+from neuralplayground.arenas.sargolini_2006 import Sargolini2006
 from neuralplayground.agents.whittington_2020 import Whittington2020
 import neuralplayground.agents.whittington_2020_extras.whittington_2020_parameters as parameters
 
@@ -15,10 +16,9 @@ agent_step_size = 1
 state_density = params['state_density']
 
 # Init environment
-env = BatchEnvironment(environment_name=env_name,
+env = Sargolini2006(environment_name=env_name,
               arena_x_limits=room_width,
               arena_y_limits=room_depth,
-              state_density=state_density,
               time_step_size=time_step_size,
               agent_step_size=agent_step_size)
 agent = Whittington2020(model_name=mod_name, params=params,
@@ -27,6 +27,7 @@ agent = Whittington2020(model_name=mod_name, params=params,
 
 positions, states = env.batch_reset(normalize_step=False, random_state=True)
 for i in range(params['train_it']):
+    print(i)
     while agent.n_walk < params['n_rollout']:
         actions = agent.act(positions)
         positions, states = env.batch_step(actions)
