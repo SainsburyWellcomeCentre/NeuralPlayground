@@ -30,6 +30,25 @@ class BatchEnvironment(Simple2D):
         self.node_layout = np.arange(self.n_states).reshape(self.room_width, self.room_depth)
 
     def batch_reset(self, normalize_step=False, random_state=False, custom_state=None):
+        """
+        Reset environment variables for multiple steps in a batch of size batch_size
+
+        Parameters:
+        ------
+            normalize_step: boolean
+                Whether the steps taken are of unit length or scaled by the agent step size
+            random_state: boolean
+                Wether the start of each trajectory is random or whether they all originate at [0,0]
+            custom_state: boolean
+                Whether a custom start location is given for the trajectories.
+
+        Returns:
+        ------
+            self.states: (16,2)
+                batch of initial (x,y) positions
+            locations: (16,1)
+                batch of discretised locations
+        """
         self.global_steps = 0
         self.history = [[] for _ in range(pars['batch_size'])]
         self.states = np.zeros(shape=(pars['batch_size'], 2))
@@ -49,6 +68,21 @@ class BatchEnvironment(Simple2D):
         return self.states, locations
 
     def batch_step(self, actions, normalize_step=False):
+        """
+        Make step in environment for each action in batch of size batch_size
+
+        Parameters:
+            actions: (16,2)
+                batch of (x,y) actions
+            normalize_step: boolean
+                whether the actions are of unit length or scaled by agent step size
+
+        Returns:
+            observations: (16,2)
+                new (x,y) position after having taken action. Set as None if isn't valid so agent.act() can try again
+            self.states: (16,2)
+                discretised location for each new (x,y) position
+        """
         observations = []
         states = []
         batch_history = []
