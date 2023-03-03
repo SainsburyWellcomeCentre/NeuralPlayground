@@ -271,12 +271,19 @@ class Whittington2020(AgentCore):
                        range(self.pars['batch_size'])]
 
     def action_policy(self):
+        """
+        Random action policy that selects an action to take from [up, down, left, right]
+        """
         arrow = [[0, 1], [0, -1], [1, 0], [-1, 0]]
         index = np.random.choice(len(arrow))
         action = arrow[index]
         return action
 
     def generate_objects(self):
+        """
+        Generate a random distributions of n_x possible objects. Each is represented as a one-hot encoded vector and is
+        what TEM sees at each location.
+        """
         poss_objects = np.zeros(shape=(self.pars['n_x'], self.pars['n_x']))
         for i in range(self.pars['n_x']):
             for j in range(self.pars['n_x']):
@@ -290,7 +297,25 @@ class Whittington2020(AgentCore):
                 rand = random.randint(0, self.pars['n_x'] - 1)
                 env_objects[i, :] = poss_objects[rand]
             self.objects.append(env_objects)
+
     def walk(self, positions):
+        """
+        Converts a trajectory in continuous 2D space to a sequence of discretised locations.
+        ----
+        Parameters:
+        -------
+            positions:
+                list of (x,y) coordinates for each step in a walk (of length n_rollout)
+
+        Returns:
+        -------
+            locations:
+                list of location values (e.g. room of width and depth of 10 would be: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                                                                                       10,11,12,13,14,15,16,17,18,19,
+                                                                                                    ...
+                                                                                       80,81,82,83,84,85,86,87,88,89,
+                                                                                       90,91,92,93,94,95,96,97,98,99]
+        """
         locations = []
         for step in positions:
             env_locations = []
@@ -301,12 +326,37 @@ class Whittington2020(AgentCore):
         return list(locations)
 
     def discretise(self, step):
+        """
+        Convert single (x,y) position into discrete location
+
+        Parameters:
+        -------
+            step: (2,1)
+                (x,y) position within continuous environment
+
+        Returns:
+        ------
+            index: int
+        """
         diff = self.xy_combination - step[np.newaxis, ...]
         dist = np.sum(diff ** 2, axis=2).T
         index = np.argmin(dist)
         return index
 
     def make_observations(self, locations):
+        """
+        Converts sequence of discrete locations to the one-hot objects present at those locations
+
+        Parameters:
+        ------
+            locations: (16,1)
+                sequence of discrete locations within an environment
+
+        Returns:
+        ------
+            observations: (16,45)
+                one-hot encoded objects present at each step of a trajectory
+        """
         observations = []
         for i, step in enumerate(locations):
             env_observations = np.zeros(shape=(self.pars['batch_size'], self.pars['n_x']))
@@ -316,6 +366,19 @@ class Whittington2020(AgentCore):
         return observations
 
     def step_to_actions(self, actions):
+        """
+        Convert trajectory of (x,y) actions into integer values (i.e. from [[0,0],[-1,0],[1,0],[0,-1],[0,1]] to [0,1,2,3,4])
+
+        Parameters:
+        ------
+            actions: (16,20,2)
+                batch of 16 actions for each step in a walk of length 20
+
+        Returns:
+        ------
+            action_values: (16,20,1)
+                batch of 16 action values for each step in walk of length 20
+        """
         action_values = []
         # actions = np.reshape(actions, (pars['n_rollout'], pars['batch_size'], 2))
         poss_values = [[0,0],[0,-1],[0,1],[-1,0],[1,0]]
