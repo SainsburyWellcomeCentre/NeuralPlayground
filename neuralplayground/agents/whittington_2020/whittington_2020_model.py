@@ -7,7 +7,7 @@ import random
 import time
 from scipy.stats import truncnorm
 
-import neuralplayground.agents.TEM_extras.TEM_utils as utils
+import neuralplayground.agents.whittington_2020.whittington_2020_utils as utils
 
 
 class Model(torch.nn.Module):

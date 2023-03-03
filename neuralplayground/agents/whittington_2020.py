@@ -11,12 +11,12 @@ import shutil
 from torch.utils.tensorboard import SummaryWriter
 
 # Custom modules
-import neuralplayground.agents.TEM_extras.TEM_utils as utils
-import neuralplayground.agents.TEM_extras.TEM_parameters as parameters
+import neuralplayground.agents.whittington_2020.whittington_2020_utils as utils
+import neuralplayground.agents.whittington_2020.whittington_2020_parameters as parameters
 from .agent_core import AgentCore
-import neuralplayground.agents.TEM_extras.TEM_model as model
+import neuralplayground.agents.whittington_2020.whittington_2020_model as model
 
-class TEM(AgentCore):
+class Whittington2020(AgentCore):
     def __init__(self, model_name: str = "TEM", **mod_kwargs):
         super().__init__()
         params = mod_kwargs['params']
