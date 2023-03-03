@@ -15,7 +15,7 @@ agent_step_size = 1
 state_density = params['state_density']
 
 # Init environment
-env = TEM_env(environment_name=env_name,
+env = BatchEnvironment(environment_name=env_name,
               arena_x_limits=room_width,
               arena_y_limits=room_depth,
               state_density=state_density,
