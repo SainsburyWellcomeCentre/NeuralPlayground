@@ -141,15 +141,23 @@ class Weber2018(AgentCore):
 
         self.sigma_exc = mod_kwargs["sigma_exc"]
         self.sigma_inh = mod_kwargs["sigma_inh"]
+        if "resolution" in mod_kwargs.keys():
+            self.resolution = mod_kwargs["resolution"]
+        else:
+            self.resolution = 50
 
         self.room_width, self.room_depth = mod_kwargs["room_width"], mod_kwargs["room_depth"]
         self.ro = mod_kwargs["ro"]
         self.obs_history = []  # Initialize observation history to update weights later
         self.grad_history = []
 
-        self.resolution = 50  # Number of pixels in the grid for the tuning functions
-        self.x_array = np.linspace(-self.room_width/2, self.room_width/2, num=self.resolution)
-        self.y_array = np.linspace(self.room_depth/2, -self.room_depth/2, num=self.resolution)
+        self.resolution = 100  # Number of pixels in the grid for the tuning functions
+
+        self.resolution_width = self.resolution
+        self.resolution_depth = int(self.resolution*(self.room_depth/self.room_width))
+
+        self.x_array = np.linspace(-self.room_width/2, self.room_width/2, num=self.resolution_width)
+        self.y_array = np.linspace(self.room_depth/2, -self.room_depth/2, num=self.resolution_depth)
         self.mesh = np.array(np.meshgrid(self.x_array, self.y_array))
         self.xy_combinations = self.mesh.T.reshape(-1, 2)
         self.reset()
@@ -213,7 +221,8 @@ class Weber2018(AgentCore):
                 # The +0.2 in the following is to avoid border effects
                 mean1 = np.random.uniform(-width_limit*(1+0.2), width_limit*(1+0.2))  # Sample means
                 mean2 = np.random.uniform(-depth_limit*(1+0.2), depth_limit*(1+0.2))
-                cov = np.diag(np.multiply(cov_scale, np.array([self.room_width, self.room_depth]))**2)
+                room_scale = np.max(np.array([self.room_width, self.room_width]))
+                cov = np.diag(np.multiply(cov_scale, np.array([room_scale, room_scale]))**2)
                 mean = np.array([mean1, mean2])
                 rv = multivariate_normal(mean, cov)  # Generate gaussian
                 gauss_list.append([mean, cov])
@@ -375,18 +384,18 @@ class Weber2018(AgentCore):
             f, ax = plt.subplots(1, 3, figsize=(14, 5))
 
         r_out_im = self.get_full_output_rate()
-        r_out_im = r_out_im.reshape((self.resolution, self.resolution))
+        r_out_im = r_out_im.reshape((self.resolution_width, self.resolution_depth))
 
         exc_im = self.exc_cell_list[np.random.choice(np.arange(self.exc_cell_list.shape[0]))
-            , ...].reshape((self.resolution, self.resolution))
+            , ...].reshape((self.resolution_width, self.resolution_depth))
         inh_im = self.inh_cell_list[np.random.choice(np.arange(self.inh_cell_list.shape[0]))
-            , ...].reshape((self.resolution, self.resolution))
+            , ...].reshape((self.resolution_width, self.resolution_depth))
 
-        ax[0].imshow(exc_im, cmap="Reds")
+        ax[0].imshow(exc_im.T, cmap="Reds")#, aspect=self.room_depth/self.room_width)
         ax[0].set_title("Exc rates", fontsize=14)
-        ax[1].imshow(inh_im, cmap="Blues")
+        ax[1].imshow(inh_im.T, cmap="Blues")#, aspect=self.room_depth/self.room_width)
         ax[1].set_title("Inh rates", fontsize=14)
-        im = ax[2].imshow(r_out_im.T, cmap="jet")
+        im = ax[2].imshow(r_out_im.T, cmap="jet")#, aspect=self.room_depth/self.room_width)
         ax[2].set_title("Out rate", fontsize=14)
         cbar = plt.colorbar(im, ax=ax[2])
 
