@@ -7,7 +7,7 @@ from ..agents import Weber2018
 from ..agents import Whittington2020
 from ..agents import Stachenfeld2018
 from ..agents import AgentCore
-import ..agents.whittington_2020_extras.whittington_2020_parameters as parameters
+import neuralplayground.agents.whittington_2020_extras.whittington_2020_parameters as parameters
 import pytest
 
 
