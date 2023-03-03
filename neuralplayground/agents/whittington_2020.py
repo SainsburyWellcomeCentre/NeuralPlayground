@@ -170,8 +170,8 @@ class Whittington2020(AgentCore):
         # Create directories for storing all information about the current run
         self.run_path, self.train_path, self.model_path, self.save_path, self.script_path, self.envs_path = utils.make_directories()
         # Save all python files in current directory to script directory
-        shutil.copy2('/nfs/nhome/live/lhollingsworth/Documents/NeuralPlayground/NPG/EHC_model_comparison/neuralplayground/agents/TEM_extras/TEM_model.py',
-                     os.path.join(self.model_path, 'TEM_model.py'))
+        shutil.copy2('/nfs/nhome/live/lhollingsworth/Documents/NeuralPlayground/NPG/EHC_model_comparison/neuralplayground/agents/whittington_2020_extras/whittington_2020_model.py',
+                     os.path.join(self.model_path, 'whittington_2020_model.py'))
         # Save parameters
         np.save(os.path.join(self.save_path, 'params'), self.pars)
         # Create a tensor board to stay updated on training progress. Start tensorboard with tensorboard --logdir=runs
