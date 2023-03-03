@@ -240,7 +240,6 @@ def parameters():
 # This specifies how parameters are updated at every backpropagation iteration/gradient update
 def parameter_iteration(iteration, params):
     # Calculate eta (rate of remembering) and lambda (rate of forgetting) for Hebbian memory updates
-    print('in pars', params['eta'])
     eta = min((iteration + 1) / params['eta_it'], 1) * params['eta']
     lamb = min((iteration + 1) / params['lambda_it'], 1) * params['lambda']
     # Calculate current scaling of variance offset for ground location inference
