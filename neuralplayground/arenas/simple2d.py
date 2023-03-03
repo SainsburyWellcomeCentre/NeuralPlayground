@@ -199,7 +199,7 @@ class Simple2D(Environment):
         return new_state, crossed_wall
 
     def plot_trajectory(self, history_data: list = None, ax=None, return_figure: bool = False, save_path: str = None,
-                        plot_every: int = 10):
+                        plot_every: int = 1):
         """ Plot the Trajectory of the agent in the environment
 
         Parameters

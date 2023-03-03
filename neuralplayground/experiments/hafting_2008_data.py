@@ -50,8 +50,7 @@ class Hafting2008Data(Experiment):
         tetrode_id = self._find_tetrode(rev_vars)
         time_array, test_spikes, x, y = self.get_tetrode_data(session_data, tetrode_id)
 
-        # Position from meters to cm
-        self.position = np.stack([x, y], axis=1) * 100
+        self.position = np.stack([x, y], axis=1)
         head_direction = np.diff(self.position, axis=0)
         # Compute head direction from position derivative
         head_direction = head_direction/np.sqrt(np.sum(head_direction**2, axis=1) + tolerance)[..., np.newaxis]

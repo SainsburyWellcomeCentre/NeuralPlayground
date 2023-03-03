@@ -97,6 +97,8 @@ class Wernle2018(Hafting2008):
 
     def step(self, action: np.ndarray, normalize_step: bool = False, skip_every: int = 10):
         """ Set the right room configuration, then call default step function """
+        if self.use_behavioral_data:
+            return super().step(action, normalize_step, skip_every)
         if self.global_steps == 0:
             self.set_room("A")
         elif self.global_steps == self.merge_time:
