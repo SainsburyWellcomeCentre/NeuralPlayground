@@ -199,7 +199,7 @@ class Simple2D(Environment):
         return new_state, crossed_wall
 
     def plot_trajectory(self, history_data: list = None, ax=None, return_figure: bool = False, save_path: str = None,
-                        plot_every: int = 10):
+                        plot_every: int = 1):
         """ Plot the Trajectory of the agent in the environment
 
         Parameters
@@ -236,6 +236,11 @@ class Simple2D(Environment):
         # Draw custom walls
         for wall in self.custom_walls:
             ax.plot(wall[:, 0], wall[:, 1], "C0", lw=3)
+
+        # Making the trajectory plot roughly square to show structure of the arena better
+        lower_lim, upper_lim = np.amin(self.arena_limits), np.amax(self.arena_limits)
+        ax.set_xlim([lower_lim, upper_lim])
+        ax.set_ylim([lower_lim, upper_lim])
 
         # Make plot of positions
         if len(history_data) != 0:

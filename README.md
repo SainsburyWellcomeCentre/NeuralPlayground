@@ -31,6 +31,7 @@ reproducible computational understanding of the hippocampus and entorhinal corte
 You can create a new environment using conda, and the yml file with all the right 
 dependencies by running
 ```
+git clone https://github.com/ClementineDomine/NeuralPlayground
 conda create --name NPG
 conda activate NPG
 conda install pip
@@ -77,7 +78,7 @@ Before sending a pull request, make sure you have the following:
 
 4. Comment your work. 
     
-All contributions to the repository are acknowledged through the all-contributors bot and in a future publication.
+All contributions to the repository are acknowledged through the all-contributors bot.
 Refer to the README.md files found in each of the modules for further details on how to contribute to them.
 
 

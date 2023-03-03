@@ -53,4 +53,4 @@ Before sending a pull request, make sure you have the following:
 
 4. Commented your work 
     
-All contributions to the repository are acknowledged through the all-contributors bot and in a future publication.
+All contributions to the repository are acknowledged through the all-contributors bot.
