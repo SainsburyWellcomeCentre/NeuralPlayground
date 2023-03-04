@@ -4,7 +4,7 @@ from copy import deepcopy
 import neuralplayground
 import os
 from neuralplayground.arenas import BasicSargolini2006, Sargolini2006
-from neuralplayground.agents import ExcInhPlasticity
+from neuralplayground.agents import Weber2018
 
 
 class Config(object):
