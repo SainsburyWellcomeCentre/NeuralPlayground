@@ -36,13 +36,13 @@ Reports may be reviewed by other members of the core development team, unless th
 
 ## 2 Code of Conduct
 
-The Turing Way team are dedicated to providing a welcoming and supportive environment for all people, regardless of background or identity.
+The NeuralPlayground team are dedicated to providing a welcoming and supportive environment for all people, regardless of background or identity.
 As such, we do not tolerate behaviour that is disrespectful to our community members or that excludes, intimidates, or causes discomfort to others.
 We do not tolerate discrimination or harassment based on characteristics that include, but are not limited to: gender identity and expression, sexual orientation, disability, physical appearance, body size, citizenship, nationality, ethnic or social origin, pregnancy, familial status, veteran status, genetic information, religion or belief (or lack thereof), membership of a national minority, property, age, education, socio-economic status, technical choices, and experience level.
 
-Everyone who participates in the Turing Way project activities is required to conform to this Code of Conduct.
-This Code of Conduct applies to all spaces managed by the Turing Way project including, but not limited to, in person focus groups and workshops, and communications online via GitHub.
-By participating, contributors indicate their acceptance of the procedures by which the Turing Way project core development team resolves any Code of Conduct incidents, which may include storage and processing of their personal information.
+Everyone who participates in the NeuralPlayground project activities is required to conform to this Code of Conduct.
+This Code of Conduct applies to all spaces managed by the NeuralPlayground project including, but not limited to, in person focus groups and workshops, and communications online via GitHub.
+By participating, contributors indicate their acceptance of the procedures by which the NeuralPlayground project core development team resolves any Code of Conduct incidents, which may include storage and processing of their personal information.
 
 ### 2.1 Expected Behaviour
 
@@ -62,7 +62,7 @@ See [this explanation of the four social rules](https://www.recurse.com/manual#s
 
 ### 2.2 Unacceptable Behaviour
 
-Examples of unacceptable behaviour by Turing Way community members at any project event or platform include:
+Examples of unacceptable behaviour by NeuralPlayground community members at any project event or platform include:
 
 * written or verbal comments which have the effect of excluding people on the basis of membership of any specific group
 * causing someone to fear for their safety, such as through stalking, following, or intimidation
