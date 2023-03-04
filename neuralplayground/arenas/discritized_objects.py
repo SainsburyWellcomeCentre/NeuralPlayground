@@ -5,7 +5,7 @@ import random
 
 from .simple2d import Simple2D
 
-class DiscreteObjectEnvironment(Simple2D):
+class DiscreteObjectEnvironment(Hafting2008):
     """
     Arena class which accounts for discrete sensory objects, inherits from the Simple2D class.
 
@@ -46,13 +46,10 @@ class DiscreteObjectEnvironment(Simple2D):
             The density of discrete states in the environment
     """
     def __init__(self, environment_name='DiscreteObject', **env_kwargs):
-        self.number_object= env_kwargs['number_object']
+        super().__init__(use_behavioral_data, data_path, recording_index, environment_name, verbose, experiment_class,
+                         **env_kwargs)
+        self.number_object = env_kwargs['number_object']
         self.state_density = env_kwargs['state_density']
-        self.arena_x_limits = env_kwargs['arena_x_limits']
-        self.arena_y_limits = env_kwargs['arena_y_limits']
-        self.room_width = np.diff(self.arena_x_limits)[0]
-        self.room_depth = np.diff(self.arena_y_limits)[0]
-
         # Variables for discretised state space
         self.n_states = (self.room_width * self.room_depth) * self.state_density
         self.resolution_w = int(self.state_density * self.room_width)
@@ -63,7 +60,6 @@ class DiscreteObjectEnvironment(Simple2D):
         self.xy_combination = np.array(np.meshgrid(self.x_array, self.y_array)).T
         self.ws = int(self.room_width * self.state_density)
         self.hs = int(self.room_depth * self.state_density)
-        super().__init__(environment_name, **env_kwargs)
 
     def reset(self, random_state=False, custom_state=False):
         """
