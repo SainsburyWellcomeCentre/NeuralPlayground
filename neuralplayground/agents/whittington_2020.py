@@ -110,7 +110,26 @@ class Whittington2020(AgentCore):
         self.prev_actions = []
         self.prev_positions = []
 
-    def act(self, positions, policy_func=None):
+        self.actions = []
+        self.prev_action = None
+        self.prev_position = None
+
+    def act(self, observation, policy_func=None):
+        position = observation[-1]
+        new_action = self.action_policy()
+
+        if None in position:
+            self.prev_action = new_action
+        else:
+            self.actions.append(self.prev_action)
+            self.obs_history.append(self.prev_position)
+            self.prev_action = new_action
+            self.prev_position = position
+            self.n_walk += 1
+
+        return new_action
+
+    def batch_act(self, positions, policy_func=None):
         """
         The base model executes one of four action (up-down-right-left) with equal probability.
         This is used to move on the rectangular environment states space (transmat).
@@ -155,7 +174,6 @@ class Whittington2020(AgentCore):
         Compute forward pass through model, updating weights, calculating TEM variables and collecting losses / accuracies
         """
         iter = int((len(self.obs_history) / 20) - 1)
-        print(iter)
         self.global_steps += 1
         positions = self.obs_history[-20:]
         actions = self.walk_actions[-20:]
@@ -249,7 +267,8 @@ class Whittington2020(AgentCore):
         # Create directories for storing all information about the current run
         self.run_path, self.train_path, self.model_path, self.save_path, self.script_path, self.envs_path = utils.make_directories()
         # Save all python files in current directory to script directory
-        shutil.copy2(os.path.abspath(os.path.join(os.getcwd(), os.pardir))+'/agents/whittington_2020_extras/whittington_2020_model.py',
+        curr_path = os.path.dirname(os.path.abspath(__file__))
+        shutil.copy2(os.path.abspath(os.path.join(os.getcwd(), os.path.abspath(os.path.join(curr_path, os.pardir))))+'/agents/whittington_2020_extras/whittington_2020_model.py',
                      os.path.join(self.model_path, 'whittington_2020_model.py'))
         # Save parameters
         np.save(os.path.join(self.save_path, 'params'), self.pars)
