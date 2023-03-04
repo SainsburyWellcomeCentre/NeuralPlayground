@@ -40,8 +40,6 @@ pip install -r requirements.txt
 
 For now, install using pip for local editing and testing
 ```
-pip install --upgrade setuptools wheel 
-python setup.py sdist bdist_wheel
 pip install -e .
 ```
 
