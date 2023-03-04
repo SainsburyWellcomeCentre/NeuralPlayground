@@ -108,28 +108,25 @@ class Whittington2020(AgentCore):
         self.obs_history = []
         self.walk_actions = []
         self.prev_actions = []
-        self.prev_positions = []
+        self.prev_observations = []
 
-        self.actions = []
         self.prev_action = None
-        self.prev_position = None
+        self.prev_observation = None
 
     def act(self, observation, policy_func=None):
-        position = observation[-1]
         new_action = self.action_policy()
-
-        if None in position:
+        if None in observation[-1]:
             self.prev_action = new_action
         else:
-            self.actions.append(self.prev_action)
-            self.obs_history.append(self.prev_position)
+            self.walk_actions.append(self.prev_action)
+            self.obs_history.append(self.prev_observation)
             self.prev_action = new_action
-            self.prev_position = position
+            self.prev_observation = observation
             self.n_walk += 1
 
         return new_action
 
-    def batch_act(self, positions, policy_func=None):
+    def batch_act(self, observations, policy_func=None):
         """
         The base model executes one of four action (up-down-right-left) with equal probability.
         This is used to move on the rectangular environment states space (transmat).
@@ -145,6 +142,7 @@ class Whittington2020(AgentCore):
         """
         all_allowed = True
         new_actions = []
+        positions = [env[2] for env in observations]
         for pos in positions:
             if None in pos:
                 all_allowed = False
@@ -152,11 +150,11 @@ class Whittington2020(AgentCore):
 
         if all_allowed:
             self.walk_actions.append(self.prev_actions)
-            self.obs_history.append(self.prev_positions)
+            self.obs_history.append(self.prev_observations)
             for batch in range(self.pars['batch_size']):
                 new_actions.append(self.action_policy())
             self.prev_actions = new_actions
-            self.prev_positions = positions
+            self.prev_observations = observations
             self.n_walk += 1
 
         elif not all_allowed:
@@ -175,15 +173,13 @@ class Whittington2020(AgentCore):
         """
         iter = int((len(self.obs_history) / 20) - 1)
         self.global_steps += 1
-        positions = self.obs_history[-20:]
-        actions = self.walk_actions[-20:]
+        history = self.obs_history[-self.pars['n_rollout']:]
+        locations = [step[0] for step in history]
+        observations = [step[1] for step in history]
+        actions = self.walk_actions[-self.pars['n_rollout']:]
         self.walk_positions = []
-        self.walk_actions = [self.walk_actions[-1]]
+        self.walk_actions = []
         self.n_walk = 0
-        # Discretise (x,y) walk information
-        locations = self.walk(positions)
-        # Make observations
-        observations = self.make_observations(locations)
         # Convert action vectors to action values
         action_values = self.step_to_actions(actions)
         # Get start time for function timing
@@ -401,9 +397,6 @@ class Whittington2020(AgentCore):
         action_values = []
         # actions = np.reshape(actions, (pars['n_rollout'], pars['batch_size'], 2))
         poss_values = [[0,0],[0,-1],[0,1],[-1,0],[1,0]]
-        for steps in actions:
-            step_list = []
-            for action in steps:
-                step_list.append(poss_values.index(list(action)))
-            action_values.append(step_list)
+        for action in actions:
+            action_values.append(poss_values.index(list(action)))
         return action_values

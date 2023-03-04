@@ -5,6 +5,7 @@ import random
 
 from .simple2d import Simple2D
 
+
 class DiscreteObjectEnvironment(Simple2D):
     """
     Arena class which accounts for discrete sensory objects, inherits from the Simple2D class.
@@ -45,8 +46,9 @@ class DiscreteObjectEnvironment(Simple2D):
         state_density: int
             The density of discrete states in the environment
     """
+
     def __init__(self, environment_name='DiscreteObject', **env_kwargs):
-        self.number_object= env_kwargs['number_object']
+        self.n_objects = env_kwargs['n_objects']
         self.state_density = env_kwargs['state_density']
         self.arena_x_limits = env_kwargs['arena_x_limits']
         self.arena_y_limits = env_kwargs['arena_y_limits']
@@ -63,9 +65,11 @@ class DiscreteObjectEnvironment(Simple2D):
         self.xy_combination = np.array(np.meshgrid(self.x_array, self.y_array)).T
         self.ws = int(self.room_width * self.state_density)
         self.hs = int(self.room_depth * self.state_density)
+
+        self.objects = np.empty(shape=(self.n_states, self.n_objects))
         super().__init__(environment_name, **env_kwargs)
 
-    def reset(self, random_state=False, custom_state=False):
+    def reset(self, random_state=False, custom_state=None):
         """
         Reset the environment variables and distribution of sensory objects.
             Parameters
@@ -89,20 +93,18 @@ class DiscreteObjectEnvironment(Simple2D):
         self.global_time = 0
         self.history = []
         if random_state:
-            pos_state = [np.random.uniform(low=self.arena_limits[0, 0], high=self.arena_limits[0, 1]),
+            start_pos = [np.random.uniform(low=self.arena_limits[0, 0], high=self.arena_limits[0, 1]),
                           np.random.uniform(low=self.arena_limits[1, 0], high=self.arena_limits[1, 1])]
         else:
-            pos_state = [0, 0]
-        pos_state = np.array(pos_state)
+            start_pos = np.array([0, 0])
 
         if custom_state is not None:
-            pos_state = np.array(custom_state)
+            start_pos = np.array(custom_state)
 
-        self.objects = np.zeros(shape=(self.n_states, self.number_object))
-        self.generate_objects()
+        self.objects = self.generate_objects()
 
         # Fully observable environment, make_observation returns the state
-        observation = self.make_observation(pos_state)
+        observation = self.make_object_observation(pos=start_pos)
         self.state = observation
         return observation, self.state
 
@@ -127,36 +129,42 @@ class DiscreteObjectEnvironment(Simple2D):
         observation: ndarray
             Array of the observation of the agent in the environment, in this case the sensory object.
         """
+        old_state = self.state.copy()
         if normalize_step:
-            action = action/np.linalg.norm(action)
-            new_pos_state = self.state[-1] + self.agent_step_size*action
+            action = action / np.linalg.norm(action)
+            new_pos_state = self.state[-1] + self.agent_step_size * action
         else:
             new_pos_state = self.state[-1] + action
         new_pos_state, valid_action = self.validate_action(self.state[-1], action, new_pos_state)
-        reward = self.reward_function(action, self.state)  # If you get reward, it should be coded here
-        observation = self.make_observation(new_pos_state)
-        new_state = observation
-        self.state = new_state
-        transition = {"action": action, "state": self.state, "next_state": new_state,
+        reward = self.reward_function(action, self.state[-1])  # If you get reward, it should be coded here
+        self.state[-1] = new_pos_state
+        observation = self.make_object_observation()
+        self.state = observation
+        transition = {"action": action, "state": old_state, "next_state": self.state,
                       "reward": reward, "step": self.global_steps}
         self.history.append(transition)
         self._increase_global_step()
-        return observation, new_state, reward
+        return observation, self.state
 
     def generate_objects(self):
-        poss_objects = np.zeros(shape=(self.number_object,self.number_object))
-        for i in range(self.number_object):
-            for j in range(self.number_object):
+        poss_objects = np.zeros(shape=(self.n_objects, self.n_objects))
+        for i in range(self.n_objects):
+            for j in range(self.n_objects):
                 if j == i:
                     poss_objects[i][j] = 1
         # Generate landscape of objects in each environment
+        objects = np.zeros(shape=(self.n_states, self.n_objects))
         for i in range(self.n_states):
-            rand = random.randint(0, self.number_object - 1)
-            self.objects[i, :] = poss_objects[rand]
+            rand = random.randint(0, self.n_objects - 1)
+            objects[i, :] = poss_objects[rand]
+        return objects
 
-    def make_observation(self, pos):
+    def make_object_observation(self, pos=[None,None]):
+        if None in pos:
+            pos = self.state[-1]
         index = self.pos_to_state(pos)
         object = self.objects[index]
+
         return [index, object, pos]
 
     def pos_to_state(self, pos):
@@ -165,7 +173,7 @@ class DiscreteObjectEnvironment(Simple2D):
         index = np.argmin(dist)
         return index
 
-    #to be written again here
+    # to be written again here
     def plot_objects(self, history_data=None, ax=None, return_figure=False):
         """ Plot the Trajectory of the agent in the environment
 
