@@ -13,15 +13,19 @@
 * [6 Lisence](#6-License)
 
 ## 1. Introduction
-The abstract representation of space has been extensively studied in the hippocampus and entorhinal cortex in part due to the easy monitoring of the task and neural recording. A growing variety
-of theoretical models have been proposed to capture the rich neural and behavioral phenomena
-associated with these circuits. However, objective comparison of these theories against each other
-and against empirical data is difficult. 
+The abstract representation of space has been extensively studied in the hippocampus and entorhinal cortex in part due to the easy monitoring of the task and neural recording. A growing variety of theoretical models have been proposed to capture the rich neural and behavioral phenomena
+associated with these circuits. However, objective comparison of these theories against each other and against empirical data is difficult. 
+
+Although the significance of virtuous interaction between experiments and theory is widely recognized, the tools available to facilitate comparison are limited. Some important challenge to standardized coparaison are the 
+
+   1. the Lack availability and accessibility of data in a standardized, labeled format.  
+   
+   2. Lack of standard or easy ways for models to interact with the task.
+   
+   3. Lack  of standard or easy ways to compare model output with empirical data. As a result, model papers typically only compare to a fraction of the     available evidence and paradigms. 
 
 To address this gap, we present an open-source standardised software framework - NeuralPlayground - to enable adjudication between the hippocampus
-and entorhinal cortex models. This Python software package offers a reproducible way to compare models
-against a centralised library of published experimental results, including neural recordings and animal behavior. The framework currently contains implementations of three Agents, as well as three Experiments providing simple interfaces to publicly available neural and behavioral data. It also contains a customizable 2-dimensional Arena (continuous and discrete) able to produce common experimental environments in which the agents can move in and interact with and a Comparison tool
-to facilitate systematic comparisons by enabling users to pick from any Agent, Arena, Experiments. Each module can also be used separately, allowing flexible access to influential models and data sets. 
+and entorhinal cortex models. This Python software package offers a reproducible way to compare models against a centralised library of published experimental results, including neural recordings and animal behavior. The framework currently contains implementations of three Agents, as well as three Experiments providing simple interfaces to publicly available neural and behavioral data. It also contains a customizable 2-dimensional Arena (continuous and discrete) able to produce common experimental environments in which the agents can move in and interact with and a Comparison tool to facilitate systematic comparisons by enabling users to pick from any Agent, Arena, Experiments. Each module can also be used separately, allowing flexible access to influential models and data sets. 
 
 Altogether, we hope our framework, available at [github.com/NeuralPlayground](https://github.com/ClementineDomine/NeuralPlayground/), offers
 a foundation that the community will build upon, working toward a shared, standardized, open, and
@@ -54,6 +58,7 @@ Each module can be used separately to easily explore and analyze experimental da
 #### How to run interactions between modules
 
 As shown in the jupyter notebooks [Examples](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples/agent_examples), the Agent can interact with an Arena in a standard RL framework. The first step is to initialise an Agent and Arena of your choice. The Agent can be thought of as the animal performing the Experiment and the Arena as the experimental setting where the animal navigates and performs a task. 
+
 
 ## 4. I-want-to-Contribute
 
