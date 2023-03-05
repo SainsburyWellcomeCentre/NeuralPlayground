@@ -4,8 +4,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from ..arenas import BasicSargolini2006
 from ..arenas import BatchEnvironment
+from ..arenas import DiscreteObjectEnvironment
 from ..agents import Weber2018
 from ..agents import Whittington2020
+import neuralplayground.agents.whittington_2020_extras.whittington_2020_parameters as parameters
 from ..agents import Stachenfeld2018
 from ..agents import AgentCore
 import neuralplayground.agents.whittington_2020_extras.whittington_2020_parameters as parameters
@@ -15,6 +17,31 @@ import pytest
 @pytest.fixture
 def get_environment():
     env = BasicSargolini2006()
+    return [env, ]
+
+@pytest.fixture
+def get_batch_environment():
+    pars_orig = parameters.parameters()
+    params = pars_orig.copy()
+    state_density = params['state_density']
+    arena_x_limits = [-5, 5]
+    arena_y_limits = [-5, 5]
+    env_name = "env_example"
+    mod_name = "TorchTEMTest"
+    time_step_size = 1
+    agent_step_size = 1
+    n_objects = 45
+    batch_size = 16
+    env_class = DiscreteObjectEnvironment
+    env = BatchEnvironment(environment_name=env_name,
+                                env_class=env_class,
+                                batch_size=batch_size,
+                                n_objects=n_objects,
+                                arena_x_limits=arena_x_limits,
+                                arena_y_limits=arena_y_limits,
+                                time_step_size=time_step_size,
+                                agent_step_size=agent_step_size,
+                                state_density=state_density)
     return [env, ]
 
 
@@ -95,7 +122,6 @@ class TestStachenfeld2018(Testmodelcore):
         n_episode = 50
         state_density = (1 / agent_step_size)
         env = get_environment[0]
-
         twoDvalue = True
         agent = Stachenfeld2018(discount=discount, t_episode=t_episode, n_episode=n_episode, threshold=threshold, lr_td=lr_td,
                    room_width=env.room_width, room_depth=env.room_depth, state_density=state_density, twoD=twoDvalue)
@@ -138,16 +164,26 @@ class TestStachenfeld2018(Testmodelcore):
 class TestWhittington2020(Testmodelcore):
 
     @pytest.fixture
-    def init_model(self, get_environment):
+    def init_model(self,get_batch_environment):
         pars_orig = parameters.parameters()
         params = pars_orig.copy()
         mod_name = "TorchTEMTest"
         state_density = params['state_density']
-        env = get_environment[0]
+        env = get_batch_environment[0]
         # Init environment
         agent = Whittington2020(model_name=mod_name, params=params,
-            room_width=env.room_width, room_depth=env.room_depth,
-            state_density=state_density)
+                        room_width=env.room_width, room_depth=env.room_depth,
+                        state_density=state_density)
         return [agent, ]
     
+    def test_agent_interaction(self, init_model, get_batch_environment):
+        pars_orig = parameters.parameters()
+        params = pars_orig.copy()
+        env = get_batch_environment[0]
+        observation, state = env.reset(random_state=False, custom_state=None)
+        for i in range(1):
+            while init_model[0].n_walk < params['n_rollout']:
+                actions = init_model[0].batch_act(observation)
+                observation, state = env.step(actions)
+            init_model[0].update()
    
