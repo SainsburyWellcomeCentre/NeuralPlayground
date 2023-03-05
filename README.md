@@ -60,11 +60,11 @@ Each module can be used separately to easily explore and analyze experimental da
 
 #### How to run interactions between modules
 
-As shown in the jupyter notebooks [Examples](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples/agent_examples), the Agent can interact with an Arena in a standard RL framework. The first step is to initialise an Agent and Arena of your choice. The Agent can be thought of as the animal performing the Experiment and the Arena as the experimental setting where the animal navigates and performs a task. 
+As shown in the jupyter notebooks [Examples_agent](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples/agent_examples), the Agent can interact with an Arena in a standard RL framework. The first step is to initialise an Agent and Arena of your choice. The Agent can be thought of as the animal performing the Experiment and the Arena as the experimental setting where the animal navigates and performs a task. 
 
 #### How to run comparisons
 
-As shown in the jupyter notebooks [Examples](https://github.com/ClementineDomine/NeuralPlayground/blob/main/examples/comparison_board_examples/comparison_board.ipynb). We show visual comparisons between results from agents running with experimental behavior and results from the real experiment.  
+As shown in the jupyter notebooks [Examples_comparison](https://github.com/ClementineDomine/NeuralPlayground/blob/main/examples/comparison_board_examples/comparison_board.ipynb). We show visual comparisons between results from agents running with experimental behavior and results from the real experiment.  
 
 
 ## 4. I-want-to-Contribute
