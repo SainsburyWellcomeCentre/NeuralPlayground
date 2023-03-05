@@ -35,16 +35,15 @@ agent = Whittington2020(model_name=mod_name, params=params,
                         state_density=state_density)
 
 observation, state = env.reset(random_state=False, custom_state=None)
-for i in range(5):
+for i in range(params['train_it']):
     while agent.n_walk < params['n_rollout']:
-        print('n_walk:', agent.n_walk)
         actions = agent.batch_act(observation)
         observation, state = env.step(actions)
     agent.update()
 
-ax = env.plot_batch_trajectory()
-fontsize = 18
-ax.grid()
-ax.set_xlabel("width", fontsize=fontsize)
-ax.set_ylabel("depth", fontsize=fontsize)
-plt.savefig('trajectory.png')
+# ax = env.plot_batch_trajectory()
+# fontsize = 18
+# ax.grid()
+# ax.set_xlabel("width", fontsize=fontsize)
+# ax.set_ylabel("depth", fontsize=fontsize)
+# plt.savefig('trajectory.png')

@@ -172,10 +172,11 @@ class Whittington2020(AgentCore):
         Compute forward pass through model, updating weights, calculating TEM variables and collecting losses / accuracies
         """
         iter = int((len(self.obs_history) / 20) - 1)
+        print(iter)
         self.global_steps += 1
         history = self.obs_history[-self.pars['n_rollout']:]
-        locations = [step[0] for step in history]
-        observations = [step[1] for step in history]
+        locations = [[{'id': env_step[0], 'shiny': None} for env_step in step] for step in history]
+        observations = [[env_step[1] for env_step in step] for step in history]
         actions = self.walk_actions[-self.pars['n_rollout']:]
         self.walk_positions = []
         self.walk_actions = []
@@ -397,6 +398,9 @@ class Whittington2020(AgentCore):
         action_values = []
         # actions = np.reshape(actions, (pars['n_rollout'], pars['batch_size'], 2))
         poss_values = [[0,0],[0,-1],[0,1],[-1,0],[1,0]]
-        for action in actions:
-            action_values.append(poss_values.index(list(action)))
+        for steps in actions:
+            env_list = []
+            for action in steps:
+                env_list.append(poss_values.index(list(action)))
+            action_values.append(env_list)
         return action_values
