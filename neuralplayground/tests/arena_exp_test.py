@@ -1,7 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from ..arenas import Environment, Simple2D, Sargolini2006, Hafting2008, ConnectedRooms, Wernle2018
+from ..arenas import Environment, Simple2D, Sargolini2006, Hafting2008, ConnectedRooms, Wernle2018,BatchEnvironment,  DiscreteObjectEnvironment
 import pytest
+
 from ..agents import RandomAgent
 
 
@@ -109,4 +110,60 @@ class TestMergingRoom2D(TestSimple2D):
         return [env, ]
 
     def test_init_env(self, init_env):
-        assert isinstance(init_env[0], Wernle2018)
+        assert isinstance(init_env[0],MergingRoom)
+        
+class TestDiscreteObjectEnvironment(object):
+    @pytest.fixture
+    def init_env(self):
+        state_density = 1
+        arena_x_limits = [-5, 5]
+        arena_y_limits = [-5, 5]
+        env_name = "env_example"
+        mod_name = "TorchTEMTest"
+        time_step_size = 1
+        agent_step_size = 1
+        n_objects = 45
+        batch_size = 16
+        env_class = Simple2D
+        env = DiscreteObjectEnvironment(environment_name=env_name,
+                                    env_class=env_class,
+                                    batch_size=batch_size,
+                                    n_objects=n_objects,
+                                    arena_x_limits=arena_x_limits,
+                                    arena_y_limits=arena_y_limits,
+                                    time_step_size=time_step_size,
+                                    agent_step_size=agent_step_size,
+                                    state_density=state_density)
+        return [env, ]
+        
+        def test_init_env(self, init_env):
+            assert isinstance(init_env[0],DiscreteObjectEnvironment)
+        
+    
+class TestBatchEnvironment(object):
+    @pytest.fixture
+    def init_env(self):
+        state_density = 1
+        arena_x_limits = [-5, 5]
+        arena_y_limits = [-5, 5]
+        env_name = "env_example"
+        mod_name = "TorchTEMTest"
+        time_step_size = 1
+        agent_step_size = 1
+        n_objects = 45
+        batch_size = 16
+        env_class = DiscreteObjectEnvironment
+        env = BatchEnvironment(environment_name=env_name,
+                                    env_class=env_class,
+                                    batch_size=batch_size,
+                                    n_objects=n_objects,
+                                    arena_x_limits=arena_x_limits,
+                                    arena_y_limits=arena_y_limits,
+                                    time_step_size=time_step_size,
+                                    agent_step_size=agent_step_size,
+                                    state_density=state_density)
+        return [env, ]
+
+    def test_init_env(self, init_env):
+        assert isinstance(init_env[0],BatchEnvironment)
+        
