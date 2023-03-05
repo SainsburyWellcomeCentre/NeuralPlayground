@@ -18,7 +18,7 @@ associated with these circuits. However, objective comparison of these theories 
 
 Although the significance of virtuous interaction between experiments and theory is widely recognized, the tools available to facilitate comparison are limited. Some important challenge to standardized coparaison are the 
 
-   1. the Lack availability and accessibility of data in a standardized, labeled format.  
+   1. Lack availability and accessibility of data in a standardized, labeled format.  
    
    2. Lack of standard or easy ways for models to interact with the task.
    
