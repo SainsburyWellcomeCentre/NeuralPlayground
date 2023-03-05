@@ -18,14 +18,17 @@ associated with these circuits. However, objective comparison of these theories 
 
 Although the significance of virtuous interaction between experiments and theory is widely recognized, the tools available to facilitate comparison are limited. Some important challenge to standardized coparaison are the 
 
-   1. the Lack availability and accessibility of data in a standardized, labeled format.  
+   1. Lack availability and accessibility of data in a standardized, labeled format.  
    
    2. Lack of standard or easy ways for models to interact with the task.
    
-   3. Lack  of standard or easy ways to compare model output with empirical data. As a result, model papers typically only compare to a fraction of the     available evidence and paradigms. 
+   3. Lack  of standard or easy ways to compare model output with empirical data. 
 
 To address this gap, we present an open-source standardised software framework - NeuralPlayground - to enable adjudication between the hippocampus
-and entorhinal cortex models. This Python software package offers a reproducible way to compare models against a centralised library of published experimental results, including neural recordings and animal behavior. The framework currently contains implementations of three Agents, as well as three Experiments providing simple interfaces to publicly available neural and behavioral data. It also contains a customizable 2-dimensional Arena (continuous and discrete) able to produce common experimental environments in which the agents can move in and interact with and a Comparison tool to facilitate systematic comparisons by enabling users to pick from any Agent, Arena, Experiments. Each module can also be used separately, allowing flexible access to influential models and data sets. 
+and entorhinal cortex models. This Python software package offers a reproducible way to compare models against a centralised library of published experimental results, including neural recordings and animal behavior. 
+The framework currently contains implementations of three Agents, as well as three Experiments providing simple interfaces to publicly available neural and behavioral data. It also contains a customizable 2-dimensional Arena (continuous and discrete) able to produce common experimental environments in which the agents can move in and interact with. We note that each module can also be used separately, allowing flexible access to influential models and data sets. 
+
+We currently rely on visual comparison of a hand-selected number of outputs of the model with neural recordings as shown in [github.com/NeuralPlayground/examples/comparison](https://github.com/ClementineDomine/NeuralPlayground/blob/main/examples/comparison_board_examples/comparison_board.ipynb). In the future, a set of quantitative measures and qualitative measures will be added for systematic comparisonsk from any Agent, Arena, Experiments.We want to restate that this won’t constitute an objective judgment of the quality of an Agent to replicate the brain mechanism. Instead, this only allows an objective and complete comparison to the current evidence in the field, as is typically done in publications.
 
 Altogether, we hope our framework, available at [github.com/NeuralPlayground](https://github.com/ClementineDomine/NeuralPlayground/), offers
 a foundation that the community will build upon, working toward a shared, standardized, open, and
@@ -57,12 +60,16 @@ Each module can be used separately to easily explore and analyze experimental da
 
 #### How to run interactions between modules
 
-As shown in the jupyter notebooks [Examples](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples/agent_examples), the Agent can interact with an Arena in a standard RL framework. The first step is to initialise an Agent and Arena of your choice. The Agent can be thought of as the animal performing the Experiment and the Arena as the experimental setting where the animal navigates and performs a task. 
+As shown in the jupyter notebooks [Examples_agent](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples/agent_examples), the Agent can interact with an Arena in a standard RL framework. The first step is to initialise an Agent and Arena of your choice. The Agent can be thought of as the animal performing the Experiment and the Arena as the experimental setting where the animal navigates and performs a task. 
+
+#### How to run comparisons
+
+As shown in the jupyter notebooks [Examples_comparison](https://github.com/ClementineDomine/NeuralPlayground/blob/main/examples/comparison_board_examples/comparison_board.ipynb). We show visual comparisons between results from agents running with experimental behavior and results from the real experiment.  
 
 
 ## 4. I-want-to-Contribute
 
-There are many ways to contribute to the [NeuralPlayground](https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground). 
+There are many ways to contribute to the [github.com/NeuralPlayground/examples/comparison](https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground). 
 
  1. Implement a hippocampal and entorhinal cortex [Agent](https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground/agents) of your choice. 
      
