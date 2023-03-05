@@ -10,6 +10,8 @@ class BatchEnvironment(Environment):
     def __init__(self, environment_name: str = "BatchEnv", env_class: object = Simple2D, batch_size: int = 1,
                  **env_kwargs):
         super().__init__(environment_name, **env_kwargs)
+        self.room_width = np.diff(env_kwargs['arena_x_limits'])[0]
+        self.room_depth = np.diff(env_kwargs['arena_y_limits'])[0]
         self.batch_size = batch_size
         self.environments = []
         for i in range(self.batch_size):

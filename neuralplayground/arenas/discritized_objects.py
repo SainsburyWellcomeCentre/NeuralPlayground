@@ -56,7 +56,7 @@ class DiscreteObjectEnvironment(Simple2D):
         self.room_depth = np.diff(self.arena_y_limits)[0]
 
         # Variables for discretised state space
-        self.n_states = (self.room_width * self.room_depth) * self.state_density
+        self.n_states = int((self.room_width * self.room_depth) * self.state_density)
         self.resolution_w = int(self.state_density * self.room_width)
         self.resolution_d = int(self.state_density * self.room_depth)
         self.x_array = np.linspace(-self.room_width / 2 + 0.5, self.room_width / 2 - 0.5, num=self.resolution_w)

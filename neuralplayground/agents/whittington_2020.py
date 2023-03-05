@@ -77,14 +77,14 @@ class Whittington2020(AgentCore):
         """
         super().__init__()
         params = mod_kwargs['params']
-        self.room_width = abs(mod_kwargs['room_width'][0] - mod_kwargs['room_width'][1])
-        self.room_depth = abs(mod_kwargs['room_depth'][0] - mod_kwargs['room_depth'][1])
+        self.room_width = mod_kwargs['room_width']
+        self.room_depth = mod_kwargs['room_depth']
         self.state_density = mod_kwargs['state_density']
         self.pars = copy.deepcopy(params)
         self.tem = model.Model(self.pars)
 
         # Variables for discretised (SR) state space
-        self.n_states = (self.room_width * self.room_depth) * self.state_density
+        self.n_states = int((self.room_width * self.room_depth) * self.state_density)
         self.resolution_w = int(self.state_density * self.room_width)
         self.resolution_d = int(self.state_density * self.room_depth)
         self.x_array = np.linspace(-self.room_width / 2 + 0.5, self.room_width / 2 - 0.5, num=self.resolution_w)
@@ -93,7 +93,6 @@ class Whittington2020(AgentCore):
         self.xy_combination = np.array(np.meshgrid(self.x_array, self.y_array)).T
         self.ws = int(self.room_width * self.state_density)
         self.hs = int(self.room_depth * self.state_density)
-        self.node_layout = np.arange(self.n_states).reshape(self.room_width, self.room_depth)
 
         self.reset()
 
