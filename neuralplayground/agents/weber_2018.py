@@ -391,11 +391,11 @@ class Weber2018(AgentCore):
         inh_im = self.inh_cell_list[np.random.choice(np.arange(self.inh_cell_list.shape[0]))
             , ...].reshape((self.resolution_width, self.resolution_depth))
 
-        ax[0].imshow(exc_im.T, cmap="Reds")#, aspect=self.room_depth/self.room_width)
+        ax[0].imshow(exc_im.T, cmap="Reds")
         ax[0].set_title("Exc rates", fontsize=14)
-        ax[1].imshow(inh_im.T, cmap="Blues")#, aspect=self.room_depth/self.room_width)
+        ax[1].imshow(inh_im.T, cmap="Blues")
         ax[1].set_title("Inh rates", fontsize=14)
-        im = ax[2].imshow(r_out_im.T, cmap="jet")#, aspect=self.room_depth/self.room_width)
+        im = ax[2].imshow(r_out_im.T, cmap="jet")
         ax[2].set_title("Out rate", fontsize=14)
         cbar = plt.colorbar(im, ax=ax[2])
 

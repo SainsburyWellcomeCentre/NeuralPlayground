@@ -189,7 +189,7 @@ class Stachenfeld2018(AgentCore):
         self.obs_history.append(obs)
         if len(self.obs_history) >= 1000:
             self.obs_history = [obs, ]
-        arrow=[[0,1],[0,-1],[1,0],[-1,0]]
+        arrow= [[0, 1], [0, -1], [1, 0], [-1, 0]]
         action = np.random.normal(scale=0.1, size=(2,))
         diff = action- arrow
         dist = np.sum(diff ** 2, axis=1)
