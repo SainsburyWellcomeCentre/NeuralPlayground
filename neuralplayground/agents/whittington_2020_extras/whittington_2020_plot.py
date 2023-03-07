@@ -76,7 +76,7 @@ def plot_memory(iters, steps=None, do_save=False):
             fig.savefig('./figs/plot_mem_' + name + '.png')
 
 
-def plot_map(environment, values, ax=None, min_val=None, max_val=None, num_cols=100, location_cm='viridis',
+def plot_map(environment, values, ax=None, min_val=None, max_val=None, num_cols=100, location_cm='plasma',
              action_cm='Pastel1', do_plot_actions=False, shape='circle', radius=None):
     # If min_val and max_val are not specified: take the minimum and maximum of the supplied values
     min_val = np.min(values) if min_val is None else min_val
@@ -243,7 +243,6 @@ def plot_cells(p, g, environment, n_f_ovc=0, columns=10, radius=None):
                 # Plot rate map for this cell by collection firing rate at each location
                 plot_map(environment, np.array([loc_rates[l][c] for l in range(len(loc_rates))]), ax[row, col],
                          shape='square', radius=radius)
-
 
 def initialise_axes(ax=None):
     # If no axes specified: create new figure with new empty axes

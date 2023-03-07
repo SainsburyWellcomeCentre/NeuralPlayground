@@ -11,23 +11,17 @@ class BatchEnvironment(Environment):
                  **env_kwargs):
         super().__init__(environment_name, **env_kwargs)
         self.batch_size = batch_size
+        batch_x_limits = env_kwargs['arena_x_limits']
+        batch_y_limits = env_kwargs['arena_y_limits']
         self.environments = []
         for i in range(self.batch_size):
+            env_kwargs['arena_x_limits'] = batch_x_limits[i]
+            env_kwargs['arena_y_limits'] = batch_y_limits[i]
             self.environments.append(env_class(**env_kwargs))
-        self.room_width = np.diff(self.environments[0].arena_x_limits)[0]
-        self.room_depth = np.diff(self.environments[0].arena_y_limits)[0]
-        self.state_density = self.environments[0].state_density
 
-        # Variables for discretised state space
-        self.resolution_w = int(self.state_density * self.room_width)
-        self.resolution_d = int(self.state_density * self.room_depth)
-        self.x_array = np.linspace(-self.room_width / 2, self.room_width / 2, num=self.resolution_w)
-        self.y_array = np.linspace(self.room_depth / 2, -self.room_depth / 2, num=self.resolution_d)
-        self.mesh = np.array(np.meshgrid(self.x_array, self.y_array))
-        self.xy_combination = np.array(np.meshgrid(self.x_array, self.y_array)).T
-        self.ws = int(self.room_width * self.state_density)
-        self.hs = int(self.room_depth * self.state_density)
-        self.n_states = self.resolution_w * self.resolution_d
+        self.room_widths = [np.diff(self.environments[i].arena_x_limits)[0] for i in range(self.batch_size)]
+        self.room_depths = [np.diff(self.environments[i].arena_y_limits)[0] for i in range(self.batch_size)]
+        self.state_densities = [self.environments[i].state_density for i in range(self.batch_size)]
 
     def reset(self, random_state: bool = False, custom_state: np.ndarray = None):
         self.global_steps = 0
@@ -38,19 +32,6 @@ class BatchEnvironment(Environment):
         all_states = []
         for i, env in enumerate(self.environments):
             env_obs, env_state = env.reset()
-            # if random_state:
-            #     env.state[-1] = [np.random.uniform(low=env.arena_x_limits[0], high=env.arena_x_limits[1]),
-            #                   np.random.uniform(low=env.arena_x_limits[0], high=env.arena_y_limits[1])]
-            # else:
-            #     env.state[-1] = [0, 0]
-            # # start_pos = np.asarray(start_pos)
-            #
-            # if custom_state is not None:
-            #     env.state[-1] = np.array(custom_state)
-            # # Fully observable environment, make_observation returns the state
-            # observation = env.make_object_observation()
-            # env.state = observation
-            # env.objects = env.generate_objects()
             all_states.append(env_state)
             all_observations.append(env_obs)
 

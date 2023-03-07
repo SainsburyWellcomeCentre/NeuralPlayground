@@ -77,12 +77,16 @@ class Whittington2020(AgentCore):
         """
         super().__init__()
         params = mod_kwargs['params']
-        self.room_width = mod_kwargs['room_width']
-        self.room_depth = mod_kwargs['room_depth']
-        self.state_density = mod_kwargs['state_density']
+        self.room_widths = mod_kwargs['room_widths']
+        self.room_depths = mod_kwargs['room_depths']
+        self.state_densities = mod_kwargs['state_densities']
         self.pars = copy.deepcopy(params)
         self.tem = model.Model(self.pars)
         self.batch_size = mod_kwargs['batch_size']
+        self.n_states = [int(self.room_widths[i] * self.room_depths[i] * self.state_densities[i]) for i in range(self.batch_size)]
+        self.actions = [[0, 1], [0, -1], [1, 0], [-1, 0]]
+        self.n_actions = len(self.actions)
+        self.final_model_input = []
         self.reset()
 
     def reset(self):
@@ -93,12 +97,13 @@ class Whittington2020(AgentCore):
         self.tem = model.Model(self.pars)
         self.initialise()
         self.n_walk = -1
+        self.final_model_input = []
         self.obs_history = []
         self.walk_actions = []
         self.prev_action = None
         self.prev_observation = None
         self.prev_actions = [[None,None] for _ in range(self.batch_size)]
-        self.prev_observations = [[-1,-1,[-self.room_width, self.room_depth]] for _ in range(self.batch_size)]
+        self.prev_observations = [[-1,-1,[float('inf'), float('inf')]] for _ in range(self.batch_size)]
 
     def act(self, observation, policy_func=None):
         new_action = self.action_policy()
@@ -158,8 +163,8 @@ class Whittington2020(AgentCore):
         """
         Compute forward pass through model, updating weights, calculating TEM variables and collecting losses / accuracies
         """
-        iter = int((len(self.obs_history) / 20) - 1)
-        print(iter)
+        self.iter = int((len(self.obs_history) / 20) - 1)
+        # print(self.iter)
         self.global_steps += 1
         history = self.obs_history[-self.pars['n_rollout']:]
         locations = [[{'id': env_step[0], 'shiny': None} for env_step in step] for step in history]
@@ -173,7 +178,7 @@ class Whittington2020(AgentCore):
         # Get start time for function timing
         start_time = time.time()
         # Get updated parameters for this backprop iteration
-        self.eta_new, self.lambda_new, self.p2g_scale_offset, self.lr, self.walk_length_center, loss_weights = parameters.parameter_iteration(iter, self.pars)
+        self.eta_new, self.lambda_new, self.p2g_scale_offset, self.lr, self.walk_length_center, loss_weights = parameters.parameter_iteration(self.iter, self.pars)
         # Update eta and lambda
         self.tem.hyper['eta'] = self.eta_new
         self.tem.hyper['lambda'] = self.lambda_new
@@ -188,6 +193,24 @@ class Whittington2020(AgentCore):
                  np.reshape(action_values, (20, 16))[i].tolist()] for i in range(self.pars['n_rollout'])]
 
         forward = self.tem(model_input, self.prev_iter)
+
+        if self.iter == self.pars['train_it'] - self.pars['save_period']:
+            print('starting final walk')
+            self.final_prev_iter = [forward[-1].detach()]
+
+            self.environments = [[[], self.n_actions, self.n_states[i], len(self.obs_history[-1][i][1])]
+                                 for i in range(self.pars['batch_size'])]
+
+        if self.iter >= self.pars['train_it'] - self.pars['save_period']:
+            self.final_model_input.extend(model_input)
+
+            for i, step in enumerate(model_input):
+                for j, env_step in enumerate(step[0]):
+                    if env_step['id'] not in [ids['id'] for ids in self.environments[j][0]]:
+                        loc_dict = {'id': env_step['id'], 'observation': np.argmax(observations[i][j]),
+                                    'x': history[i][j][-1][0], 'y': history[i][j][-1][1], 'shiny': None}
+                        self.environments[j][0].append(loc_dict)
+
 
         # Accumulate loss from forward pass
         loss = torch.tensor(0.0)
@@ -223,9 +246,9 @@ class Whittington2020(AgentCore):
         acc_p, acc_g, acc_gt = np.mean([[np.mean(a) for a in step.correct()] for step in forward], axis=0)
         acc_p, acc_g, acc_gt = [a * 100 for a in (acc_p, acc_g, acc_gt)]
         # Log progress
-        if iter % 10 == 0:
+        if self.iter % 10 == 0:
             # Write series of messages to logger from this backprop iteration
-            self.logger.info('Finished backprop iter {:d} in {:.2f} seconds.'.format(iter, time.time() - start_time))
+            self.logger.info('Finished backprop iter {:d} in {:.2f} seconds.'.format(self.iter, time.time() - start_time))
             self.logger.info('Loss: {:.2f}. <p_g> {:.2f} <p_x> {:.2f} <x_gen> {:.2f} <x_g> {:.2f} <x_p> {:.2f} <g> {:.2f} <reg_g> {:.2f} <reg_p> {:.2f}'.format(
                     loss.detach().numpy(), *plot_loss))
             self.logger.info('Accuracy: <p> {:.2f}% <g> {:.2f}% <gt> {:.2f}%'.format(acc_p, acc_g, acc_gt))
@@ -234,14 +257,9 @@ class Whittington2020(AgentCore):
             self.logger.info('Weights:' + str([w for w in loss_weights.numpy()]))
             self.logger.info(' ')
 
-        if iter % self.pars['save_interval'] == 0 and iter > 0:
-            torch.save(self.tem.state_dict(), self.model_path + '/tem_' + str(iter) + '.pt')
-            torch.save(self.tem.hyper, self.model_path + '/params_' + str(iter) + '.pt')
-
-        if iter == self.pars['train_it'] - 1:
-            # Save the final state of the model after training has finished
-            torch.save(self.state_dict(), self.model_path + '/tem_' + str(iter) + '.pt')
-            torch.save(self.tem.hyper, self.model_path + '/params_' + str(iter) + '.pt')
+        if self.iter == self.pars['train_it'] - 1:
+            final_forward = self.tem(self.final_model_input, self.final_prev_iter)
+            self.save_variables(final_forward)
 
     def initialise(self):
         # Create directories for storing all information about the current run
@@ -268,7 +286,7 @@ class Whittington2020(AgentCore):
         """
         Random action policy that selects an action to take from [up, down, left, right]
         """
-        arrow = [[0, 1], [0, -1], [1, 0], [-1, 0]]
+        arrow = self.actions
         index = np.random.choice(len(arrow))
         action = arrow[index]
         return action
@@ -289,10 +307,144 @@ class Whittington2020(AgentCore):
         """
         action_values = []
         # actions = np.reshape(actions, (pars['n_rollout'], pars['batch_size'], 2))
-        poss_values = [[0,0],[0,-1],[0,1],[-1,0],[1,0]]
+        poss_values = self.actions
         for steps in actions:
             env_list = []
             for action in steps:
                 env_list.append(poss_values.index(list(action)))
             action_values.append(env_list)
         return action_values
+
+    def save_variables(self, forward):
+        """
+        Save all variables to file
+        """
+        # Save all variables to file
+        np.save(self.save_path + '/n_states', self.n_states)
+        np.save(self.save_path + '/n_actions', self.n_actions)
+        np.save(self.save_path + '/env_dims', (self.room_widths, self.room_depths))
+        torch.save(self.environments, self.save_path + '/environments')
+
+        g, p = self.rate_maps(forward)
+        torch.save(g, self.save_path + '/g_all')
+        torch.save(p, self.save_path + '/p_all')
+
+        correct_model, correct_node, correct_edge = self.compare_to_agents(forward)
+        torch.save((correct_model, correct_node, correct_edge), self.save_path + '/correct_all')
+
+        zero_shot = self.zero_shot(forward)
+        torch.save(zero_shot, self.save_path + '/zero_shot')
+
+    def rate_maps(self, forward):
+        # Store location x cell firing rate matrix for abstract and grounded location representation across environments
+        all_g, all_p = [], []
+        # Go through environments and collect firing rates in each
+        for env_i in range(self.batch_size):
+            # Collect grounded location/hippocampal/place cell representation during walk: separate into frequency modules, then locations
+            p = [[[] for loc in range(self.n_states[env_i])] for f in range(self.pars['n_f'])]
+            # Collect abstract location/entorhinal/grid cell representation during walk: separate into frequency modules, then locations
+            g = [[[] for loc in range(self.n_states[env_i])] for f in range(self.pars['n_f'])]
+            # In each step, concatenate the representations to the appropriate list
+            for step in forward:
+                # Run through frequency modules and append the firing rates to the correct location list
+                for f in range(self.pars['n_f']):
+                    g[f][step.g[env_i]['id']].append(step.g_inf[f][env_i].detach().numpy())
+                    p[f][step.g[env_i]['id']].append(step.p_inf[f][env_i].detach().numpy())
+
+            for cells, n_cells in zip([p, g], [self.pars['n_p'], self.pars['n_g']]):
+                for f, frequency in enumerate(cells):
+                    # Average across visits of the each location, but only the second half of the visits so model roughly know the environment
+                    for l, location in enumerate(frequency):
+                        frequency[l] = sum(location[int(len(location) / 2):]) / len(
+                            location[int(len(location) / 2):]) if len(
+                            location[int(len(location) / 2):]) > 0 else np.zeros(n_cells[f])
+                    # Then concatenate the locations to get a [locations x cells for this frequency] matrix
+                    cells[f] = np.stack(frequency, axis=0)
+            # Append the final average representations of this environment to the list of representations across environments
+            all_g.append(g)
+            all_p.append(p)
+        return all_g, all_p
+
+    def compare_to_agents(self, forward, include_stay_still=False):
+        # Store for each environment for each step whether is was predicted correctly by the model, and by a perfect node and perfect edge agent
+        all_correct_model, all_correct_node, all_correct_edge = [], [], []
+        # Run through environments and check for correct or incorrect prediction
+        for env_i in range(self.batch_size):
+            # Keep track for each location whether it has been visited
+            location_visited = np.full(self.n_states[env_i], False)
+            # And for each action in each location whether it has been taken
+            action_taken = np.full((self.n_states[env_i], self.n_actions), False)
+            # Make array to list whether the observation was predicted correctly or not for the model
+            correct_model = []
+            # And the same for a node agent, that picks a random observation on first encounter of a node, and the correct one every next time
+            correct_node = []
+            # And the same for an edge agent, that picks a random observation on first encounter of an edge, and the correct one every next time
+            correct_edge = []
+            # Get the very first iteration
+            prev_iter = forward[0]
+            # Run through iterations of forward pass to check when an action is taken for the first time
+            for step in forward[1:]:
+                # Get the previous action and previous location
+                prev_a, prev_g = prev_iter.a[env_i], prev_iter.g[env_i]['id']
+                # If the previous action was standing still: only count as valid transition standing still actions are included as zero-shot inference
+                if self.pars['has_static_action'] and prev_a == 0 and not include_stay_still:
+                    prev_a = None
+                # Mark the location of the previous iteration as visited
+                location_visited[prev_g] = True
+                # Update model prediction for this step
+                correct_model.append((torch.argmax(step.x_gen[2][env_i]) == torch.argmax(step.x[env_i])).numpy())
+                # Update node agent prediction for this step: correct when this state was visited beofre, otherwise chance
+                correct_node.append(True if location_visited[step.g[env_i]['id']] else np.random.randint(
+                    self.pars['n_x']) == torch.argmax(step.x[env_i]).numpy())
+                # Update edge agent prediction for this step: always correct if no action taken, correct when action leading to this state was taken before, otherwise chance
+                correct_edge.append(
+                    True if prev_a is None else True if action_taken[prev_g, prev_a] else np.random.randint(
+                        self.pars['n_x']) == torch.argmax(step.x[env_i]).numpy())
+                # Update the previous action as taken
+                if prev_a is not None:
+                    action_taken[prev_g, prev_a] = True
+                # And update the previous iteration to the current iteration
+                prev_iter = step
+            # Add the performance of model, node agent, and edge agent for this environment to list across environments
+            all_correct_model.append(correct_model)
+            all_correct_node.append(correct_node)
+            all_correct_edge.append(correct_edge)
+        # Return list of prediction success for all three agents across environments
+        return all_correct_model, all_correct_node, all_correct_edge
+
+    def zero_shot(self, forward, include_stay_still=False):
+        # Track for all opportunities for zero-shot inference if the predictions were correct across environments
+        all_correct_zero_shot = []
+        # Run through environments and check for zero-shot inference in each of them
+        for env_i in range(self.batch_size):
+            # Keep track for each location whether it has been visited
+            location_visited = np.full(self.n_states[env_i], False)
+            # And for each action in each location whether it has been taken
+            action_taken = np.full((self.n_states[env_i], self.n_actions), False)
+            # Get the very first iteration
+            prev_iter = forward[0]
+            # Make list that for all opportunities for zero-shot inference tracks if the predictions were correct
+            correct_zero_shot = []
+            # Run through iterations of forward pass to check when an action is taken for the first time
+            for step in forward[1:]:
+                # Get the previous action and previous location
+                prev_a, prev_g = prev_iter.a[env_i], prev_iter.g[env_i]['id']
+                # If the previous action was standing still: only count as valid transition standing still actions are included as zero-shot inference
+                if self.pars['has_static_action'] and prev_a == 0 and not include_stay_still:
+                    prev_a = None
+                # Mark the location of the previous iteration as visited
+                location_visited[prev_g] = True
+                # Zero shot inference occurs when the current location was visited, but the previous action wasn't taken before
+                if location_visited[step.g[env_i]['id']] and prev_a is not None and not action_taken[prev_g, prev_a]:
+                    # Find whether the prediction was correct
+                    correct_zero_shot.append(
+                        (torch.argmax(step.x_gen[2][env_i]) == torch.argmax(step.x[env_i])).numpy())
+                # Update the previous action as taken
+                if prev_a is not None:
+                    action_taken[prev_g, prev_a] = True
+                # And update the previous iteration to the current iteration
+                prev_iter = step
+            # Having gone through the full forward pass for one environment, add the zero-shot performance to the list of all
+            all_correct_zero_shot.append(correct_zero_shot)
+        # Return lists of success of zero-shot inference for all environments
+        return all_correct_zero_shot
