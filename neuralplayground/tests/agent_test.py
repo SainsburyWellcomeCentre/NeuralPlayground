@@ -23,25 +23,25 @@ def get_environment():
 def get_batch_environment():
     pars_orig = parameters.parameters()
     params = pars_orig.copy()
-    state_density = params['state_density']
+    state_density = 1
     arena_x_limits = [-5, 5]
     arena_y_limits = [-5, 5]
     env_name = "env_example"
     mod_name = "TorchTEMTest"
     time_step_size = 1
-    agent_step_size = 1
+    agent_step_size = 1/state_density
     n_objects = 45
     batch_size = 16
     env_class = DiscreteObjectEnvironment
     env = BatchEnvironment(environment_name=env_name,
-                                env_class=env_class,
-                                batch_size=batch_size,
-                                n_objects=n_objects,
-                                arena_x_limits=arena_x_limits,
-                                arena_y_limits=arena_y_limits,
-                                time_step_size=time_step_size,
-                                agent_step_size=agent_step_size,
-                                state_density=state_density)
+                           env_class=env_class,
+                           batch_size=batch_size,
+                           n_objects=n_objects,
+                           arena_x_limits=arena_x_limits,
+                           arena_y_limits=arena_y_limits,
+                           time_step_size=time_step_size,
+                           agent_step_size=agent_step_size,
+                           state_density=state_density)
     return [env, ]
 
 
@@ -168,12 +168,13 @@ class TestWhittington2020(Testmodelcore):
         pars_orig = parameters.parameters()
         params = pars_orig.copy()
         mod_name = "TorchTEMTest"
-        state_density = params['state_density']
+        state_density = 1
+        batch_size = 16
         env = get_batch_environment[0]
         # Init environment
         agent = Whittington2020(model_name=mod_name, params=params,
                         room_width=env.room_width, room_depth=env.room_depth,
-                        state_density=state_density)
+            batch_size=batch_size,state_density=state_density)
         return [agent, ]
     
     def test_agent_interaction(self, init_model, get_batch_environment):
@@ -184,6 +185,6 @@ class TestWhittington2020(Testmodelcore):
         for i in range(1):
             while init_model[0].n_walk < params['n_rollout']:
                 actions = init_model[0].batch_act(observation)
-                observation, state = env.step(actions)
+                observation, state = env.step(actions, normalize_step=True)
             init_model[0].update()
    
