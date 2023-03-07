@@ -10,15 +10,16 @@ import neuralplayground.agents.whittington_2020_extras.whittington_2020_paramete
 pars_orig = parameters.parameters()
 params = pars_orig.copy()
 
-arena_x_limits = [-5, 5]
-arena_y_limits = [-5, 5]
+batch_size = 16
+arena_x_limits = [[-5,5], [-4,4], [-5,5], [-6,6], [-4,4], [-5,5], [-6,6], [-5,5], [-4,4], [-5,5], [-6,6], [-5,5], [-4,4], [-5,5], [-6,6], [-5,5]]
+arena_y_limits = [[-5,5], [-4,4], [-5,5], [-6,6], [-4,4], [-5,5], [-6,6], [-5,5], [-4,4], [-5,5], [-6,6], [-5,5], [-4,4], [-5,5], [-6,6], [-5,5]]
 env_name = "env_example"
 mod_name = "SimpleTEM"
 time_step_size = 1
 state_density = 1
 agent_step_size = 1/state_density
 n_objects = 45
-batch_size = 16
+
 # env = Hafting2008(agent_step_size=agent_step_size,
 #                   time_step_size=time_step_size,
 #                   use_behavioral_data=False)
@@ -29,17 +30,19 @@ env_class = DiscreteObjectEnvironment
 
 # Init environment
 env = BatchEnvironment(environment_name=env_name,
-                        env_class=env_class,
+                       env_class=env_class,
+                       batch_size=batch_size,
+                       arena_x_limits=arena_x_limits,
+                       arena_y_limits=arena_y_limits,
+                       state_density=state_density,
+                       n_objects=n_objects,
+                       agent_step_size=agent_step_size)
+agent = Whittington2020(model_name=mod_name,
+                        params=params,
                         batch_size=batch_size,
-                        n_objects=n_objects,
-                        arena_x_limits=arena_x_limits,
-                        arena_y_limits=arena_y_limits,
-                        time_step_size=time_step_size,
-                        agent_step_size=agent_step_size,
-                        state_density=state_density)
-agent = Whittington2020(model_name=mod_name, params=params,
-                        room_width=env.room_width, room_depth=env.room_depth,
-                        batch_size=batch_size, state_density=state_density)
+                        room_widths=env.room_widths,
+                        room_depths=env.room_depths,
+                        state_densities=env.state_densities)
 
 observation, state = env.reset(random_state=True, custom_state=None)
 for i in range(params['train_it']):
@@ -48,7 +51,6 @@ for i in range(params['train_it']):
         observation, state = env.step(actions, normalize_step=True)
     agent.update()
 
-print('DONE')
 # ax = env.plot_batch_trajectory()
 # fontsize = 18
 # ax.grid()
