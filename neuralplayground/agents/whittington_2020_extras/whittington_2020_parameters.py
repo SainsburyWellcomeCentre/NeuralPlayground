@@ -30,21 +30,15 @@ def parameters():
     # -- Traning parameters
     # Number of walks to generate
     params['train_it'] = 20000
-    params['save_period'] = 5000
+    # Number of steps to roll out before backpropagation through time
+    params['n_rollout'] = 20
+    params['save_period'] = 5000 / params['n_rollout']
     # Saving interval
     params['save_interval'] = 10
     # Number of environments to save
     params['n_envs_save'] = 6
-    # Number of steps to roll out before backpropagation through time
-    params['n_rollout'] = 20
     # Batch size: number of walks for training simultaneously
     params['batch_size'] = 16
-    # Which batch in which environment
-    params['widths'] = [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10]
-    # params['widths'] = [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5]
-    # params['widths'] = [4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4]
-    params['n_states_world'] = [x ** 2 for x in params['widths']]
-    params['diff_env_batches_envs'] = np.arange(params['batch_size'])
     # Other relevant parameters
     params['state_density'] = 1
     # Minimum length of a walk on one environment. Walk lengths are sampled uniformly from a window that shifts down until its lower limit is walk_it_min at the end of training
