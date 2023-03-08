@@ -195,21 +195,23 @@ class Whittington2020(AgentCore):
         forward = self.tem(model_input, self.prev_iter)
 
         if self.iter == self.pars['train_it'] - self.pars['save_period']:
-            print('starting final walk')
-            self.final_prev_iter = [forward[-1].detach()]
-
-            self.environments = [[[], self.n_actions, self.n_states[i], len(self.obs_history[-1][i][1])]
-                                 for i in range(self.pars['batch_size'])]
+            # print('starting final walk')
+            self.environments = [[], self.n_actions, self.n_states[0], len(self.obs_history[-1][0][1])]
 
         if self.iter >= self.pars['train_it'] - self.pars['save_period']:
-            self.final_model_input.extend(model_input)
+            single_locs = [[model_input[step][0][0]] for step in range(self.pars['n_rollout'])]
+            single_obs = [model_input[step][1][0].unsqueeze(dim=0) for step in range(self.pars['n_rollout'])]
+            single_act = [[model_input[step][2][0]] for step in range(self.pars['n_rollout'])]
+            single_env_input = [[single_locs[step], single_obs[step], single_act[step]] for step in range(self.pars['n_rollout'])]
+            single_history = [[history[step][0][i] for i in range(3)] for step in range(self.pars['n_rollout'])]
+            self.final_model_input.extend(single_env_input)
 
-            for i, step in enumerate(model_input):
-                for j, env_step in enumerate(step[0]):
-                    if env_step['id'] not in [ids['id'] for ids in self.environments[j][0]]:
-                        loc_dict = {'id': env_step['id'], 'observation': np.argmax(observations[i][j]),
-                                    'x': history[i][j][-1][0], 'y': history[i][j][-1][1], 'shiny': None}
-                        self.environments[j][0].append(loc_dict)
+            for i, step in enumerate(single_env_input):
+                id = step[0][0]['id']
+                if not any(d['id'] == id for d in self.environments[0]):
+                    loc_dict = {'id': step[0][0]['id'], 'observation': np.argmax(step[1][0]),
+                                'x': round(single_history[i][-1][0],1), 'y': round(single_history[i][-1][1],1), 'shiny': None}
+                    self.environments[0].append(loc_dict)
 
 
         # Accumulate loss from forward pass
@@ -258,7 +260,17 @@ class Whittington2020(AgentCore):
             self.logger.info(' ')
 
         if self.iter == self.pars['train_it'] - 1:
-            final_forward = self.tem(self.final_model_input, self.final_prev_iter)
+            with torch.no_grad():
+                final_forward = self.tem(self.final_model_input, prev_iter=None)
+            # torch.save(self.tem.state_dict(), self.model_path + '/tem')
+            # torch.save(self.tem.hyper, self.model_path + '/params')
+            # torch.save(self.final_model_input, self.model_path + '/final_model_input')
+            # Save all variables to file
+            np.save(self.save_path + '/n_states', self.n_states)
+            np.save(self.save_path + '/n_actions', self.n_actions)
+            np.save(self.save_path + '/env_dims', (self.room_widths, self.room_depths))
+            torch.save(self.environments, self.save_path + '/environments')
+
             self.save_variables(final_forward)
 
     def initialise(self):
@@ -268,6 +280,8 @@ class Whittington2020(AgentCore):
         curr_path = os.path.dirname(os.path.abspath(__file__))
         shutil.copy2(os.path.abspath(os.path.join(os.getcwd(), os.path.abspath(os.path.join(curr_path, os.pardir))))+'/agents/whittington_2020_extras/whittington_2020_model.py',
                      os.path.join(self.model_path, 'whittington_2020_model.py'))
+        shutil.copy2(os.path.abspath(os.path.join(os.getcwd(), os.path.abspath(os.path.join(curr_path, os.pardir)))) + '/agents/whittington_2020_extras/whittington_2020_parameters.py',
+                     os.path.join(self.model_path, 'whittington_2020_parameters.py'))
         # Save parameters
         np.save(os.path.join(self.save_path, 'params'), self.pars)
         # Create a tensor board to stay updated on training progress. Start tensorboard with tensorboard --logdir=runs
@@ -277,7 +291,7 @@ class Whittington2020(AgentCore):
         # Make an ADAM optimizer for TEM
         self.adam = torch.optim.Adam(self.tem.parameters(), lr=self.pars['lr_max'])
         # Initialise whether a state has been visited for each world
-        self.visited = [[False for _ in range(self.pars['n_states_world'][env])] for env in
+        self.visited = [[False for _ in range(self.n_states[env])] for env in
                         range(self.pars['batch_size'])]
         # Initialise the previous iteration as None: we start from the beginning of the walk, so there is no previous iteration yet
         self.prev_iter = None
@@ -339,7 +353,7 @@ class Whittington2020(AgentCore):
         # Store location x cell firing rate matrix for abstract and grounded location representation across environments
         all_g, all_p = [], []
         # Go through environments and collect firing rates in each
-        for env_i in range(self.batch_size):
+        for env_i in range(self.tem.hyper['batch_size']):
             # Collect grounded location/hippocampal/place cell representation during walk: separate into frequency modules, then locations
             p = [[[] for loc in range(self.n_states[env_i])] for f in range(self.pars['n_f'])]
             # Collect abstract location/entorhinal/grid cell representation during walk: separate into frequency modules, then locations
@@ -369,7 +383,7 @@ class Whittington2020(AgentCore):
         # Store for each environment for each step whether is was predicted correctly by the model, and by a perfect node and perfect edge agent
         all_correct_model, all_correct_node, all_correct_edge = [], [], []
         # Run through environments and check for correct or incorrect prediction
-        for env_i in range(self.batch_size):
+        for env_i in range(self.tem.hyper['batch_size']):
             # Keep track for each location whether it has been visited
             location_visited = np.full(self.n_states[env_i], False)
             # And for each action in each location whether it has been taken
@@ -416,7 +430,7 @@ class Whittington2020(AgentCore):
         # Track for all opportunities for zero-shot inference if the predictions were correct across environments
         all_correct_zero_shot = []
         # Run through environments and check for zero-shot inference in each of them
-        for env_i in range(self.batch_size):
+        for env_i in range(self.tem.hyper['batch_size']):
             # Keep track for each location whether it has been visited
             location_visited = np.full(self.n_states[env_i], False)
             # And for each action in each location whether it has been taken
