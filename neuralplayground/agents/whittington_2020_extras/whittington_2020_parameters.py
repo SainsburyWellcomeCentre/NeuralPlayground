@@ -29,10 +29,10 @@ def parameters():
 
     # -- Traning parameters
     # Number of walks to generate
-    params['train_it'] = 20000
+    params['train_it'] = 5
     # Number of steps to roll out before backpropagation through time
     params['n_rollout'] = 20
-    params['save_period'] = 5000 / params['n_rollout']
+    params['save_period'] = 40 / params['n_rollout']
     # Saving interval
     params['save_interval'] = 10
     # Number of environments to save

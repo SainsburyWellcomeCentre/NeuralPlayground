@@ -83,6 +83,7 @@ class Whittington2020(AgentCore):
         self.pars = copy.deepcopy(params)
         self.tem = model.Model(self.pars)
         self.batch_size = mod_kwargs['batch_size']
+        self.n_envs_save = 4
         self.n_states = [int(self.room_widths[i] * self.room_depths[i] * self.state_densities[i]) for i in range(self.batch_size)]
         self.actions = [[0, 1], [0, -1], [1, 0], [-1, 0]]
         self.n_actions = len(self.actions)
@@ -196,22 +197,23 @@ class Whittington2020(AgentCore):
 
         if self.iter == self.pars['train_it'] - self.pars['save_period']:
             # print('starting final walk')
-            self.environments = [[], self.n_actions, self.n_states[0], len(self.obs_history[-1][0][1])]
+            self.final_model_input = []
+            self.environments = [[[], self.n_actions, self.n_states[i], len(self.obs_history[-1][i][1])]
+                                    for i in range(self.n_envs_save)]
 
         if self.iter >= self.pars['train_it'] - self.pars['save_period']:
-            single_locs = [[model_input[step][0][0]] for step in range(self.pars['n_rollout'])]
-            single_obs = [model_input[step][1][0].unsqueeze(dim=0) for step in range(self.pars['n_rollout'])]
-            single_act = [[model_input[step][2][0]] for step in range(self.pars['n_rollout'])]
-            single_env_input = [[single_locs[step], single_obs[step], single_act[step]] for step in range(self.pars['n_rollout'])]
-            single_history = [[history[step][0][i] for i in range(3)] for step in range(self.pars['n_rollout'])]
-            self.final_model_input.extend(single_env_input)
-
-            for i, step in enumerate(single_env_input):
-                id = step[0][0]['id']
-                if not any(d['id'] == id for d in self.environments[0]):
-                    loc_dict = {'id': step[0][0]['id'], 'observation': np.argmax(step[1][0]),
-                                'x': round(single_history[i][-1][0],1), 'y': round(single_history[i][-1][1],1), 'shiny': None}
-                    self.environments[0].append(loc_dict)
+            n_env_input = [[[model_input[step][i][env_i] for env_i in range(self.n_envs_save)] for i in range(3)]
+                           for step in range(self.pars['n_rollout'])]
+            for step in range(self.pars['n_rollout']):
+                n_env_input[step][1] = torch.stack([n_env_input[step][1][i].flatten() for i in range(self.n_envs_save)])
+            self.final_model_input.extend(n_env_input)
+            for step in range(self.pars['n_rollout']):
+                env_ids = n_env_input[step][0]
+                for i, id in enumerate(env_ids):
+                    if not any(d['id'] == id['id'] for d in self.environments[i][0]):
+                        loc_dict = {'id': env_ids[i]['id'], 'observation': np.argmax(n_env_input[step][1][i]),
+                                    'x': round(history[step][i][-1][0],1), 'y': round(history[step][i][-1][1],1), 'shiny': None}
+                        self.environments[i][0].append(loc_dict)
 
 
         # Accumulate loss from forward pass
