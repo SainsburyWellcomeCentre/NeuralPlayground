@@ -6,3 +6,4 @@ from .hafting_2008 import Hafting2008
 from .sargolini_2006 import Sargolini2006, BasicSargolini2006
 from .wernle_2018 import Wernle2018, MergingRoom
 from .batch_environment import BatchEnvironment
+from .discritized_objects import DiscreteObjectEnvironment

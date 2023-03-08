@@ -50,6 +50,7 @@ class DiscreteObjectEnvironment(Environment):
     """
 
     def __init__(self, environment_name='DiscreteObject', **env_kwargs):
+        super().__init__(environment_name, **env_kwargs)
         self.n_objects = env_kwargs['n_objects']
         self.state_density = env_kwargs['state_density']
         self.arena_x_limits = env_kwargs['arena_x_limits']
@@ -63,7 +64,6 @@ class DiscreteObjectEnvironment(Environment):
         self._create_default_walls()
         self._create_custom_walls()
         self.wall_list = self.default_walls + self.custom_walls
-        self.state_dims_labels = ["x_pos", "y_pos"]
 
         # Variables for discretised state space
         self.resolution_w = int(self.state_density * self.room_width)
@@ -76,8 +76,6 @@ class DiscreteObjectEnvironment(Environment):
         self.hs = int(self.room_depth * self.state_density)
         self.n_states = self.resolution_w * self.resolution_d
         self.objects = np.empty(shape=(self.n_states, self.n_objects))
-
-        super().__init__(environment_name, **env_kwargs)
 
     def reset(self, random_state=False, custom_state=None):
         """
@@ -151,9 +149,9 @@ class DiscreteObjectEnvironment(Environment):
         self.state[-1] = new_pos_state
         observation = self.make_object_observation()
         self.state = observation
-        transition = {"action": action, "state": self.old_state, "next_state": self.state,
+        self.transition = {"action": action, "state": self.old_state, "next_state": self.state,
                       "reward": reward, "step": self.global_steps}
-        self.history.append(transition)
+        # self.history.append(transition)
         self._increase_global_step()
         return observation, self.state
 
