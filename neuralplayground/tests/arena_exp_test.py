@@ -110,7 +110,7 @@ class TestMergingRoom2D(TestSimple2D):
         return [env, ]
 
     def test_init_env(self, init_env):
-        assert isinstance(init_env[0],MergingRoom)
+        assert isinstance(init_env[0],Wernle2018)
         
 class TestDiscreteObjectEnvironment(object):
     @pytest.fixture
