@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from ..arenas import Environment, Simple2D, Sargolini2006, Hafting2008, ConnectedRooms, Wernle2018,
+from ..arenas import Environment, Simple2D, Sargolini2006, Hafting2008, ConnectedRooms, Wernle2018
 import pytest
 
 from ..agents import RandomAgent
