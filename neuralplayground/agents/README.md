@@ -13,11 +13,9 @@ with their surroundings (i.e., the environment). An agent receives observations 
 
 ## 2. Models-Implemented 
 
-  1. [The Tolman-Eichenbaum machine](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/agents/whittington_2020.py)
-  
-  2. [The hippocampus as a predictive map](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/agents/stachenfeld_2018.py)
+  1. [The hippocampus as a predictive map](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/agents/stachenfeld_2018.py)
 
-  3. [Learning place cells, grid cells and invariances with excitatory and inhibitory plasticity](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/agents/weber_2018.py)
+  2. [Learning place cells, grid cells and invariances with excitatory and inhibitory plasticity](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/agents/weber_2018.py)
 
 Each of the these models are implemented in a jupyter notebook in [Examples](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples) to facilitate the interaction.
 
