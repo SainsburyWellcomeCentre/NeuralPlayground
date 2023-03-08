@@ -19,29 +19,30 @@ def get_environment():
     env = BasicSargolini2006()
     return [env, ]
 
+
 @pytest.fixture
 def get_batch_environment():
     pars_orig = parameters.parameters()
     params = pars_orig.copy()
-    state_density = params['state_density']
+    state_density = 1
     arena_x_limits = [-5, 5]
     arena_y_limits = [-5, 5]
     env_name = "env_example"
     mod_name = "TorchTEMTest"
     time_step_size = 1
-    agent_step_size = 1
+    agent_step_size = 1 / state_density
     n_objects = 45
     batch_size = 16
     env_class = DiscreteObjectEnvironment
     env = BatchEnvironment(environment_name=env_name,
-                                env_class=env_class,
-                                batch_size=batch_size,
-                                n_objects=n_objects,
-                                arena_x_limits=arena_x_limits,
-                                arena_y_limits=arena_y_limits,
-                                time_step_size=time_step_size,
-                                agent_step_size=agent_step_size,
-                                state_density=state_density)
+                           env_class=env_class,
+                           batch_size=batch_size,
+                           n_objects=n_objects,
+                           arena_x_limits=arena_x_limits,
+                           arena_y_limits=arena_y_limits,
+                           time_step_size=time_step_size,
+                           agent_step_size=agent_step_size,
+                           state_density=state_density)
     return [env, ]
 
 
@@ -55,8 +56,6 @@ class Testmodelcore(object):
 
     def test_init_model(self, init_model):
         assert isinstance(init_model[0], AgentCore)
-
-    
 
 
 class TestWeber2018(Testmodelcore):
@@ -80,9 +79,9 @@ class TestWeber2018(Testmodelcore):
         env = get_environment[0]
 
         agent = Weber2018(model_name=model_name, exc_eta=exc_eta, inh_eta=inh_eta, sigma_exc=sigma_exc,
-                                 sigma_inh=sigma_inh, Ne=Ne, Ni=Ni, agent_step_size=agent_step_size, ro=1,
-                                 Nef=Nef, Nif=Nif, room_width=env.room_width, room_depth=env.room_depth,
-                                 alpha_i=alpha_i, alpha_e=alpha_e, we_init=we_init, wi_init=wi_init)
+                          sigma_inh=sigma_inh, Ne=Ne, Ni=Ni, agent_step_size=agent_step_size, ro=1,
+                          Nef=Nef, Nif=Nif, room_width=env.room_width, room_depth=env.room_depth,
+                          alpha_i=alpha_i, alpha_e=alpha_e, we_init=we_init, wi_init=wi_init)
         return [agent, ]
 
     def test_init_model(self, init_model):
@@ -90,7 +89,7 @@ class TestWeber2018(Testmodelcore):
 
     def test_plot_rates(self, init_model):
         init_model[0].plot_rates()
-        
+
     def test_agent_interaction(self, init_model, get_environment):
         env = get_environment[0]
         plot_every = 0
@@ -123,10 +122,12 @@ class TestStachenfeld2018(Testmodelcore):
         state_density = (1 / agent_step_size)
         env = get_environment[0]
         twoDvalue = True
-        agent = Stachenfeld2018(discount=discount, t_episode=t_episode, n_episode=n_episode, threshold=threshold, lr_td=lr_td,
-                   room_width=env.room_width, room_depth=env.room_depth, state_density=state_density, twoD=twoDvalue)
+        agent = Stachenfeld2018(discount=discount, t_episode=t_episode, n_episode=n_episode, threshold=threshold,
+                                lr_td=lr_td,
+                                room_width=env.room_width, room_depth=env.room_depth, state_density=state_density,
+                                twoD=twoDvalue)
         return [agent, ]
-    
+
     def test_agent_interaction(self, init_model, get_environment):
         env = get_environment[0]
         plot_every = 0
@@ -144,7 +145,7 @@ class TestStachenfeld2018(Testmodelcore):
             obs, state, reward = env.step(action)
             obs = obs[:2]
             total_iters += 1
-            
+
     def test_init_model(self, init_model):
         assert isinstance(init_model[0], Stachenfeld2018)
 
@@ -161,21 +162,23 @@ class TestStachenfeld2018(Testmodelcore):
         sr_sum = init_model[0].successor_rep_sum()
         init_model[0].plot_eigen(sr_sum, eigen=(0,), save_path=None)
 
+
 class TestWhittington2020(Testmodelcore):
 
     @pytest.fixture
-    def init_model(self,get_batch_environment):
+    def init_model(self, get_batch_environment):
         pars_orig = parameters.parameters()
         params = pars_orig.copy()
         mod_name = "TorchTEMTest"
-        state_density = params['state_density']
+        state_density = 1
+        batch_size = 16
         env = get_batch_environment[0]
         # Init environment
         agent = Whittington2020(model_name=mod_name, params=params,
-                        room_width=env.room_width, room_depth=env.room_depth,
-                        state_density=state_density)
+                                room_width=env.room_width, room_depth=env.room_depth,
+                                batch_size=batch_size, state_density=state_density)
         return [agent, ]
-    
+
     def test_agent_interaction(self, init_model, get_batch_environment):
         pars_orig = parameters.parameters()
         params = pars_orig.copy()
@@ -184,6 +187,5 @@ class TestWhittington2020(Testmodelcore):
         for i in range(1):
             while init_model[0].n_walk < params['n_rollout']:
                 actions = init_model[0].batch_act(observation)
-                observation, state = env.step(actions)
+                observation, state = env.step(actions, normalize_step=True)
             init_model[0].update()
-   

@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from ..arenas import Environment, Simple2D, Sargolini2006, Hafting2008, ConnectedRooms, Wernle2018,BatchEnvironment,  DiscreteObjectEnvironment
+from ..arenas import Environment, Simple2D, Sargolini2006, Hafting2008, ConnectedRooms, Wernle2018, BatchEnvironment, \
+    DiscreteObjectEnvironment
 import pytest
 
 from ..agents import RandomAgent
@@ -103,15 +104,16 @@ class TestMergingRoom2D(TestSimple2D):
         n_steps = ((merging_time + switch_time) * 60) / time_step_size
 
         env = Wernle2018(environment_name=env_name,
-                            merge_time=merging_time,
-                            switch_time=switch_time,
-                            time_step_size=time_step_size,
-                            agent_step_size=agent_step_size)
+                         merge_time=merging_time,
+                         switch_time=switch_time,
+                         time_step_size=time_step_size,
+                         agent_step_size=agent_step_size)
         return [env, ]
 
     def test_init_env(self, init_env):
-        assert isinstance(init_env[0],MergingRoom)
-        
+        assert isinstance(init_env[0], Wernle2018)
+
+
 class TestDiscreteObjectEnvironment(object):
     @pytest.fixture
     def init_env(self):
@@ -126,20 +128,20 @@ class TestDiscreteObjectEnvironment(object):
         batch_size = 16
         env_class = Simple2D
         env = DiscreteObjectEnvironment(environment_name=env_name,
-                                    env_class=env_class,
-                                    batch_size=batch_size,
-                                    n_objects=n_objects,
-                                    arena_x_limits=arena_x_limits,
-                                    arena_y_limits=arena_y_limits,
-                                    time_step_size=time_step_size,
-                                    agent_step_size=agent_step_size,
-                                    state_density=state_density)
+                                        env_class=env_class,
+                                        batch_size=batch_size,
+                                        n_objects=n_objects,
+                                        arena_x_limits=arena_x_limits,
+                                        arena_y_limits=arena_y_limits,
+                                        time_step_size=time_step_size,
+                                        agent_step_size=agent_step_size,
+                                        state_density=state_density)
         return [env, ]
-        
+
         def test_init_env(self, init_env):
-            assert isinstance(init_env[0],DiscreteObjectEnvironment)
-        
-    
+            assert isinstance(init_env[0], DiscreteObjectEnvironment)
+
+
 class TestBatchEnvironment(object):
     @pytest.fixture
     def init_env(self):
@@ -154,16 +156,15 @@ class TestBatchEnvironment(object):
         batch_size = 16
         env_class = DiscreteObjectEnvironment
         env = BatchEnvironment(environment_name=env_name,
-                                    env_class=env_class,
-                                    batch_size=batch_size,
-                                    n_objects=n_objects,
-                                    arena_x_limits=arena_x_limits,
-                                    arena_y_limits=arena_y_limits,
-                                    time_step_size=time_step_size,
-                                    agent_step_size=agent_step_size,
-                                    state_density=state_density)
+                               env_class=env_class,
+                               batch_size=batch_size,
+                               n_objects=n_objects,
+                               arena_x_limits=arena_x_limits,
+                               arena_y_limits=arena_y_limits,
+                               time_step_size=time_step_size,
+                               agent_step_size=agent_step_size,
+                               state_density=state_density)
         return [env, ]
 
     def test_init_env(self, init_env):
-        assert isinstance(init_env[0],BatchEnvironment)
-        
+        assert isinstance(init_env[0], BatchEnvironment)
