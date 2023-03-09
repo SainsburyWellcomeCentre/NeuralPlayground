@@ -88,6 +88,8 @@ class Whittington2020(AgentCore):
         self.actions = [[0, 1], [0, -1], [1, 0], [-1, 0]]
         self.n_actions = len(self.actions)
         self.final_model_input = []
+
+        self.prev_observations = None
         self.reset()
 
     def reset(self):
@@ -142,8 +144,8 @@ class Whittington2020(AgentCore):
                 break
 
         if all_allowed:
-            self.walk_actions.append(self.prev_actions)
-            self.obs_history.append(self.prev_observations)
+            self.walk_actions.append(self.prev_actions.copy())
+            self.obs_history.append(self.prev_observations.copy())
             for batch in range(self.pars['batch_size']):
                 new_actions.append(self.action_policy())
             self.prev_actions = new_actions
@@ -198,22 +200,22 @@ class Whittington2020(AgentCore):
         if self.iter == self.pars['train_it'] - self.pars['save_period']:
             # print('starting final walk')
             self.final_model_input = []
-            self.environments = [[[], self.n_actions, self.n_states[i], len(self.obs_history[-1][i][1])]
-                                    for i in range(self.n_envs_save)]
+            self.environments = [[], self.n_actions, self.n_states[0], len(self.obs_history[-1][0][1])]
 
         if self.iter >= self.pars['train_it'] - self.pars['save_period']:
-            n_env_input = [[[model_input[step][i][env_i] for env_i in range(self.n_envs_save)] for i in range(3)]
-                           for step in range(self.pars['n_rollout'])]
+            single_index = [[model_input[step][0][0]] for step in range(self.pars['n_rollout'])]
+            single_obs = [torch.unsqueeze(model_input[step][1][0], dim=0) for step in range(self.pars['n_rollout'])]
+            single_action = [[model_input[step][2][0]] for step in range(self.pars['n_rollout'])]
+            single_model_input = [[single_index[step], single_obs[step], single_action[step]]for step in range(self.pars['n_rollout'])]
+            # for step in range(self.pars['n_rollout']):
+            #     single_model_input[step][1] = torch.unsqueeze(single_model_input[step][1], dim=0)
+            self.final_model_input.extend(single_model_input)
             for step in range(self.pars['n_rollout']):
-                n_env_input[step][1] = torch.stack([n_env_input[step][1][i].flatten() for i in range(self.n_envs_save)])
-            self.final_model_input.extend(n_env_input)
-            for step in range(self.pars['n_rollout']):
-                env_ids = n_env_input[step][0]
-                for i, id in enumerate(env_ids):
-                    if not any(d['id'] == id['id'] for d in self.environments[i][0]):
-                        loc_dict = {'id': env_ids[i]['id'], 'observation': np.argmax(n_env_input[step][1][i]),
-                                    'x': round(history[step][i][-1][0],1), 'y': round(history[step][i][-1][1],1), 'shiny': None}
-                        self.environments[i][0].append(loc_dict)
+                id = single_model_input[step][0][0]['id']
+                if not any(d['id'] == id for d in self.environments[0]):
+                    loc_dict = {'id': id, 'observation': np.argmax(single_model_input[step][1]),
+                                'x': history[step][0][-1][0], 'y': history[step][0][-1][1], 'shiny': None}
+                    self.environments[0].append(loc_dict)
 
 
         # Accumulate loss from forward pass
