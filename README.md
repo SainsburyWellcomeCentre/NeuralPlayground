@@ -1,4 +1,5 @@
 # NeuralPlayground: The  standardised environment for the hippocampus and entorhinal cortex models. 
+### (Developing visualization and comparison board)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-5-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
