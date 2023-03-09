@@ -114,8 +114,12 @@ class TestMergingRoom(TestSimple2D):
         merging_time = 40
         switch_time = 20
         n_steps = ((merging_time + switch_time) * 60) / time_step_size
+        room_width = [-10, 10]
+        room_depth = [-10, 10]
 
-        env = MergingRoom(environment_name=env_name,
+        env = MergingRoom(arena_x_limits=room_width,
+                          arena_y_limits=room_depth,
+                          environment_name=env_name,
                           merge_time=merging_time,
                           switch_time=switch_time,
                           time_step_size=time_step_size,
