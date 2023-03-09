@@ -1,3 +1,4 @@
+torch
 anyio==3.6.2
 argon2-cffi==21.3.0
 argon2-cffi-bindings==21.2.0
@@ -78,7 +79,6 @@ pyrsistent==0.19.3
 pytest==7.2.1
 python-dateutil==2.8.2
 python-json-logger==2.0.7
-pytorch
 pytz==2022.7.1
 PyYAML==6.0
 pyzmq==25.0.0
