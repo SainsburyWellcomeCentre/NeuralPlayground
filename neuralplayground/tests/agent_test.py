@@ -25,8 +25,10 @@ def get_batch_environment():
     pars_orig = parameters.parameters()
     params = pars_orig.copy()
     state_density = 1
-    arena_x_limits = [-5, 5]
-    arena_y_limits = [-5, 5]
+    arena_x_limits = [[-5, 5], [-4, 4], [-5, 5], [-6, 6], [-4, 4], [-5, 5], [-6, 6], [-5, 5], [-4, 4], [-5, 5], [-6, 6],
+                      [-5, 5], [-4, 4], [-5, 5], [-6, 6], [-5, 5]]
+    arena_y_limits = [[-5, 5], [-4, 4], [-5, 5], [-6, 6], [-4, 4], [-5, 5], [-6, 6], [-5, 5], [-4, 4], [-5, 5], [-6, 6],
+                      [-5, 5], [-4, 4], [-5, 5], [-6, 6], [-5, 5]]
     env_name = "env_example"
     mod_name = "TorchTEMTest"
     time_step_size = 1
@@ -170,13 +172,15 @@ class TestWhittington2020(Testmodelcore):
         pars_orig = parameters.parameters()
         params = pars_orig.copy()
         mod_name = "TorchTEMTest"
-        state_density = 1
         batch_size = 16
         env = get_batch_environment[0]
         # Init environment
-        agent = Whittington2020(model_name=mod_name, params=params,
-                                room_width=env.room_width, room_depth=env.room_depth,
-                                batch_size=batch_size, state_density=state_density)
+        agent = Whittington2020(model_name=mod_name,
+                                params=params,
+                                batch_size=batch_size,
+                                room_widths=env.room_widths,
+                                room_depths=env.room_depths,
+                                state_densities=env.state_densities)
         return [agent, ]
 
     def test_agent_interaction(self, init_model, get_batch_environment):

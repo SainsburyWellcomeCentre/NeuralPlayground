@@ -145,13 +145,15 @@ class TestDiscreteObjectEnvironment(object):
 class TestBatchEnvironment(object):
     @pytest.fixture
     def init_env(self):
-        state_density = 1
-        arena_x_limits = [-5, 5]
-        arena_y_limits = [-5, 5]
+        arena_x_limits = [[-5, 5], [-4, 4], [-5, 5], [-6, 6], [-4, 4], [-5, 5], [-6, 6], [-5, 5], [-4, 4], [-5, 5],
+                          [-6, 6], [-5, 5], [-4, 4], [-5, 5], [-6, 6], [-5, 5]]
+        arena_y_limits = [[-5, 5], [-4, 4], [-5, 5], [-6, 6], [-4, 4], [-5, 5], [-6, 6], [-5, 5], [-4, 4], [-5, 5],
+                          [-6, 6], [-5, 5], [-4, 4], [-5, 5], [-6, 6], [-5, 5]]
         env_name = "env_example"
         mod_name = "TorchTEMTest"
         time_step_size = 1
-        agent_step_size = 1
+        state_density = 1
+        agent_step_size = 1 / state_density
         n_objects = 45
         batch_size = 16
         env_class = DiscreteObjectEnvironment
