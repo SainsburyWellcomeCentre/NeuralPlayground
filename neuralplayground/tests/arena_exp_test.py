@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from ..arenas import Environment, Simple2D, Sargolini2006, Hafting2008, ConnectedRooms, Wernle2018
+from ..arenas import Environment, Simple2D, Sargolini2006, Hafting2008, ConnectedRooms, Wernle2018, MergingRoom
 import pytest
 
 from ..agents import RandomAgent
@@ -85,7 +85,7 @@ class TestConnectedRooms(TestSimple2D):
         assert isinstance(init_env[0], ConnectedRooms)
 
 
-class Wernle2018(TestSimple2D):
+class TestWernle2018(TestSimple2D):
     @pytest.fixture
     def init_env(self):
         env_name = "MergingRoom"
@@ -103,5 +103,24 @@ class Wernle2018(TestSimple2D):
         return [env, ]
 
     def test_init_env(self, init_env):
-        assert isinstance(init_env[0],Wernle2018)
-        
+        assert isinstance(init_env[0], Wernle2018)
+
+class TestMergingRoom(TestSimple2D):
+    @pytest.fixture
+    def init_env(self):
+        env_name = "MergingRoom"
+        time_step_size = 0.2
+        agent_step_size = 3
+        merging_time = 40
+        switch_time = 20
+        n_steps = ((merging_time + switch_time) * 60) / time_step_size
+
+        env = MergingRoom(environment_name=env_name,
+                          merge_time=merging_time,
+                          switch_time=switch_time,
+                          time_step_size=time_step_size,
+                          agent_step_size=agent_step_size)
+        return [env, ]
+
+    def test_init_env(self, init_env):
+        assert isinstance(init_env[0], MergingRoom)
