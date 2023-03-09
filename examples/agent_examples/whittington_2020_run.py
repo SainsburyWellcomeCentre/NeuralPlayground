@@ -5,6 +5,7 @@ TEM learning to predict upcoming sensory stimulus in a range of 16 square enviro
 
 # Standard Imports
 import matplotlib.pyplot as plt
+from tqdm import tqdm
 
 # NeuralPlayground Imports
 from neuralplayground.arenas.discritized_objects import DiscreteObjectEnvironment
@@ -57,7 +58,7 @@ agent = Whittington2020(model_name=mod_name,
 
 # Reset environment and begin training (random_state=True is currently necessary)
 observation, state = env.reset(random_state=True, custom_state=None)
-for i in range(params['train_it']):
+for i in tqdm(range(params['train_it'])):
     while agent.n_walk < params['n_rollout']:
         actions = agent.batch_act(observation)
         observation, state = env.step(actions, normalize_step=True)
