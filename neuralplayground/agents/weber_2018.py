@@ -9,8 +9,6 @@ Check examples/testing_weber_model.ipynb
 
 import sys
 
-import numpy as np
-import random
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import numpy as np
