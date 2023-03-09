@@ -66,6 +66,7 @@ As shown in the jupyter notebooks [Examples_agent](https://github.com/Clementine
 
 As shown in the jupyter notebooks [Examples_comparison](https://github.com/ClementineDomine/NeuralPlayground/blob/main/examples/comparison_board_examples/comparison_board.ipynb). We show visual comparisons between results from agents running with experimental behavior and results from the real experiment.  
 
+### Check our Tolman-Eichenbaum Machine Implementation in [this branch](https://github.com/ClementineDomine/NeuralPlayground/tree/whittington_2020) (work in progress).
 
 ## 4. I-want-to-Contribute
 
@@ -92,11 +93,11 @@ All contributions to the repository are acknowledged through the all-contributor
 Refer to the README.md files found in each of the modules for further details on how to contribute to them.
 
 
-### 5. Cite 
+## 5. Cite 
 
 See [Citation](https://github.com/ClementineDomine/NeuralPlayground/blob/main/documents/citation.cff) for the correct citation of this framework. 
 
-### 6. License
+## 6. License
 
 More details about the license can be found at [Licence](https://github.com/ClementineDomine/NeuralPlayground/blob/main/documents/lisence.md).
 
