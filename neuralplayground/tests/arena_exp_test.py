@@ -43,10 +43,6 @@ class TestSimple2D(object):
 class TestSargolini2006(TestSimple2D):
     @pytest.fixture
     def init_env(self):
-        # data_path = "../envs/experiments/Sargolini2006/raw_data_sample/"
-
-        # session = {"rat_id": "11016", "sess": "31010502"}
-
         env = Sargolini2006(verbose=True,
                             time_step_size=None,
                             agent_step_size=None)
@@ -59,12 +55,9 @@ class TestSargolini2006(TestSimple2D):
         init_env[0].experiment.plot_trajectory()
 
 
-class TestHafting2008(TestSimple2D):
+class TestHafting2008(TestSargolini2006):
     @pytest.fixture
     def init_env(self):
-        # data_path = "../envs/experiments/Hafting2008/"
-        # session = {"rat_id": "11015", "sess": "13120410", "cell_id": "t5c1"}
-
         env = Hafting2008(data_path=None,
                           verbose=True,
                           # session=session,
@@ -92,7 +85,7 @@ class TestConnectedRooms(TestSimple2D):
         assert isinstance(init_env[0], ConnectedRooms)
 
 
-class TestMergingRoom2D(TestSimple2D):
+class Wernle2018(TestSimple2D):
     @pytest.fixture
     def init_env(self):
         env_name = "MergingRoom"

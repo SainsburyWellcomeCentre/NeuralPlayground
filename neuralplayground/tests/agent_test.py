@@ -15,7 +15,6 @@ def get_environment():
     return [env, ]
 
 
-
 class Testmodelcore(object):
 
     @pytest.fixture
@@ -26,8 +25,6 @@ class Testmodelcore(object):
 
     def test_init_model(self, init_model):
         assert isinstance(init_model[0], AgentCore)
-
-    
 
 
 class TestWeber2018(Testmodelcore):
