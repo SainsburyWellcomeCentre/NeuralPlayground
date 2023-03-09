@@ -23,7 +23,7 @@ class BatchEnvironment(Environment):
         self.room_depths = [np.diff(self.environments[i].arena_y_limits)[0] for i in range(self.batch_size)]
         self.state_densities = [self.environments[i].state_density for i in range(self.batch_size)]
 
-    def reset(self, random_state: bool = False, custom_state: np.ndarray = None):
+    def reset(self, random_state: bool = True, custom_state: np.ndarray = None):
         self.global_steps = 0
         self.global_time = 0
         self.history = []
@@ -78,10 +78,10 @@ class BatchEnvironment(Environment):
         f: matplotlib.figure
             if return_figure parameters is True
         """
-        env = self.environments[3]
+        env = self.environments[0]
         # Use or not saved history
         if history_data is None:
-            history_data = [his[3] for his in self.history]
+            history_data = [his[0] for his in self.history]
 
         # Generate Figure
         if ax is None:

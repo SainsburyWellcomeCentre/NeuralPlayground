@@ -68,8 +68,8 @@ class DiscreteObjectEnvironment(Environment):
         # Variables for discretised state space
         self.resolution_w = int(self.state_density * self.room_width)
         self.resolution_d = int(self.state_density * self.room_depth)
-        self.x_array = np.linspace(-self.room_width / 2, self.room_width / 2, num=self.resolution_w)
-        self.y_array = np.linspace(self.room_depth / 2, -self.room_depth / 2, num=self.resolution_d)
+        self.x_array = np.linspace(-self.room_width/2 + (1/2*self.state_density), self.room_width/2 - (1/2*self.state_density), num=self.resolution_w)
+        self.y_array = np.linspace(self.room_depth/2 - (1/2*self.state_density), -self.room_depth/2 + (1/2*self.state_density), num=self.resolution_d)
         self.mesh = np.array(np.meshgrid(self.x_array, self.y_array))
         self.xy_combination = np.array(np.meshgrid(self.x_array, self.y_array)).T
         self.ws = int(self.room_width * self.state_density)
@@ -77,7 +77,7 @@ class DiscreteObjectEnvironment(Environment):
         self.n_states = self.resolution_w * self.resolution_d
         self.objects = np.empty(shape=(self.n_states, self.n_objects))
 
-    def reset(self, random_state=False, custom_state=None):
+    def reset(self, random_state=True, custom_state=None):
         """
         Reset the environment variables and distribution of sensory objects.
             Parameters
@@ -102,18 +102,18 @@ class DiscreteObjectEnvironment(Environment):
         self.history = []
         self.state = [-1, -1, [self.room_width + 1, self.room_depth + 1]]
         if random_state:
-            self.state[-1] = [np.random.uniform(low=self.arena_limits[0, 0], high=self.arena_limits[0, 1]),
+            pos = [np.random.uniform(low=self.arena_limits[0, 0], high=self.arena_limits[0, 1]),
                               np.random.uniform(low=self.arena_limits[1, 0], high=self.arena_limits[1, 1])]
         else:
-            self.state[-1] = np.array([0, 0])
+            pos = np.array([0, 0])
 
         if custom_state is not None:
-            self.state[-1] = np.array(custom_state)
+            pos = np.array(custom_state)
 
         self.objects = self.generate_objects()
 
         # Fully observable environment, make_observation returns the state
-        observation = self.make_object_observation()
+        observation = self.make_object_observation(pos)
         self.state = observation
         return observation, self.state
 
@@ -146,8 +146,8 @@ class DiscreteObjectEnvironment(Environment):
             new_pos_state = self.state[-1] + action
         new_pos_state, valid_action = self.validate_action(self.state[-1], action, new_pos_state)
         reward = self.reward_function(action, self.state[-1])  # If you get reward, it should be coded here
-        self.state[-1] = new_pos_state
-        observation = self.make_object_observation()
+        # self.state[-1] = new_pos_state
+        observation = self.make_object_observation(new_pos_state)
         self.state = observation
         self.transition = {"action": action, "state": self.old_state, "next_state": self.state,
                       "reward": reward, "step": self.global_steps}
@@ -168,8 +168,7 @@ class DiscreteObjectEnvironment(Environment):
             objects[i, :] = poss_objects[rand]
         return objects
 
-    def make_object_observation(self):
-        pos = self.state[-1]
+    def make_object_observation(self, pos):
         index = self.pos_to_state(np.array(pos))
         object = self.objects[index]
 
