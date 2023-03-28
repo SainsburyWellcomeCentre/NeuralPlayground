@@ -3,9 +3,10 @@ import pickle
 import os
 import pandas as pd
 from deepdiff import DeepDiff
+from gym import spaces, Env
 
 
-class Environment(object):
+class Environment(Env):
     """ Abstract parent environment class
     Methods
     ----------

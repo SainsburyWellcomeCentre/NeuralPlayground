@@ -1,5 +1,7 @@
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+import cv2 
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from neuralplayground.arenas.arena_core import Environment
 import numpy as np
 from neuralplayground.utils import check_crossing_wall
@@ -266,7 +268,7 @@ class Simple2D(Environment):
                     sc = ax.plot(x_, y_, "-", color=cmap(norm(i)), alpha=0.6)
 
             sc = ax.scatter(aux_x, aux_y, c=np.arange(len(aux_x)), vmin=0, vmax=len(aux_x),
-                            cmap="plasma", alpha=0.6, s=0.1)
+                            cmap="plasma", alpha=0.6, s=0.5)
             cbar = plt.colorbar(sc, ax=ax, ticks=[0, len(state_history)])
             cbar.ax.set_ylabel('N steps', rotation=270, fontsize=16)
             cbar.ax.set_yticklabels([0, len(state_history)], fontsize=16)
@@ -278,3 +280,18 @@ class Simple2D(Environment):
             return ax, f
         else:
             return ax
+
+    def render(self):
+        """ Render the environment """
+        f, ax = plt.subplots(1, 1, figsize=(8, 6))
+        canvas = FigureCanvas(f)
+        history = self.history[-50:]
+        ax = self.plot_trajectory(history_data = history,ax = ax)
+        print(canvas)
+        print("debug")
+        canvas.draw()
+        image = np.frombuffer(canvas.tostring_rgb(), dtype='uint8')
+        image = image.reshape(f.canvas.get_width_height()[::-1] + (3,))
+        print(image.shape)
+        cv2.imshow("Game", image)
+        cv2.waitKey(10)
