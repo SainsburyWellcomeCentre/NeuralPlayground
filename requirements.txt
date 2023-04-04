@@ -9,4 +9,4 @@ deepdiff
 setuptools
 wheel
 gym
-cv2
+opencv-python
