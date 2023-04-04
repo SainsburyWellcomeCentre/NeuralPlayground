@@ -9,5 +9,5 @@ deepdiff
 setuptools
 wheel
 gym
-opencv-python
+opencv-python-headless
 gymnasium
