@@ -5,6 +5,7 @@ from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from neuralplayground.arenas.arena_core import Environment
 import numpy as np
 from neuralplayground.utils import check_crossing_wall
+from gymnasium.spaces import Box
 
 
 class Simple2D(Environment):
@@ -74,8 +75,15 @@ class Simple2D(Environment):
                                       [self.arena_y_limits[0], self.arena_y_limits[1]]])
         self.room_width = np.diff(self.arena_x_limits)[0]
         self.room_depth = np.diff(self.arena_y_limits)[0]
+        self.observation_space = Box(low=np.array([self.arena_x_limits[0], self.arena_y_limits[0]]),
+                                     high=np.array([self.arena_x_limits[1], self.arena_y_limits[1]]),
+                                     dtype=np.float64)
+        # Action are not bounded in this environment since the action is normalized in the step function
+        # And can't cross the walls of the environment
+        self.action_space = Box(low=np.array((-np.inf, -np.inf)), high=np.array((np.inf, np.inf)), dtype=np.float64)
         self.agent_step_size = env_kwargs["agent_step_size"]
         self.state_dims_labels = ["x_pos", "y_pos"]
+
         self._create_default_walls()
         self._create_custom_walls()
         self.wall_list = self.default_walls + self.custom_walls
@@ -281,17 +289,15 @@ class Simple2D(Environment):
         else:
             return ax
 
-    def render(self):
-        """ Render the environment """
+    def render(self, history_length=30):
+        """ Render the environment live through iterations """
         f, ax = plt.subplots(1, 1, figsize=(8, 6))
         canvas = FigureCanvas(f)
-        history = self.history[-50:]
-        ax = self.plot_trajectory(history_data = history,ax = ax)
-        print(canvas)
-        print("debug")
+        history = self.history[-history_length:]
+        ax = self.plot_trajectory(history_data=history, ax=ax)
         canvas.draw()
         image = np.frombuffer(canvas.tostring_rgb(), dtype='uint8')
         image = image.reshape(f.canvas.get_width_height()[::-1] + (3,))
         print(image.shape)
-        cv2.imshow("Game", image)
+        cv2.imshow("2D_env", image)
         cv2.waitKey(10)

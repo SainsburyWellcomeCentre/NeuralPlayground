@@ -10,3 +10,4 @@ setuptools
 wheel
 gym
 opencv-python
+gymnasium

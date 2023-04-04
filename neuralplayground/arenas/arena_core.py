@@ -3,7 +3,7 @@ import pickle
 import os
 import pandas as pd
 from deepdiff import DeepDiff
-from gym import spaces, Env
+from gymnasium import spaces, Env
 
 
 class Environment(Env):
@@ -63,6 +63,8 @@ class Environment(Env):
         self.env_kwargs = env_kwargs  # Parameters of the environment
         self.metadata = {"env_kwargs": env_kwargs}  # Define within each subclass for specific environments
         self.state = np.array([])
+        self.observation_space = spaces.Box(low=-np.inf, high=np.inf, shape=(0,), dtype=np.float64)
+        self.action_space = spaces.Box(low=-np.inf, high=np.inf, shape=(0,), dtype=np.float64)
         self.history = []
         # Initializing global counts
         self.global_steps = 0
