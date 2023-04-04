@@ -37,6 +37,7 @@ class TestSimple2D(object):
             action = agent.act(obs)
             # Run environment for given action
             obs, state, reward = init_env[0].step(action)
+            init_env[0].render()
         init_env[0].plot_trajectory()
 
 
