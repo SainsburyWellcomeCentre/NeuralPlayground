@@ -9,3 +9,4 @@ deepdiff
 setuptools
 wheel
 gym
+cv2
