@@ -87,7 +87,7 @@ class Whittington2020(AgentCore):
         self.n_states = [int(self.room_widths[i] * self.room_depths[i] * self.state_densities[i]) for i in range(self.batch_size)]
         self.actions = [[0, 1], [0, -1], [1, 0], [-1, 0]]
         self.n_actions = len(self.actions)
-        self.final_model_input = []
+        self.final_model_input = None
 
         self.prev_observations = None
         self.reset()
@@ -100,7 +100,7 @@ class Whittington2020(AgentCore):
         self.tem = model.Model(self.pars)
         self.initialise()
         self.n_walk = -1
-        self.final_model_input = []
+        self.final_model_input = None
         self.obs_history = []
         self.walk_actions = []
         self.prev_action = None
@@ -194,29 +194,9 @@ class Whittington2020(AgentCore):
         # Collect all information in walk variable
         model_input = [[locations[i], torch.from_numpy(np.reshape(observations, (20, 16, 45))[i]).type(torch.float32),
                  np.reshape(action_values, (20, 16))[i].tolist()] for i in range(self.pars['n_rollout'])]
+        self.final_model_input = model_input
 
         forward = self.tem(model_input, self.prev_iter)
-
-        if self.iter == self.pars['train_it'] - self.pars['save_period']:
-            # print('starting final walk')
-            self.final_model_input = []
-            self.environments = [[], self.n_actions, self.n_states[0], len(self.obs_history[-1][0][1])]
-
-        if self.iter >= self.pars['train_it'] - self.pars['save_period']:
-            single_index = [[model_input[step][0][0]] for step in range(self.pars['n_rollout'])]
-            single_obs = [torch.unsqueeze(model_input[step][1][0], dim=0) for step in range(self.pars['n_rollout'])]
-            single_action = [[model_input[step][2][0]] for step in range(self.pars['n_rollout'])]
-            single_model_input = [[single_index[step], single_obs[step], single_action[step]]for step in range(self.pars['n_rollout'])]
-            # for step in range(self.pars['n_rollout']):
-            #     single_model_input[step][1] = torch.unsqueeze(single_model_input[step][1], dim=0)
-            self.final_model_input.extend(single_model_input)
-            for step in range(self.pars['n_rollout']):
-                id = single_model_input[step][0][0]['id']
-                if not any(d['id'] == id for d in self.environments[0]):
-                    loc_dict = {'id': id, 'observation': np.argmax(single_model_input[step][1]),
-                                'x': history[step][0][-1][0], 'y': history[step][0][-1][1], 'shiny': None}
-                    self.environments[0].append(loc_dict)
-
 
         # Accumulate loss from forward pass
         loss = torch.tensor(0.0)
@@ -262,20 +242,6 @@ class Whittington2020(AgentCore):
                 np.max(np.abs(self.prev_iter[0].M[0].numpy())), self.tem.hyper['eta'], self.tem.hyper['lambda'], self.tem.hyper['p2g_scale_offset']))
             self.logger.info('Weights:' + str([w for w in loss_weights.numpy()]))
             self.logger.info(' ')
-
-        if self.iter == self.pars['train_it'] - 1:
-            with torch.no_grad():
-                final_forward = self.tem(self.final_model_input, prev_iter=None)
-            # torch.save(self.tem.state_dict(), self.model_path + '/tem')
-            # torch.save(self.tem.hyper, self.model_path + '/params')
-            # torch.save(self.final_model_input, self.model_path + '/final_model_input')
-            # Save all variables to file
-            np.save(self.save_path + '/n_states', self.n_states)
-            np.save(self.save_path + '/n_actions', self.n_actions)
-            np.save(self.save_path + '/env_dims', (self.room_widths, self.room_depths))
-            torch.save(self.environments, self.save_path + '/environments')
-
-            self.save_variables(final_forward)
 
     def initialise(self):
         # Create directories for storing all information about the current run
@@ -352,6 +318,24 @@ class Whittington2020(AgentCore):
 
         zero_shot = self.zero_shot(forward)
         torch.save(zero_shot, self.save_path + '/zero_shot')
+
+    def collect_environment_info(self, model_input):
+        self.final_model_input = []
+        self.environments = [[], self.n_actions, self.n_states[0], len(self.obs_history[-1][0][1])]
+
+        single_index = [[model_input[step][0][0]] for step in range(len(model_input))]
+        single_obs = [torch.unsqueeze(model_input[step][1][0], dim=0) for step in range(len(model_input))]
+        single_action = [[model_input[step][2][0]] for step in range(len(model_input))]
+        single_model_input = [[single_index[step], single_obs[step], single_action[step]]for step in range(len(model_input))]
+        self.final_model_input.extend(single_model_input)
+        for step in range(len(model_input)):
+            id = single_model_input[step][0][0]['id']
+            if not any(d['id'] == id for d in self.environments[0]):
+                loc_dict = {'id': id, 'observation': np.argmax(single_model_input[step][1]),
+                            'x': history[step][0][-1][0], 'y': history[step][0][-1][1], 'shiny': None}
+                self.environments[0].append(loc_dict)
+
+        return self.environments
 
     def rate_maps(self, forward):
         # Store location x cell firing rate matrix for abstract and grounded location representation across environments
