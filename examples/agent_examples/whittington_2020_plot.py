@@ -16,21 +16,22 @@ import neuralplayground.agents.whittington_2020_extras.whittington_2020_analyse 
 import neuralplayground.agents.whittington_2020_extras.whittington_2020_plot as plot
 
 # Select trained model
-date = '2023-03-28'
-run = '1'
-index = '9999'
-torch_path = '/nfs/nhome/live/lhollingsworth/Documents/NeuralPlayground'
+date = '2023-03-02'
+run = '3'
+index = '19999'
+base_path = '/nfs/nhome/live/lhollingsworth/Documents/NeuralPlayground'
+npg_path = '/nfs/nhome/live/lhollingsworth/Documents/NeuralPlayground/NPG/EHC_model_comparison/examples/'
 # Load the model: use import library to import module from specified path
-model_spec = importlib.util.spec_from_file_location("model", torch_path + '/Summaries/' + date + '/torch_run' + run + '/script/whittington_2020_model.py')
+model_spec = importlib.util.spec_from_file_location("model", base_path + '/Summaries/' + date + '/torch_run' + run + '/script/whittington_2020_model.py')
 model = importlib.util.module_from_spec(model_spec)
 model_spec.loader.exec_module(model)
 
 # Load the parameters of the model
-params = torch.load(torch_path + '/Summaries/' + date + '/torch_run' + run + '/model/params_' + index + '.pt')
+params = torch.load(base_path + '/Summaries/' + date + '/torch_run' + run + '/model/params_' + index + '.pt')
 # Create a new tem model with the loaded parameters
 tem = model.Model(params)
 # Load the model weights after training
-model_weights = torch.load(torch_path + '/Summaries/' + date + '/torch_run' + run + '/model/tem_' + index + '.pt')
+model_weights = torch.load(base_path + '/Summaries/' + date + '/torch_run' + run + '/model/tem_' + index + '.pt')
 # Set the model weights to the loaded trained model weights
 tem.load_state_dict(model_weights)
 # Make sure model is in evaluate mode (not crucial because it doesn't currently use dropout or batchnorm layers)
@@ -38,8 +39,8 @@ tem.eval()
 
 # Initialise environment parameters
 batch_size = 16
-arena_x_limits = [[10,10], [10,10], [10,10], [10,10], [10,10], [10,10], [10,10], [10,10], [10,10], [10,10], [10,10], [10,10], [10,10], [10,10], [10,10], [10,10]]
-arena_y_limits = [[10,10], [10,10], [10,10], [10,10], [10,10], [10,10], [10,10], [10,10], [10,10], [10,10], [10,10], [10,10], [10,10], [10,10], [10,10], [10,10]]
+arena_x_limits = [[-5,5], [-5,5], [-5,5], [-5,5], [-5,5], [-5,5], [-5,5], [-5,5], [-5,5], [-5,5], [-5,5], [-5,5], [-5,5], [-5,5], [-5,5], [-5,5]]
+arena_y_limits = [[-5,5], [-5,5], [-5,5], [-5,5], [-5,5], [-5,5], [-5,5], [-5,5], [-5,5], [-5,5], [-5,5], [-5,5], [-5,5], [-5,5], [-5,5], [-5,5]]
 env_name = "env_example"
 mod_name = "SimpleTEM"
 time_step_size = 1
@@ -69,12 +70,31 @@ agent = Whittington2020(model_name=mod_name,
 # Run around environment
 observation, state = env.reset(random_state=True, custom_state=None)
 while agent.n_walk < 5000:
+    print(agent.n_walk)
     action = agent.batch_act(observation)
     observation, state = env.step(action, normalize_step=True)
+environments = [agent.collect_environment_info()]
 model_input = agent.final_model_input
-environments = agent.collect_environment_info(model_input)
 
 with torch.no_grad():
     forward = tem(model_input, prev_iter=None)
 
+include_stay_still = True
+shiny_envs = [False]
+env_to_plot = 0
+envs_to_avg = shiny_envs if shiny_envs[env_to_plot] else [not shiny_env for shiny_env in shiny_envs]
 
+correct_model, correct_node, correct_edge = analyse.compare_to_agents(forward, tem, environments, include_stay_still=include_stay_still)
+zero_shot = analyse.zero_shot(forward, tem, environments, include_stay_still=include_stay_still)
+
+
+# Plot results of agent comparison and zero-shot inference analysis
+filt_size = 41
+plt.figure()
+plt.plot(analyse.smooth(np.mean(np.array([env for env_i, env in enumerate(correct_model) if envs_to_avg[env_i]]),0)[1:], filt_size), label='tem')
+plt.plot(analyse.smooth(np.mean(np.array([env for env_i, env in enumerate(correct_node) if envs_to_avg[env_i]]),0)[1:], filt_size), label='node')
+plt.plot(analyse.smooth(np.mean(np.array([env for env_i, env in enumerate(correct_edge) if envs_to_avg[env_i]]),0)[1:], filt_size), label='edge')
+plt.ylim(0, 1)
+plt.legend()
+plt.title('Zero-shot inference: ' + str(np.mean([np.mean(env) for env_i, env in enumerate(zero_shot) if envs_to_avg[env_i]]) * 100) + '%')
+plt.show()

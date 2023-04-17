@@ -319,9 +319,18 @@ class Whittington2020(AgentCore):
         zero_shot = self.zero_shot(forward)
         torch.save(zero_shot, self.save_path + '/zero_shot')
 
-    def collect_environment_info(self, model_input):
+    def collect_environment_info(self):
         self.final_model_input = []
-        self.environments = [[], self.n_actions, self.n_states[0], len(self.obs_history[-1][0][1])]
+        environments = [[], self.n_actions, self.n_states[0], len(self.obs_history[-1][0][1])]
+
+        history = self.obs_history[-self.n_walk:]
+        locations = [[{'id': env_step[0], 'shiny': None} for env_step in step] for step in history]
+        observations = [[env_step[1] for env_step in step] for step in history]
+        actions = self.walk_actions[-self.n_walk:]
+        action_values = self.step_to_actions(actions)
+
+        model_input = [[locations[i], torch.from_numpy(np.reshape(observations, (self.n_walk, 16, 45))[i]).type(torch.float32),
+                 np.reshape(action_values, (self.n_walk, 16))[i].tolist()] for i in range(self.n_walk)]
 
         single_index = [[model_input[step][0][0]] for step in range(len(model_input))]
         single_obs = [torch.unsqueeze(model_input[step][1][0], dim=0) for step in range(len(model_input))]
@@ -330,12 +339,13 @@ class Whittington2020(AgentCore):
         self.final_model_input.extend(single_model_input)
         for step in range(len(model_input)):
             id = single_model_input[step][0][0]['id']
-            if not any(d['id'] == id for d in self.environments[0]):
+            if not any(d['id'] == id for d in environments[0]):
                 loc_dict = {'id': id, 'observation': np.argmax(single_model_input[step][1]),
                             'x': history[step][0][-1][0], 'y': history[step][0][-1][1], 'shiny': None}
-                self.environments[0].append(loc_dict)
+                environments[0].append(loc_dict)
 
-        return self.environments
+
+        return environments
 
     def rate_maps(self, forward):
         # Store location x cell firing rate matrix for abstract and grounded location representation across environments
