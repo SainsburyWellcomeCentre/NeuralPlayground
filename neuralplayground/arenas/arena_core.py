@@ -42,6 +42,10 @@ class Environment(Env):
         number of calls to step method, set to 0 when calling reset
     global_time: float
         time simulating environment through step method, then global_time = time_step_size * global_steps
+    observation_space: gym.spaces
+        specify the range of observations as in openai gym
+    action_space: gym.spaces
+        specify the range of actions as in openai gym
     """
     def __init__(self, environment_name: str = "Environment", **env_kwargs):
         """ Initialisation of Environment class
