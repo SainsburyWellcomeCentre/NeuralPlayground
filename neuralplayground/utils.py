@@ -310,3 +310,4 @@ class OnlineRateMap(object):
         self.nan = np.nan
         filtered_ratemap[nan_indexes] = self.nan
         return filtered_ratemap
+
