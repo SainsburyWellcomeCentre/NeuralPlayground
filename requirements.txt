@@ -8,3 +8,6 @@ matplotlib
 deepdiff
 setuptools
 wheel
+gym
+opencv-python
+gymnasium

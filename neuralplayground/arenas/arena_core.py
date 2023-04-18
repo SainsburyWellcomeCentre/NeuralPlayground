@@ -3,9 +3,10 @@ import pickle
 import os
 import pandas as pd
 from deepdiff import DeepDiff
+from gymnasium import spaces, Env
 
 
-class Environment(object):
+class Environment(Env):
     """ Abstract parent environment class
     Methods
     ----------
@@ -41,6 +42,10 @@ class Environment(object):
         number of calls to step method, set to 0 when calling reset
     global_time: float
         time simulating environment through step method, then global_time = time_step_size * global_steps
+    observation_space: gym.spaces
+        specify the range of observations as in openai gym
+    action_space: gym.spaces
+        specify the range of actions as in openai gym
     """
     def __init__(self, environment_name: str = "Environment", **env_kwargs):
         """ Initialisation of Environment class
@@ -62,6 +67,8 @@ class Environment(object):
         self.env_kwargs = env_kwargs  # Parameters of the environment
         self.metadata = {"env_kwargs": env_kwargs}  # Define within each subclass for specific environments
         self.state = np.array([])
+        self.observation_space = spaces.Box(low=-np.inf, high=np.inf, shape=(0,), dtype=np.float64)
+        self.action_space = spaces.Box(low=-np.inf, high=np.inf, shape=(0,), dtype=np.float64)
         self.history = []
         # Initializing global counts
         self.global_steps = 0

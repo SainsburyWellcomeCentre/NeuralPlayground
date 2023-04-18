@@ -47,6 +47,7 @@ pip install -r requirements.txt
 
 For now, install using pip for local editing and testing
 ```
+python setup.py sdist bdist_wheel
 pip install -e .
 ```
 
