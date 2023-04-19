@@ -85,8 +85,8 @@ class Whittington2020(AgentCore):
         self.batch_size = mod_kwargs['batch_size']
         self.n_envs_save = 4
         self.n_states = [int(self.room_widths[i] * self.room_depths[i] * self.state_densities[i]) for i in range(self.batch_size)]
-        self.actions = [[0, 1], [0, -1], [1, 0], [-1, 0]]
-        self.n_actions = len(self.actions)
+        self.poss_actions = [[0,1], [1,0], [0,-1], [-1,0]]
+        self.n_actions = len(self.poss_actions)
         self.final_model_input = None
 
         self.prev_observations = None
@@ -139,7 +139,7 @@ class Whittington2020(AgentCore):
         all_allowed = True
         new_actions = []
         for i, loc in enumerate(locations):
-            if loc == self.prev_observations[i][0]:
+            if loc == self.prev_observations[i][0] and self.prev_actions[i] != [0,0]:
                 all_allowed = False
                 break
 
@@ -270,14 +270,14 @@ class Whittington2020(AgentCore):
         """
         Random action policy that selects an action to take from [up, down, left, right]
         """
-        arrow = self.actions
+        arrow = self.poss_actions
         index = np.random.choice(len(arrow))
         action = arrow[index]
         return action
 
     def step_to_actions(self, actions):
         """
-        Convert trajectory of (x,y) actions into integer values (i.e. from [[0,0],[-1,0],[1,0],[0,-1],[0,1]] to [0,1,2,3,4])
+        Convert trajectory of (x,y) actions into integer values (i.e. from [[0,0],[0,1],[1,0],[0,-1],[-1,0]] to [0,1,2,3,4])
 
         Parameters:
         ------
@@ -291,11 +291,10 @@ class Whittington2020(AgentCore):
         """
         action_values = []
         # actions = np.reshape(actions, (pars['n_rollout'], pars['batch_size'], 2))
-        poss_values = self.actions
         for steps in actions:
             env_list = []
             for action in steps:
-                env_list.append(poss_values.index(list(action)))
+                env_list.append(self.poss_actions.index(list(action))+1)
             action_values.append(env_list)
         return action_values
 
@@ -340,7 +339,7 @@ class Whittington2020(AgentCore):
         for step in range(len(model_input)):
             id = single_model_input[step][0][0]['id']
             if not any(d['id'] == id for d in environments[0]):
-                loc_dict = {'id': id, 'observation': np.argmax(single_model_input[step][1]),
+                loc_dict = {'id': id, 'observation': int(np.argmax(single_model_input[step][1])),
                             'x': history[step][0][-1][0], 'y': history[step][0][-1][1], 'shiny': None}
                 environments[0].append(loc_dict)
 

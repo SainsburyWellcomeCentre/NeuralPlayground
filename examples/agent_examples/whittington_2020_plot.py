@@ -16,13 +16,13 @@ import neuralplayground.agents.whittington_2020_extras.whittington_2020_analyse 
 import neuralplayground.agents.whittington_2020_extras.whittington_2020_plot as plot
 
 # Select trained model
-date = '2023-03-02'
-run = '3'
-index = '19999'
+date = '2023-04-17'
+run = '0'
+index = '9999'
 base_path = '/nfs/nhome/live/lhollingsworth/Documents/NeuralPlayground'
 npg_path = '/nfs/nhome/live/lhollingsworth/Documents/NeuralPlayground/NPG/EHC_model_comparison/examples/'
 # Load the model: use import library to import module from specified path
-model_spec = importlib.util.spec_from_file_location("model", base_path + '/Summaries/' + date + '/torch_run' + run + '/script/whittington_2020_model.py')
+model_spec = importlib.util.spec_from_file_location("model", base_path + '/Summaries/' + date + '/torch_run' + run + '/script/model.py')
 model = importlib.util.module_from_spec(model_spec)
 model_spec.loader.exec_module(model)
 
@@ -67,14 +67,20 @@ agent = Whittington2020(model_name=mod_name,
                         room_depths=env.room_depths,
                         state_densities=env.state_densities)
 
-# Run around environment
-observation, state = env.reset(random_state=True, custom_state=None)
-while agent.n_walk < 5000:
-    print(agent.n_walk)
-    action = agent.batch_act(observation)
-    observation, state = env.step(action, normalize_step=True)
-environments = [agent.collect_environment_info()]
-model_input = agent.final_model_input
+# # Run around environment
+# observation, state = env.reset(random_state=True, custom_state=None)
+# while agent.n_walk < 5000:
+#     if agent.n_walk % 100 == 0:
+#         print(agent.n_walk)
+#     action = agent.batch_act(observation)
+#     observation, state = env.step(action, normalize_step=True)
+# environments = [agent.collect_environment_info()]
+# model_input = agent.final_model_input
+# torch.save(environments, 'environments')
+# torch.save(model_input, 'model_input')
+
+environments = torch.load('environments')
+model_input = torch.load('model_input')
 
 with torch.no_grad():
     forward = tem(model_input, prev_iter=None)
@@ -86,7 +92,9 @@ envs_to_avg = shiny_envs if shiny_envs[env_to_plot] else [not shiny_env for shin
 
 correct_model, correct_node, correct_edge = analyse.compare_to_agents(forward, tem, environments, include_stay_still=include_stay_still)
 zero_shot = analyse.zero_shot(forward, tem, environments, include_stay_still=include_stay_still)
-
+occupation = analyse.location_occupation(forward, tem, environments)
+g, p = analyse.rate_map(forward, tem, environments)
+from_acc, to_acc = analyse.location_accuracy(forward, tem, environments)
 
 # Plot results of agent comparison and zero-shot inference analysis
 filt_size = 41
@@ -97,4 +105,15 @@ plt.plot(analyse.smooth(np.mean(np.array([env for env_i, env in enumerate(correc
 plt.ylim(0, 1)
 plt.legend()
 plt.title('Zero-shot inference: ' + str(np.mean([np.mean(env) for env_i, env in enumerate(zero_shot) if envs_to_avg[env_i]]) * 100) + '%')
+
+plot.plot_cells(p[env_to_plot], g[env_to_plot], environments[env_to_plot], n_f_ovc=(params['n_f_ovc'] if 'n_f_ovc' in params else 0), columns = 25)
+
+plt.figure()
+ax = plt.subplot(1,2,1)
+plot.plot_map(environments[env_to_plot], np.array(to_acc[env_to_plot]), ax)
+ax.set_title('Accuracy to location')
+ax = plt.subplot(1,2,2)
+plot.plot_map(environments[env_to_plot], np.array(from_acc[env_to_plot]), ax)
+ax.set_title('Accuracy from location')
+
 plt.show()
