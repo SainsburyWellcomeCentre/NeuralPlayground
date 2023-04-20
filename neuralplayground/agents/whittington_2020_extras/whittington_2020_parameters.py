@@ -32,9 +32,8 @@ def parameters():
     params['train_it'] = 20000
     # Number of steps to roll out before backpropagation through time
     params['n_rollout'] = 20
-    params['save_period'] = 5000 / params['n_rollout']
     # Saving interval
-    params['save_interval'] = 10
+    params['save_interval'] = 100
     # Number of environments to save
     params['n_envs_save'] = 6
     # Batch size: number of walks for training simultaneously

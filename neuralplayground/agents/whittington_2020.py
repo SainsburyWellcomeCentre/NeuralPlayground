@@ -242,6 +242,15 @@ class Whittington2020(AgentCore):
                 np.max(np.abs(self.prev_iter[0].M[0].numpy())), self.tem.hyper['eta'], self.tem.hyper['lambda'], self.tem.hyper['p2g_scale_offset']))
             self.logger.info('Weights:' + str([w for w in loss_weights.numpy()]))
             self.logger.info(' ')
+        # Also store the internal state (all learnable parameters) and the hyperparameters periodically 
+        if self.iter % self.pars['save_interval'] == 0:
+            torch.save(self.tem.state_dict(), self.model_path + '/tem_' + str(self.iter) + '.pt')
+            torch.save(self.tem.hyper, self.model_path + '/params_' + str(self.iter) + '.pt')
+
+        # Save the final state of the model after training has finished
+        if self.iter == self.pars['train_it'] - 1:
+            torch.save(self.tem.state_dict(), self.model_path + '/tem_' + str(self.iter) + '.pt')
+            torch.save(self.tem.hyper, self.model_path + '/params_' + str(self.iter) + '.pt')
 
     def initialise(self):
         # Create directories for storing all information about the current run
@@ -297,26 +306,6 @@ class Whittington2020(AgentCore):
                 env_list.append(self.poss_actions.index(list(action))+1)
             action_values.append(env_list)
         return action_values
-
-    def save_variables(self, forward):
-        """
-        Save all variables to file
-        """
-        # Save all variables to file
-        np.save(self.save_path + '/n_states', self.n_states)
-        np.save(self.save_path + '/n_actions', self.n_actions)
-        np.save(self.save_path + '/env_dims', (self.room_widths, self.room_depths))
-        torch.save(self.environments, self.save_path + '/environments')
-
-        g, p = self.rate_maps(forward)
-        torch.save(g, self.save_path + '/g_all')
-        torch.save(p, self.save_path + '/p_all')
-
-        correct_model, correct_node, correct_edge = self.compare_to_agents(forward)
-        torch.save((correct_model, correct_node, correct_edge), self.save_path + '/correct_all')
-
-        zero_shot = self.zero_shot(forward)
-        torch.save(zero_shot, self.save_path + '/zero_shot')
 
     def collect_environment_info(self):
         self.final_model_input = []
