@@ -16,13 +16,13 @@ import neuralplayground.agents.whittington_2020_extras.whittington_2020_analyse 
 import neuralplayground.agents.whittington_2020_extras.whittington_2020_plot as plot
 
 # Select trained model
-date = '2023-04-17'
+date = '2023-04-19'
 run = '0'
-index = '9999'
+index = '19999'
 base_path = '/nfs/nhome/live/lhollingsworth/Documents/NeuralPlayground'
 npg_path = '/nfs/nhome/live/lhollingsworth/Documents/NeuralPlayground/NPG/EHC_model_comparison/examples/'
 # Load the model: use import library to import module from specified path
-model_spec = importlib.util.spec_from_file_location("model", base_path + '/Summaries/' + date + '/torch_run' + run + '/script/model.py')
+model_spec = importlib.util.spec_from_file_location("model", base_path + '/Summaries/' + date + '/torch_run' + run + '/script/whittington_2020_model.py')
 model = importlib.util.module_from_spec(model_spec)
 model_spec.loader.exec_module(model)
 
@@ -79,8 +79,8 @@ agent = Whittington2020(model_name=mod_name,
 # torch.save(environments, 'environments')
 # torch.save(model_input, 'model_input')
 
-environments = torch.load('environments')
-model_input = torch.load('model_input')
+environments = torch.load(base_path + '/NPG/environments')
+model_input = torch.load(base_path + '/NPG/model_input')
 
 with torch.no_grad():
     forward = tem(model_input, prev_iter=None)
