@@ -11,12 +11,12 @@ class BatchEnvironment(Environment):
                  **env_kwargs):
         super().__init__(environment_name, **env_kwargs)
         self.batch_size = batch_size
-        batch_x_limits = env_kwargs['arena_x_limits']
-        batch_y_limits = env_kwargs['arena_y_limits']
+        self.batch_x_limits = env_kwargs['arena_x_limits']
+        self.batch_y_limits = env_kwargs['arena_y_limits']
         self.environments = []
         for i in range(self.batch_size):
-            env_kwargs['arena_x_limits'] = batch_x_limits[i]
-            env_kwargs['arena_y_limits'] = batch_y_limits[i]
+            env_kwargs['arena_x_limits'] = self.batch_x_limits[i]
+            env_kwargs['arena_y_limits'] = self.batch_y_limits[i]
             self.environments.append(env_class(**env_kwargs))
 
         self.room_widths = [np.diff(self.environments[i].arena_x_limits)[0] for i in range(self.batch_size)]
@@ -136,3 +136,38 @@ class BatchEnvironment(Environment):
             return ax, f
         else:
             return ax
+        
+    def collect_environment_info(self, model_input, history, environments):
+        for step in range(len(model_input)):
+            id = model_input[step][0][0]['id']
+            if not any(d['id'] == id for d in environments[0]):
+                x, y = history[step][0][-1][0], history[step][0][-1][1]
+
+                # Round the (x, y) coordinates to the center of the nearest state
+                rounded_x, rounded_y = self.round_to_nearest_state_center(x, y)
+
+                # Normalize the rounded coordinates
+                normalized_x, normalized_y = self.normalize_coordinates(rounded_x, rounded_y)
+
+                loc_dict = {'id': id, 'observation': int(np.argmax(model_input[step][1])),
+                            'x': normalized_x, 'y': normalized_y, 'shiny': None}
+                environments[0].append(loc_dict)
+        
+        return environments
+    
+    def round_to_nearest_state_center(self, x, y):
+        state_width = 1 / self.state_densities[0]
+        state_depth = 1 / self.state_densities[0]
+
+        rounded_x = round(x / state_width) * state_width + state_width / 2
+        rounded_y = round(y / state_depth) * state_depth + state_depth / 2
+        
+        return rounded_x, rounded_y
+
+    def normalize_coordinates(self, x, y):
+        x_min, x_max = self.batch_x_limits[0][0], self.batch_x_limits[0][1]
+        y_min, y_max = self.batch_y_limits[0][0], self.batch_y_limits[0][1]
+        normalized_x = (x - x_min) / (x_max - x_min)
+        normalized_y = (y - y_min) / (y_max - y_min)
+        return normalized_x, normalized_y
+

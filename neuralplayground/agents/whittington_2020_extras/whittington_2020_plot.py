@@ -76,8 +76,7 @@ def plot_memory(iters, steps=None, do_save=False):
             fig.savefig('./figs/plot_mem_' + name + '.png')
 
 
-def plot_map(environment, values, ax=None, min_val=None, max_val=None, num_cols=100, location_cm='plasma',
-             action_cm='Pastel1', do_plot_actions=False, shape='circle', radius=None):
+def plot_map(environment, values, ax=None, min_val=None, max_val=None, num_cols=100, location_cm='viridis', action_cm='Pastel1', do_plot_actions=False, shape='circle', radius=None):
     # If min_val and max_val are not specified: take the minimum and maximum of the supplied values
     min_val = np.min(values) if min_val is None else min_val
     max_val = np.max(values) if max_val is None else max_val
@@ -86,8 +85,7 @@ def plot_map(environment, values, ax=None, min_val=None, max_val=None, num_cols=
     # Create color map for actions: colour given by action index
     action_cm = cm.get_cmap(action_cm, environment[1])
     # Calculate colour corresponding to each value
-    plotvals = np.floor((values - min_val) / (max_val - min_val) * num_cols) if max_val != min_val else np.ones(
-        values.shape)
+    plotvals = np.floor((values - min_val) / (max_val - min_val) * num_cols) if max_val != min_val else np.ones(values.shape)
     # Calculate radius of location circles based on how many nodes there are
     if shape == 'square':
         radius = 1 / np.sqrt(environment[2]) if radius is None else radius
@@ -99,39 +97,37 @@ def plot_map(environment, values, ax=None, min_val=None, max_val=None, num_cols=
     location_patches, action_patches = [], []
     # Now start drawing locations and actions
     for i, location in enumerate(environment[0]):
-        x_new = (location['x'] + 5) / 10
-        y_new = (location['y'] + 5) / 10
         # Create patch for location
-        location_patches.append(plt.Rectangle((x_new - radius / 2, y_new - radius / 2), radius, radius, color=location_cm(int(plotvals[i]))) if shape == 'square'
-                                else plt.Circle((x_new, y_new), radius, color=location_cm(int(plotvals[i]))))
+        location_patches.append(plt.Rectangle((location['x']-radius/2, location['y']-radius/2), radius, radius, color=location_cm(int(plotvals[i]))) if shape == 'square'
+                                else plt.Circle((location['x'], location['y']), radius, color=location_cm(int(plotvals[i]))))            
         # And create action patches, if action plotting is switched on
         if do_plot_actions:
             for a, action in enumerate(location['actions']):
                 # Only draw patch if action probability is larger than 0
                 if action['probability'] > 0:
                     # Find where this action takes you
-                    locations_to = [environment[0][loc_to] for loc_to in
-                                    np.where(np.array(action['transition']) > 0)[0]]
+                    locations_to = [environment[0][loc_to] for loc_to in np.where(np.array(action['transition'])>0)[0]]
                     # Create an action patch for each possible transition for this action
                     for loc_to in locations_to:
                         action_patches.append(action_patch(location, loc_to, radius, action_cm(action['id'])))
     # After drawing all locations, add shiny patches
     for location in environment[0]:
-        x_new = (location['x'] + 5) / 10
-        y_new = (location['y'] + 5) / 10
         # For shiny locations, add big red patch to indicate shiny
         if location['shiny']:
             # Create square patch for location
-            location_patches.append(
-                plt.Rectangle((x_new - radius / 2, y_new - radius / 2), radius, radius, linewidth=1,
-                              facecolor='none', edgecolor=[1, 0, 0]) if shape == 'square'
-                else plt.Circle((x_new, y_new), radius, linewidth=1, facecolor='none',
-                                edgecolor=[1, 0, 0]))
-            # Add patches to axes
+            location_patches.append(plt.Rectangle((location['x']-radius/2, location['y']-radius/2), radius, radius, linewidth=1, facecolor='none', edgecolor=[1,0,0]) if shape == 'square'
+                                    else plt.Circle((location['x'], location['y']), radius, linewidth=1, facecolor='none', edgecolor=[1,0,0]))            
+    # Add patches to axes
     for patch in location_patches + action_patches:
         ax.add_patch(patch)
     # Return axes for further use
     return ax
+
+def normalize_coordinates(x, y, x_min, x_max, y_min, y_max):
+    normalized_x = (x - x_min) / (x_max - x_min)
+    normalized_y = (y - y_min) / (y_max - y_min)
+    return normalized_x, normalized_y
+
 
 def transform_coordinates(coords):
     transformed_coords = []

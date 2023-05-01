@@ -256,11 +256,7 @@ class Whittington2020(AgentCore):
         # Create directories for storing all information about the current run
         self.run_path, self.train_path, self.model_path, self.save_path, self.script_path, self.envs_path = utils.make_directories()
         # Save all python files in current directory to script directory
-        curr_path = os.path.dirname(os.path.abspath(__file__))
-        shutil.copy2(os.path.abspath(os.path.join(os.getcwd(), os.path.abspath(os.path.join(curr_path, os.pardir))))+'/agents/whittington_2020_extras/whittington_2020_model.py',
-                     os.path.join(self.model_path, 'whittington_2020_model.py'))
-        shutil.copy2(os.path.abspath(os.path.join(os.getcwd(), os.path.abspath(os.path.join(curr_path, os.pardir)))) + '/agents/whittington_2020_extras/whittington_2020_parameters.py',
-                     os.path.join(self.model_path, 'whittington_2020_parameters.py'))
+        self.save_files()
         # Save parameters
         np.save(os.path.join(self.save_path, 'params'), self.pars)
         # Create a tensor board to stay updated on training progress. Start tensorboard with tensorboard --logdir=runs
@@ -274,6 +270,20 @@ class Whittington2020(AgentCore):
                         range(self.pars['batch_size'])]
         # Initialise the previous iteration as None: we start from the beginning of the walk, so there is no previous iteration yet
         self.prev_iter = None
+    
+    def save_files(self):
+        curr_path = os.path.dirname(os.path.abspath(__file__))
+        shutil.copy2(os.path.abspath(os.path.join(os.getcwd(), os.path.abspath(os.path.join(curr_path, os.pardir)))) + '/agents/whittington_2020_extras/whittington_2020_model.py',
+                     os.path.join(self.script_path, 'whittington_2020_model.py'))
+        shutil.copy2(os.path.abspath(os.path.join(os.getcwd(), os.path.abspath(os.path.join(curr_path, os.pardir)))) + '/agents/whittington_2020_extras/whittington_2020_parameters.py',
+                     os.path.join(self.script_path, 'whittington_2020_parameters.py'))
+        shutil.copy2(os.path.abspath(os.path.join(os.getcwd(), os.path.abspath(os.path.join(curr_path, os.pardir)))) + '/agents/whittington_2020_extras/whittington_2020_analyse.py',
+                     os.path.join(self.script_path, 'whittington_2020_analyse.py'))
+        shutil.copy2(os.path.abspath(os.path.join(os.getcwd(), os.path.abspath(os.path.join(curr_path, os.pardir)))) + '/agents/whittington_2020_extras/whittington_2020_plot.py',
+                     os.path.join(self.script_path, 'whittington_2020_plot.py'))
+        shutil.copy2(os.path.abspath(os.path.join(os.getcwd(), os.path.abspath(os.path.join(curr_path, os.pardir)))) + '/agents/whittington_2020_extras/whittington_2020_utils.py',
+                     os.path.join(self.script_path, 'whittington_2020_utils.py'))
+        return
 
     def action_policy(self):
         """
@@ -307,10 +317,9 @@ class Whittington2020(AgentCore):
             action_values.append(env_list)
         return action_values
 
-    def collect_environment_info(self):
-        self.final_model_input = []
+    def collect_final_trajectory(self):
+        final_model_input = []
         environments = [[], self.n_actions, self.n_states[0], len(self.obs_history[-1][0][1])]
-
         history = self.obs_history[-self.n_walk:]
         locations = [[{'id': env_step[0], 'shiny': None} for env_step in step] for step in history]
         observations = [[env_step[1] for env_step in step] for step in history]
@@ -324,16 +333,9 @@ class Whittington2020(AgentCore):
         single_obs = [torch.unsqueeze(model_input[step][1][0], dim=0) for step in range(len(model_input))]
         single_action = [[model_input[step][2][0]] for step in range(len(model_input))]
         single_model_input = [[single_index[step], single_obs[step], single_action[step]]for step in range(len(model_input))]
-        self.final_model_input.extend(single_model_input)
-        for step in range(len(model_input)):
-            id = single_model_input[step][0][0]['id']
-            if not any(d['id'] == id for d in environments[0]):
-                loc_dict = {'id': id, 'observation': int(np.argmax(single_model_input[step][1])),
-                            'x': history[step][0][-1][0], 'y': history[step][0][-1][1], 'shiny': None}
-                environments[0].append(loc_dict)
+        final_model_input.extend(single_model_input)
 
-
-        return environments
+        return final_model_input, history, environments
 
     def rate_maps(self, forward):
         # Store location x cell firing rate matrix for abstract and grounded location representation across environments
