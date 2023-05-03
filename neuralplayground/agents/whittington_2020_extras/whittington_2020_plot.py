@@ -87,10 +87,7 @@ def plot_map(environment, values, ax=None, min_val=None, max_val=None, num_cols=
     # Calculate colour corresponding to each value
     plotvals = np.floor((values - min_val) / (max_val - min_val) * num_cols) if max_val != min_val else np.ones(values.shape)
     # Calculate radius of location circles based on how many nodes there are
-    if shape == 'square':
-        radius = 1 / np.sqrt(environment[2]) if radius is None else radius
-    else:
-        radius = 2*(0.01 + 1/(10*np.sqrt(environment[2]))) if radius is None else radius
+    radius = 2*(0.01 + 1/(10*np.sqrt(environment[2]))) if radius is None else radius
     # Initialise empty axis
     ax = initialise_axes(ax)
     # Create empty list of location patches and action patches
@@ -214,9 +211,9 @@ def plot_walk(environment, walk, max_steps=None, n_steps=1, ax=None):
     return ax
 
 
-def plot_cells(p, g, environment, n_f_ovc=0, columns=10, radius=None):
+def plot_cells(p, g, environment, n_f_ovc=0, columns=10):
     # Run through all hippocampal and entorhinal rate maps, big nested arrays arranged as [frequency][location][cell]
-    for cells, names in zip([p, g], ['Hippocampal', 'Entorhinal']):
+    for cells, names in zip([p, g],['Hippocampal','Entorhinal']):
         # Calculate the number of rows that each frequency module requires
         n_rows_f = np.cumsum([0] + [np.ceil(len(c[0]) * 1.0 / columns) for c in cells]).astype(int)
         # Create subplots for cells across frequencies
@@ -228,17 +225,15 @@ def plot_cells(p, g, environment, n_f_ovc=0, columns=10, radius=None):
         # And run through all frequencies to plot cells for that frequency
         for f, loc_rates in enumerate(cells):
             # Set title for current axis
-            ax[n_rows_f[f], int(columns / 2)].set_title(
-                names + ('' if f < len(cells) - n_f_ovc else ' object vector ') + ' cells, frequency '
-                + str(f if f < len(cells) - n_f_ovc else f - (len(cells) - n_f_ovc)))
+            ax[n_rows_f[f], int(columns/2)].set_title(names + ('' if f < len(cells) - n_f_ovc else ' object vector ') + ' cells, frequency ' 
+                                         + str(f if f < len(cells) - n_f_ovc else f - (len(cells) - n_f_ovc)))
             # Plot map for each cell
             for c in range(len(loc_rates[0])):
                 # Get current row and column
                 row = int(n_rows_f[f] + np.floor(c / columns))
                 col = int(c % columns)
                 # Plot rate map for this cell by collection firing rate at each location
-                plot_map(environment, np.array([loc_rates[l][c] for l in range(len(loc_rates))]), ax[row, col],
-                         shape='square', radius=radius)
+                plot_map(environment, np.array([loc_rates[l][c] for l in range(len(loc_rates))]), ax[row, col], shape='square', radius=1/np.sqrt(len(loc_rates)))
 
 def initialise_axes(ax=None):
     # If no axes specified: create new figure with new empty axes

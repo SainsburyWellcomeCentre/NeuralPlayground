@@ -157,11 +157,14 @@ class BatchEnvironment(Environment):
     
     def round_to_nearest_state_center(self, x, y):
         state_width = 1 / self.state_densities[0]
-        state_depth = 1 / self.state_densities[0]
+        state_depth = 1 / self.state_densities[1]
 
-        rounded_x = round(x / state_width) * state_width + state_width / 2
-        rounded_y = round(y / state_depth) * state_depth + state_depth / 2
-        
+        half_state_width = state_width / 2
+        half_state_depth = state_depth / 2
+
+        rounded_x = round((x + half_state_width) / state_width) * state_width - half_state_width
+        rounded_y = round((y + half_state_depth) / state_depth) * state_depth - half_state_depth
+
         return rounded_x, rounded_y
 
     def normalize_coordinates(self, x, y):

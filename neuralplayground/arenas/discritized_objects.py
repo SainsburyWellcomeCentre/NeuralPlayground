@@ -69,9 +69,9 @@ class DiscreteObjectEnvironment(Environment):
         self.resolution_w = int(self.state_density * self.room_width)
         self.resolution_d = int(self.state_density * self.room_depth)
         self.x_array = np.linspace(-self.room_width/2 + (1/2*self.state_density), self.room_width/2 - (1/2*self.state_density), num=self.resolution_w)
-        self.y_array = np.linspace(self.room_depth/2 - (1/2*self.state_density), -self.room_depth/2 + (1/2*self.state_density), num=self.resolution_d)
+        self.y_array = np.linspace(-self.room_depth/2 + (1/2*self.state_density), self.room_depth/2 - (1/2*self.state_density), num=self.resolution_d)
         self.mesh = np.array(np.meshgrid(self.x_array, self.y_array))
-        self.xy_combination = np.array(np.meshgrid(self.x_array, self.y_array)).T
+        self.xy_combination = np.stack(np.array(np.meshgrid(self.x_array, self.y_array)), axis=-1)
         self.ws = int(self.room_width * self.state_density)
         self.hs = int(self.room_depth * self.state_density)
         self.n_states = self.resolution_w * self.resolution_d
@@ -175,8 +175,8 @@ class DiscreteObjectEnvironment(Environment):
         return [index, object, pos]
 
     def pos_to_state(self, pos):
-        diff = self.xy_combination - pos[np.newaxis, ...]
-        dist = np.sum(diff ** 2, axis=2).T
+        diff = (self.xy_combination - pos) ** 2
+        dist = np.sum(diff ** 2, axis=-1)
         index = np.argmin(dist)
         return index
 

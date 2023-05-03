@@ -21,7 +21,7 @@ run = '0'
 index = '19999'
 base_path = '/nfs/nhome/live/lhollingsworth/Documents/NeuralPlayground'
 npg_path = '/nfs/nhome/live/lhollingsworth/Documents/NeuralPlayground/NPG/EHC_model_comparison/examples'
-base_win_path = 'H:/Documents/PhD/NeuralPlayground/NPG'
+base_win_path = 'H:/Documents/PhD/NeuralPlayground'
 win_path = 'H:/Documents/PhD/NeuralPlayground/NPG/NeuralPlayground/examples'
 # Load the model: use import library to import module from specified path
 model_spec = importlib.util.spec_from_file_location("model", win_path + '/Summaries/' + date + '/torch_run' + run + '/script/whittington_2020_model.py')
@@ -69,17 +69,17 @@ agent = Whittington2020(model_name=mod_name,
                         room_depths=env.room_depths,
                         state_densities=env.state_densities)
 
-# Run around environment
-observation, state = env.reset(random_state=True, custom_state=None)
-while agent.n_walk < 500:
-    if agent.n_walk % 100 == 0:
-        print(agent.n_walk)
-    action = agent.batch_act(observation)
-    observation, state = env.step(action, normalize_step=True)
-model_input, history, environments = agent.collect_final_trajectory()
-environments = [env.collect_environment_info(model_input, history, environments)]
-torch.save(environments, 'environments')
-torch.save(model_input, 'model_input')
+# # Run around environment
+# observation, state = env.reset(random_state=True, custom_state=None)
+# while agent.n_walk < 5000:
+#     if agent.n_walk % 100 == 0:
+#         print(agent.n_walk)
+#     action = agent.batch_act(observation)
+#     observation, state = env.step(action, normalize_step=True)
+# model_input, history, environments = agent.collect_final_trajectory()
+# environments = [env.collect_environment_info(model_input, history, environments)]
+# torch.save(environments, 'environments')
+# torch.save(model_input, 'model_input')
 
 environments = torch.load(base_win_path + '/environments')
 model_input = torch.load(base_win_path + '/model_input')
@@ -87,7 +87,7 @@ model_input = torch.load(base_win_path + '/model_input')
 with torch.no_grad():
     forward = tem(model_input, prev_iter=None)
 
-include_stay_still = True
+include_stay_still = False
 shiny_envs = [False]
 env_to_plot = 0
 envs_to_avg = shiny_envs if shiny_envs[env_to_plot] else [not shiny_env for shiny_env in shiny_envs]
