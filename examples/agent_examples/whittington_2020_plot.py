@@ -12,8 +12,10 @@ from neuralplayground.arenas.batch_environment import BatchEnvironment
 from neuralplayground.arenas.hafting_2008 import Hafting2008
 from neuralplayground.agents.whittington_2020 import Whittington2020
 import neuralplayground.agents.whittington_2020_extras.whittington_2020_parameters as parameters
-import neuralplayground.agents.whittington_2020_extras.whittington_2020_analyse as analyse
-import neuralplayground.agents.whittington_2020_extras.whittington_2020_plot as plot
+# import neuralplayground.agents.whittington_2020_extras.whittington_2020_analyse as analyse
+# import neuralplayground.agents.whittington_2020_extras.whittington_2020_plot as plot
+import analyse
+import plot
 
 # Select trained model
 date = '2023-04-19'
@@ -78,17 +80,18 @@ agent = Whittington2020(model_name=mod_name,
 #     observation, state = env.step(action, normalize_step=True)
 # model_input, history, environments = agent.collect_final_trajectory()
 # environments = [env.collect_environment_info(model_input, history, environments)]
-# torch.save(environments, 'environments')
-# torch.save(model_input, 'model_input')
+# torch.save(environments, 'NPG_environments')
+# torch.save(model_input, 'NPG_model_input')
 
 environments = torch.load(base_win_path + '/environments')
-model_input = torch.load(base_win_path + '/model_input')
+npg_environments = torch.load(base_win_path + '/NPG_environments')
+model_input = torch.load(base_win_path + '/NPG_model_input')
 
 with torch.no_grad():
     forward = tem(model_input, prev_iter=None)
 
 include_stay_still = False
-shiny_envs = [False]
+shiny_envs = [False, False, False, False]
 env_to_plot = 0
 envs_to_avg = shiny_envs if shiny_envs[env_to_plot] else [not shiny_env for shiny_env in shiny_envs]
 

@@ -85,7 +85,7 @@ class Whittington2020(AgentCore):
         self.batch_size = mod_kwargs['batch_size']
         self.n_envs_save = 4
         self.n_states = [int(self.room_widths[i] * self.room_depths[i] * self.state_densities[i]) for i in range(self.batch_size)]
-        self.poss_actions = [[0,1], [1,0], [0,-1], [-1,0]]
+        self.poss_actions = [[0,-1], [1,0], [0,1], [-1,0]]
         self.n_actions = len(self.poss_actions)
         self.final_model_input = None
 
@@ -296,7 +296,7 @@ class Whittington2020(AgentCore):
 
     def step_to_actions(self, actions):
         """
-        Convert trajectory of (x,y) actions into integer values (i.e. from [[0,0],[0,1],[1,0],[0,-1],[-1,0]] to [0,1,2,3,4])
+        Convert trajectory of (x,y) actions into integer values (i.e. from [[0,0],[0,-1],[1,0],[0,1],[-1,0]] to [0,1,2,3,4])
 
         Parameters:
         ------
