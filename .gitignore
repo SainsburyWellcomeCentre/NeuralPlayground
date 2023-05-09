@@ -44,7 +44,17 @@ environments/experiment_data/Hafting2008/
 
 *.icloud*
 
-*.pytest_cache*
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
 *test_crossrun_results*
 
 #Results
@@ -52,5 +62,3 @@ environments/experiment_data/Hafting2008/
 *.png
 
 *.egg-info
-
-
