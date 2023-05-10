@@ -103,6 +103,7 @@ class Whittington2020(AgentCore):
         self.final_model_input = None
         self.obs_history = []
         self.walk_actions = []
+        self.walk_action_values = []
         self.prev_action = None
         self.prev_observation = None
         self.prev_actions = [[None,None] for _ in range(self.batch_size)]
@@ -173,11 +174,11 @@ class Whittington2020(AgentCore):
         locations = [[{'id': env_step[0], 'shiny': None} for env_step in step] for step in history]
         observations = [[env_step[1] for env_step in step] for step in history]
         actions = self.walk_actions[-self.pars['n_rollout']:]
-        self.walk_positions = []
-        self.walk_actions = []
+        # self.walk_actions = []
         self.n_walk = 0
         # Convert action vectors to action values
         action_values = self.step_to_actions(actions)
+        self.walk_action_values.append(action_values)
         # Get start time for function timing
         start_time = time.time()
         # Get updated parameters for this backprop iteration

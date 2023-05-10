@@ -21,21 +21,21 @@ import plot
 date = '2023-04-19'
 run = '0'
 index = '19999'
-base_path = '/nfs/nhome/live/lhollingsworth/Documents/NeuralPlayground'
+base_path = '/nfs/nhome/live/lhollingsworth/Documents/NeuralPlayground/NPG'
 npg_path = '/nfs/nhome/live/lhollingsworth/Documents/NeuralPlayground/NPG/EHC_model_comparison/examples'
 base_win_path = 'H:/Documents/PhD/NeuralPlayground'
 win_path = 'H:/Documents/PhD/NeuralPlayground/NPG/NeuralPlayground/examples'
 # Load the model: use import library to import module from specified path
-model_spec = importlib.util.spec_from_file_location("model", win_path + '/Summaries/' + date + '/torch_run' + run + '/script/whittington_2020_model.py')
+model_spec = importlib.util.spec_from_file_location("model", npg_path + '/Summaries/' + date + '/torch_run' + run + '/script/whittington_2020_model.py')
 model = importlib.util.module_from_spec(model_spec)
 model_spec.loader.exec_module(model)
 
 # Load the parameters of the model
-params = torch.load(win_path + '/Summaries/' + date + '/torch_run' + run + '/model/params_' + index + '.pt')
+params = torch.load(npg_path + '/Summaries/' + date + '/torch_run' + run + '/model/params_' + index + '.pt')
 # Create a new tem model with the loaded parameters
 tem = model.Model(params)
 # Load the model weights after training
-model_weights = torch.load(win_path + '/Summaries/' + date + '/torch_run' + run + '/model/tem_' + index + '.pt')
+model_weights = torch.load(npg_path + '/Summaries/' + date + '/torch_run' + run + '/model/tem_' + index + '.pt')
 # Set the model weights to the loaded trained model weights
 tem.load_state_dict(model_weights)
 # Make sure model is in evaluate mode (not crucial because it doesn't currently use dropout or batchnorm layers)
@@ -83,13 +83,12 @@ agent = Whittington2020(model_name=mod_name,
 # torch.save(environments, 'NPG_environments')
 # torch.save(model_input, 'NPG_model_input')
 
-environments = torch.load(base_win_path + '/environments')
-npg_environments = torch.load(base_win_path + '/NPG_environments')
-model_input = torch.load(base_win_path + '/NPG_model_input')
+environments = torch.load(base_path + '/final_environments')
+# npg_environments = torch.load(base_path + '/NPG_environments')
+model_input = torch.load(base_path + '/final_model_input')
 
 with torch.no_grad():
     forward = tem(model_input, prev_iter=None)
-
 include_stay_still = False
 shiny_envs = [False, False, False, False]
 env_to_plot = 0
