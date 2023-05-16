@@ -1,8 +1,8 @@
 import numpy as np
 import pytest
 
-from ..agents import RandomAgent
-from ..arenas import (
+from neuralplayground.agents import RandomAgent
+from neuralplayground.arenas import (
     ConnectedRooms,
     Hafting2008,
     MergingRoom,

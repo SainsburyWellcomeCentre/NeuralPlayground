@@ -2,8 +2,8 @@ import numpy as np
 import pytest
 from tqdm import tqdm
 
-from ..agents import AgentCore, Stachenfeld2018, Weber2018
-from ..arenas import BasicSargolini2006
+from neuralplayground.agents import AgentCore, Stachenfeld2018, Weber2018
+from neuralplayground.arenas import BasicSargolini2006
 
 
 @pytest.fixture
