@@ -83,10 +83,9 @@ line-length = 127
 [tool.check-manifest]
 ignore = [
   "*.yaml",
+  ".all-contributorsrc",
   "tox.ini",
   "tests/*",
-  "tests/test_unit/*",
-  "tests/test_integration/*",
 ]
 
 [tool.ruff]
