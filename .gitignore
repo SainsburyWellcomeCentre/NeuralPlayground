@@ -1,7 +1,6 @@
 # Prerequisites
 *.d
-models/figures/
-environments/experiment_data/Hafting2008/
+
 # Compiled Object files
 *.slo
 *.lo
@@ -11,7 +10,6 @@ environments/experiment_data/Hafting2008/
 # Precompiled Headers
 *.gch
 *.pch
-environments/experiment_data/Hafting2008/
 
 # Compiled Dynamic libraries
 *.so
@@ -56,6 +54,10 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 *test_crossrun_results*
+
+# Linting
+.mypy_cache/
+.ruff_cache/
 
 #Results
 *.pdf

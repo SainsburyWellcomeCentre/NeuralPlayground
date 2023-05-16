@@ -85,8 +85,7 @@ ignore = [
   "*.yaml",
   "tox.ini",
   "tests/*",
-  "tests/test_unit/*",
-  "tests/test_integration/*",
+  ".all-contributorsrc",
 ]
 
 [tool.ruff]
