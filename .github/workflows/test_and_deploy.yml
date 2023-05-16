@@ -11,11 +11,11 @@ on:
 jobs:
 
   display:
+    name: Build "display"
     runs-on: ubuntu-latest
     env:
       DISPLAY: ':99.0'
     steps:
-      - name: build "display"
       - uses: tlambert03/setup-qt-libs@v1
         run: |
           /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -screen 0 1920x1200x24 -ac +extension GLX
