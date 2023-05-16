@@ -1,7 +1,16 @@
 include LICENSE
 include README.md
+include .all-contributorsrc
 
 recursive-include examples *
 
 recursive-exclude * __pycache__
 recursive-exclude * *.py[co]
+
+recursive-exclude neuralplayground/experiments/hafting_2008 *
+recursive-exclude neuralplayground/experiments/sargolini_2006 *
+recursive-exclude neuralplayground/experiments/wernle_2018 *
+
+recursive-include documents *.cff
+recursive-include documents *.md
+recursive-include neuralplayground *.md
