@@ -76,7 +76,7 @@ addopts = "--cov=neuralplayground"
 [tool.black]
 target-version = ['py38', 'py39', 'py310', 'py311']
 skip-string-normalization = false
-line-length = 79
+line-length = 127
 
 [tool.setuptools_scm]
 
@@ -90,7 +90,7 @@ ignore = [
 ]
 
 [tool.ruff]
-line-length = 79
+line-length = 127
 exclude = ["__init__.py","build",".eggs"]
 select = ["I", "E", "F"]
 fix = true

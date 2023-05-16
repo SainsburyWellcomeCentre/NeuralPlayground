@@ -146,9 +146,7 @@ class TestStachenfeld2018(Testmodelcore):
         init_model[0].plot_eigen(sr, eigen=(0, 1), save_path=None)
 
     def test_plot_sr_td(self, init_model):
-        sr_td = init_model[
-            0
-        ].update_successor_rep_td_full()  # Choose your type of Update
+        sr_td = init_model[0].update_successor_rep_td_full()  # Choose your type of Update
         init_model[0].plot_eigen(sr_td, eigen=(0,), save_path=None)
 
     def test_plot_sr_sum(self, init_model):

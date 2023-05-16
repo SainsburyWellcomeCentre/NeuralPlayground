@@ -53,9 +53,7 @@ class TestSimple2D(object):
 class TestSargolini2006(TestSimple2D):
     @pytest.fixture
     def init_env(self):
-        env = Sargolini2006(
-            verbose=True, time_step_size=None, agent_step_size=None
-        )
+        env = Sargolini2006(verbose=True, time_step_size=None, agent_step_size=None)
         return [
             env,
         ]

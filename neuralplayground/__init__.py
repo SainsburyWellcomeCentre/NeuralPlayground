@@ -1,1 +1,1 @@
-name = 'neuralplayground'
+name = "neuralplayground"
