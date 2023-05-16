@@ -1,34 +1,33 @@
-import sys
-from tqdm import tqdm
 import numpy as np
-import matplotlib.pyplot as plt
-from ..arenas import BasicSargolini2006
-from ..agents import Weber2018
-from ..agents import Stachenfeld2018
-from ..agents import AgentCore
 import pytest
+from tqdm import tqdm
+
+from ..agents import AgentCore, Stachenfeld2018, Weber2018
+from ..arenas import BasicSargolini2006
 
 
 @pytest.fixture
 def get_environment():
     env = BasicSargolini2006()
-    return [env, ]
+    return [
+        env,
+    ]
 
 
 class Testmodelcore(object):
-
     @pytest.fixture
     def init_model(self, get_environment):
         agent = AgentCore()
 
-        return [agent, ]
+        return [
+            agent,
+        ]
 
     def test_init_model(self, init_model):
         assert isinstance(init_model[0], AgentCore)
 
 
 class TestWeber2018(Testmodelcore):
-
     @pytest.fixture
     def init_model(self, get_environment):
         exc_eta = 2e-4
@@ -47,21 +46,37 @@ class TestWeber2018(Testmodelcore):
         agent_step_size = 0.1
         env = get_environment[0]
 
-        agent = Weber2018(model_name=model_name, exc_eta=exc_eta, inh_eta=inh_eta, sigma_exc=sigma_exc,
-                                 sigma_inh=sigma_inh, Ne=Ne, Ni=Ni, agent_step_size=agent_step_size, ro=1,
-                                 Nef=Nef, Nif=Nif, room_width=env.room_width, room_depth=env.room_depth,
-                                 alpha_i=alpha_i, alpha_e=alpha_e, we_init=we_init, wi_init=wi_init)
-        return [agent, ]
+        agent = Weber2018(
+            model_name=model_name,
+            exc_eta=exc_eta,
+            inh_eta=inh_eta,
+            sigma_exc=sigma_exc,
+            sigma_inh=sigma_inh,
+            Ne=Ne,
+            Ni=Ni,
+            agent_step_size=agent_step_size,
+            ro=1,
+            Nef=Nef,
+            Nif=Nif,
+            room_width=env.room_width,
+            room_depth=env.room_depth,
+            alpha_i=alpha_i,
+            alpha_e=alpha_e,
+            we_init=we_init,
+            wi_init=wi_init,
+        )
+        return [
+            agent,
+        ]
 
     def test_init_model(self, init_model):
         assert isinstance(init_model[0], Weber2018)
 
     def test_plot_rates(self, init_model):
         init_model[0].plot_rates()
-        
+
     def test_agent_interaction(self, init_model, get_environment):
         env = get_environment[0]
-        plot_every = 0
         total_iters = 0
         n_steps = 1
         obs, state = env.reset()
@@ -79,25 +94,34 @@ class TestWeber2018(Testmodelcore):
 
 
 class TestStachenfeld2018(Testmodelcore):
-
     @pytest.fixture
     def init_model(self, get_environment):
         agent_step_size = 10
-        discount = .9
+        discount = 0.9
         threshold = 1e-6
         lr_td = 1e-2
         t_episode = 50
         n_episode = 50
-        state_density = (1 / agent_step_size)
+        state_density = 1 / agent_step_size
         env = get_environment[0]
         twoDvalue = True
-        agent = Stachenfeld2018(discount=discount, t_episode=t_episode, n_episode=n_episode, threshold=threshold, lr_td=lr_td,
-                   room_width=env.room_width, room_depth=env.room_depth, state_density=state_density, twoD=twoDvalue)
-        return [agent, ]
-    
+        agent = Stachenfeld2018(
+            discount=discount,
+            t_episode=t_episode,
+            n_episode=n_episode,
+            threshold=threshold,
+            lr_td=lr_td,
+            room_width=env.room_width,
+            room_depth=env.room_depth,
+            state_density=state_density,
+            twoD=twoDvalue,
+        )
+        return [
+            agent,
+        ]
+
     def test_agent_interaction(self, init_model, get_environment):
         env = get_environment[0]
-        plot_every = 0
         total_iters = 0
         n_steps = 1
         obs, state = env.reset()
@@ -112,7 +136,7 @@ class TestStachenfeld2018(Testmodelcore):
             obs, state, reward = env.step(action)
             obs = obs[:2]
             total_iters += 1
-            
+
     def test_init_model(self, init_model):
         assert isinstance(init_model[0], Stachenfeld2018)
 
@@ -122,12 +146,11 @@ class TestStachenfeld2018(Testmodelcore):
         init_model[0].plot_eigen(sr, eigen=(0, 1), save_path=None)
 
     def test_plot_sr_td(self, init_model):
-        sr_td = init_model[0].update_successor_rep_td_full()  # Choose your type of Update
+        sr_td = init_model[
+            0
+        ].update_successor_rep_td_full()  # Choose your type of Update
         init_model[0].plot_eigen(sr_td, eigen=(0,), save_path=None)
 
     def test_plot_sr_sum(self, init_model):
         sr_sum = init_model[0].successor_rep_sum()
         init_model[0].plot_eigen(sr_sum, eigen=(0,), save_path=None)
-
-
-   
