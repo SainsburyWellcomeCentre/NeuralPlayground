@@ -10,17 +10,6 @@ on:
 
 jobs:
 
-  display:
-    name: Build "display"
-    runs-on: ubuntu-latest
-    env:
-      DISPLAY: ':99.0'
-    steps:
-      - uses: tlambert03/setup-qt-libs@v1
-      - name: Start Xvfb
-        run: |
-          /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -screen 0 1920x1200x24 -ac +extension GLX
-
   linting:
     runs-on: ubuntu-latest
     steps:
@@ -41,18 +30,11 @@ jobs:
         # Run all supported Python versions on linux
         python-version: ["3.8", "3.9", "3.10", "3.11"]
         os: [ubuntu-latest]
-        # Include one windows and macos run
-        include:
-        - os: macos-latest
-          python-version: "3.10"
-        - os: windows-latest
-          python-version: "3.10"
-
     steps:
-      # Run tests
       - uses: neuroinformatics-unit/actions/test@v2.0.0
         with:
           python-version: ${{ matrix.python-version }}
+          use-xvfb: true
 
   build_sdist_wheels:
     name: Build source distribution
@@ -61,7 +43,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: neuroinformatics-unit/actions/build_sdist_wheels@v2.0.0
-
 
   upload_all:
     name: Publish build distributions
