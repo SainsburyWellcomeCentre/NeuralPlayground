@@ -10,7 +10,7 @@
 * [3 The Project](#3-Project)
 * [4 How to Contribute](#4-I-want-to-Contribute)
 * [5 Cite ](#5-Cite)
-* [6 Lisence](#6-License)
+* [6 Licence](#6-License)
 
 ## 1. Introduction
 The abstract representation of space has been extensively studied in the hippocampus and entorhinal cortex in part due to the easy monitoring of the task and neural recording. A growing variety of theoretical models have been proposed to capture the rich neural and behavioral phenomena
