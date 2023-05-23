@@ -69,6 +69,7 @@ class Hafting2008Data(Experiment):
         self.best_recording_index = 4  # Nice session recording as default
         # Arena limits from the experimental setting, first row x limits, second row y limits, in cm
         self.arena_limits = np.array([[-200, 200], [-20, 20]])
+
         data_path_list = glob.glob(self.data_path + "*.mat")
         mice_ids = np.unique([dp.split("/")[-1][:5] for dp in data_path_list])
         # Initialize data dictionary, later handled by this object itself (so don't worry about this)
@@ -496,3 +497,58 @@ class Hafting2008Data(Experiment):
         ax.set_xlim([np.amin([x.min(), y.min()])-1.0, np.amax([x.max(), y.max()])+1.0])
         ax.set_ylim([np.amin([x.min(), y.min()])-1.0, np.amax([x.max(), y.max()])+1.0])
         return ax
+
+    def recording_tetr(self, recording_index: Union[int, tuple, list] = None,
+                            save_path: Union[str, tuple, list] = None,
+                            tetrode_id: Union[str, tuple, list] = None,
+                            bin_size: float = 2.0):
+        """ tetrode ratemap from spike data for a given recording index or a list of recording index.
+        If given a list or tuple as argument, all arguments must be list, tuple, or None.
+
+        Parameters
+        ----------
+        recording_index: int, tuple of ints, list of ints
+            recording index to plot spike ratemap, if list or tuple, it will recursively call this function
+            to make a plot per recording index. If this argument is list or tuple, the rest of variables must
+            be list or tuple with their respective types, or keep the default None value.
+        save_path: str, list of str, tuple of str
+            saving path of the generated figure, if None, no figure is saved
+        tetrode_id: str, list of str, or tuple of str
+            tetrode id in the corresponding session
+        bin_size: float
+            bin size to discretize space when computing ratemap
+
+        Returns
+        -------
+        h: ndarray (nybins, nxbins)
+            Number of spikes falling on each bin through the recorded session, nybins number of bins in y axis,
+            nxbins number of bins in x axis
+        binx: ndarray (nxbins +1,)
+            bin limits of the ratemap on the x axis
+        biny: ndarray (nybins +1,)
+            bin limits of the ratemap on the y axis
+        (when using list pr tuple as argument, this function return a list or tuple of the variables listed above)
+        """
+
+        # Recursive call of this function in case of list or tuple
+
+        # Recall recorded data
+        session_data, rev_vars, rat_info = self.get_recording_data(recording_index)
+        if tetrode_id is None:
+            tetrode_id = self._find_tetrode(rev_vars)
+
+        arena_width = self.arena_limits[0, 1] - self.arena_limits[0, 0]
+        arena_depth = self.arena_limits[1, 1] - self.arena_limits[1, 0]
+
+        # Recall spike data
+        time_array, test_spikes, x, y = self.get_tetrode_data(session_data, tetrode_id)
+
+        # Compute ratemap matrices from data
+        x_size = int(arena_width / bin_size)
+        y_size = int(arena_depth / bin_size)
+        h, binx, biny = get_2D_ratemap(time_array, test_spikes, x, y, x_size=int(arena_width / bin_size),
+                                       y_size=int(arena_depth / bin_size), filter_result=True)
+
+
+        # Return ratemap values, x bin limits and y bin limits
+        return h, binx, biny

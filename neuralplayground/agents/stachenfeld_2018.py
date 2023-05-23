@@ -124,15 +124,15 @@ class Stachenfeld2018(AgentCore):
 
         self.reset()
         # Variables for the SR-agent state space
-        self.resolution_d = int(self.state_density * self.room_depth)
-        self.resolution_w = int(self.state_density * self.room_width)
-        self.x_array = np.linspace(-self.room_width / 2, self.room_width / 2, num=self.resolution_d)
-        self.y_array = np.linspace(self.room_depth / 2, -self.room_depth / 2, num=self.resolution_w)
+        self.resolution_depth = int(self.state_density * self.room_depth)
+        self.resolution_width = int(self.state_density * self.room_width)
+        self.x_array = np.linspace(-self.room_width / 2, self.room_width / 2, num=self.resolution_depth)
+        self.y_array = np.linspace(self.room_depth / 2, -self.room_depth / 2, num=self.resolution_width)
         self.mesh = np.array(np.meshgrid(self.x_array, self.y_array))
         self.xy_combinations = self.mesh.T.reshape(-1, 2)
-        self.w = int(self.room_width * self.state_density)
-        self.l = int(self.room_depth * self.state_density)
-        self.n_state = int(self.l * self.w)
+        self.width = int(self.room_width * self.state_density)
+        self.depth = int(self.room_depth * self.state_density)
+        self.n_state = int(self.depth * self.width)
         self.obs_history = []
         if twoD:
             self.create_transmat(self.state_density,  '2D_env')
@@ -165,7 +165,7 @@ class Stachenfeld2018(AgentCore):
 
 
         """
-        node_layout = np.arange(self.n_state).reshape(self.l, self.w)
+        node_layout = np.arange(self.n_state).reshape(self.depth, self.width)
     
         diff = self.xy_combinations - pos[np.newaxis, ...]
         dist = np.sum(diff ** 2, axis=1)
@@ -237,22 +237,22 @@ class Stachenfeld2018(AgentCore):
 
         if name_env == '2D_env':
             adjmat_triu = np.zeros((self.n_state, self.n_state))
-            node_layout = np.arange(self.n_state).reshape(self.l, self.w)
-            x_coord = np.linspace(0, np.min([self.l / self.w, 1]), num=self.l)
-            y_coord = np.linspace(0, np.min([self.w / self.l, 1]), num=self.w)
+            node_layout = np.arange(self.n_state).reshape(self.depth, self.width)
+            x_coord = np.linspace(0, np.min([self.depth / self.width, 1]), num=self.depth)
+            y_coord = np.linspace(0, np.min([self.width / self.depth, 1]), num=self.width)
             self.xy=[]
 
-            for i in range(self.l):
-                for j in range(self.w):
+            for i in range(self.depth):
+                for j in range(self.width):
                     s = node_layout[i, j]
                     neighbours = []
                     if i - 1 >= 0:
                         neighbours.append(node_layout[i - 1, j])
-                    if i + 1 < self.l:
+                    if i + 1 < self.depth:
                         neighbours.append(node_layout[i + 1, j])
                     if j - 1 >= 0:
                         neighbours.append(node_layout[i, j - 1])
-                    if j + 1 < self.w:
+                    if j + 1 < self.width:
                         neighbours.append(node_layout[i, j + 1])
                     adjmat_triu[s, neighbours] = 1
 
@@ -406,31 +406,25 @@ class Stachenfeld2018(AgentCore):
         save_path: string
             Path to save the plot
         """
-       
+
         evals, evecs = np.linalg.eig(matrix)
-    
+
         if ax is None:
-            f, ax = plt.subplots(1, len(eigen), figsize=(4*len(eigen), 5))
+            f, ax = plt.subplots(1, len(eigen), figsize=(4 * len(eigen), 5))
             if len(eigen) == 1:
-                evecs_0 = evecs[:, eigen[0]].reshape(self.l, self.w).real
+                evecs_0 = evecs[:, eigen[0]].reshape(self.depth, self.width).real
                 im = ax.imshow(evecs_0, cmap='jet')
                 cbar = plt.colorbar(im, ax=ax)
             else:
                 for i, eig in enumerate(eigen):
-                    evecs_0 = evecs[:, eig].reshape(self.l, self.w).real
-                    im = ax[i].imshow(evecs_0,cmap='jet')
+                    evecs_0 = evecs[:, eig].reshape(self.depth, self.width).real
+                    im = ax[i].imshow(evecs_0, cmap='jet')
                 cbar = plt.colorbar(im, ax=ax[i])
         if save_path is None:
-            
-            pass  
+
+            pass
         else:
-            
+
             plt.savefig(save_path, bbox_inches="tight")
         return ax
-
-
-
-
-
-
 
