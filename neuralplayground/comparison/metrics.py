@@ -171,8 +171,8 @@ class GridScorer(object):
     max_60_ind = np.argmax(scores_60)
     max_90_ind = np.argmax(scores_90)
 
-    return (scores_60[max_60_ind], scores_90[max_90_ind],
-            self._masks[max_60_ind][1], self._masks[max_90_ind][1], sac)
+    return (sac, scores_60[max_60_ind], scores_90[max_90_ind],
+            self._masks[max_60_ind][1], self._masks[max_90_ind][1])
 
   def plot_sac(self,
                sac,
