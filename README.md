@@ -3,8 +3,6 @@
 [![All Contributors](https://img.shields.io/badge/all_contributors-5-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
-
-
 * [1 Introduction](#1-Introduction)
 * [2 Installation ](#2-Installation)
 * [3 The Project](#3-Project)
@@ -33,6 +31,8 @@ We currently rely on visual comparison of a hand-selected number of outputs of t
 Altogether, we hope our framework, available at [github.com/NeuralPlayground](https://github.com/ClementineDomine/NeuralPlayground/), offers
 a foundation that the community will build upon, working toward a shared, standardized, open, and
 reproducible computational understanding of the hippocampus and entorhinal cortex.
+
+Try our <a href="https://colab.research.google.com/github/ClementineDomine/NeuralPlayground/blob/comparison_board/colab_example.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Colab Jupyter Notebook"/></a> for a quick introduction. 
 
 ## 2. Installation
 You can create a new environment using conda, and the yml file with all the right 
