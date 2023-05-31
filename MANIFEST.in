@@ -4,6 +4,7 @@ include README.md
 recursive-exclude * __pycache__
 recursive-exclude * *.py[co]
 
+recursive-exclude examples *
 recursive-exclude neuralplayground/experiments/hafting_2008 *
 recursive-exclude neuralplayground/experiments/sargolini_2006 *
 recursive-exclude neuralplayground/experiments/wernle_2018 *
