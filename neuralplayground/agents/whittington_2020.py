@@ -85,7 +85,7 @@ class Whittington2020(AgentCore):
         self.batch_size = mod_kwargs['batch_size']
         self.n_envs_save = 4
         self.n_states = [int(self.room_widths[i] * self.room_depths[i] * self.state_densities[i]) for i in range(self.batch_size)]
-        self.poss_actions = [[0,-1], [1,0], [0,1], [-1,0]]
+        self.poss_actions = [[0,0], [0,-1], [1,0], [0,1], [-1,0]]
         self.n_actions = len(self.poss_actions)
         self.final_model_input = None
 
@@ -288,7 +288,7 @@ class Whittington2020(AgentCore):
 
     def action_policy(self):
         """
-        Random action policy that selects an action to take from [up, down, left, right]
+        Random action policy that selects an action to take from [stay, up, down, left, right]
         """
         arrow = self.poss_actions
         index = np.random.choice(len(arrow))
@@ -314,7 +314,7 @@ class Whittington2020(AgentCore):
         for steps in actions:
             env_list = []
             for action in steps:
-                env_list.append(self.poss_actions.index(list(action))+1)
+                env_list.append(self.poss_actions.index(list(action)))
             action_values.append(env_list)
         return action_values
 

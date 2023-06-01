@@ -12,16 +12,16 @@ from neuralplayground.arenas.batch_environment import BatchEnvironment
 from neuralplayground.arenas.hafting_2008 import Hafting2008
 from neuralplayground.agents.whittington_2020 import Whittington2020
 import neuralplayground.agents.whittington_2020_extras.whittington_2020_parameters as parameters
-# import neuralplayground.agents.whittington_2020_extras.whittington_2020_analyse as analyse
-# import neuralplayground.agents.whittington_2020_extras.whittington_2020_plot as plot
-import analyse
-import plot
+import neuralplayground.agents.whittington_2020_extras.whittington_2020_analyse as analyse
+import neuralplayground.agents.whittington_2020_extras.whittington_2020_plot as plot
+# import analyse
+# import plot
 
 # Select trained model
-date = '2023-04-19'
+date = '2023-05-17'
 run = '0'
 index = '19999'
-base_path = '/nfs/nhome/live/lhollingsworth/Documents/NeuralPlayground/NPG'
+base_path = '/nfs/nhome/live/lhollingsworth/Documents/NeuralPlayground/NPG/EHC_model_comparison'
 npg_path = '/nfs/nhome/live/lhollingsworth/Documents/NeuralPlayground/NPG/EHC_model_comparison/examples'
 base_win_path = 'H:/Documents/PhD/NeuralPlayground'
 win_path = 'H:/Documents/PhD/NeuralPlayground/NPG/NeuralPlayground/examples'
@@ -43,8 +43,8 @@ tem.eval()
 
 # Initialise environment parameters
 batch_size = 16
-arena_x_limits = [[-5,5], [-5,5], [-5,5], [-5,5], [-5,5], [-5,5], [-5,5], [-5,5], [-5,5], [-5,5], [-5,5], [-5,5], [-5,5], [-5,5], [-5,5], [-5,5]]
-arena_y_limits = [[-5,5], [-5,5], [-5,5], [-5,5], [-5,5], [-5,5], [-5,5], [-5,5], [-5,5], [-5,5], [-5,5], [-5,5], [-5,5], [-5,5], [-5,5], [-5,5]]
+arena_x_limits = [[-5,5], [-4,4], [-5,5], [-6,6], [-4,4], [-5,5], [-6,6], [-5,5], [-4,4], [-5,5], [-6,6], [-5,5], [-4,4], [-5,5], [-6,6], [-5,5]]
+arena_y_limits = [[-5,5], [-4,4], [-5,5], [-6,6], [-4,4], [-5,5], [-6,6], [-5,5], [-4,4], [-5,5], [-6,6], [-5,5], [-4,4], [-5,5], [-6,6], [-5,5]]
 env_name = "env_example"
 mod_name = "SimpleTEM"
 time_step_size = 1
@@ -71,21 +71,22 @@ agent = Whittington2020(model_name=mod_name,
                         room_depths=env.room_depths,
                         state_densities=env.state_densities)
 
-# # Run around environment
-# observation, state = env.reset(random_state=True, custom_state=None)
-# while agent.n_walk < 5000:
-#     if agent.n_walk % 100 == 0:
-#         print(agent.n_walk)
-#     action = agent.batch_act(observation)
-#     observation, state = env.step(action, normalize_step=True)
-# model_input, history, environments = agent.collect_final_trajectory()
-# environments = [env.collect_environment_info(model_input, history, environments)]
-# torch.save(environments, 'NPG_environments')
-# torch.save(model_input, 'NPG_model_input')
+# Run around environment
+observation, state = env.reset(random_state=True, custom_state=None)
+while agent.n_walk < 5000:
+    if agent.n_walk % 100 == 0:
+        print(agent.n_walk)
+    action = agent.batch_act(observation)
+    observation, state = env.step(action, normalize_step=True)
+model_input, history, environments = agent.collect_final_trajectory()
+environments = [env.collect_environment_info(model_input, history, environments)]
+torch.save(environments, 'NPG_environments')
+torch.save(model_input, 'NPG_model_input')
 
-environments = torch.load(base_path + '/final_environments')
-# npg_environments = torch.load(base_path + '/NPG_environments')
-model_input = torch.load(base_path + '/final_model_input')
+# environments = torch.load(base_path + '/final_environments')
+# model_input = torch.load(base_path + '/final_model_input')
+environments = torch.load(base_path + '/NPG_environments')
+model_input = torch.load(base_path + '/NPG_model_input')
 
 with torch.no_grad():
     forward = tem(model_input, prev_iter=None)

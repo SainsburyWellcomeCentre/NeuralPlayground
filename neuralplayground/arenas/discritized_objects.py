@@ -139,12 +139,12 @@ class DiscreteObjectEnvironment(Environment):
             Array of the observation of the agent in the environment, in this case the sensory object.
         """
         self.old_state = self.state.copy()
-        if normalize_step:
-            action = action / np.linalg.norm(action)
-            if action[0] == 0:
+        if action[0] == 0:
                 action_rev = np.array([0., -action[1]])
-            else:
-                action_rev = action
+        else:
+            action_rev = action
+        if normalize_step and np.linalg.norm(action) > 0:
+            action_rev = action_rev / np.linalg.norm(action_rev)
             new_pos_state = self.state[-1] + self.agent_step_size * action_rev
         else:
             new_pos_state = self.state[-1] + action_rev
