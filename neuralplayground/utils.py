@@ -1,12 +1,15 @@
 import numpy as np
-import os
-from scipy.ndimage import gaussian_filter
 from scipy.interpolate import interp1d
+from scipy.ndimage import gaussian_filter
 
 
-def check_crossing_wall(pre_state: np.ndarray, new_state: np.ndarray,
-                        wall: np.ndarray, wall_closenes: float = 1e-5,
-                        tolerance: float = 1e-9):
+def check_crossing_wall(
+    pre_state: np.ndarray,
+    new_state: np.ndarray,
+    wall: np.ndarray,
+    wall_closenes: float = 1e-5,
+    tolerance: float = 1e-9,
+):
     """
 
     Parameters
@@ -32,11 +35,11 @@ def check_crossing_wall(pre_state: np.ndarray, new_state: np.ndarray,
     """
 
     # Check if the line of the wall and the line between the states cross
-    A = np.stack([np.diff(wall, axis=0)[0, :], -new_state+pre_state], axis=1)
+    A = np.stack([np.diff(wall, axis=0)[0, :], -new_state + pre_state], axis=1)
     b = pre_state - wall[0, :]
     try:
         intersection = np.linalg.inv(A) @ b
-    except:
+    except Exception:
         intersection = np.linalg.inv(A + np.identity(A.shape[0]) * tolerance) @ b
     smaller_than_one = intersection <= 1
     larger_than_zero = intersection >= 0
@@ -44,13 +47,13 @@ def check_crossing_wall(pre_state: np.ndarray, new_state: np.ndarray,
     # If condition is true, then the points cross the wall
     cross_wall = np.alltrue(np.logical_and(smaller_than_one, larger_than_zero))
     if cross_wall:
-        new_state = (intersection[-1]-wall_closenes)*(new_state-pre_state) + pre_state
+        new_state = (intersection[-1] - wall_closenes) * (new_state - pre_state) + pre_state
 
     return new_state, cross_wall
 
 
 def create_circular_wall(center: np.ndarray, radius: float, n_walls: int = 100):
-    """ Generate a circular wall by discretizing the circle into many walls.
+    """Generate a circular wall by discretizing the circle into many walls.
 
     Parameters
     ----------
@@ -67,18 +70,18 @@ def create_circular_wall(center: np.ndarray, radius: float, n_walls: int = 100):
         n_walls that creates a circle
     """
 
-    d_angle = 2*np.pi/n_walls
+    d_angle = 2 * np.pi / n_walls
     list_of_segments = []
     for i in range(n_walls):
-        init_point = np.array([radius*np.cos(d_angle*i), radius*np.sin(d_angle*i)]) + center
-        end_point = np.array([radius*np.cos(d_angle*(i+1)), radius*np.sin(d_angle*(i+1))]) + center
+        init_point = np.array([radius * np.cos(d_angle * i), radius * np.sin(d_angle * i)]) + center
+        end_point = np.array([radius * np.cos(d_angle * (i + 1)), radius * np.sin(d_angle * (i + 1))]) + center
         wall = np.stack([init_point, end_point])
         list_of_segments.append(wall)
     return list_of_segments
 
 
 def inheritors(klass):
-    """ Given a class, returns child classes (for future implementation of comparison board) """
+    """Given a class, returns child classes (for future implementation of comparison board)"""
     subclasses = set()
     work = [klass]
     while work:
@@ -91,7 +94,7 @@ def inheritors(klass):
 
 
 def clean_data(data, keep_headers=False):
-    """ For a dictionary with positional data, this function replace nans by interpolated positions
+    """For a dictionary with positional data, this function replace nans by interpolated positions
     Used in data readers in the experiment classes
 
     Parameters
@@ -124,13 +127,20 @@ def clean_data(data, keep_headers=False):
                 clean_x = x_range[nan_indexes]
                 clean_val = np.array(val)[nan_indexes, 0]
                 # print(clean_x.shape, clean_val.shape)
-                f = interp1d(clean_x, clean_val, kind='cubic', fill_value="extrapolate")
+                f = interp1d(clean_x, clean_val, kind="cubic", fill_value="extrapolate")
                 aux_dict[key] = f(x_range)[..., np.newaxis]
     return aux_dict
 
 
-def get_2D_ratemap(time_array: np.ndarray, spikes: np.ndarray, x: np.ndarray, y: np.ndarray,
-                   x_size: float = 50, y_size: float = 50, filter_result: bool = False):
+def get_2D_ratemap(
+    time_array: np.ndarray,
+    spikes: np.ndarray,
+    x: np.ndarray,
+    y: np.ndarray,
+    x_size: float = 50,
+    y_size: float = 50,
+    filter_result: bool = False,
+):
     """
     Parameters
     ----------
@@ -163,7 +173,7 @@ def get_2D_ratemap(time_array: np.ndarray, spikes: np.ndarray, x: np.ndarray, y:
 
     # Find x, y position of each spike using spike times
     for s in spikes:
-        array_pos = np.argmin(np.abs(time_array-s))
+        array_pos = np.argmin(np.abs(time_array - s))
         x_spikes.append(x[array_pos])
         y_spikes.append(y[array_pos])
     x_spikes = np.array(x_spikes)
@@ -177,8 +187,14 @@ def get_2D_ratemap(time_array: np.ndarray, spikes: np.ndarray, x: np.ndarray, y:
 
 
 class OnlineRateMap(object):
-
-    def __init__(self, spikes, position, size=(100, 100), x_range=(-100, 100), y_range=(-100, 100)):
+    def __init__(
+        self,
+        spikes,
+        position,
+        size=(100, 100),
+        x_range=(-100, 100),
+        y_range=(-100, 100),
+    ):
         """
         Creates a ratemap where it is possible to distinguish firing rate and traversed position at the same time
 
@@ -201,8 +217,8 @@ class OnlineRateMap(object):
         self.size = size
         self.x_range = x_range
         self.y_range = y_range
-        self.x_pos_bins = np.linspace(x_range[0], x_range[1], num=size[0]+1)
-        self.y_pos_bins = np.linspace(y_range[0], y_range[1], num=size[1]+1)
+        self.x_pos_bins = np.linspace(x_range[0], x_range[1], num=size[0] + 1)
+        self.y_pos_bins = np.linspace(y_range[0], y_range[1], num=size[1] + 1)
         self.spikes = spikes
         self.position = position
         self.last_t_end = 0
@@ -225,14 +241,17 @@ class OnlineRateMap(object):
         """
 
         # Get spikes and position within the range
-        pos = self.position[np.logical_and(self.position[:, 0] >= t_init, self.position[:, 0] < t_end), :]
+        pos = self.position[
+            np.logical_and(self.position[:, 0] >= t_init, self.position[:, 0] < t_end),
+            :,
+        ]
 
         # Interpolate position for smooth plot
         if interp_factor != 1:
             t = pos[:, 0]
             x = pos[:, 1]
             y = pos[:, 2]
-            t_inter = np.linspace(np.amin(t), np.amax(t), num=len(t)*interp_factor, endpoint=False)
+            t_inter = np.linspace(np.amin(t), np.amax(t), num=len(t) * interp_factor, endpoint=False)
             fx = interp1d(t, x)
             fy = interp1d(t, y)
             x_inter = fx(t_inter)
@@ -241,11 +260,11 @@ class OnlineRateMap(object):
 
         spk = self.spikes[np.logical_and(self.spikes >= t_init, self.spikes < t_end)]
 
-        h_spk, bin_spk = np.histogram(spk, bins=np.linspace(t_init, t_end, num=pos.shape[0]+1))
+        h_spk, bin_spk = np.histogram(spk, bins=np.linspace(t_init, t_end, num=pos.shape[0] + 1))
 
         # Convert position to indexes in the ratemap
-        x_index = (pos[:, 1] - self.x_range[0])/(self.x_range[1]-self.x_range[0])*self.size[1]
-        y_index = (pos[:, 2] - self.y_range[0])/(self.y_range[1]-self.y_range[0])*self.size[0]
+        x_index = (pos[:, 1] - self.x_range[0]) / (self.x_range[1] - self.x_range[0]) * self.size[1]
+        y_index = (pos[:, 2] - self.y_range[0]) / (self.y_range[1] - self.y_range[0]) * self.size[0]
         x_index, y_index = x_index.astype(int), y_index.astype(int)
 
         # update ratemap pixels
@@ -265,14 +284,17 @@ class OnlineRateMap(object):
     def update_ratemap(self, dt, interp_factor=1):
         t_init = self.last_t_init
         t_end = self.last_t_end + dt
-        pos = self.position[np.logical_and(self.position[:, 0] >= t_init, self.position[:, 0] < t_end), :]
+        pos = self.position[
+            np.logical_and(self.position[:, 0] >= t_init, self.position[:, 0] < t_end),
+            :,
+        ]
 
         # Interpolate position for smooth plot
         if interp_factor != 1:
             t = pos[:, 0]
             x = pos[:, 1]
             y = pos[:, 2]
-            t_inter = np.linspace(np.amin(t), np.amax(t), num=len(t)*interp_factor, endpoint=False)
+            t_inter = np.linspace(np.amin(t), np.amax(t), num=len(t) * interp_factor, endpoint=False)
             fx = interp1d(t, x)
             fy = interp1d(t, y)
             x_inter = fx(t_inter)
@@ -281,11 +303,11 @@ class OnlineRateMap(object):
 
         spk = self.spikes[np.logical_and(self.spikes >= t_init, self.spikes < t_end)]
 
-        h_spk, bin_spk = np.histogram(spk, bins=np.linspace(t_init, t_end, num=pos.shape[0]+1))
+        h_spk, bin_spk = np.histogram(spk, bins=np.linspace(t_init, t_end, num=pos.shape[0] + 1))
 
         # Convert position to indexes in the ratemap
-        x_index = (pos[:, 1] - self.x_range[0])/(self.x_range[1]-self.x_range[0])*self.size[1]
-        y_index = (pos[:, 2] - self.y_range[0])/(self.y_range[1]-self.y_range[0])*self.size[0]
+        x_index = (pos[:, 1] - self.x_range[0]) / (self.x_range[1] - self.x_range[0]) * self.size[1]
+        y_index = (pos[:, 2] - self.y_range[0]) / (self.y_range[1] - self.y_range[0]) * self.size[0]
         x_index, y_index = x_index.astype(int), y_index.astype(int)
 
         # update ratemap pixels

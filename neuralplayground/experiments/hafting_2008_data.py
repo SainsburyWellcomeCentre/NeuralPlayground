@@ -1,27 +1,35 @@
-import os.path
-import numpy as np
-import scipy.io as sio
 import glob
-import matplotlib.pyplot as plt
-import pandas as pd
-import neuralplayground
-import matplotlib as mpl
-from IPython.display import display
-from neuralplayground.utils import clean_data, get_2D_ratemap
-from .experiment_core import Experiment
+import os.path
 from typing import Union
+
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import scipy.io as sio
+from IPython.display import display
+
+import neuralplayground
+from neuralplayground.utils import clean_data, get_2D_ratemap
+
+from .experiment_core import Experiment
 
 
 class Hafting2008Data(Experiment):
-    """ Data class for Hafting et al. 2008. https://www.nature.com/articles/nature06957
-        The data can be obtained from https://archive.norstore.no/pages/public/datasetDetail.jsf?id=C43035A4-5CC5-44F2-B207-126922523FD9
-        This class only consider animal raw animal trajectories and neural recordings
-        This class is also used for Sargolini2006Data due to its similar data structure
+    """Data class for Hafting et al. 2008. https://www.nature.com/articles/nature06957
+    The data can be obtained from https://archive.norstore.no/pages/public/datasetDetail.jsf?id=C43035A4-5CC5-44F2-B207-126922523FD9
+    This class only consider animal raw animal trajectories and neural recordings
+    This class is also used for Sargolini2006Data due to its similar data structure
     """
 
-    def __init__(self, data_path: str = None, recording_index: int = None,
-                 experiment_name: str = "FullHaftingData", verbose: bool = False):
-        """ Hafting2008Data Init
+    def __init__(
+        self,
+        data_path: str = None,
+        recording_index: int = None,
+        experiment_name: str = "FullHaftingData",
+        verbose: bool = False,
+    ):
+        """Hafting2008Data Init
 
         Parameters
         ----------
@@ -53,7 +61,7 @@ class Hafting2008Data(Experiment):
         self.position = np.stack([x, y], axis=1)
         head_direction = np.diff(self.position, axis=0)
         # Compute head direction from position derivative
-        head_direction = head_direction/np.sqrt(np.sum(head_direction**2, axis=1) + tolerance)[..., np.newaxis]
+        head_direction = head_direction / np.sqrt(np.sum(head_direction**2, axis=1) + tolerance)[..., np.newaxis]
         self.head_direction = head_direction
 
     def _find_data_path(self, data_path: str):
@@ -64,8 +72,8 @@ class Hafting2008Data(Experiment):
             self.data_path = data_path
 
     def _load_data(self):
-        """ Parse data according to specific data format
-        if you are a user check the notebook examples """
+        """Parse data according to specific data format
+        if you are a user check the notebook examples"""
         self.best_recording_index = 4  # Nice session recording as default
         # Arena limits from the experimental setting, first row x limits, second row y limits, in cm
         self.arena_limits = np.array([[-200, 200], [-20, 20]])
@@ -96,18 +104,24 @@ class Hafting2008Data(Experiment):
                     self.data_per_animal[m_id][sess][session_info] = cleaned_data
 
     def _create_dataframe(self):
-        """ Generate dataframe for easy display and access of data """
+        """Generate dataframe for easy display and access of data"""
         self.list = []
-        l = 0
+        idx = 0
         for rat_id, rat_sess in self.data_per_animal.items():
             for sess, recorded_vars in rat_sess.items():
-                self.list.append({"rec_index": l, "rat_id": rat_id, "session": sess,
-                                   "recorded_vars": list(recorded_vars.keys())})
-                l += 1
+                self.list.append(
+                    {
+                        "rec_index": idx,
+                        "rat_id": rat_id,
+                        "session": sess,
+                        "recorded_vars": list(recorded_vars.keys()),
+                    }
+                )
+                idx += 1
         self.recording_list = pd.DataFrame(self.list).set_index("rec_index")
 
     def show_data(self, full_dataframe: bool = False):
-        """ Print of available data recorded in the experiment
+        """Print of available data recorded in the experiment
 
         Parameters
         ----------
@@ -121,19 +135,19 @@ class Hafting2008Data(Experiment):
         """
         print("Dataframe with recordings")
         if full_dataframe:
-            pd.set_option('display.max_rows', None)
-            pd.set_option('display.max_columns', None)
+            pd.set_option("display.max_rows", None)
+            pd.set_option("display.max_columns", None)
         display(self.recording_list)
         return self.recording_list
 
     def show_readme(self):
-        """ Print original readme of the dataset """
+        """Print original readme of the dataset"""
         readme_path = glob.glob(self.data_path + "readme" + "*.txt")[0]
-        with open(readme_path, 'r') as fin:
+        with open(readme_path, "r") as fin:
             print(fin.read())
 
     def get_recorded_session(self, recording_index: int = None):
-        """ Get identifiers to sort the experimental data
+        """Get identifiers to sort the experimental data
 
         Parameters
         ----------
@@ -152,11 +166,15 @@ class Hafting2008Data(Experiment):
         if recording_index is None:
             recording_index = self.best_recording_index
         list_item = self.recording_list.iloc[recording_index]
-        rat_id, sess, recorded_vars = list_item["rat_id"], list_item["session"], list_item["recorded_vars"]
+        rat_id, sess, recorded_vars = (
+            list_item["rat_id"],
+            list_item["session"],
+            list_item["recorded_vars"],
+        )
         return rat_id, sess, recorded_vars
 
     def get_recording_data(self, recording_index: int = None):
-        """ Get experimental data for a given recordin index
+        """Get experimental data for a given recordin index
 
         Parameters
         ----------
@@ -189,7 +207,7 @@ class Hafting2008Data(Experiment):
             return session_data, rec_vars, identifiers
 
     def _find_tetrode(self, rev_vars: list):
-        """ Static function to find tetrode id in a multiple tetrode recording session
+        """Static function to find tetrode id in a multiple tetrode recording session
 
         Parameters
         ----------
@@ -202,11 +220,12 @@ class Hafting2008Data(Experiment):
             found first tetrode id in the recorded variable list
         """
         tetrode_id = next(
-            var_name for var_name in rev_vars if (var_name != 'position') and (("t" in var_name) or ("T" in var_name)))
+            var_name for var_name in rev_vars if (var_name != "position") and (("t" in var_name) or ("T" in var_name))
+        )
         return tetrode_id
 
     def get_tetrode_data(self, session_data: str = None, tetrode_id: str = None):
-        """ Return time stamp, position and spikes for a given session and tetrode
+        """Return time stamp, position and spikes for a given session and tetrode
 
         Parameters
         ----------
@@ -239,18 +258,21 @@ class Hafting2008Data(Experiment):
         y = np.clip(y2, a_min=self.arena_limits[1, 0], a_max=self.arena_limits[1, 1])
         time_array = position_data["post"][:]
         tetrode_data = session_data[tetrode_id]
-        test_spikes = tetrode_data["ts"][:, ]
+        test_spikes = tetrode_data["ts"][:,]
         test_spikes = test_spikes[:, 0]
         time_array = time_array[:, 0]
 
         return time_array, test_spikes, x, y
 
-    def plot_recording_tetr(self, recording_index: Union[int, tuple, list] = None,
-                            save_path: Union[str, tuple, list] = None,
-                            ax: Union[mpl.axes.Axes, tuple, list] = None,
-                            tetrode_id: Union[str, tuple, list] = None,
-                            bin_size: float = 2.0):
-        """ Plot tetrode ratemap from spike data for a given recording index or a list of recording index.
+    def plot_recording_tetr(
+        self,
+        recording_index: Union[int, tuple, list] = None,
+        save_path: Union[str, tuple, list] = None,
+        ax: Union[mpl.axes.Axes, tuple, list] = None,
+        tetrode_id: Union[str, tuple, list] = None,
+        bin_size: float = 2.0,
+    ):
+        """Plot tetrode ratemap from spike data for a given recording index or a list of recording index.
         If given a list or tuple as argument, all arguments must be list, tuple, or None.
 
         Parameters
@@ -318,8 +340,15 @@ class Hafting2008Data(Experiment):
         time_array, test_spikes, x, y = self.get_tetrode_data(session_data, tetrode_id)
 
         # Compute ratemap matrices from data
-        h, binx, biny = get_2D_ratemap(time_array, test_spikes, x, y, x_size=int(arena_width/bin_size),
-                                       y_size=int(arena_depth/bin_size), filter_result=True)
+        h, binx, biny = get_2D_ratemap(
+            time_array,
+            test_spikes,
+            x,
+            y,
+            x_size=int(arena_width / bin_size),
+            y_size=int(arena_depth / bin_size),
+            filter_result=True,
+        )
 
         # Use auxiliary function to make the plot
         self._make_tetrode_plot(h, ax, tetrode_id, save_path)
@@ -327,7 +356,7 @@ class Hafting2008Data(Experiment):
         return h, binx, biny
 
     def _make_tetrode_plot(self, h, ax, title, save_path):
-        """ plot function with formating of ratemap plot
+        """plot function with formating of ratemap plot
 
         Parameters
         ----------
@@ -348,14 +377,14 @@ class Hafting2008Data(Experiment):
         """
 
         # Formating ratemap plot
-        sc = ax.imshow(h, cmap='jet')
+        sc = ax.imshow(h, cmap="jet")
         cbar = plt.colorbar(sc, ax=ax, ticks=[np.min(h), np.max(h)], orientation="horizontal")
-        cbar.ax.set_xlabel('Firing rate', fontsize=12)
+        cbar.ax.set_xlabel("Firing rate", fontsize=12)
         cbar.ax.set_xticklabels([np.round(np.min(h)), np.round(np.max(h))], fontsize=12)
         ax.set_title(title)
 
-        ax.set_ylabel('width', fontsize=16)
-        ax.set_xlabel('depth', fontsize=16)
+        ax.set_ylabel("width", fontsize=16)
+        ax.set_xlabel("depth", fontsize=16)
         ax.grid(False)
 
         ax.set_xticks([])
@@ -368,11 +397,14 @@ class Hafting2008Data(Experiment):
             plt.savefig(save_path, bbox_inches="tight")
             return ax
 
-    def plot_trajectory(self, recording_index: Union[int, tuple, list] = None,
-                        save_path: Union[str, tuple, list] = None,
-                        ax: Union[mpl.axes.Axes, tuple, list] = None,
-                        plot_every: int = 20):
-        """ Plot animal trajectory from a given recording index, corresponding to a recording session
+    def plot_trajectory(
+        self,
+        recording_index: Union[int, tuple, list] = None,
+        save_path: Union[str, tuple, list] = None,
+        ax: Union[mpl.axes.Axes, tuple, list] = None,
+        plot_every: int = 20,
+    ):
+        """Plot animal trajectory from a given recording index, corresponding to a recording session
 
         Parameters
         ----------
@@ -431,7 +463,7 @@ class Hafting2008Data(Experiment):
             plt.savefig(save_path, bbox_inches="tight")
         return x, y, time_array
 
-    def _make_trajectory_plot(self, x, y, ax, plot_every, fontsize = 24):
+    def _make_trajectory_plot(self, x, y, ax, plot_every, fontsize=24):
         """
 
         Parameters
@@ -454,14 +486,30 @@ class Hafting2008Data(Experiment):
         """
 
         # Plotting borders of the arena
-        ax.plot([self.arena_limits[0, 0], self.arena_limits[0, 0]],
-                [self.arena_limits[1, 0], self.arena_limits[1, 1]], "C3", lw=3)
-        ax.plot([self.arena_limits[0, 1], self.arena_limits[0, 1]],
-                [self.arena_limits[1, 0], self.arena_limits[1, 1]], "C3", lw=3)
-        ax.plot([self.arena_limits[0, 0], self.arena_limits[0, 1]],
-                [self.arena_limits[1, 1], self.arena_limits[1, 1]], "C3", lw=3)
-        ax.plot([self.arena_limits[0, 0], self.arena_limits[0, 1]],
-                [self.arena_limits[1, 0], self.arena_limits[1, 0]], "C3", lw=3)
+        ax.plot(
+            [self.arena_limits[0, 0], self.arena_limits[0, 0]],
+            [self.arena_limits[1, 0], self.arena_limits[1, 1]],
+            "C3",
+            lw=3,
+        )
+        ax.plot(
+            [self.arena_limits[0, 1], self.arena_limits[0, 1]],
+            [self.arena_limits[1, 0], self.arena_limits[1, 1]],
+            "C3",
+            lw=3,
+        )
+        ax.plot(
+            [self.arena_limits[0, 0], self.arena_limits[0, 1]],
+            [self.arena_limits[1, 1], self.arena_limits[1, 1]],
+            "C3",
+            lw=3,
+        )
+        ax.plot(
+            [self.arena_limits[0, 0], self.arena_limits[0, 1]],
+            [self.arena_limits[1, 0], self.arena_limits[1, 0]],
+            "C3",
+            lw=3,
+        )
 
         # Setting colormap of trajectory
         cmap = mpl.cm.get_cmap("plasma")
@@ -480,22 +528,31 @@ class Hafting2008Data(Experiment):
                 sc = ax.plot(x_, y_, "-", color=cmap(norm(i)), alpha=0.6)
 
         # Setting plot labels
-        ax.set_xlabel('width', fontsize=fontsize)
-        ax.set_ylabel('depth', fontsize=fontsize)
+        ax.set_xlabel("width", fontsize=fontsize)
+        ax.set_ylabel("depth", fontsize=fontsize)
         ax.set_title("position", fontsize=fontsize)
         ax.grid(False)
 
         cmap = mpl.cm.get_cmap("plasma")
         norm = plt.Normalize(0, np.size(x))
-        sc = ax.scatter(aux_x, aux_y, c=np.arange(len(aux_x)), vmin=0, vmax=len(x), cmap="plasma", alpha=0.6, s=0.1)
+        sc = ax.scatter(
+            aux_x,
+            aux_y,
+            c=np.arange(len(aux_x)),
+            vmin=0,
+            vmax=len(x),
+            cmap="plasma",
+            alpha=0.6,
+            s=0.1,
+        )
 
         # Setting colorbar to show number of sampled (time steps) recorded
         cbar = plt.colorbar(sc, ax=ax, ticks=[0, len(x)])
         cbar.ax.tick_params(labelsize=fontsize)
-        cbar.ax.set_ylabel('N steps', rotation=270, fontsize=fontsize)
+        cbar.ax.set_ylabel("N steps", rotation=270, fontsize=fontsize)
         cbar.ax.set_yticklabels([0, len(x)], fontsize=fontsize)
-        ax.set_xlim([np.amin([x.min(), y.min()])-1.0, np.amax([x.max(), y.max()])+1.0])
-        ax.set_ylim([np.amin([x.min(), y.min()])-1.0, np.amax([x.max(), y.max()])+1.0])
+        ax.set_xlim([np.amin([x.min(), y.min()]) - 1.0, np.amax([x.max(), y.max()]) + 1.0])
+        ax.set_ylim([np.amin([x.min(), y.min()]) - 1.0, np.amax([x.max(), y.max()]) + 1.0])
         return ax
 
     def recording_tetr(self, recording_index: Union[int, tuple, list] = None,

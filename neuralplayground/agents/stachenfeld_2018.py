@@ -8,15 +8,14 @@ Check examples/Stachenfeld_2018_example.ipynb
 """
 
 import sys
-sys.path.append("../")
 
-
-import matplotlib.pyplot as plt
 import matplotlib as mpl
+import matplotlib.pyplot as plt
 import numpy as np
 
-
 from .agent_core import AgentCore
+
+sys.path.append("../")
 
 
 class Stachenfeld2018(AgentCore):
@@ -76,7 +75,8 @@ class Stachenfeld2018(AgentCore):
     update(self):
         Compute the successor representation matrix using TD learning while interacting with the environement
     plot_transition(self, matrix, save_path=None, ax=None):
-        Plot the input matrix and compare it to the transition matrix from the rectangular environment states space (rectangular- transmat).
+        Plot the input matrix and compare it to the transition matrix from the
+        rectangular environment states space (rectangular- transmat).
     plot_eigen(self,matrix, save_path, ax=None):
         Plot the matrix and the 4 largest modes of its eigen-decomposition
     """
@@ -119,7 +119,7 @@ class Stachenfeld2018(AgentCore):
         self.room_width = mod_kwargs["room_width"]
         self.room_depth = mod_kwargs["room_depth"]
         self.state_density = mod_kwargs["state_density"]
-        twoD = mod_kwargs['twoD']
+        twoD = mod_kwargs["twoD"]
         self.inital_obs_variable = None
 
         self.reset()
@@ -135,7 +135,7 @@ class Stachenfeld2018(AgentCore):
         self.n_state = int(self.depth * self.width)
         self.obs_history = []
         if twoD:
-            self.create_transmat(self.state_density,  '2D_env')
+            self.create_transmat(self.state_density, "2D_env")
 
     def reset(self):
         """
@@ -166,9 +166,9 @@ class Stachenfeld2018(AgentCore):
 
         """
         node_layout = np.arange(self.n_state).reshape(self.depth, self.width)
-    
+
         diff = self.xy_combinations - pos[np.newaxis, ...]
-        dist = np.sum(diff ** 2, axis=1)
+        dist = np.sum(diff**2, axis=1)
         index = np.argmin(dist)
         curr_state = index
         return curr_state
@@ -184,15 +184,18 @@ class Stachenfeld2018(AgentCore):
         Returns
         -------
         action : array (2,1)
-            Action value (Direction of the agent step) in this case executes one of four action (up-down-right-left) with equal probability.
+            Action value (Direction of the agent step) in this case executes one of
+            four action (up-down-right-left) with equal probability.
         """
         self.obs_history.append(obs)
         if len(self.obs_history) >= 1000:
-            self.obs_history = [obs, ]
-        arrow= [[0, 1], [0, -1], [1, 0], [-1, 0]]
+            self.obs_history = [
+                obs,
+            ]
+        arrow = [[0, 1], [0, -1], [1, 0], [-1, 0]]
         action = np.random.normal(scale=0.1, size=(2,))
-        diff = action- arrow
-        dist = np.sum(diff ** 2, axis=1)
+        diff = action - arrow
+        dist = np.sum(diff**2, axis=1)
         index = np.argmin(dist)
         action = arrow[index]
         self.next_state = self.obs_to_state(obs)
@@ -212,7 +215,7 @@ class Stachenfeld2018(AgentCore):
         T: array (n_state,n_state)
              The computed transition matrix from the successor representation matrix M
         """
-        T = (1/self.gamma)*np.linalg.inv(M)@(M-np.eye(self.n_state))
+        T = (1 / self.gamma) * np.linalg.inv(M) @ (M - np.eye(self.n_state))
         return T
 
     def create_transmat(self, state_density: float, name_env: str, plotting_variable: bool = False):
@@ -233,14 +236,15 @@ class Stachenfeld2018(AgentCore):
             transmat_norm: array (n_state,n_state)
                 Normalised transition matrix
 
-         """
+        """
 
-        if name_env == '2D_env':
+        if name_env == "2D_env":
             adjmat_triu = np.zeros((self.n_state, self.n_state))
             node_layout = np.arange(self.n_state).reshape(self.depth, self.width)
             x_coord = np.linspace(0, np.min([self.depth / self.width, 1]), num=self.depth)
             y_coord = np.linspace(0, np.min([self.width / self.depth, 1]), num=self.width)
-            self.xy=[]
+            self.xy = []
+
 
             for i in range(self.depth):
                 for j in range(self.width):
@@ -256,7 +260,6 @@ class Stachenfeld2018(AgentCore):
                         neighbours.append(node_layout[i, j + 1])
                     adjmat_triu[s, neighbours] = 1
 
-
             transmat = adjmat_triu + adjmat_triu.T
             transmat = np.array(transmat, dtype=np.float64)
             row_sums = np.sum(transmat, axis=1)
@@ -266,9 +269,9 @@ class Stachenfeld2018(AgentCore):
         # Initial srmat
         self.srmat = np.eye(self.n_state)
 
-        if plotting_variable==True:
+        if plotting_variable is True:
             f, ax = plt.subplots(1, 1, figsize=(14, 5))
-            ax.imshow(self.transmat_norm, interpolation='nearest',cmap='jet')
+            ax.imshow(self.transmat_norm, interpolation="nearest", cmap="jet")
 
         return self.transmat_norm
 
@@ -316,22 +319,22 @@ class Stachenfeld2018(AgentCore):
         """
 
         if self.inital_obs_variable is None:
-            self.curr_state= self.next_state
-            self.inital_obs_variable=True
+            self.curr_state = self.next_state
+            self.inital_obs_variable = True
 
         next_state = self.next_state
         self.n_state = self.transmat_norm.shape[0]
         a = np.array(self.curr_state)
         x = a.flatten()
-        b = np.eye(self.n_state)[x, :self.n_state]
+        b = np.eye(self.n_state)[x, : self.n_state]
         L = b.reshape(a.shape + (self.n_state,))
         curr_state_vec = L
 
-        update_val = (curr_state_vec + self.gamma * self.srmat[:, next_state] - self.srmat[:,self.curr_state])
-        self.srmat[:, self.curr_state] = self.srmat[:, self.curr_state] + self.learning_rate *update_val
+        update_val = curr_state_vec + self.gamma * self.srmat[:, next_state] - self.srmat[:, self.curr_state]
+        self.srmat[:, self.curr_state] = self.srmat[:, self.curr_state] + self.learning_rate * update_val
 
         self.grad_history.append(np.sqrt(np.sum(update_val**2)))
-        self.curr_state=next_state
+        self.curr_state = next_state
 
         return self.srmat
 
@@ -351,22 +354,20 @@ class Stachenfeld2018(AgentCore):
         srmat0 = np.eye(self.n_state)
         srmat_full = srmat0.copy()
         for i in range(self.n_episode):
-
             curr_state = random_state.randint(self.n_state)
             for j in range(self.t_episode):
                 a = np.array([curr_state])
                 x = a.flatten()
-                b = np.eye(self.n_state)[x, :self.n_state]
+                b = np.eye(self.n_state)[x, : self.n_state]
                 L = b.reshape(a.shape + (self.n_state,))
 
                 curr_state_vec = L
                 random_state.multinomial(1, self.transmat_norm[curr_state, :])
                 next_state = np.where(random_state.multinomial(1, self.transmat_norm[curr_state, :]))[0][0]
 
-                srmat_full[:, curr_state] = srmat_full[:, curr_state] + self.learning_rate * (curr_state_vec +
-                                                                                    self.gamma * srmat_full[:,
-                                                                                                 next_state] - srmat_full[:,
-                                                                                                               curr_state])
+                srmat_full[:, curr_state] = srmat_full[:, curr_state] + self.learning_rate * (
+                    curr_state_vec + self.gamma * srmat_full[:, next_state] - srmat_full[:, curr_state]
+                )
                 curr_state = next_state
                 t_elapsed += 1
 
@@ -374,7 +375,8 @@ class Stachenfeld2018(AgentCore):
 
     def plot_transition(self, matrix: np.ndarray, save_path: str = None, ax: mpl.axes.Axes = None):
         """
-        Plot the input matrix and compare it to the transition matrix from the rectangular environment states space (rectangular- transmat).
+        Plot the input matrix and compare it to the transition matrix from the rectangular
+        environment states space (rectangular- transmat).
         (If a new state space type is added please update this function)
         Parameters
         ----------
@@ -385,16 +387,16 @@ class Stachenfeld2018(AgentCore):
         """
         evals, evecs = np.linalg.eig(matrix)
         if ax is None:
-            f, ax = plt.subplots(1,2, figsize=(14, 5))
-            ax[0].imshow(self.transmat_norm,cmap='jet')
-            ax[1].imshow(matrix,cmap='jet')
-        if not save_path is None:
+            f, ax = plt.subplots(1, 2, figsize=(14, 5))
+            ax[0].imshow(self.transmat_norm, cmap="jet")
+            ax[1].imshow(matrix, cmap="jet")
+        if save_path is not None:
             plt.savefig(save_path, bbox_inches="tight")
             plt.close("all")
         return ax
 
     def plot_eigen(self, matrix: np.ndarray, save_path: str, eigen=(0, 1), ax: mpl.axes.Axes = None):
-        """"
+        """ "
         Plot the matrix and the 4 largest modes of its eigen-decomposition
 
         Parameters
@@ -412,6 +414,7 @@ class Stachenfeld2018(AgentCore):
         if ax is None:
             f, ax = plt.subplots(1, len(eigen), figsize=(4 * len(eigen), 5))
             if len(eigen) == 1:
+
                 evecs_0 = evecs[:, eigen[0]].reshape(self.depth, self.width).real
                 im = ax.imshow(evecs_0, cmap='jet')
                 cbar = plt.colorbar(im, ax=ax)
@@ -427,4 +430,3 @@ class Stachenfeld2018(AgentCore):
 
             plt.savefig(save_path, bbox_inches="tight")
         return ax
-

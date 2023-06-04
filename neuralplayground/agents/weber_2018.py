@@ -7,10 +7,9 @@ This implementation can interact with environments from the package as shown in 
 Check examples/testing_weber_model.ipynb
 """
 
-import sys
 
-import matplotlib.pyplot as plt
 import matplotlib as mpl
+import matplotlib.pyplot as plt
 import numpy as np
 from scipy.stats import multivariate_normal
 from tqdm import tqdm
@@ -144,7 +143,10 @@ class Weber2018(AgentCore):
         else:
             self.resolution = 50
 
-        self.room_width, self.room_depth = mod_kwargs["room_width"], mod_kwargs["room_depth"]
+        self.room_width, self.room_depth = (
+            mod_kwargs["room_width"],
+            mod_kwargs["room_depth"],
+        )
         self.ro = mod_kwargs["ro"]
         self.obs_history = []  # Initialize observation history to update weights later
         self.grad_history = []
@@ -152,10 +154,10 @@ class Weber2018(AgentCore):
         self.resolution = 100  # Number of pixels in the grid for the tuning functions
 
         self.resolution_width = self.resolution
-        self.resolution_depth = int(self.resolution*(self.room_depth/self.room_width))
+        self.resolution_depth = int(self.resolution * (self.room_depth / self.room_width))
 
-        self.x_array = np.linspace(-self.room_width/2, self.room_width/2, num=self.resolution_width)
-        self.y_array = np.linspace(self.room_depth/2, -self.room_depth/2, num=self.resolution_depth)
+        self.x_array = np.linspace(-self.room_width / 2, self.room_width / 2, num=self.resolution_width)
+        self.y_array = np.linspace(self.room_depth / 2, -self.room_depth / 2, num=self.resolution_depth)
         self.mesh = np.array(np.meshgrid(self.x_array, self.y_array))
         self.xy_combinations = self.mesh.T.reshape(-1, 2)
         self.reset()
@@ -168,20 +170,24 @@ class Weber2018(AgentCore):
         self.obs_history = []  # Reset observation history
         self.grad_history = []
         # Initialize weights
-        self.wi = np.random.uniform(low=self.wi_init-0.05*self.wi_init,
-                                    high=self.wi_init+0.05*self.wi_init, size=(self.Ni,))
-        self.we = np.random.uniform(low=self.we_init-0.05*self.we_init,
-                                    high=self.we_init+0.05*self.we_init, size=(self.Ne,))
+        self.wi = np.random.uniform(
+            low=self.wi_init - 0.05 * self.wi_init,
+            high=self.wi_init + 0.05 * self.wi_init,
+            size=(self.Ni,),
+        )
+        self.we = np.random.uniform(
+            low=self.we_init - 0.05 * self.we_init,
+            high=self.we_init + 0.05 * self.we_init,
+            size=(self.Ne,),
+        )
 
         # Initialize tuning functions
-        self.inh_rates_functions, self.inh_cell_list = self.generate_tuning_curves(n_curves=self.Ni,
-                                                                                   cov_scale=self.sigma_inh,
-                                                                                   Nf=self.Nif,
-                                                                                   alpha=self.alpha_i)
-        self.exc_rates_functions, self.exc_cell_list = self.generate_tuning_curves(n_curves=self.Ne,
-                                                                                   cov_scale=self.sigma_exc,
-                                                                                   Nf=self.Nef,
-                                                                                   alpha=self.alpha_e)
+        self.inh_rates_functions, self.inh_cell_list = self.generate_tuning_curves(
+            n_curves=self.Ni, cov_scale=self.sigma_inh, Nf=self.Nif, alpha=self.alpha_i
+        )
+        self.exc_rates_functions, self.exc_cell_list = self.generate_tuning_curves(
+            n_curves=self.Ne, cov_scale=self.sigma_exc, Nf=self.Nef, alpha=self.alpha_e
+        )
 
         self.init_we_sum = np.sqrt(np.sum(self.we**2))  # Keep track of normalization constant
 
@@ -217,15 +223,15 @@ class Weber2018(AgentCore):
             cell_i = 0
             for j in range(Nf):
                 # The +0.2 in the following is to avoid border effects
-                mean1 = np.random.uniform(-width_limit*(1+0.2), width_limit*(1+0.2))  # Sample means
-                mean2 = np.random.uniform(-depth_limit*(1+0.2), depth_limit*(1+0.2))
+                mean1 = np.random.uniform(-width_limit * (1 + 0.2), width_limit * (1 + 0.2))  # Sample means
+                mean2 = np.random.uniform(-depth_limit * (1 + 0.2), depth_limit * (1 + 0.2))
                 room_scale = np.max(np.array([self.room_width, self.room_width]))
-                cov = np.diag(np.multiply(cov_scale, np.array([room_scale, room_scale]))**2)
+                cov = np.diag(np.multiply(cov_scale, np.array([room_scale, room_scale])) ** 2)
                 mean = np.array([mean1, mean2])
                 rv = multivariate_normal(mean, cov)  # Generate gaussian
                 gauss_list.append([mean, cov])
-                normalization_constant = 2*np.pi*np.sqrt(np.linalg.det(cov))  # normalization constant (eq 13)
-                cell_i += rv.pdf(self.xy_combinations)*normalization_constant*alpha  # See equation 13
+                normalization_constant = 2 * np.pi * np.sqrt(np.linalg.det(cov))  # normalization constant (eq 13)
+                cell_i += rv.pdf(self.xy_combinations) * normalization_constant * alpha  # See equation 13
             function_list.append(gauss_list)
             cell_list.append(cell_i)
         cell_list = np.array(cell_list)
@@ -311,16 +317,16 @@ class Weber2018(AgentCore):
         r_out = self.get_output_rates(pos)
 
         # Excitatory weights update (eq 2)
-        delta_we = self.etaexc*self.get_rates(self.exc_cell_list, pos=pos)*r_out
+        delta_we = self.etaexc * self.get_rates(self.exc_cell_list, pos=pos) * r_out
         # Inhibitory weights update (eq 3)
-        delta_wi = self.etainh*self.get_rates(self.inh_cell_list, pos=pos)*(r_out - self.ro)
-        self.grad_history.append(np.sqrt(np.sum(delta_we**2)+np.sum(delta_wi**2)))
+        delta_wi = self.etainh * self.get_rates(self.inh_cell_list, pos=pos) * (r_out - self.ro)
+        self.grad_history.append(np.sqrt(np.sum(delta_we**2) + np.sum(delta_wi**2)))
 
         self.we = self.we + delta_we
         self.wi = self.wi + delta_wi
 
         if exc_normalization:
-            self.we = self.init_we_sum/np.sqrt(np.sum(self.we**2))*self.we
+            self.we = self.init_we_sum / np.sqrt(np.sum(self.we**2)) * self.we
 
         self.we = np.clip(self.we, a_min=0, a_max=np.amax(self.we))  # Negative weights to zero
         self.wi = np.clip(self.wi, a_min=0, a_max=np.amax(self.wi))
@@ -339,15 +345,15 @@ class Weber2018(AgentCore):
         r_out = r_out[..., np.newaxis]
 
         # Excitatory weights update (eq 2)
-        delta_we = self.etaexc*(self.exc_cell_list @ r_out)/self.resolution**2
+        delta_we = self.etaexc * (self.exc_cell_list @ r_out) / self.resolution**2
         # Inhibitory weights update (eq 3)
-        delta_wi = self.etainh*(self.inh_cell_list @ (r_out-self.ro))/self.resolution**2
+        delta_wi = self.etainh * (self.inh_cell_list @ (r_out - self.ro)) / self.resolution**2
 
         self.we = self.we + delta_we[:, 0]
         self.wi = self.wi + delta_wi[:, 0]
 
         if exc_normalization:
-            self.we = self.init_we_sum/np.sqrt(np.sum(self.we**2))*self.we
+            self.we = self.init_we_sum / np.sqrt(np.sum(self.we**2)) * self.we
 
         self.we = np.clip(self.we, a_min=0, a_max=np.amax(self.we))  # Negative weights to zero
         self.wi = np.clip(self.wi, a_min=0, a_max=np.amax(self.wi))
@@ -384,10 +390,12 @@ class Weber2018(AgentCore):
         r_out_im = self.get_full_output_rate()
         r_out_im = r_out_im.reshape((self.resolution_width, self.resolution_depth))
 
-        exc_im = self.exc_cell_list[np.random.choice(np.arange(self.exc_cell_list.shape[0]))
-            , ...].reshape((self.resolution_width, self.resolution_depth))
-        inh_im = self.inh_cell_list[np.random.choice(np.arange(self.inh_cell_list.shape[0]))
-            , ...].reshape((self.resolution_width, self.resolution_depth))
+        exc_im = self.exc_cell_list[np.random.choice(np.arange(self.exc_cell_list.shape[0])), ...].reshape(
+            (self.resolution_width, self.resolution_depth)
+        )
+        inh_im = self.inh_cell_list[np.random.choice(np.arange(self.inh_cell_list.shape[0])), ...].reshape(
+            (self.resolution_width, self.resolution_depth)
+        )
 
         ax[0].imshow(exc_im.T, cmap="Reds")
         ax[0].set_title("Exc rates", fontsize=14)
@@ -395,9 +403,9 @@ class Weber2018(AgentCore):
         ax[1].set_title("Inh rates", fontsize=14)
         im = ax[2].imshow(r_out_im.T, cmap="jet")
         ax[2].set_title("Out rate", fontsize=14)
-        cbar = plt.colorbar(im, ax=ax[2])
+        plt.colorbar(im, ax=ax[2])
 
-        if not save_path is None:
+        if save_path is not None:
             plt.savefig(save_path, bbox_inches="tight")
             plt.close("all")
         else:
