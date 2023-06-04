@@ -48,10 +48,10 @@ For now, install using pip for local editing and testing
 ```
 pip install -e .
 ```
-or 
+or
 ```
 pip install -e '.[dev]'
-``` 
+```
 if you want to install the dependencies for development.
 
 ## 3. Project
