@@ -165,7 +165,7 @@ class Stachenfeld2018(AgentCore):
 
 
         """
-        node_layout = np.arange(self.n_state).reshape(self.depth, self.width)
+        np.arange(self.n_state).reshape(self.depth, self.width)
 
         diff = self.xy_combinations - pos[np.newaxis, ...]
         dist = np.sum(diff**2, axis=1)
@@ -241,10 +241,9 @@ class Stachenfeld2018(AgentCore):
         if name_env == "2D_env":
             adjmat_triu = np.zeros((self.n_state, self.n_state))
             node_layout = np.arange(self.n_state).reshape(self.depth, self.width)
-            x_coord = np.linspace(0, np.min([self.depth / self.width, 1]), num=self.depth)
-            y_coord = np.linspace(0, np.min([self.width / self.depth, 1]), num=self.width)
+            np.linspace(0, np.min([self.depth / self.width, 1]), num=self.depth)
+            np.linspace(0, np.min([self.width / self.depth, 1]), num=self.width)
             self.xy = []
-
 
             for i in range(self.depth):
                 for j in range(self.width):
@@ -414,19 +413,16 @@ class Stachenfeld2018(AgentCore):
         if ax is None:
             f, ax = plt.subplots(1, len(eigen), figsize=(4 * len(eigen), 5))
             if len(eigen) == 1:
-
                 evecs_0 = evecs[:, eigen[0]].reshape(self.depth, self.width).real
-                im = ax.imshow(evecs_0, cmap='jet')
-                cbar = plt.colorbar(im, ax=ax)
+                im = ax.imshow(evecs_0, cmap="jet")
+                plt.colorbar(im, ax=ax)
             else:
                 for i, eig in enumerate(eigen):
                     evecs_0 = evecs[:, eig].reshape(self.depth, self.width).real
-                    im = ax[i].imshow(evecs_0, cmap='jet')
-                cbar = plt.colorbar(im, ax=ax[i])
+                    im = ax[i].imshow(evecs_0, cmap="jet")
+                plt.colorbar(im, ax=ax[i])
         if save_path is None:
-
             pass
         else:
-
             plt.savefig(save_path, bbox_inches="tight")
         return ax

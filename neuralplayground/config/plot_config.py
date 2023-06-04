@@ -2,7 +2,6 @@ from .main_config import NPGConfig
 
 
 class TrajectoryConfig(NPGConfig):
-
     def __init__(self):
         self.FIGURE_SIZE = (8, 6)
         self.TRAJECTORY_COLORMAP = "plasma"
@@ -21,18 +20,16 @@ class TrajectoryConfig(NPGConfig):
 
 
 class RateMapConfig(NPGConfig):
-
-        def __init__(self):
-            self.FIGURE_SIZE = (8, 6)
-            self.RATEMAP_COLORMAP = "jet"
-            self.BIN_SIZE = 2.0
-            self.LABEL_FONTSIZE = 24
-            self.TICK_LABEL_FONTSIZE = 12
-            self.COLORBAR_LABEL_FONTSIZE = 12
+    def __init__(self):
+        self.FIGURE_SIZE = (8, 6)
+        self.RATEMAP_COLORMAP = "jet"
+        self.BIN_SIZE = 2.0
+        self.LABEL_FONTSIZE = 24
+        self.TICK_LABEL_FONTSIZE = 12
+        self.COLORBAR_LABEL_FONTSIZE = 12
 
 
 class PlotsConfig(NPGConfig):
-
     def __init__(self):
         self.TRAJECTORY = TrajectoryConfig()
         self.RATEMAP = RateMapConfig()
