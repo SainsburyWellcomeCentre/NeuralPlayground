@@ -6,11 +6,13 @@ TEM learning to predict upcoming sensory stimulus in a range of 16 square enviro
 # Standard Imports
 import matplotlib.pyplot as plt
 from tqdm import tqdm
+import os
 
 # NeuralPlayground Imports
 from neuralplayground.arenas.discritized_objects import DiscreteObjectEnvironment
 from neuralplayground.arenas.batch_environment import BatchEnvironment
 from neuralplayground.arenas.hafting_2008 import Hafting2008
+from neuralplayground.arenas.sargolini_2006 import BasicSargolini2006
 from neuralplayground.agents.whittington_2020 import Whittington2020
 import neuralplayground.agents.whittington_2020_extras.whittington_2020_parameters as parameters
 
@@ -37,8 +39,15 @@ n_objects = 45
 # arena_x_limits = [env.arena_x_limits for i in range(batch_size)]
 # arena_y_limits = [env.arena_y_limits for i in range(batch_size)]
 
-# Init simple 2D environment with discrtised objects
-env_class = DiscreteObjectEnvironment
+# Init simple 2D (batched) environment with discrtised objects
+# env_class = DiscreteObjectEnvironment
+
+# Init environment from Sargolini, with behavioural data instead of random walk
+parent_directory = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..')
+data_path = os.path.join(parent_directory, 'neuralplayground', 'experiments', 'sargolini_2006')
+env_class = BasicSargolini2006(use_behavioral_data=True, data_path=data_path,
+                         time_step_size=0.1, agent_step_size=None)
+
 env = BatchEnvironment(environment_name=env_name,
                        env_class=env_class,
                        batch_size=batch_size,
@@ -52,9 +61,9 @@ env = BatchEnvironment(environment_name=env_name,
 agent = Whittington2020(model_name=mod_name,
                         params=params,
                         batch_size=batch_size,
-                        room_widths=env.room_widths,
-                        room_depths=env.room_depths,
-                        state_densities=env.state_densities)
+                        room_widths=env.room_width,
+                        room_depths=env.room_depth,
+                        state_densities=state_density)
 
 # Reset environment and begin training (random_state=True is currently necessary)
 observation, state = env.reset(random_state=True, custom_state=None)
