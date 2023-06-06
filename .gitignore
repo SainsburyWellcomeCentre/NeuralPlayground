@@ -1,5 +1,7 @@
 # Prerequisites
 *.d
+models/figures/
+environments/experiment_data/Hafting2008/
 # Compiled Object files
 *.slo
 *.lo
@@ -9,6 +11,7 @@
 # Precompiled Headers
 *.gch
 *.pch
+environments/experiment_data/Hafting2008/
 
 # Compiled Dynamic libraries
 *.so
@@ -41,17 +44,7 @@
 
 *.icloud*
 
-# Unit tests / coverage reports / linting
-htmlcov/
-.tox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-.hypothesis/
-.*_cache/
+*.pytest_cache*
 *test_crossrun_results*
 
 #Results
@@ -59,3 +52,5 @@ coverage.xml
 *.png
 
 *.egg-info
+
+

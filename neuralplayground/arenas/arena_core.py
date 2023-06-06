@@ -1,14 +1,13 @@
-import os
-import pickle
-
 import numpy as np
+import pickle
+import os
 import pandas as pd
 from deepdiff import DeepDiff
-from gymnasium import Env, spaces
+from gymnasium import spaces, Env
 
 
 class Environment(Env):
-    """Abstract parent environment class
+    """ Abstract parent environment class
     Methods
     ----------
     __init__(self, environment_name: str = "Environment", **env_kwargs):
@@ -48,9 +47,8 @@ class Environment(Env):
     action_space: gym.spaces
         specify the range of actions as in openai gym
     """
-
     def __init__(self, environment_name: str = "Environment", **env_kwargs):
-        """Initialisation of Environment class
+        """ Initialisation of Environment class
 
         Parameters
         ----------
@@ -77,7 +75,7 @@ class Environment(Env):
         self.global_time = 0
 
     def make_observation(self):
-        """Just take the state and returns an array of sensory information
+        """  Just take the state and returns an array of sensory information
         In more complex cases, the observation might be different from the internal state of the environment
 
         Returns
@@ -89,7 +87,7 @@ class Environment(Env):
         return self.state
 
     def step(self, action=None):
-        """Runs the environment dynamics. Increasing global counters.
+        """ Runs the environment dynamics. Increasing global counters.
         Given some action, return observation, new state and reward.
 
         Parameters
@@ -119,7 +117,7 @@ class Environment(Env):
         self.global_time += self.time_step_size
 
     def reset(self):
-        """Re-initialize state. Returns observation and re-setted state
+        """ Re-initialize state. Returns observation and re-setted state
 
         Returns
         -------
@@ -136,17 +134,19 @@ class Environment(Env):
         return observation, self.state
 
     def save_environment(self, save_path: str):
-        """Save current variables of the object to re-instantiate the environment later
+        """ Save current variables of the object to re-instantiate the environment later
 
         Parameters
         ----------
         save_path: str
             Path to save the environment
         """
-        pickle.dump(self.__dict__, open(os.path.join(save_path), "wb"), pickle.HIGHEST_PROTOCOL)
+        pickle.dump(self.__dict__,
+                    open(os.path.join(save_path), "wb"),
+                    pickle.HIGHEST_PROTOCOL)
 
     def restore_environment(self, save_path: str):
-        """Restore environment saved using save_environment method
+        """ Restore environment saved using save_environment method
 
         Parameters
         ----------
@@ -156,7 +156,7 @@ class Environment(Env):
         self.__dict__ = pd.read_pickle(save_path)
 
     def __eq__(self, other):
-        """Check if two environments are equal by comparing all of its attributes
+        """ Check if two environments are equal by comparing all of its attributes
 
         Parameters:
         ----------
@@ -172,11 +172,11 @@ class Environment(Env):
             return False
 
     def get_trajectory_data(self):
-        """Returns interaction history"""
+        """ Returns interaction history """
         return self.history
 
     def reward_function(self, action, state):
-        """Code reward curriculum here as a function of action and state
+        """ Code reward curriculum here as a function of action and state
         and attributes of the environment if you want
 
         Parameters
