@@ -73,7 +73,8 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/13147259?v=4",
       "profile": "http://adamltyson.com",
       "contributions": [
-        "maintenance"
+        "maintenance",
+        "infra"
       ]
     }
   ],
