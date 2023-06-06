@@ -56,13 +56,23 @@
       "contributions": [
         "mentoring"
       ]
+    },
+    {
+      "login": "niksirbi",
+      "name": "Niko Sirmpilatze",
+      "avatar_url": "https://avatars.githubusercontent.com/u/20923448?v=4",
+      "profile": "http://nikosirmpilatze.com",
+      "contributions": [
+        "infra"
+      ]
     }
   ],
   "contributorsPerLine": 7,
-  "projectName": "EHC_model_comparison",
-  "projectOwner": "ClementineDomine",
+  "projectName": "NeuralPlayground",
+  "projectOwner": "SainsburyWellcomeCentre",
   "repoType": "github",
   "repoHost": "https://github.com",
   "skipCi": true,
-  "commitConvention": "angular"
+  "commitConvention": "angular",
+  "commitType": "docs"
 }
