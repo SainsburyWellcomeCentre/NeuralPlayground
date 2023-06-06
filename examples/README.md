@@ -10,7 +10,7 @@ In this section, you will find examples demonstrating how to initialise and run 
 
 ## Arena
 
-In this section, you will find examples demonstrating how to build the different arena architectures (both static and dynamic, artificial and from experiments).
+In this section, you will find examples demonstrating how to build the different arena architectures (both static and dynamic, artificial and from experiments). 
 
 
 ## Experiments

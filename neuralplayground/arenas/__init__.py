@@ -1,4 +1,4 @@
-name = "arenas"
+name = 'arenas'
 from .arena_core import Environment
 from .simple2d import Simple2D
 from .connected_rooms import ConnectedRooms
