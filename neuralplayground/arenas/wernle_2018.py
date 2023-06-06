@@ -1,12 +1,11 @@
 import numpy as np
-
-from ..experiments.wernle_2018_data import Wernle2018Data
 from .hafting_2008 import Hafting2008
 from .simple2d import Simple2D
+from ..experiments.wernle_2018_data import Wernle2018Data
 
 
 class Wernle2018(Hafting2008):
-    """Arena resembling Wernle2018 experimental setting
+    """ Arena resembling Wernle2018 experimental setting
 
     Methods (In addition to Hafting 2008)
     ----------
@@ -22,19 +21,9 @@ class Wernle2018(Hafting2008):
     switch_time: float
         Time in minutes to change the agent from one room to the other one
     """
-
-    def __init__(
-        self,
-        use_behavioral_data: bool = False,
-        data_path: str = None,
-        recording_index: int = None,
-        environment_name: str = "Wernle2018",
-        verbose: bool = False,
-        experiment_class=Wernle2018Data,
-        merge_time: float = 100,
-        switch_time: float = 50,
-        **env_kwargs,
-    ):
+    def __init__(self, use_behavioral_data: bool = False, data_path: str = None, recording_index: int = None,
+                 environment_name: str = "Wernle2018", verbose: bool = False, experiment_class=Wernle2018Data,
+                 merge_time: float = 100, switch_time: float = 50, **env_kwargs):
         """
 
         Parameters
@@ -60,25 +49,18 @@ class Wernle2018(Hafting2008):
             time_step_size: float
                 Time step size in second
         """
-        super().__init__(
-            use_behavioral_data,
-            data_path,
-            recording_index,
-            environment_name,
-            verbose,
-            experiment_class,
-            **env_kwargs,
-        )
+        super().__init__(use_behavioral_data, data_path, recording_index, environment_name, verbose, experiment_class,
+                         **env_kwargs)
         self.time_step_size = env_kwargs["time_step_size"]
-        self.merge_time = int((merge_time * 60) / self.time_step_size)
-        self.switch_time = int((switch_time * 60) / self.time_step_size)
+        self.merge_time = int((merge_time*60) / self.time_step_size)
+        self.switch_time = int((switch_time*60) / self.time_step_size)
 
         self.AB_id = "AB"
         self.A_id = "A"
         self.B_id = "B"
 
     def set_room(self, room_id: str):
-        """Place the agent in the right room configuration depending the amount of exploration time
+        """ Place the agent in the right room configuration depending the amount of exploration time
 
         Parameters
         ----------
@@ -88,20 +70,16 @@ class Wernle2018(Hafting2008):
         """
         if room_id == self.A_id:
             # Take the agent to room A
-            self.state = [
-                np.random.uniform(low=self.arena_limits[0, 0], high=self.arena_limits[0, 1]),
-                np.random.uniform(low=self.arena_limits[1, 0], high=0),
-            ]
+            self.state = [np.random.uniform(low=self.arena_limits[0, 0], high=self.arena_limits[0, 1]),
+                          np.random.uniform(low=self.arena_limits[1, 0], high=0)]
             # Add wall in between to separete rooms
             self.custom_walls = [np.array([[-100, 0], [100, 0]])]
             # Update walls in the environment
             self.wall_list = self.default_walls + self.custom_walls
         elif room_id == self.B_id:
             # Take the agent to room B
-            self.state = [
-                np.random.uniform(low=self.arena_limits[0, 0], high=self.arena_limits[0, 1]),
-                np.random.uniform(low=0, high=self.arena_limits[1, 1]),
-            ]
+            self.state = [np.random.uniform(low=self.arena_limits[0, 0], high=self.arena_limits[0, 1]),
+                          np.random.uniform(low=0, high=self.arena_limits[1, 1])]
             # Add wall in between to separete rooms
             self.custom_walls = [np.array([[-100, 0], [100, 0]])]
             # Update walls in the environment
@@ -114,11 +92,11 @@ class Wernle2018(Hafting2008):
                 self.wall_list = self.default_walls + self.custom_walls
 
     def _create_custom_walls(self):
-        """Add wall in between when initializing environment as default"""
+        """ Add wall in between when initializing environment as default """
         self.custom_walls = [np.array([[-100, 0], [100, 0]])]
 
     def step(self, action: np.ndarray, normalize_step: bool = False, skip_every: int = 10):
-        """Set the right room configuration, then call default step function"""
+        """ Set the right room configuration, then call default step function """
         if self.use_behavioral_data:
             return super().step(action, normalize_step, skip_every)
         if self.global_steps == 0:
@@ -131,7 +109,7 @@ class Wernle2018(Hafting2008):
 
 
 class MergingRoom(Simple2D):
-    """Arena resembling Wernle2018 experimental setting BUT WITH GENERIC ROOM DIMENSIONS
+    """ Arena resembling Wernle2018 experimental setting BUT WITH GENERIC ROOM DIMENSIONS
 
     Methods (In addition to Simple2D)
     ----------
@@ -147,14 +125,8 @@ class MergingRoom(Simple2D):
     switch_time: float
         Time in minutes to change the agent from one room to the other one
     """
-
-    def __init__(
-        self,
-        environment_name: str = "Wernle2018",
-        merge_time: float = 100,
-        switch_time: float = 50,
-        **env_kwargs,
-    ):
+    def __init__(self, environment_name: str = "Wernle2018",
+                 merge_time: float = 100, switch_time: float = 50, **env_kwargs):
         """
 
         Parameters
@@ -184,15 +156,15 @@ class MergingRoom(Simple2D):
         super().__init__(environment_name, **env_kwargs)
 
         self.time_step_size = env_kwargs["time_step_size"]
-        self.merge_time = int((merge_time * 60) / self.time_step_size)
-        self.switch_time = int((switch_time * 60) / self.time_step_size)
+        self.merge_time = int((merge_time*60) / self.time_step_size)
+        self.switch_time = int((switch_time*60) / self.time_step_size)
 
         self.AB_id = "AB"
         self.A_id = "A"
         self.B_id = "B"
 
     def set_room(self, room_id: str):
-        """Place the agent in the right room configuration depending the amount of exploration time
+        """ Place the agent in the right room configuration depending the amount of exploration time
 
         Parameters
         ----------
@@ -202,20 +174,16 @@ class MergingRoom(Simple2D):
         """
         if room_id == self.A_id:
             # Take the agent to room A
-            self.state = [
-                np.random.uniform(low=self.arena_limits[0, 0], high=self.arena_limits[0, 1]),
-                np.random.uniform(low=self.arena_limits[1, 0], high=0),
-            ]
+            self.state = [np.random.uniform(low=self.arena_limits[0, 0], high=self.arena_limits[0, 1]),
+                          np.random.uniform(low=self.arena_limits[1, 0], high=0)]
             # Add wall in between to separete rooms
             self.custom_walls = [np.array([[self.arena_limits[0, 0], 0], [self.arena_limits[0, 1], 0]])]
             # Update walls in the environment
             self.wall_list = self.default_walls + self.custom_walls
         elif room_id == self.B_id:
             # Take the agent to room B
-            self.state = [
-                np.random.uniform(low=self.arena_limits[0, 0], high=self.arena_limits[0, 1]),
-                np.random.uniform(low=0, high=self.arena_limits[1, 1]),
-            ]
+            self.state = [np.random.uniform(low=self.arena_limits[0, 0], high=self.arena_limits[0, 1]),
+                          np.random.uniform(low=0, high=self.arena_limits[1, 1])]
             # Add wall in between to separete rooms
             self.custom_walls = [np.array([[self.arena_limits[0, 0], 0], [self.arena_limits[0, 1], 0]])]
             # Update walls in the environment
@@ -228,11 +196,11 @@ class MergingRoom(Simple2D):
                 self.wall_list = self.default_walls + self.custom_walls
 
     def _create_custom_walls(self):
-        """Add wall in between when initializing environment as default"""
+        """ Add wall in between when initializing environment as default """
         self.custom_walls = [np.array([[self.arena_limits[0, 0], 0], [self.arena_limits[0, 1], 0]])]
 
     def step(self, action: np.ndarray, normalize_step: bool = False):
-        """Set the right room configuration, then call default step function"""
+        """ Set the right room configuration, then call default step function """
         if self.global_steps == 0:
             self.set_room("A")
         elif self.global_steps == self.merge_time:
