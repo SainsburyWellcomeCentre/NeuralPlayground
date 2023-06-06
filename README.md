@@ -34,6 +34,8 @@ Altogether, we hope our framework, available at [github.com/NeuralPlayground](ht
 a foundation that the community will build upon, working toward a shared, standardized, open, and
 reproducible computational understanding of the hippocampus and entorhinal cortex.
 
+Try our short tutorial online in Colab. <a href="https://githubtocolab.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/colab_example.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
+
 ## 2. Installation
 You can create a new environment using conda, and the yml file with all the right
 dependencies by running
