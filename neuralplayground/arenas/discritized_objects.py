@@ -49,8 +49,18 @@ class DiscreteObjectEnvironment(Environment):
             The density of discrete states in the environment
     """
 
-    def __init__(self, environment_name='DiscreteObject', **env_kwargs):
+    def __init__(self, use_behavioural_data: bool = False, data_path: str = None, recording_index: int = None,
+                 environment_name: str = "DiscreteObject", verbose: bool = False, experiment_class: str = None, 
+                 **env_kwargs):
         super().__init__(environment_name, **env_kwargs)
+        self.data_path = data_path
+        self.environment_name = environment_name
+        self.use_behavioral_data = use_behavioural_data
+        self.experiment = experiment_class(data_path=self.data_path, experiment_name=self.environment_name,
+                                           recording_index=recording_index, verbose=verbose)  
+        if self.use_behavioral_data:
+            self.state_dims_labels = ["x_pos", "y_pos", "head_direction_x", "head_direction_y"]
+
         self.n_objects = env_kwargs['n_objects']
         self.state_density = env_kwargs['state_density']
         self.arena_x_limits = env_kwargs['arena_x_limits']
@@ -110,6 +120,11 @@ class DiscreteObjectEnvironment(Environment):
         if custom_state is not None:
             pos = np.array(custom_state)
 
+        # Reset to first position recorded in this session
+        if self.use_behavioral_data:
+            pos, head_dir = self.experiment.position[0, :], self.experiment.head_direction[0, :]
+            custom_state = np.concatenate([pos, head_dir])
+
         self.objects = self.generate_objects()
 
         # Fully observable environment, make_observation returns the state
@@ -117,7 +132,7 @@ class DiscreteObjectEnvironment(Environment):
         self.state = observation
         return observation, self.state
 
-    def step(self, action, normalize_step=False):
+    def step(self, action: np.ndarray, normalize_step: bool = False, skip_every: int = 10):
         """
         Runs the environment dynamics. Increasing global counters. Given some action, return observation,
         new state and reward.
@@ -128,6 +143,9 @@ class DiscreteObjectEnvironment(Environment):
             Array containing the action of the agent, in this case the delta_x and detla_y increment to position
         normalize_step: bool
             If true, the action is normalized to have unit size, then scaled by the agent step size
+        skip_every: int
+            When using behavioral data, the next state will be the position and head direction
+            "skip_every" recorded steps after the current one, essentially reducing the sampling rate
 
         Returns
         -------
@@ -138,17 +156,32 @@ class DiscreteObjectEnvironment(Environment):
         observation: ndarray
             Array of the observation of the agent in the environment, in this case the sensory object.
         """
-        self.old_state = self.state.copy()
-        if action[0] == 0:
-                action_rev = np.array([0., -action[1]])
+        if self.use_behavioral_data:
+            # In this case, the action is ignored and computed from the step in behavioral data recorded from the experiment
+            if self.global_steps*skip_every >= self.experiment.position.shape[0]-1:
+                self.global_steps = np.random.choice(np.arange(skip_every))
+            # Time elapsed since last reset
+            self.global_time = self.global_steps*self.time_step_size
+
+            # New state as "skip every" steps after the current one in the recording
+            new_state = self.experiment.position[self.global_steps * skip_every, :], \
+                self.experiment.head_direction[self.global_steps * skip_every, :]
+            new_state = np.concatenate(new_state)
+
+            # Inferring action from recording
+            action = new_state - self.state
         else:
-            action_rev = action
-        if normalize_step and np.linalg.norm(action) > 0:
-            action_rev = action_rev / np.linalg.norm(action_rev)
-            new_pos_state = self.state[-1] + self.agent_step_size * action_rev
-        else:
-            new_pos_state = self.state[-1] + action_rev
-        new_pos_state, valid_action = self.validate_action(self.state[-1], action_rev, new_pos_state)
+            self.old_state = self.state.copy()
+            if action[0] == 0:
+                    action_rev = np.array([0., -action[1]])
+            else:
+                action_rev = action
+            if normalize_step and np.linalg.norm(action) > 0:
+                action_rev = action_rev / np.linalg.norm(action_rev)
+                new_pos_state = self.state[-1] + self.agent_step_size * action_rev
+            else:
+                new_pos_state = self.state[-1] + action_rev
+            new_pos_state, valid_action = self.validate_action(self.state[-1], action_rev, new_pos_state)
         reward = self.reward_function(action_rev, self.state[-1])  # If you get reward, it should be coded here
         # self.state[-1] = new_pos_state
         observation = self.make_object_observation(new_pos_state)
