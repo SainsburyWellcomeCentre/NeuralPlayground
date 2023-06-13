@@ -22,34 +22,30 @@ params = pars_orig.copy()
 
 # Initialise environment parameters
 batch_size = 16
-arena_x_limits = [[-200,200], [-100,100], [-50,50], [-40,40], [-200,200], [-100,100], [-50,50], [-40,40], [-200,200], [-100,100], [-50,50], [-40,40], [-200,200], [-100,100], [-50,50], [-40,40]]
-arena_y_limits = [[-20,20],   [-10,10],   [-5,5],   [-4,4],   [-20,20],   [-10,10],   [-5,5],   [-4,4],   [-20,20],   [-10,10],   [-5,5],   [-4,4],   [-20,20],   [-10,10],   [-5,5],   [-4,4]]
-env_name = "Hafting2008"
+arena_x_limits = [[-5,5], [-4,4], [-5,5], [-6,6], [-4,4], [-5,5], [-6,6], [-5,5], [-4,4], [-5,5], [-6,6], [-5,5], [-4,4], [-5,5], [-6,6], [-5,5]]
+arena_y_limits = [[-5,5], [-4,4], [-5,5], [-6,6], [-4,4], [-5,5], [-6,6], [-5,5], [-4,4], [-5,5], [-6,6], [-5,5], [-4,4], [-5,5], [-6,6], [-5,5]]
+env_name = "env_example"
 mod_name = "SimpleTEM"
-time_step_size = 1/50
+time_step_size = 1
 state_density = 1
 agent_step_size = 1/state_density
 n_objects = 45
 
-# # Init environment from Hafting 2008 (optional, if chosen, comment out the )
-# env = Hafting2008(agent_step_size=agent_step_size,
-#                   time_step_size=time_step_size,
-#                   use_behavioral_data=False)
-
-parent_directory = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..')
-data_path = os.path.join(parent_directory, 'neuralplayground', 'experiments', 'sargolini_2006')
-env = BasicSargolini2006(use_behavioral_data=True, data_path=data_path,
-                         time_step_size=0.1,
-                         agent_step_size=None)
+# Init environment from Hafting 2008 (optional, if chosen, comment out the )
+env = Hafting2008(agent_step_size=agent_step_size,
+                  time_step_size=time_step_size,
+                  use_behavioral_data=False)
+#
+# arena_x_limits = [env.arena_x_limits for i in range(batch_size)]
+# arena_y_limits = [env.arena_y_limits for i in range(batch_size)]
 
 # Init simple 2D (batched) environment with discrtised objects
-env_class = DiscreteObjectEnvironment
+# env_class = DiscreteObjectEnvironment
 
-# # Init environment from Sargolini, with behavioural data instead of random walk
-# parent_directory = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..')
-# data_path = os.path.join(parent_directory, 'neuralplayground', 'experiments', 'sargolini_2006')
-# env_class = DiscreteObjectEnvironment(use_behavioral_data=True, data_path=data_path,
-#                          )
+# Init environment from Sargolini, with behavioural data instead of random walk
+parent_directory = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..')
+data_path = os.path.join(parent_directory, 'neuralplayground', 'experiments', 'sargolini_2006')
+env_class = BasicSargolini2006
 
 env = BatchEnvironment(environment_name=env_name,
                        env_class=env_class,
@@ -64,15 +60,14 @@ env = BatchEnvironment(environment_name=env_name,
 agent = Whittington2020(model_name=mod_name,
                         params=params,
                         batch_size=batch_size,
-                        room_widths=env.room_widths,
-                        room_depths=env.room_depths,
-                        state_densities=env.state_densities)
+                        room_widths=env.room_width,
+                        room_depths=env.room_depth,
+                        state_densities=state_density)
 
 # Reset environment and begin training (random_state=True is currently necessary)
 observation, state = env.reset(random_state=True, custom_state=None)
 for i in range(params['train_it']):
     while agent.n_walk < params['n_rollout']:
-        print(agent.n_walk)
         actions = agent.batch_act(observation)
         observation, state = env.step(actions, normalize_step=True)
     agent.update()
