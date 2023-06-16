@@ -8,13 +8,18 @@ import matplotlib.pyplot as plt
 from tqdm import tqdm
 import os
 
-# NeuralPlayground Imports
+# NeuralPlayground Arena Imports
 from neuralplayground.arenas.discritized_objects import DiscreteObjectEnvironment
 from neuralplayground.arenas.batch_environment import BatchEnvironment
 from neuralplayground.arenas.hafting_2008 import Hafting2008
 from neuralplayground.arenas.sargolini_2006 import BasicSargolini2006
 from neuralplayground.agents.whittington_2020 import Whittington2020
+
+# NeuralPlayground Agent Imports
 import neuralplayground.agents.whittington_2020_extras.whittington_2020_parameters as parameters
+
+# NeuralPlayground Experiment Imports
+from neuralplayground.experiments import Sargolini2006Data
 
 # Initialise TEM Parameters
 pars_orig = parameters.parameters()
@@ -22,11 +27,13 @@ params = pars_orig.copy()
 
 # Initialise environment parameters
 batch_size = 16
-arena_x_limits = [[-200,200], [-100,100], [-50,50], [-40,40], [-200,200], [-100,100], [-50,50], [-40,40], [-200,200], [-100,100], [-50,50], [-40,40], [-200,200], [-100,100], [-50,50], [-40,40]]
-arena_y_limits = [[-20,20],   [-10,10],   [-5,5],   [-4,4],   [-20,20],   [-10,10],   [-5,5],   [-4,4],   [-20,20],   [-10,10],   [-5,5],   [-4,4],   [-20,20],   [-10,10],   [-5,5],   [-4,4]]
+# arena_x_limits = [[-5,5], [-4,4], [-5,5], [-6,6], [-4,4], [-5,5], [-6,6], [-5,5], [-4,4], [-5,5], [-6,6], [-5,5], [-4,4], [-5,5], [-6,6], [-5,5]]
+# arena_y_limits = [[-5,5], [-4,4], [-5,5], [-6,6], [-4,4], [-5,5], [-6,6], [-5,5], [-4,4], [-5,5], [-6,6], [-5,5], [-4,4], [-5,5], [-6,6], [-5,5]]
+arena_x_limits = [[-20,20], [-20,20], [-15,15], [-10,10], [-20,20], [-20,20], [-15,15], [-10,10], [-20,20], [-20,20], [-15,15], [-10,10], [-20,20], [-20,20], [-15,15], [-10,10]]
+arena_y_limits = [[-4,4],   [-2,2],   [-2,2],   [-1,1],   [-4,4],   [-2,2],   [-2,2],   [-1,1],   [-4,4],   [-2,2],   [-2,2],   [-1,1],   [-4,4],   [-2,2],   [-2,2],   [-1,1]]
 env_name = "Hafting2008"
 mod_name = "SimpleTEM"
-time_step_size = 1/50
+time_step_size = 1
 state_density = 1
 agent_step_size = 1/state_density
 n_objects = 45
@@ -36,20 +43,19 @@ n_objects = 45
 #                   time_step_size=time_step_size,
 #                   use_behavioral_data=False)
 
-parent_directory = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..')
-data_path = os.path.join(parent_directory, 'neuralplayground', 'experiments', 'sargolini_2006')
-env = BasicSargolini2006(use_behavioral_data=True, data_path=data_path,
-                         time_step_size=0.1,
-                         agent_step_size=None)
-
-# Init simple 2D (batched) environment with discrtised objects
-env_class = DiscreteObjectEnvironment
-
-# # Init environment from Sargolini, with behavioural data instead of random walk
 # parent_directory = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..')
 # data_path = os.path.join(parent_directory, 'neuralplayground', 'experiments', 'sargolini_2006')
-# env_class = DiscreteObjectEnvironment(use_behavioral_data=True, data_path=data_path,
-#                          )
+# env = BasicSargolini2006(use_behavioral_data=True, data_path=data_path,
+#                          time_step_size=0.1,
+#                          agent_step_size=None)
+
+# # Init simple 2D (batched) environment with discrtised objects
+# env_class = DiscreteObjectEnvironment
+
+# Init environment from Sargolini, with behavioural data instead of random walk
+parent_directory = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..')
+data_path = os.path.normpath(os.path.join(parent_directory, 'neuralplayground', 'experiments', 'sargolini_2006', 'raw_data_sample'))
+env_class = DiscreteObjectEnvironment(use_behavioral_data=True, data_path=data_path, experiment_class=Sargolini2006Data)
 
 env = BatchEnvironment(environment_name=env_name,
                        env_class=env_class,
