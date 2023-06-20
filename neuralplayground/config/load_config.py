@@ -9,7 +9,7 @@ from .plot_config import PlotsConfig
 
 
 def _load_config(config_path: str = None):
-    """Load config from a given path
+    """Load config file
 
     Parameters
     ----------
@@ -21,7 +21,6 @@ def _load_config(config_path: str = None):
     config: NPGConfig
         Config object
     """
-
     with open(config_path, "r") as file:
         CONFIG_FILE_YAML = yaml.safe_load(file)
         print(config_path)
@@ -29,18 +28,18 @@ def _load_config(config_path: str = None):
     return PLOT_CONFIG
 
 
-def generate_config_file():
-    """Generate a config file in the current directory
+def generate_config_file(dir_path: str = None):
+    """Generate config file
 
     Parameters
     ----------
-    config_path: str
-        Path to the config file
+    dir_path: str
+        Path to the new config file, use current path if dir_path is None
 
-    Returns
-    -------
-    config: NPGConfig
-        Config object
     """
+    if dir_path is None:
+        dir_path = "./"
 
-    shutil.copyfile(os.path.join(neuralplayground.__path__[0], "config", "default_config.yaml"), "./config_params.yaml")
+    new_config_file_path = os.path.join(dir_path, "config_params.yaml")
+
+    shutil.copyfile(os.path.join(neuralplayground.__path__[0], "config", "default_config.yaml"), new_config_file_path)
