@@ -70,15 +70,14 @@ env = BatchEnvironment(environment_name=env_name,
 agent = Whittington2020(model_name=mod_name,
                         params=params,
                         batch_size=batch_size,
-                        room_widths=env.room_widths,
-                        room_depths=env.room_depths,
-                        state_densities=env.state_densities)
+                        room_widths=env.room_width,
+                        room_depths=env.room_depth,
+                        state_densities=state_density)
 
 # Reset environment and begin training (random_state=True is currently necessary)
 observation, state = env.reset(random_state=True, custom_state=None)
 for i in range(params['train_it']):
     while agent.n_walk < params['n_rollout']:
-        print(agent.n_walk)
         actions = agent.batch_act(observation)
         observation, state = env.step(actions, normalize_step=True)
     agent.update()
