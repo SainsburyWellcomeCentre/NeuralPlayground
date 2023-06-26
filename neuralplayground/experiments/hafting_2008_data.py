@@ -9,7 +9,7 @@ import pandas as pd
 import scipy.io as sio
 from IPython.display import display
 
-import neuralplayground
+from neuralplayground.datasets import fetch_data_path
 from neuralplayground.utils import clean_data, get_2D_ratemap
 
 from .experiment_core import Experiment
@@ -34,7 +34,8 @@ class Hafting2008Data(Experiment):
         Parameters
         ----------
         data_path: str
-            if None, load the data sample in the package, else load data from given path
+            if None, fetch the data from the NeuralPlayground data repository,
+            else load data from given path
         recording_index: int
             if None, load data from default recording index
         experiment_name: str
@@ -67,7 +68,7 @@ class Hafting2008Data(Experiment):
     def _find_data_path(self, data_path: str):
         """Set self.data_path to the data directory within the package"""
         if data_path is None:
-            self.data_path = os.path.join(neuralplayground.__path__[0], "experiments/hafting_2008/")
+            self.data_path = fetch_data_path("hafting_2008")
         else:
             self.data_path = data_path
 

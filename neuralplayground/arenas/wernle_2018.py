@@ -42,7 +42,7 @@ class Wernle2018(Hafting2008):
         use_behavioral_data: bool
             If True, then uses the animal trajectories recorded in Wernle 2018
         data_path: str
-            if None, load the data of corresponding experiment available in the package,
+            if None, fetch the data from the NeuralPlayground data repository,
             else load data from given path
         recording_index: int
             if None, load data from default recording index of corresponding experiment class
@@ -162,7 +162,7 @@ class MergingRoom(Simple2D):
         use_behavioral_data: bool
             If True, then uses the animal trajectories recorded in Wernle 2018
         data_path: str
-            if None, load the data of corresponding experiment available in the package,
+            if None, fetch the data from the NeuralPlayground data repository,
             else load data from given path
         recording_index: int
             if None, load data from default recording index of corresponding experiment class

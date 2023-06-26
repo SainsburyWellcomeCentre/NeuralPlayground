@@ -9,6 +9,7 @@ import pandas as pd
 import scipy.io as sio
 
 import neuralplayground
+from neuralplayground.datasets import fetch_data_path
 from neuralplayground.experiments.hafting_2008_data import Hafting2008Data
 from neuralplayground.utils import get_2D_ratemap
 
@@ -30,7 +31,8 @@ class Wernle2018Data(Hafting2008Data):
         Parameters
         ----------
         data_path: str
-            if None, load the data sample in the package, else load data from given path
+            if None, fetch the data from the NeuralPlayground data repository,
+            else load data from given path
         recording_index: int
             if None, load data from default recording index
         experiment_name: str
@@ -48,7 +50,7 @@ class Wernle2018Data(Hafting2008Data):
     def _find_data_path(self, data_path: str):
         """Set self.data_path to the data directory within the package"""
         if data_path is None:
-            self.data_path = os.path.join(neuralplayground.__path__[0], "experiments/wernle_2018/")
+            self.data_path = fetch_data_path("wernle_2018")
         else:
             self.data_path = data_path
 
