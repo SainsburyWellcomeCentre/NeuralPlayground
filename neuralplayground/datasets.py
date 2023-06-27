@@ -6,7 +6,6 @@ and are downloaded to the user's local machine the first time they are used.
 """
 
 from pathlib import Path
-from typing import Literal
 
 import pooch
 
@@ -29,9 +28,11 @@ DATASET_REGISTRY = pooch.create(
     },
 )
 
+dataset_names = [n.split(".")[0] for n in DATASET_REGISTRY.registry.keys()]
+
 
 def fetch_data_path(
-    dataset_name: Literal["hafting_2008", "sargolini_2006", "wernle_2018"],
+    dataset_name: str,
     progressbar: bool = True,
 ):
     """Download and cache a dataset from the GIN repository.
@@ -39,7 +40,7 @@ def fetch_data_path(
     Parameters
     ----------
     dataset_name : str
-        One of "hafting_2008", "sargolini_2006", "wernle_2018"
+        The name of one the available datasets, e.g. "hafting_2008".
     progressbar : bool
         If True, show a progress bar while downloading the data.
         Defaults to True.
@@ -49,6 +50,8 @@ def fetch_data_path(
     str
         Path to the downloaded dataset
     """
+    if dataset_name not in dataset_names:
+        raise ValueError(f"Dataset {dataset_name} not found. Available datasets: {dataset_names}")
     DATASET_REGISTRY.fetch(f"{dataset_name}.zip", processor=pooch.Unzip(extract_dir=LOCAL_DATA_DIR), progressbar=progressbar)
     data_path = LOCAL_DATA_DIR / dataset_name
     return data_path.as_posix() + "/"
