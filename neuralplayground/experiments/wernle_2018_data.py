@@ -48,7 +48,8 @@ class Wernle2018Data(Hafting2008Data):
         )
 
     def _find_data_path(self, data_path: str):
-        """Set self.data_path to the data directory within the package"""
+        """Fetch data from NeuralPlayground data repository 
+        if no data path is supplied by the user"""
         if data_path is None:
             self.data_path = fetch_data_path("wernle_2018")
         else:

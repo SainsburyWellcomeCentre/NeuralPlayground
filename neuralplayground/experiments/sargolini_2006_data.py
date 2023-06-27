@@ -124,7 +124,8 @@ class Sargolini2006Data(Hafting2008Data):
         )
 
     def _find_data_path(self, data_path: str):
-        """Set self.data_path to the data directory within the package"""
+        """Fetch data from NeuralPlayground data repository 
+        if no data path is supplied by the user"""
         if data_path is None:
             self.data_path = fetch_data_path("sargolini_2006") + "raw_data_sample/"
         else:
