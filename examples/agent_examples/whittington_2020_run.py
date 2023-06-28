@@ -43,41 +43,36 @@ n_objects = 45
 #                   time_step_size=time_step_size,
 #                   use_behavioral_data=False)
 
-# parent_directory = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..')
-# data_path = os.path.join(parent_directory, 'neuralplayground', 'experiments', 'sargolini_2006')
-# env = BasicSargolini2006(use_behavioral_data=True, data_path=data_path,
-#                          time_step_size=0.1,
-#                          agent_step_size=None)
-
 # # Init simple 2D (batched) environment with discrtised objects
 # env_class = DiscreteObjectEnvironment
 
 # Init environment from Sargolini, with behavioural data instead of random walk
-parent_directory = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..')
-data_path = os.path.normpath(os.path.join(parent_directory, 'neuralplayground', 'experiments', 'sargolini_2006', 'raw_data_sample'))
-env_class = DiscreteObjectEnvironment(use_behavioral_data=True, data_path=data_path, experiment_class=Sargolini2006Data)
-
 env = BatchEnvironment(environment_name=env_name,
-                       env_class=env_class,
+                       env_class=DiscreteObjectEnvironment,
                        batch_size=batch_size,
                        arena_x_limits=arena_x_limits,
                        arena_y_limits=arena_y_limits,
                        state_density=state_density,
                        n_objects=n_objects,
-                       agent_step_size=agent_step_size)
+                       agent_step_size=agent_step_size,
+                       use_behavioural_data=True,
+                       data_path=None,
+                       experiment_class=Sargolini2006Data)
 
 # Init TEM agent
 agent = Whittington2020(model_name=mod_name,
                         params=params,
                         batch_size=batch_size,
-                        room_widths=env.room_width,
-                        room_depths=env.room_depth,
-                        state_densities=state_density)
+                        room_widths=env.room_widths,
+                        room_depths=env.room_depths,
+                        state_densities=env.state_densities)
 
 # Reset environment and begin training (random_state=True is currently necessary)
 observation, state = env.reset(random_state=True, custom_state=None)
 for i in range(params['train_it']):
+    print("Iteration: ", i)
     while agent.n_walk < params['n_rollout']:
+        print("Walk: ", agent.n_walk)
         actions = agent.batch_act(observation)
         observation, state = env.step(actions, normalize_step=True)
     agent.update()

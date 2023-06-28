@@ -49,14 +49,12 @@ class DiscreteObjectEnvironment(Environment):
             The density of discrete states in the environment
     """
 
-    def __init__(self, use_behavioural_data: bool = False, data_path: str = None, recording_index: int = None,
-                 environment_name: str = "DiscreteObject", verbose: bool = False, experiment_class: str = None, 
-                 **env_kwargs):
+    def __init__(self, recording_index: int = None, environment_name: str = "DiscreteObject", verbose: bool = False, 
+    experiment_class: str = None, **env_kwargs):
         super().__init__(environment_name, **env_kwargs)
-        self.data_path = data_path
         self.environment_name = environment_name
-        self.use_behavioral_data = use_behavioural_data
-        self.experiment = experiment_class(data_path=self.data_path, experiment_name=self.environment_name,
+        self.use_behavioral_data = env_kwargs["use_behavioural_data"]
+        self.experiment = experiment_class(experiment_name=self.environment_name, data_path=env_kwargs["data_path"],
                                            recording_index=recording_index, verbose=verbose)  
         if self.use_behavioral_data:
             self.state_dims_labels = ["x_pos", "y_pos", "head_direction_x", "head_direction_y"]
