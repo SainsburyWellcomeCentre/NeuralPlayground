@@ -167,7 +167,7 @@ class DiscreteObjectEnvironment(Environment):
             new_state = np.concatenate(new_state)
 
             # Inferring action from recording
-            action = new_state - self.state
+            action = new_state[:2] - self.state[-1]
         else:
             self.old_state = self.state.copy()
             if action[0] == 0:
