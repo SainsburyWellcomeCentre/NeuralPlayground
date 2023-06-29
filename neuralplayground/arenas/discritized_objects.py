@@ -162,12 +162,18 @@ class DiscreteObjectEnvironment(Environment):
             self.global_time = self.global_steps*self.time_step_size
 
             # New state as "skip every" steps after the current one in the recording
-            new_state = self.experiment.position[self.global_steps * skip_every, :], \
+            new_pos_state = self.experiment.position[self.global_steps * skip_every, :], \
                 self.experiment.head_direction[self.global_steps * skip_every, :]
-            new_state = np.concatenate(new_state)
+            new_pos_state = np.concatenate(new_pos_state)
 
             # Inferring action from recording
-            action = new_state[:2] - self.state[-1]
+            action = new_pos_state[:2] - self.state[-1][:2]
+
+            self.old_state = self.state[:2].copy()
+            if action[0] == 0:
+                action_rev = np.array([0., -action[1]])
+            else:
+                action_rev = action
         else:
             self.old_state = self.state.copy()
             if action[0] == 0:
@@ -210,6 +216,8 @@ class DiscreteObjectEnvironment(Environment):
         return [index, object, pos]
 
     def pos_to_state(self, pos):
+        if len(pos) > 2:
+            pos = pos[:2]
         diff = (self.xy_combination - pos) ** 2
         dist = np.sum(diff ** 2, axis=-1)
         index = np.argmin(dist)
