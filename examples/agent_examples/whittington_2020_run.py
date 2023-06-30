@@ -55,7 +55,7 @@ env = BatchEnvironment(environment_name=env_name,
                        state_density=state_density,
                        n_objects=n_objects,
                        agent_step_size=agent_step_size,
-                       use_behavioural_data=True,
+                       use_behavioural_data=False,
                        data_path=None,
                        experiment_class=Sargolini2006Data)
 
@@ -69,7 +69,7 @@ agent = Whittington2020(model_name=mod_name,
 
 # Reset environment and begin training (random_state=True is currently necessary)
 observation, state = env.reset(random_state=True, custom_state=None)
-for i in range(params['train_it']):
+for i in range(3):
     print("Iteration: ", i)
     while agent.n_walk < params['n_rollout']:
         print("Walk: ", agent.n_walk)

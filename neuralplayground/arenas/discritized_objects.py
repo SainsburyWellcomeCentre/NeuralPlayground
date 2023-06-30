@@ -58,17 +58,21 @@ class DiscreteObjectEnvironment(Environment):
                                            recording_index=recording_index, verbose=verbose)  
         if self.use_behavioral_data:
             self.state_dims_labels = ["x_pos", "y_pos", "head_direction_x", "head_direction_y"]
+            self.arena_limits = self.experiment.arena_limits
+            self.arena_x_limits = self.arena_limits[0]
+            self.arena_y_limits = self.arena_limits[1]
+        else:
+            self.state_dims_labels = ["x_pos", "y_pos"]
+            self.arena_x_limits = env_kwargs['arena_x_limits']
+            self.arena_y_limits = env_kwargs['arena_y_limits']
 
         self.n_objects = env_kwargs['n_objects']
         self.state_density = env_kwargs['state_density']
-        self.arena_x_limits = env_kwargs['arena_x_limits']
-        self.arena_y_limits = env_kwargs['arena_y_limits']
         self.arena_limits = np.array([[self.arena_x_limits[0], self.arena_x_limits[1]],
                                       [self.arena_y_limits[0], self.arena_y_limits[1]]])
         self.room_width = np.diff(self.arena_x_limits)[0]
         self.room_depth = np.diff(self.arena_y_limits)[0]
         self.agent_step_size = env_kwargs['agent_step_size']
-        self.state_dims_labels = ["x_pos", "y_pos"]
         self._create_default_walls()
         self._create_custom_walls()
         self.wall_list = self.default_walls + self.custom_walls
