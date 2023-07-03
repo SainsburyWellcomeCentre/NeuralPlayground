@@ -34,7 +34,7 @@ arena_y_limits = [[-4,4],   [-2,2],   [-2,2],   [-1,1],   [-4,4],   [-2,2],   [-
 env_name = "Hafting2008"
 mod_name = "SimpleTEM"
 time_step_size = 1
-state_density = 1
+state_density = 1/10
 agent_step_size = 1/state_density
 n_objects = 45
 
@@ -55,7 +55,7 @@ env = BatchEnvironment(environment_name=env_name,
                        state_density=state_density,
                        n_objects=n_objects,
                        agent_step_size=agent_step_size,
-                       use_behavioural_data=False,
+                       use_behavioural_data=True,
                        data_path=None,
                        experiment_class=Sargolini2006Data)
 

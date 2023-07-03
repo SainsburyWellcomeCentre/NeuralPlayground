@@ -59,8 +59,8 @@ class DiscreteObjectEnvironment(Environment):
         if self.use_behavioral_data:
             self.state_dims_labels = ["x_pos", "y_pos", "head_direction_x", "head_direction_y"]
             self.arena_limits = self.experiment.arena_limits
-            self.arena_x_limits = self.arena_limits[0]
-            self.arena_y_limits = self.arena_limits[1]
+            self.arena_x_limits = self.arena_limits[0].astype(int)
+            self.arena_y_limits = self.arena_limits[1].astype(int)
         else:
             self.state_dims_labels = ["x_pos", "y_pos"]
             self.arena_x_limits = env_kwargs['arena_x_limits']
