@@ -158,6 +158,7 @@ class DiscreteObjectEnvironment(Environment):
         observation: ndarray
             Array of the observation of the agent in the environment, in this case the sensory object.
         """
+        self.old_state = self.state.copy()
         if self.use_behavioral_data:
             # In this case, the action is ignored and computed from the step in behavioral data recorded from the experiment
             if self.global_steps*skip_every >= self.experiment.position.shape[0]-1:
@@ -169,17 +170,7 @@ class DiscreteObjectEnvironment(Environment):
             new_pos_state = self.experiment.position[self.global_steps * skip_every, :], \
                 self.experiment.head_direction[self.global_steps * skip_every, :]
             new_pos_state = np.concatenate(new_pos_state)
-
-            # Inferring action from recording
-            action = new_pos_state[:2] - self.state[-1][:2]
-
-            self.old_state = self.state[:2].copy()
-            if action[0] == 0:
-                action_rev = np.array([0., -action[1]])
-            else:
-                action_rev = action
         else:
-            self.old_state = self.state.copy()
             if action[0] == 0:
                     action_rev = np.array([0., -action[1]])
             else:
@@ -190,8 +181,7 @@ class DiscreteObjectEnvironment(Environment):
             else:
                 new_pos_state = self.state[-1] + action_rev
             new_pos_state, valid_action = self.validate_action(self.state[-1], action_rev, new_pos_state)
-        reward = self.reward_function(action_rev, self.state[-1])  # If you get reward, it should be coded here
-        # self.state[-1] = new_pos_state
+        reward = self.reward_function(action, self.state[-1])  # If you get reward, it should be coded here
         observation = self.make_object_observation(new_pos_state)
         self.state = observation
         self.transition = {"action": action, "state": self.old_state, "next_state": self.state,
