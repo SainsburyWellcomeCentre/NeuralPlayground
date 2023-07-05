@@ -65,7 +65,8 @@ agent = Whittington2020(model_name=mod_name,
                         batch_size=batch_size,
                         room_widths=env.room_widths,
                         room_depths=env.room_depths,
-                        state_densities=env.state_densities)
+                        state_densities=env.state_densities,
+                        use_behavioural_data=True)
 
 # Reset environment and begin training (random_state=True is currently necessary)
 observation, state = env.reset(random_state=True, custom_state=None)

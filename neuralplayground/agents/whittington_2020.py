@@ -83,6 +83,7 @@ class Whittington2020(AgentCore):
         self.pars = copy.deepcopy(params)
         self.tem = model.Model(self.pars)
         self.batch_size = mod_kwargs['batch_size']
+        self.use_behavioural_data = mod_kwargs['use_behavioural_data']
         self.n_envs_save = 4
         self.n_states = [int(self.room_widths[i] * self.room_depths[i] * self.state_densities[i]) for i in range(self.batch_size)]
         self.poss_actions = [[0,0], [0,-1], [1,0], [0,1], [-1,0]]
@@ -136,30 +137,42 @@ class Whittington2020(AgentCore):
         action : array (16,2)
             Action values (Direction of the agent step) in this case executes one of four action (up-down-right-left) with equal probability.
         """
-        locations = [env[0] for env in observations]
-        all_allowed = True
-        new_actions = []
-        for i, loc in enumerate(locations):
-            if loc == self.prev_observations[i][0] and self.prev_actions[i] != [0,0]:
-                all_allowed = False
-                break
-
-        if all_allowed:
-            self.walk_actions.append(self.prev_actions.copy())
+        
+        if self.use_behavioural_data:
+            actions = [observations[i][2][:2] - self.prev_observations[i][2][:2] for i in range(self.batch_size)]
+            new_actions = [self.round_to_cardinal_direction(action) for action in actions]
+            self.walk_actions.append(new_actions)
             self.obs_history.append(self.prev_observations.copy())
-            for batch in range(self.pars['batch_size']):
-                new_actions.append(self.action_policy())
-            self.prev_actions = new_actions
             self.prev_observations = observations
             self.n_walk += 1
+            # if all(actions[0] != [-float('inf'), -float('inf')]) and all(actions[0] != [0., 0.]):
+            #     print('yees')
 
-        elif not all_allowed:
+        elif not self.use_behavioural_data:
+            locations = [env[0] for env in observations]
+            all_allowed = True
+            new_actions = []
             for i, loc in enumerate(locations):
-                if loc == self.prev_observations[i][0]:
+                if loc == self.prev_observations[i][0] and self.prev_actions[i] != [0,0]:
+                    all_allowed = False
+                    break
+
+            if all_allowed:
+                self.walk_actions.append(self.prev_actions.copy())
+                self.obs_history.append(self.prev_observations.copy())
+                for batch in range(self.pars['batch_size']):
                     new_actions.append(self.action_policy())
-                else:
-                    new_actions.append(self.prev_actions[i])
-            self.prev_actions = new_actions
+                self.prev_actions = new_actions
+                self.prev_observations = observations
+                self.n_walk += 1
+
+            elif not all_allowed:
+                for i, loc in enumerate(locations):
+                    if loc == self.prev_observations[i][0]:
+                        new_actions.append(self.action_policy())
+                    else:
+                        new_actions.append(self.prev_actions[i])
+                self.prev_actions = new_actions
 
         return new_actions
 
@@ -317,6 +330,30 @@ class Whittington2020(AgentCore):
                 env_list.append(self.poss_actions.index(list(action)))
             action_values.append(env_list)
         return action_values
+    
+    def round_to_cardinal_direction(self, action):
+        """
+        Rounds the action vector to the closest cardinal direction (North, South, East, or West).
+
+        Parameters
+        ----------
+        action: ndarray
+            The action vector to round.
+
+        Returns
+        -------
+        rounded_action: ndarray
+            The rounded action vector representing the closest cardinal direction.
+        """
+        angles = np.arctan2(action[1], action[0])  # Calculate the angle of the action vector
+        angle_degrees = np.degrees(angles)  # Convert the angle to degrees
+        angle_rounded = np.round(angle_degrees / 90) * 90  # Round the angle to the nearest multiple of 90 degrees
+        rounded_angle_radians = np.radians(angle_rounded)  # Convert the rounded angle back to radians
+
+        rounded_action = np.array([np.cos(rounded_angle_radians), np.sin(rounded_angle_radians)])
+        rounded_action[np.abs(rounded_action) < 1e-10] = 0  # Set very small values to zero
+
+        return rounded_action
 
     def collect_final_trajectory(self):
         final_model_input = []

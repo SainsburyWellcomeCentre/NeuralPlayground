@@ -45,7 +45,7 @@ class BatchEnvironment(Environment):
         for batch, env in enumerate(self.environments):
             action = actions[batch]
             env_obs, env_state = env.step(action, normalize_step)
-            if env.state[0] == env.old_state[0] and action != [0, 0]:
+            if env.state[0] == env.old_state[0] and all(action != [0, 0]):
                 all_allowed = False
             all_observations.append(env_obs)
             all_states.append(env_state)
