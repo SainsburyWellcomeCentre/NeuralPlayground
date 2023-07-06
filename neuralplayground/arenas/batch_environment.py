@@ -13,6 +13,7 @@ class BatchEnvironment(Environment):
         self.batch_size = batch_size
         self.batch_x_limits = env_kwargs['arena_x_limits']
         self.batch_y_limits = env_kwargs['arena_y_limits']
+        self.use_behavioural_data = env_kwargs['use_behavioural_data']
         self.environments = []
         for i in range(self.batch_size):
             env_kwargs['arena_x_limits'] = self.batch_x_limits[i]
@@ -45,8 +46,12 @@ class BatchEnvironment(Environment):
         for batch, env in enumerate(self.environments):
             action = actions[batch]
             env_obs, env_state = env.step(action, normalize_step)
-            if env.state[0] == env.old_state[0] and all(action != [0, 0]):
-                all_allowed = False
+            if self.use_behavioural_data:
+                if env.state[0] == env.old_state[0]:
+                    all_allowed = False
+            else:
+                if env.state[0] == env.old_state[0] and all(action != [0, 0]):
+                    all_allowed = False
             all_observations.append(env_obs)
             all_states.append(env_state)
 

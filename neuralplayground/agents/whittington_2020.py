@@ -139,13 +139,13 @@ class Whittington2020(AgentCore):
         """
         
         if self.use_behavioural_data:
-            actions = [observations[i][2][:2] - self.prev_observations[i][2][:2] for i in range(self.batch_size)]
-            new_actions = [self.round_to_cardinal_direction(action) for action in actions]
+            state_diffs = [observations[i][0] - self.prev_observations[i][0] for i in range(self.batch_size)]
+            new_actions = self.infer_action(state_diffs)
             self.walk_actions.append(new_actions)
             self.obs_history.append(self.prev_observations.copy())
             self.prev_observations = observations
             self.n_walk += 1
-            # if all(actions[0] != [-float('inf'), -float('inf')]) and all(actions[0] != [0., 0.]):
+            # if all(self.prev_observations[0][2] != [float('inf'), float('inf')]):
             #     print('yees')
 
         elif not self.use_behavioural_data:
@@ -331,29 +331,37 @@ class Whittington2020(AgentCore):
             action_values.append(env_list)
         return action_values
     
-    def round_to_cardinal_direction(self, action):
+    def infer_action(self, state_diffs):
         """
-        Rounds the action vector to the closest cardinal direction (North, South, East, or West).
+        Infers the action taken between state indices based on the difference between states.
 
         Parameters
         ----------
-        action: ndarray
-            The action vector to round.
+        state_diff: int
+            The difference between the state indices.
+        environment_width: int
+            The width of the environment (number of states per row).
 
         Returns
         -------
-        rounded_action: ndarray
-            The rounded action vector representing the closest cardinal direction.
+        action: str
+            The inferred action ('N', 'S', 'W', or 'E') based on the state difference.
         """
-        angles = np.arctan2(action[1], action[0])  # Calculate the angle of the action vector
-        angle_degrees = np.degrees(angles)  # Convert the angle to degrees
-        angle_rounded = np.round(angle_degrees / 90) * 90  # Round the angle to the nearest multiple of 90 degrees
-        rounded_angle_radians = np.radians(angle_rounded)  # Convert the rounded angle back to radians
+        actions = []
+        for i in range(self.batch_size):
+            if state_diffs[i] == -self.room_widths[i]:
+                actions.append([0, 1])
+            elif state_diffs[i] == self.room_widths[i]:
+                actions.append([0, -1])
+            elif state_diffs[i] == -1:
+                actions.append([-1, 0])
+            elif state_diffs == 1:
+                actions.append([1, 0])
+            else:
+                actions.append([0, 0])
 
-        rounded_action = np.array([np.cos(rounded_angle_radians), np.sin(rounded_angle_radians)])
-        rounded_action[np.abs(rounded_action) < 1e-10] = 0  # Set very small values to zero
+        return actions
 
-        return rounded_action
 
     def collect_final_trajectory(self):
         final_model_input = []
