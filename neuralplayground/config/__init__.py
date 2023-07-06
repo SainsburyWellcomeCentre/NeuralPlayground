@@ -5,7 +5,7 @@ import neuralplayground
 from .load_config import _load_config
 from neuralplayground import CONFIG_PATH
 
-
+# Load config file
 if CONFIG_PATH is None:
     CONFIG_PATH = os.path.join(neuralplayground.__path__[0], "config", "default_config.yaml")
     PLOT_CONFIG = _load_config(CONFIG_PATH)
