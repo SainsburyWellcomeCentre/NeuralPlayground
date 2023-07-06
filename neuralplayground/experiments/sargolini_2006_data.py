@@ -5,6 +5,7 @@ import numpy as np
 import scipy.io as sio
 
 import neuralplayground
+from neuralplayground.datasets import fetch_data_path
 from neuralplayground.experiments import Experiment, Hafting2008Data
 from neuralplayground.utils import clean_data
 
@@ -28,12 +29,13 @@ class SargoliniDataTrajectory(Experiment):
         experiment_name: str
             string to identify object in case of multiple instances
         data_path: str
-            if None, load the data sample in the package, else load data from given path
+            if None, fetch the data from the NeuralPlayground data repository,
+            else load data from given path
         """
         self.experiment_name = experiment_name
         if data_path is None:
             # Set data_path to the data directory within the package
-            self.data_path = os.path.join(neuralplayground.__path__[0], "experiments/sargolini_2006")
+            self.data_path = fetch_data_path("sargolini_2006")
         else:
             self.data_path = data_path
         # Sort the data in data_path
@@ -105,7 +107,8 @@ class Sargolini2006Data(Hafting2008Data):
         Parameters
         ----------
         data_path: str
-            if None, load the data sample in the package, else load data from given path
+            if None, fetch the data from the NeuralPlayground data repository,
+            else load data from given path
         recording_index: int
             if None, load data from default recording index
         experiment_name: str
@@ -121,14 +124,12 @@ class Sargolini2006Data(Hafting2008Data):
         )
 
     def _find_data_path(self, data_path: str):
-        """Set self.data_path to the data directory within the package"""
+        """Fetch data from NeuralPlayground data repository 
+        if no data path is supplied by the user"""
         if data_path is None:
-            self.data_path = os.path.join(
-                neuralplayground.__path__[0],
-                "experiments/sargolini_2006/raw_data_sample/",
-            )
+            self.data_path = fetch_data_path("sargolini_2006") + "raw_data_sample/"
         else:
-            self.data_path = data_path
+            self.data_path = data_path + "raw_data_sample/"
 
     def _load_data(self):
         """Parse data according to specific data format
