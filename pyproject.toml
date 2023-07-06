@@ -33,6 +33,7 @@ dependencies = [
   "deepdiff",
   "opencv-python",
   "gymnasium",
+  "pooch",
 ]
 
 [project.urls]
