@@ -1,3 +1,5 @@
+import os
+
 import numpy as np
 from scipy.interpolate import interp1d
 from scipy.ndimage import gaussian_filter
@@ -332,3 +334,8 @@ class OnlineRateMap(object):
         self.nan = np.nan
         filtered_ratemap[nan_indexes] = self.nan
         return filtered_ratemap
+
+
+def check_dir(path):
+    if not os.path.isdir(path):
+        os.makedirs(path)
