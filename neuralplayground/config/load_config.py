@@ -23,7 +23,7 @@ def _load_config(config_path: str = None):
     """
     with open(config_path, "r") as file:
         CONFIG_FILE_YAML = yaml.safe_load(file)
-        print(config_path)
+        # print(config_path)
     PLOT_CONFIG = PlotsConfig(CONFIG_FILE_YAML["plot_config"])
     return PLOT_CONFIG
 

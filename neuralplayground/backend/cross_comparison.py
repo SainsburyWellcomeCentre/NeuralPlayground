@@ -1,5 +1,11 @@
 import os
+import pickle
+import sys
 
+import pandas as pd
+
+from neuralplayground.agents import AgentCore
+from neuralplayground.arenas import Environment
 from neuralplayground.utils import check_dir
 
 
@@ -49,7 +55,14 @@ class SimulationsManager(object):
 
 class SingleSim(object):
     def __init__(
-        self, agent_class, agent_params, env_class, env_params, training_loop, training_loop_params, simulation_id: str
+        self,
+        agent_class=None,
+        agent_params=None,
+        env_class=None,
+        env_params=None,
+        training_loop=None,
+        training_loop_params=None,
+        simulation_id: str = None,
     ):
         self.agent_class = agent_class
         self.agent_params = agent_params
@@ -60,10 +73,70 @@ class SingleSim(object):
         self.simulation_id = simulation_id
 
     def run_sim(self, save_path: str):
-        agent = self.agent_class(**self.agent_params)
-        env = self.env_class(**self.env_params)
+        run_log_path = os.path.join(save_path, "run.log")
+        error_log_path = os.path.join(save_path, "error.log")
+        state_log_path = os.path.join(save_path, "state.log")
+
+        original_stdout = sys.stdout
+        original_stderr = sys.stderr
+        sys.stdout = open(run_log_path, "w")
+        sys.stderr = open(error_log_path, "w")
+
+        # Saving simulation parameters
+        print("---> Saving simulation parameters")
+        self._update_log_state("saving_params", state_log_path)
+        self.save_params(save_path)
+
+        # Initializing models
+        print("---> Initializing models")
+        self._update_log_state("initializing_models", state_log_path)
+        agent, env = self._init_models()
+
+        # Training loop
+        print("---> Training loop")
+        self._update_log_state("training_loop", state_log_path)
         trained_agent, trained_env = self.training_loop(agent, env, **self.training_loop_params)
 
-    def save_sim(self, save_path: str):
-        self.agent.save_agent()
-        self.env.save_environment()
+        # Saving models
+        print("---> Saving models")
+        self._update_log_state("saving_models", state_log_path)
+        self._save_models(save_path, trained_agent, trained_env)
+
+        print("---> Simulation finished")
+        self._update_log_state("successful_run", state_log_path)
+
+        sys.stdout.close()
+        sys.stderr.close()
+        sys.stdout = original_stdout
+        sys.stderr = original_stderr
+
+    def _init_models(self):
+        agent = self.agent_class(**self.agent_params)
+        env = self.env_class(**self.env_params)
+        return agent, env
+
+    def _save_models(self, save_path: str, agent: AgentCore, env: Environment):
+        agent.save_agent(os.path.join(save_path, "agent"))
+        env.save_environment(os.path.join(save_path, "arena"))
+
+    def save_params(self, save_path: str):
+        save_path = os.path.join(save_path, "params.sim")
+        pickle.dump(self.__dict__, open(save_path, "wb"), protocol=pickle.HIGHEST_PROTOCOL)
+
+    def load_params(self, load_path: str):
+        self.__dict__ = pd.read_pickle(load_path)
+
+    def _update_log_state(self, message: str, save_path: str):
+        state_log = open(save_path, "w")
+        state_log.write(message)
+        state_log.close()
+
+    def __str__(self):
+        str_rep = f"Simulation: {self.simulation_id}\n"
+        str_rep += f"Agent: {self.agent_class}\n"
+        str_rep += f"Agent params: {self.agent_params}\n"
+        str_rep += f"Environment: {self.env_class}\n"
+        str_rep += f"Environment params: {self.env_params}\n"
+        str_rep += f"Training loop: {self.training_loop}\n"
+        str_rep += f"Training loop params: {self.training_loop_params}\n"
+        return str_rep

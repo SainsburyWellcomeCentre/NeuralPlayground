@@ -142,6 +142,10 @@ class Weber2018(AgentCore):
             self.resolution = mod_kwargs["resolution"]
         else:
             self.resolution = 50
+        if "disable_tqdm" in mod_kwargs.keys():
+            self.disable_tqdm = mod_kwargs["disable_tqdm"]
+        else:
+            self.disable_tqdm = False
 
         self.room_width, self.room_depth = (
             mod_kwargs["room_width"],
@@ -218,7 +222,7 @@ class Weber2018(AgentCore):
         depth_limit = self.room_depth / 2.0
         cell_list = []  # This will become a numpy array with the tuning curves in 2D (images)
         function_list = []  # List with parameters of each gaussian in the tuning curve
-        for i in tqdm(range(n_curves)):
+        for i in tqdm(range(n_curves), disable=self.disable_tqdm):
             gauss_list = []
             cell_i = 0
             for j in range(Nf):
