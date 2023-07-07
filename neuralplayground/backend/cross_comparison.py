@@ -73,6 +73,7 @@ class SingleSim(object):
         self.simulation_id = simulation_id
 
     def run_sim(self, save_path: str):
+        check_dir(save_path)
         run_log_path = os.path.join(save_path, "run.log")
         error_log_path = os.path.join(save_path, "error.log")
         state_log_path = os.path.join(save_path, "state.log")
