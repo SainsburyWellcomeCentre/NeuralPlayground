@@ -76,7 +76,7 @@ def make_plot_trajectories(arena_limits, x, y, ax, plot_every, fontsize=24):
     # Setting plot labels
     ax.set_xlabel("width", fontsize=fontsize)
     ax.set_ylabel("depth", fontsize=fontsize)
-    ax.set_title("position", fontsize=fontsize)
+    ax.set_title("popo", fontsize=fontsize)
     ax.grid(False)
 
     cmap = mpl.cm.get_cmap("plasma")
@@ -88,6 +88,7 @@ def make_plot_trajectories(arena_limits, x, y, ax, plot_every, fontsize=24):
     cbar.ax.tick_params(labelsize=fontsize)
     cbar.ax.set_ylabel("N steps", rotation=270, fontsize=fontsize)
     cbar.ax.set_yticklabels([0, len(x)], fontsize=fontsize)
-    ax.set_xlim([np.amin([x.min(), y.min()]) - 1.0, np.amax([x.max(), y.max()]) + 1.0])
-    ax.set_ylim([np.amin([x.min(), y.min()]) - 1.0, np.amax([x.max(), y.max()]) + 1.0])
+    lower_lim, upper_lim = np.amin(arena_limits), np.amax(arena_limits)
+    ax.set_xlim([lower_lim, upper_lim])
+    ax.set_ylim([lower_lim, upper_lim])
     return ax

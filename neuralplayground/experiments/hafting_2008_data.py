@@ -11,6 +11,7 @@ from IPython.display import display
 
 from neuralplayground.datasets import fetch_data_path
 from neuralplayground.utils import clean_data, get_2D_ratemap
+from neuralplayground.plotting.plot_utils import make_plot_trajectories
 
 from .experiment_core import Experiment
 
@@ -277,6 +278,7 @@ class Hafting2008Data(Experiment):
         """Plot tetrode ratemap from spike data for a given recording index or a list of recording index.
         If given a list or tuple as argument, all arguments must be list, tuple, or None.
 
+
         Parameters
         ----------
         recording_index: int, tuple of ints, list of ints
@@ -457,105 +459,15 @@ class Hafting2008Data(Experiment):
 
         time_array, test_spikes, x, y = self.get_tetrode_data(session_data, tetrode_id)
         # Helper function to format the trajectory plot
-        self._make_trajectory_plot(x, y, ax, plot_every)
+
+        ax = make_plot_trajectories(self.arena_limits, x, y, ax, plot_every, fontsize=24)
+
         # Save if save_path is not None
         if save_path is None:
             pass
         else:
             plt.savefig(save_path, bbox_inches="tight")
         return x, y, time_array
-
-    def _make_trajectory_plot(self, x, y, ax, plot_every, fontsize=24):
-        """
-
-        Parameters
-        ----------
-        x: ndarray (n_samples,)
-            x position throughout recording of the given session
-        y: ndarray (n_samples,)
-            y position throughout recording of the given session
-        ax: mpl.axes._subplots.AxesSubplot (matplotlib axis from subplots)
-            axis from subplot from matplotlib where the ratemap will be plotted.
-        plot_every: int
-            time steps skipped to make the plot to reduce cluttering
-        fontsize: int
-            fontsize of labels in the plot
-
-        Returns
-        -------
-        ax: mpl.axes._subplots.AxesSubplot (matplotlib axis from subplots)
-            Modified axis where the trajectory is plotted
-        """
-
-        # Plotting borders of the arena
-        ax.plot(
-            [self.arena_limits[0, 0], self.arena_limits[0, 0]],
-            [self.arena_limits[1, 0], self.arena_limits[1, 1]],
-            "C3",
-            lw=3,
-        )
-        ax.plot(
-            [self.arena_limits[0, 1], self.arena_limits[0, 1]],
-            [self.arena_limits[1, 0], self.arena_limits[1, 1]],
-            "C3",
-            lw=3,
-        )
-        ax.plot(
-            [self.arena_limits[0, 0], self.arena_limits[0, 1]],
-            [self.arena_limits[1, 1], self.arena_limits[1, 1]],
-            "C3",
-            lw=3,
-        )
-        ax.plot(
-            [self.arena_limits[0, 0], self.arena_limits[0, 1]],
-            [self.arena_limits[1, 0], self.arena_limits[1, 0]],
-            "C3",
-            lw=3,
-        )
-
-        # Setting colormap of trajectory
-        cmap = mpl.cm.get_cmap("plasma")
-        norm = plt.Normalize(0, np.size(x))
-
-        aux_x = []
-        aux_y = []
-        for i in range(len(x)):
-            if i % plot_every == 0:
-                if i + plot_every >= len(x):
-                    break
-                x_ = [x[i], x[i + plot_every]]
-                y_ = [y[i], y[i + plot_every]]
-                aux_x.append(x[i])
-                aux_y.append(y[i])
-                sc = ax.plot(x_, y_, "-", color=cmap(norm(i)), alpha=0.6)
-
-        # Setting plot labels
-        ax.set_xlabel("width", fontsize=fontsize)
-        ax.set_ylabel("depth", fontsize=fontsize)
-        ax.set_title("position", fontsize=fontsize)
-        ax.grid(False)
-
-        cmap = mpl.cm.get_cmap("plasma")
-        norm = plt.Normalize(0, np.size(x))
-        sc = ax.scatter(
-            aux_x,
-            aux_y,
-            c=np.arange(len(aux_x)),
-            vmin=0,
-            vmax=len(x),
-            cmap="plasma",
-            alpha=0.6,
-            s=0.1,
-        )
-
-        # Setting colorbar to show number of sampled (time steps) recorded
-        cbar = plt.colorbar(sc, ax=ax, ticks=[0, len(x)])
-        cbar.ax.tick_params(labelsize=fontsize)
-        cbar.ax.set_ylabel("N steps", rotation=270, fontsize=fontsize)
-        cbar.ax.set_yticklabels([0, len(x)], fontsize=fontsize)
-        ax.set_xlim([np.amin([x.min(), y.min()]) - 1.0, np.amax([x.max(), y.max()]) + 1.0])
-        ax.set_ylim([np.amin([x.min(), y.min()]) - 1.0, np.amax([x.max(), y.max()]) + 1.0])
-        return ax
 
     def recording_tetr(self, recording_index: Union[int, tuple, list] = None,
                             save_path: Union[str, tuple, list] = None,

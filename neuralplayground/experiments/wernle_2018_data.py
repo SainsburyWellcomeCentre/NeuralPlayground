@@ -12,6 +12,7 @@ import neuralplayground
 from neuralplayground.datasets import fetch_data_path
 from neuralplayground.experiments.hafting_2008_data import Hafting2008Data
 from neuralplayground.utils import get_2D_ratemap
+from neuralplayground.plotting.plot_utils import make_plot_trajectories
 
 
 class Wernle2018Data(Hafting2008Data):
@@ -475,7 +476,8 @@ class Wernle2018Data(Hafting2008Data):
             return
 
         # Helper function to format the trajectory plot
-        ax = self._make_trajectory_plot(x, y, ax, plot_every)
+
+        ax =  ax = make_plot_trajectories(self.arena_limits, x, y, ax, plot_every, fontsize=24)
         if save_path is None:
             pass
         else:

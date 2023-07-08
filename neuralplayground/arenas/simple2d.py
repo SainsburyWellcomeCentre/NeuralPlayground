@@ -7,6 +7,7 @@ from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 
 from neuralplayground.arenas.arena_core import Environment
 from neuralplayground.utils import check_crossing_wall
+from neuralplayground.plotting.plot_utils import make_plot_trajectories
 
 
 class Simple2D(Environment):
@@ -285,7 +286,6 @@ class Simple2D(Environment):
         f: matplotlib.figure
             if return_figure parameters is True
         """
-
         # Use or not saved history
         if history_data is None:
             history_data = self.history
@@ -294,54 +294,25 @@ class Simple2D(Environment):
         if ax is None:
             f, ax = plt.subplots(1, 1, figsize=(8, 6))
 
-        # Draw walls
-        for wall in self.default_walls:
-            ax.plot(wall[:, 0], wall[:, 1], "C3", lw=3)
-
-        # Draw custom walls
-        for wall in self.custom_walls:
-            ax.plot(wall[:, 0], wall[:, 1], "C0", lw=3)
-
-        # Making the trajectory plot roughly square to show structure of the arena better
-        lower_lim, upper_lim = np.amin(self.arena_limits), np.amax(self.arena_limits)
-        ax.set_xlim([lower_lim, upper_lim])
-        ax.set_ylim([lower_lim, upper_lim])
-
         # Make plot of positions
         if len(history_data) != 0:
             state_history = [s["state"] for s in history_data]
-            next_state_history = [s["next_state"] for s in history_data]
-            state_history[0]
-            next_state_history[-1]
-
-            cmap = mpl.cm.get_cmap("plasma")
-            norm = plt.Normalize(0, len(state_history))
-
-            aux_x = []
-            aux_y = []
+            x = []
+            y = []
             for i, s in enumerate(state_history):
                 if i % plot_every == 0:
                     if i + plot_every >= len(state_history):
                         break
-                    x_ = [s[0], state_history[i + plot_every][0]]
-                    y_ = [s[1], state_history[i + plot_every][1]]
-                    aux_x.append(s[0])
-                    aux_y.append(s[1])
-                    sc = ax.plot(x_, y_, "-", color=cmap(norm(i)), alpha=0.6)
+                    x.append(s[0])
+                    y.append(s[1])
+            ax=make_plot_trajectories(self.arena_limits, np.asarray(x), np.asarray(y), ax, plot_every)
 
-            sc = ax.scatter(
-                aux_x,
-                aux_y,
-                c=np.arange(len(aux_x)),
-                vmin=0,
-                vmax=len(aux_x),
-                cmap="plasma",
-                alpha=0.6,
-                s=0.5,
-            )
-            cbar = plt.colorbar(sc, ax=ax, ticks=[0, len(state_history)])
-            cbar.ax.set_ylabel("N steps", rotation=270, fontsize=16)
-            cbar.ax.set_yticklabels([0, len(state_history)], fontsize=16)
+        for wall in self.default_walls:
+            ax.plot(wall[:, 0], wall[:, 1], "C3", lw=3)
+
+            # Draw custom walls
+        for wall in self.custom_walls:
+            ax.plot(wall[:, 0], wall[:, 1], "C0", lw=3)
 
         if save_path is not None:
             plt.savefig(save_path, bbox_inches="tight")
