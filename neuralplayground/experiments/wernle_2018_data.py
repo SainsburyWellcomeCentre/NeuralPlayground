@@ -477,7 +477,7 @@ class Wernle2018Data(Hafting2008Data):
 
         # Helper function to format the trajectory plot
 
-        ax =  ax = make_plot_trajectories(self.arena_limits, x, y, ax, plot_every, fontsize=24)
+        ax =  make_plot_trajectories(self.arena_limits, x, y, ax, plot_every, fontsize=24)
         if save_path is None:
             pass
         else:

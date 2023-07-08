@@ -76,7 +76,7 @@ def make_plot_trajectories(arena_limits, x, y, ax, plot_every, fontsize=24):
     # Setting plot labels
     ax.set_xlabel("width", fontsize=fontsize)
     ax.set_ylabel("depth", fontsize=fontsize)
-    ax.set_title("popo", fontsize=fontsize)
+    ax.set_title("position", fontsize=fontsize)
     ax.grid(False)
 
     cmap = mpl.cm.get_cmap("plasma")
