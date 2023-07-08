@@ -1,13 +1,12 @@
 import cv2
-import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 from gymnasium.spaces import Box
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 
 from neuralplayground.arenas.arena_core import Environment
-from neuralplayground.utils import check_crossing_wall
 from neuralplayground.plotting.plot_utils import make_plot_trajectories
+from neuralplayground.utils import check_crossing_wall
 
 
 class Simple2D(Environment):
@@ -305,7 +304,7 @@ class Simple2D(Environment):
                         break
                     x.append(s[0])
                     y.append(s[1])
-            ax=make_plot_trajectories(self.arena_limits, np.asarray(x), np.asarray(y), ax, plot_every)
+            ax = make_plot_trajectories(self.arena_limits, np.asarray(x), np.asarray(y), ax, plot_every)
 
         for wall in self.default_walls:
             ax.plot(wall[:, 0], wall[:, 1], "C3", lw=3)

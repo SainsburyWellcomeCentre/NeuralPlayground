@@ -414,5 +414,3 @@ class Weber2018(AgentCore):
             plt.close("all")
         else:
             return ax
-
-
