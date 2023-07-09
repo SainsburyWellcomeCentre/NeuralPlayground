@@ -12,7 +12,7 @@ import neuralplayground
 from neuralplayground.datasets import fetch_data_path
 from neuralplayground.experiments.hafting_2008_data import Hafting2008Data
 from neuralplayground.utils import get_2D_ratemap
-from neuralplayground.plotting.plot_utils import make_plot_trajectories
+from neuralplayground.plotting.plot_utils import make_plot_trajectories , make_plot_rate_map
 
 
 class Wernle2018Data(Hafting2008Data):
@@ -398,7 +398,7 @@ class Wernle2018Data(Hafting2008Data):
 
         sess_index = self.recording_list.iloc[recording_index]["session"]
         # Use auxiliary function to make the plot
-        self._make_tetrode_plot(h, ax, "sess_index_" + str(sess_index) + "_" + merged_mssg, save_path)
+        ax=make_plot_rate_map(h, ax, "sess_index_" + str(sess_index) + "_" + merged_mssg)
         # Save if save_path is not None
         if save_path is None:
             pass

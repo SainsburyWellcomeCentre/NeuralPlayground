@@ -11,7 +11,7 @@ from IPython.display import display
 
 from neuralplayground.datasets import fetch_data_path
 from neuralplayground.utils import clean_data, get_2D_ratemap
-from neuralplayground.plotting.plot_utils import make_plot_trajectories
+from neuralplayground.plotting.plot_utils import make_plot_trajectories , make_plot_rate_map
 
 from .experiment_core import Experiment
 
@@ -332,74 +332,17 @@ class Hafting2008Data(Experiment):
         if ax is None:
             f, ax = plt.subplots(1, 1, figsize=(10, 8))
 
-        # Recall recorded data
-        session_data, rev_vars, rat_info = self.get_recording_data(recording_index)
-        if tetrode_id is None:
-            tetrode_id = self._find_tetrode(rev_vars)
-
-        arena_width = self.arena_limits[0, 1] - self.arena_limits[0, 0]
-        arena_depth = self.arena_limits[1, 1] - self.arena_limits[1, 0]
-
-        # Recall spike data
-        time_array, test_spikes, x, y = self.get_tetrode_data(session_data, tetrode_id)
-
         # Compute ratemap matrices from data
-        h, binx, biny = get_2D_ratemap(
-            time_array,
-            test_spikes,
-            x,
-            y,
-            x_size=int(arena_width / bin_size),
-            y_size=int(arena_depth / bin_size),
-            filter_result=True,
-        )
+        h, binx, biny = self.recording_tetr(recording_index, save_path, tetrode_id, bin_size)
 
         # Use auxiliary function to make the plot
-        self._make_tetrode_plot(h, ax, tetrode_id, save_path)
-        # Return ratemap values, x bin limits and y bin limits
-        return h, binx, biny
-
-    def _make_tetrode_plot(self, h, ax, title, save_path):
-        """plot function with formating of ratemap plot
-
-        Parameters
-        ----------
-        h: ndarray (nybins, nxbins)
-            Number of spikes falling on each bin through the recorded session, nybins number of bins in y axis,
-            nxbins number of bins in x axis
-        ax: mpl.axes._subplots.AxesSubplot (matplotlib axis from subplots)
-            axis from subplot from matplotlib where the ratemap will be plotted.
-        title: str
-            plot title, tetrode id by default when called
-        save_path: str, list of str, tuple of str
-            saving path of the generated figure, if None, no figure is saved
-
-        Returns
-        -------
-        ax: mpl.axes._subplots.AxesSubplot (matplotlib axis from subplots)
-            Modified axis where ratemap is plotted
-        """
-
-        # Formating ratemap plot
-        sc = ax.imshow(h, cmap="jet")
-        cbar = plt.colorbar(sc, ax=ax, ticks=[np.min(h), np.max(h)], orientation="horizontal")
-        cbar.ax.set_xlabel("Firing rate", fontsize=12)
-        cbar.ax.set_xticklabels([np.round(np.min(h)), np.round(np.max(h))], fontsize=12)
-        ax.set_title(title)
-
-        ax.set_ylabel("width", fontsize=16)
-        ax.set_xlabel("depth", fontsize=16)
-        ax.grid(False)
-
-        ax.set_xticks([])
-        ax.set_yticks([])
-
-        # Save if save_path is not None
+        ax = make_plot_rate_map(h, ax, tetrode_id)
         if save_path is None:
-            return ax
+            return h, binx, biny
         else:
             plt.savefig(save_path, bbox_inches="tight")
-            return ax
+            # Return ratemap values, x bin limits and y bin limits
+            return h, binx, biny
 
     def plot_trajectory(
         self,
@@ -469,6 +412,7 @@ class Hafting2008Data(Experiment):
             plt.savefig(save_path, bbox_inches="tight")
         return x, y, time_array
 
+
     def recording_tetr(self, recording_index: Union[int, tuple, list] = None,
                             save_path: Union[str, tuple, list] = None,
                             tetrode_id: Union[str, tuple, list] = None,
@@ -515,8 +459,6 @@ class Hafting2008Data(Experiment):
         time_array, test_spikes, x, y = self.get_tetrode_data(session_data, tetrode_id)
 
         # Compute ratemap matrices from data
-        x_size = int(arena_width / bin_size)
-        y_size = int(arena_depth / bin_size)
         h, binx, biny = get_2D_ratemap(time_array, test_spikes, x, y, x_size=int(arena_width / bin_size),
                                        y_size=int(arena_depth / bin_size), filter_result=True)
 

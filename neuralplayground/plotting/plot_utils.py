@@ -92,3 +92,41 @@ def make_plot_trajectories(arena_limits, x, y, ax, plot_every, fontsize=24):
     ax.set_xlim([lower_lim, upper_lim])
     ax.set_ylim([lower_lim, upper_lim])
     return ax
+
+
+def make_plot_rate_map(h, ax, title):
+    """plot function with formating of ratemap plot
+
+    Parameters
+    ----------
+    h: ndarray (nybins, nxbins)
+        Number of spikes falling on each bin through the recorded session, nybins number of bins in y axis,
+        nxbins number of bins in x axis
+    ax: mpl.axes._subplots.AxesSubplot (matplotlib axis from subplots)
+        axis from subplot from matplotlib where the ratemap will be plotted.
+    title: str
+        plot title, tetrode id by default when called
+    save_path: str, list of str, tuple of str
+        saving path of the generated figure, if None, no figure is saved
+
+    Returns
+    -------
+    ax: mpl.axes._subplots.AxesSubplot (matplotlib axis from subplots)
+        Modified axis where ratemap is plotted
+    """
+
+    # Formating ratemap plot
+    sc = ax.imshow(h, cmap="jet")
+    cbar = plt.colorbar(sc, ax=ax, ticks=[np.min(h), np.max(h)], orientation="horizontal")
+    cbar.ax.set_xlabel("Firing rate", fontsize=12)
+    cbar.ax.set_xticklabels([np.round(np.min(h)), np.round(np.max(h))], fontsize=12)
+    ax.set_title(title)
+
+    ax.set_ylabel("width", fontsize=16)
+    ax.set_xlabel("depth", fontsize=16)
+    ax.grid(False)
+
+    ax.set_xticks([])
+    ax.set_yticks([])
+    # Save if save_path is not None
+    return ax
