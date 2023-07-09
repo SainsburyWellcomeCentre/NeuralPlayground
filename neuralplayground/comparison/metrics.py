@@ -22,7 +22,7 @@ import copy
 import matplotlib.pyplot as plt
 import numpy as np
 import skimage
-from scipy import ndimage
+from scipy import ndimage, stats
 from skimage.segmentation import watershed
 
 
@@ -129,7 +129,7 @@ class GridScorer(object):
         -------
         props : dict
             A dictionary containing measures of the SAC. Keys include:
-            * gridness score
+            * gridness scorescore
             * scale
             * orientation
             * coordinates of the peaks (nominally 6) closest to SAC centre
@@ -227,11 +227,11 @@ class GridScorer(object):
             step = kwargs.pop("step")
         else:
             step = 30
-        """ Hardcoded comment to allow for pre-commit hook to pass """
-        # try:
-        #     gridscore, rotationCorrVals, rotationArr = gridness(sac_middle, step=step)
-        # except Exception:
-        #     gridscore, rotationCorrVals, rotationArr = np.nan, np.nan, np.nan
+
+        try:
+            gridscore, rotationCorrVals, rotationArr = self.gridness(sac_middle, step)
+        except Exception:
+            gridscore, rotationCorrVals, rotationArr = np.nan, np.nan, np.nan
 
         im_centre = central_pt
 
@@ -263,7 +263,7 @@ class GridScorer(object):
                 # get the min containing circle given the eliipse minor axis
                 from skimage.measure import CircleModel
 
-                _params = im_centre
+                _params = list(im_centre)
                 _params.append(np.min(ellipse_axes))
                 circleXY = CircleModel().predict_xy(np.linspace(0, 2 * np.pi, 50), params=_params)
             except (TypeError, ValueError):  # non-iterable x and y
@@ -418,3 +418,66 @@ class GridScorer(object):
         ax.axis("off")
         if title is not None:
             ax.set_title(title)
+
+    def gridness(self, image, step):
+        """
+        Calculates the gridness score in a grid cell SAC.
+
+        Briefly, the data in `image` is rotated in `step` amounts and
+        each rotated array is correlated with the original.
+        The maximum of the values at 30, 90 and 150 degrees
+        is the subtracted from the minimum of the values at 60, 120
+        and 180 degrees to give the grid score.
+
+        Parameters
+        ----------
+        image : array_like
+            The spatial autocorrelogram
+        step : int, optional
+            The amount to rotate the SAC in each step of the rotational
+            correlation procedure
+
+        Returns
+        -------
+        gridmeasures : 3-tuple
+            The gridscore, the correlation values at each `step` and
+            the rotational array
+
+        Notes
+        -----
+        The correlation performed is a Pearsons R. Some rescaling of the
+        values in `image` is performed following rotation.
+
+        See Also
+        --------
+        skimage.transform.rotate : for how the rotation of `image` is done
+        skimage.exposure.rescale_intensity : for the resscaling following
+        rotation
+
+        """
+        # TODO: add options in here for whether the full range of correlations
+        # are wanted or whether a reduced set is wanted (i.e. at the 30-tuples)
+        from collections import OrderedDict
+
+        rotationalCorrVals = OrderedDict.fromkeys(np.arange(0, 181, step), np.nan)
+        rotationArr = np.zeros(len(rotationalCorrVals)) * np.nan
+        # autoCorrMiddle needs to be rescaled or the image rotation falls down
+        # as values are cropped to lie between 0 and 1.0
+        in_range = (np.nanmin(image), np.nanmax(image))
+        out_range = (0, 1)
+        import skimage
+
+        autoCorrMiddleRescaled = skimage.exposure.rescale_intensity(image, in_range, out_range)
+        origNanIdx = np.isnan(autoCorrMiddleRescaled.ravel())
+        for idx, angle in enumerate(rotationalCorrVals.keys()):
+            rotatedA = skimage.transform.rotate(autoCorrMiddleRescaled, angle=angle, cval=np.nan, order=3)
+            # ignore nans
+            rotatedNanIdx = np.isnan(rotatedA.ravel())
+            allNans = np.logical_or(origNanIdx, rotatedNanIdx)
+            # get the correlation between the original and rotated images
+            rotationalCorrVals[angle] = stats.pearsonr(autoCorrMiddleRescaled.ravel()[~allNans], rotatedA.ravel()[~allNans])[0]
+            rotationArr[idx] = rotationalCorrVals[angle]
+        gridscore = np.min((rotationalCorrVals[60], rotationalCorrVals[120])) - np.max(
+            (rotationalCorrVals[150], rotationalCorrVals[30], rotationalCorrVals[90])
+        )
+        return gridscore, rotationalCorrVals, rotationArr
