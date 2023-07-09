@@ -5,10 +5,6 @@ import numpy as np
 from neuralplayground.config import PLOT_CONFIG
 
 
-def test_function():
-    print(str(PLOT_CONFIG.TRAJECTORY))
-
-
 def make_plot_trajectories(arena_limits, x, y, ax, plot_every, fontsize=24):
     """
     Parameters

@@ -34,17 +34,10 @@ class SimulationsManager(object):
             self.simulation_paths.append(sim_path)
 
     def run_all(self):
-        for sim in self.simulation_list:
-            for run in range(self.runs_per_sim):
-                sim.run_sim()
-                sim.save_sim()
+        pass
 
     def run_single_sim(self, sim_index):
-        for run in range(self.runs_per_sim):
-            current_sim = self.simulation_list[sim_index]
-            current_sim.initialize_models()
-            current_sim.run_sim()
-            current_sim.save_sim()
+        pass
 
     def check_runs(self):
         pass
