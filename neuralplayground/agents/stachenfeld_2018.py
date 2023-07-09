@@ -116,8 +116,6 @@ class Stachenfeld2018(AgentCore):
         self.gamma = mod_kwargs["discount"]
         self.threshold = mod_kwargs["threshold"]
         self.learning_rate = mod_kwargs["lr_td"]
-        self.t_episode = mod_kwargs["t_episode"]
-        self.n_episode = mod_kwargs["n_episode"]
         self.room_width = mod_kwargs["room_width"]
         self.room_depth = mod_kwargs["room_depth"]
         self.state_density = mod_kwargs["state_density"]
@@ -276,9 +274,9 @@ class Stachenfeld2018(AgentCore):
 
         return self.transmat_norm
 
-    def update_successor_rep(self):
+    def successor_rep_solution(self):
         """
-        Compute the successor representation matrix using geometric sums.
+        Compute closed form solution of successor representation matrix using geometric sums.
 
         Returns:
         -------
@@ -339,7 +337,7 @@ class Stachenfeld2018(AgentCore):
 
         return self.srmat
 
-    def update_successor_rep_td_full(self):
+    def update_successor_rep_td_full(self, n_episode: int = None, t_episode: int = None):
         """
         Compute the successor representation matrix using TD learning
 
@@ -349,14 +347,15 @@ class Stachenfeld2018(AgentCore):
                 successor representation matrix
 
         """
+
         random_state = np.random.RandomState(1234)
 
         t_elapsed = 0
         srmat0 = np.eye(self.n_state)
         srmat_full = srmat0.copy()
-        for i in range(self.n_episode):
+        for i in range(n_episode):
             curr_state = random_state.randint(self.n_state)
-            for j in range(self.t_episode):
+            for j in range(t_episode):
                 a = np.array([curr_state])
                 x = a.flatten()
                 b = np.eye(self.n_state)[x, : self.n_state]

@@ -1,13 +1,12 @@
 import numpy as np
 
-from neuralplayground.agents import Weber2018
+from neuralplayground.agents import Stachenfeld2018, Weber2018
 from neuralplayground.arenas import Simple2D
-from neuralplayground.backend import default_training_loop
+from neuralplayground.backend import default_training_loop, episode_based_training_loop
 
 from .cross_comparison import SingleSim
 
 # Experiment 1: Weber 2018
-
 sim1_params = {
     "simulation_id": "weber_2018_in_simple2D",
     "agent_class": Weber2018,
@@ -44,4 +43,30 @@ sim1_params = {
     "training_loop_params": {"n_steps": 100},
 }
 
-sim_object = SingleSim(**sim1_params)
+sim2_params = {
+    "simulation_id": "stachenfeld_2018_in_simple2D",
+    "agent_class": Stachenfeld2018,
+    "env_class": Simple2D,
+    "env_params": {
+        "arena_x_limits": [-6, 6],
+        "arena_y_limits": [-6, 6],
+        "env_name": "env_example",
+        "time_step_size": 0.2,
+        "agent_step_size": 1,
+    },
+    "agent_params": {
+        "discount": 0.9,
+        "threshold": 1e-6,
+        "lr_td": 1e-2,
+        "state_density": 1,
+        "room_width": 12,
+        "room_depth": 12,
+        "twoD": True,
+    },
+    "training_loop": episode_based_training_loop,
+    "training_loop_params": {"t_episode": 10, "n_episode": 10},
+}
+
+
+sim_object1 = SingleSim(**sim1_params)
+sim_object2 = SingleSim(**sim2_params)

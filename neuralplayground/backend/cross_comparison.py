@@ -6,32 +6,51 @@ import pandas as pd
 
 from neuralplayground.agents import AgentCore
 from neuralplayground.arenas import Environment
-from neuralplayground.utils import check_dir
+from neuralplayground.utils import check_dir, get_date_time
 
 
-class SimulationsManager(object):
+class SimulationManager(object):
     """Class to manage the runs of multiple combinations of agents, environments, parameters and training loops"""
 
-    def __init__(
-        self, simulation_list, runs_per_sim: int, simulation_id: str = "default_comparison", results_path: str = "results"
-    ):
+    def __init__(self, simulation_list, runs_per_sim: int, manager_id: str = "default_comparison", verbose: bool = False):
         self.simulation_list = simulation_list
         self.runs_per_sim = runs_per_sim
-        self.simulation_id = simulation_id
-        self.results_path = results_path
-        self._generate_sim_paths()
+        self.manager_id = manager_id
+        self.results_path = manager_id
+        self.verbose = verbose
+        if self.verbose:
+            print(self)
 
-    def _generate_sim_paths(self):
+    def generate_sim_paths(self):
         """Generate the paths for the simulations
         If the path does not exist, it will be created
         if the path exists, it will save the results in the existing path
         """
-        self.full_results_path = os.path.join(self.results_path, self.simulation_id)
+        self.full_results_path = self.results_path
         self.simulation_paths = []
+        str_path = self.full_results_path
         for sim in self.simulation_list:
             sim_path = os.path.join(self.full_results_path, sim.simulation_id)
-            check_dir(sim_path)
             self.simulation_paths.append(sim_path)
+            str_path += f"\n  {sim_path}"
+            for run in range(self.runs_per_sim):
+                # writing path for each run index and date time
+                run_path = os.path.join(sim_path, f"run_{run}_{get_date_time()}")
+                check_dir(run_path)
+                state_log_path = os.path.join(run_path, "state.log")
+                sim._update_log_state(message="in_queue", save_path=state_log_path)
+                str_path += f"\n    {run_path}"
+
+        if self.verbose:
+            print(str_path)
+
+    def __str__(self):
+        sim_list = [sim.simulation_id for sim in self.simulation_list]
+        mssg_str = (
+            f'SimulationManager "{self.manager_id}" \nwith {sim_list} simulations'
+            + f" \nand {self.runs_per_sim} runs per simulation"
+        )
+        return mssg_str
 
     def run_all(self):
         pass

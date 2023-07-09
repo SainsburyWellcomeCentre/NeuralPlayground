@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 
 import numpy as np
 from scipy.interpolate import interp1d
@@ -339,3 +340,11 @@ class OnlineRateMap(object):
 def check_dir(path):
     if not os.path.isdir(path):
         os.makedirs(path)
+
+
+def get_date_time():
+    # datetime object containing current date and time
+    now = datetime.now()
+    dt_string = now.strftime("%d-%m-%Y_%H-%M-%S-%f")[:-3]
+    now = str(dt_string)
+    return now
