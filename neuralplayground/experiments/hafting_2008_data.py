@@ -336,7 +336,7 @@ class Hafting2008Data(Experiment):
         h, binx, biny = self.recording_tetr(recording_index, save_path, tetrode_id, bin_size)
 
         # Use auxiliary function to make the plot
-        ax = make_plot_rate_map(h, ax, tetrode_id)
+        ax = make_plot_rate_map(h, ax, tetrode_id,"width","depth","Firing rate")
         if save_path is None:
             return h, binx, biny
         else:

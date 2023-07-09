@@ -398,7 +398,7 @@ class Wernle2018Data(Hafting2008Data):
 
         sess_index = self.recording_list.iloc[recording_index]["session"]
         # Use auxiliary function to make the plot
-        ax=make_plot_rate_map(h, ax, "sess_index_" + str(sess_index) + "_" + merged_mssg)
+        ax=make_plot_rate_map(h, ax, "sess_index_" + str(sess_index) + "_" + merged_mssg,"width","depth","Firing rate")
         # Save if save_path is not None
         if save_path is None:
             pass

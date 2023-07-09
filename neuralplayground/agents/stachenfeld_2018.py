@@ -13,6 +13,8 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 
+from neuralplayground.plotting.plot_utils import make_plot_rate_map
+
 from .agent_core import AgentCore
 
 sys.path.append("../")
@@ -359,7 +361,6 @@ class Stachenfeld2018(AgentCore):
                 x = a.flatten()
                 b = np.eye(self.n_state)[x, : self.n_state]
                 L = b.reshape(a.shape + (self.n_state,))
-
                 curr_state_vec = L
                 random_state.multinomial(1, self.transmat_norm[curr_state, :])
                 next_state = np.where(random_state.multinomial(1, self.transmat_norm[curr_state, :]))[0][0]
@@ -369,10 +370,9 @@ class Stachenfeld2018(AgentCore):
                 )
                 curr_state = next_state
                 t_elapsed += 1
-
         return srmat_full
 
-    def plot_transition(self, matrix: np.ndarray, save_path: str = None, ax: mpl.axes.Axes = None):
+    def plot_transition(self, save_path: str = None, ax: mpl.axes.Axes = None):
         """
         Plot the input matrix and compare it to the transition matrix from the rectangular
         environment states space (rectangular- transmat).
@@ -384,11 +384,11 @@ class Stachenfeld2018(AgentCore):
         save_path: string
             Path to save the plot
         """
-        evals, evecs = np.linalg.eig(matrix)
+        T = self.get_T_from_M(self.srmat)
         if ax is None:
             f, ax = plt.subplots(1, 2, figsize=(14, 5))
-            ax[0].imshow(self.transmat_norm, cmap="jet")
-            ax[1].imshow(matrix, cmap="jet")
+            make_plot_rate_map(self.transmat_norm, ax[0], "Transition matrix", "states", "states", "State occupency")
+            make_plot_rate_map(T, ax[1], "Transition calculated from SR matrix", "states", "states", "State occupency")
         if save_path is not None:
             plt.savefig(save_path, bbox_inches="tight")
             plt.close("all")
@@ -407,20 +407,16 @@ class Stachenfeld2018(AgentCore):
         save_path: string
             Path to save the plot
         """
-
         evals, evecs = np.linalg.eig(matrix)
-
         if ax is None:
             f, ax = plt.subplots(1, len(eigen), figsize=(4 * len(eigen), 5))
             if len(eigen) == 1:
                 evecs_0 = evecs[:, eigen[0]].reshape(self.depth, self.width).real
-                im = ax.imshow(evecs_0, cmap="jet")
-                plt.colorbar(im, ax=ax)
+                make_plot_rate_map(evecs_0, ax, "Eig_0", "width", "depth", "Firing rate")
             else:
                 for i, eig in enumerate(eigen):
                     evecs_0 = evecs[:, eig].reshape(self.depth, self.width).real
-                    im = ax[i].imshow(evecs_0, cmap="jet")
-                plt.colorbar(im, ax=ax[i])
+                    make_plot_rate_map(evecs_0, ax[i], "Eig" + str(eig), "width", "depth", "Firing rate")
         if save_path is None:
             pass
         else:

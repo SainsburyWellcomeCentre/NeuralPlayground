@@ -14,6 +14,8 @@ import numpy as np
 from scipy.stats import multivariate_normal
 from tqdm import tqdm
 
+from neuralplayground.plotting.plot_utils import make_plot_rate_map
+
 from .agent_core import AgentCore
 
 
@@ -393,21 +395,15 @@ class Weber2018(AgentCore):
 
         r_out_im = self.get_full_output_rate()
         r_out_im = r_out_im.reshape((self.resolution_width, self.resolution_depth))
-
         exc_im = self.exc_cell_list[np.random.choice(np.arange(self.exc_cell_list.shape[0])), ...].reshape(
             (self.resolution_width, self.resolution_depth)
         )
         inh_im = self.inh_cell_list[np.random.choice(np.arange(self.inh_cell_list.shape[0])), ...].reshape(
             (self.resolution_width, self.resolution_depth)
         )
-
-        ax[0].imshow(exc_im.T, cmap="Reds")
-        ax[0].set_title("Exc rates", fontsize=14)
-        ax[1].imshow(inh_im.T, cmap="Blues")
-        ax[1].set_title("Inh rates", fontsize=14)
-        im = ax[2].imshow(r_out_im.T, cmap="jet")
-        ax[2].set_title("Out rate", fontsize=14)
-        plt.colorbar(im, ax=ax[2])
+        make_plot_rate_map(exc_im.T, ax[0], "Exc rates", "width", "depth", "Firing rate")
+        make_plot_rate_map(inh_im.T, ax[1], "Inh rates", "width", "depth", "Firing rate")
+        make_plot_rate_map(r_out_im.T, ax[2], "Out rate", "width", "depth", "Firing rate")
 
         if save_path is not None:
             plt.savefig(save_path, bbox_inches="tight")

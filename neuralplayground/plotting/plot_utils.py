@@ -11,7 +11,6 @@ def test_function():
 
 def make_plot_trajectories(arena_limits, x, y, ax, plot_every, fontsize=24):
     """
-
     Parameters
     ----------
     x: ndarray (n_samples,)
@@ -94,7 +93,7 @@ def make_plot_trajectories(arena_limits, x, y, ax, plot_every, fontsize=24):
     return ax
 
 
-def make_plot_rate_map(h, ax, title):
+def make_plot_rate_map(h, ax, title, title_x, title_y, title_cbar):
     """plot function with formating of ratemap plot
 
     Parameters
@@ -118,14 +117,12 @@ def make_plot_rate_map(h, ax, title):
     # Formating ratemap plot
     sc = ax.imshow(h, cmap="jet")
     cbar = plt.colorbar(sc, ax=ax, ticks=[np.min(h), np.max(h)], orientation="horizontal")
-    cbar.ax.set_xlabel("Firing rate", fontsize=12)
+    cbar.ax.set_xlabel(title_cbar, fontsize=12)
     cbar.ax.set_xticklabels([np.round(np.min(h)), np.round(np.max(h))], fontsize=12)
     ax.set_title(title)
-
-    ax.set_ylabel("width", fontsize=16)
-    ax.set_xlabel("depth", fontsize=16)
+    ax.set_ylabel(title_y, fontsize=16)
+    ax.set_xlabel(title_x, fontsize=16)
     ax.grid(False)
-
     ax.set_xticks([])
     ax.set_yticks([])
     # Save if save_path is not None
