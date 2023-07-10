@@ -5,7 +5,7 @@ import numpy as np
 from neuralplayground.config import PLOT_CONFIG
 
 
-def make_plot_trajectories(arena_limits, x, y, ax, plot_every, fontsize=24):
+def make_plot_trajectories(arena_limits, x, y, ax, plot_every):
     """
     Parameters
     ----------
@@ -69,9 +69,9 @@ def make_plot_trajectories(arena_limits, x, y, ax, plot_every, fontsize=24):
             sc = ax.plot(x_, y_, "-", color=cmap(norm(i)), alpha=0.6)
 
     # Setting plot labels
-    ax.set_xlabel("width", fontsize=fontsize)
-    ax.set_ylabel("depth", fontsize=fontsize)
-    ax.set_title("position", fontsize=fontsize)
+    ax.set_xlabel("width", fontsize=16)
+    ax.set_ylabel("depth", fontsize=16)
+    ax.set_title("position", fontsize=16)
     ax.grid(False)
 
     cmap = mpl.cm.get_cmap("plasma")
@@ -80,9 +80,9 @@ def make_plot_trajectories(arena_limits, x, y, ax, plot_every, fontsize=24):
 
     # Setting colorbar to show number of sampled (time steps) recorded
     cbar = plt.colorbar(sc, ax=ax, ticks=[0, len(x)])
-    cbar.ax.tick_params(labelsize=fontsize)
-    cbar.ax.set_ylabel("N steps", rotation=270, fontsize=fontsize)
-    cbar.ax.set_yticklabels([0, len(x)], fontsize=fontsize)
+    cbar.ax.tick_params(labelsize=12)
+    cbar.ax.set_ylabel("N steps", rotation=270, fontsize=16)
+    cbar.ax.set_yticklabels([0, len(x)], fontsize=16)
     lower_lim, upper_lim = np.amin(arena_limits), np.amax(arena_limits)
     ax.set_xlim([lower_lim, upper_lim])
     ax.set_ylim([lower_lim, upper_lim])
@@ -113,9 +113,9 @@ def make_plot_rate_map(h, ax, title, title_x, title_y, title_cbar):
     # Formating ratemap plot
     sc = ax.imshow(h, cmap="jet")
     cbar = plt.colorbar(sc, ax=ax, ticks=[np.min(h), np.max(h)], orientation="horizontal")
-    cbar.ax.set_xlabel(title_cbar, fontsize=12)
-    cbar.ax.set_xticklabels([np.round(np.min(h)), np.round(np.max(h))], fontsize=12)
-    ax.set_title(title)
+    cbar.ax.set_xlabel(title_cbar, fontsize=16)
+    cbar.ax.set_xticklabels([np.round(np.min(h), decimals=2), np.round(np.max(h), decimals=2)], fontsize=12)
+    ax.set_title(title, fontsize=16)
     ax.set_ylabel(title_y, fontsize=16)
     ax.set_xlabel(title_x, fontsize=16)
     ax.grid(False)

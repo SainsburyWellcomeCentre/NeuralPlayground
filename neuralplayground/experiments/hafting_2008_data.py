@@ -403,7 +403,7 @@ class Hafting2008Data(Experiment):
         time_array, test_spikes, x, y = self.get_tetrode_data(session_data, tetrode_id)
         # Helper function to format the trajectory plot
 
-        ax = make_plot_trajectories(self.arena_limits, x, y, ax, plot_every, fontsize=24)
+        ax = make_plot_trajectories(self.arena_limits, x, y, ax, plot_every)
 
         # Save if save_path is not None
         if save_path is None:

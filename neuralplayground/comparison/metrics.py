@@ -25,6 +25,8 @@ import skimage
 from scipy import ndimage, stats
 from skimage.segmentation import watershed
 
+from neuralplayground.plotting.plot_utils import make_plot_rate_map
+
 
 class GridScorer(object):
     """Class for scoring ratemaps given trajectories."""
@@ -391,8 +393,8 @@ class GridScorer(object):
         if ax is None:
             ax = plt.gca()
         # Plot the sac
-
-        ax.imshow(sac, interpolation="none", *args, **kwargs)
+        ax = make_plot_rate_map(sac, ax, "sac", "width", "depth", "sac rate")
+        # ax.imshow(sac, interpolation="none", *args, **kwargs)
         # ax.pcolormesh(useful_sac, *args, **kwargs)
         # Plot a ring for the adequate mask
         if mask_params is not None:

@@ -477,7 +477,7 @@ class Wernle2018Data(Hafting2008Data):
 
         # Helper function to format the trajectory plot
 
-        ax =  make_plot_trajectories(self.arena_limits, x, y, ax, plot_every, fontsize=24)
+        ax =  make_plot_trajectories(self.arena_limits, x, y, ax, plot_every)
         if save_path is None:
             pass
         else:
@@ -511,94 +511,17 @@ class Wernle2018Data(Hafting2008Data):
         ratemaps_before = []
         ratemaps_after = []
         for i in range(n_cells):
-            ax[i, 0].imshow(self.ratemap[session_index[i], 0], cmap="jet")
-            ax[i, 1].imshow(self.ratemap[session_index[i], 1], cmap="jet")
+            make_plot_rate_map(self.ratemap[session_index[i], 0],  ax[i, 0], "Before merging", "width", "depth","Firing rate")
+            make_plot_rate_map(self.ratemap[session_index[i], 1], ax[i, 1], "After merging", "width", "depth", "Firing rate")
             ratemaps_before.append(self.ratemap[session_index[i], 0])
             ratemaps_after.append(self.ratemap[session_index[i], 1])
             ax[i, 0].axhline(y=50, color="white")
             ax[i, 1].axhline(y=50, color="white", linestyle="--")
-        ax[0, 0].set_title("Before merging")
-        ax[0, 1].set_title("After merging")
         return ratemaps_before, ratemaps_after, ax
-
-    def plot_development(
-        self,
-        n_cells: int = 3,
-        time_interval: Union[tuple, list] = (1.0, 2.0),
-        merged: bool = False,
-        plot_every: int = 10,
-    ):
-        """Prototype function for evolution of ratemaps through time
-
-        Parameters
-        ----------
-        n_cells: int
-            Number of cells to plot, from 0 to 19
-        time_interval: 2D-tuple or list with floats
-            Time inverval from experiment, if merged true, then time inverval after merging
-        merged: bool
-            If True, make plot for data after merging
-        plot_every: int
-            time steps skipped to make the plot to reduce cluttering
-
-        Returns
-        -------
-        ax: mpl.axes._subplots.AxesSubplot (matplotlib axis from subplots)
-            Modified axis where the trajectory is plotted
-        """
-        if merged:
-            pos = self.pos_AB[:n_cells, 0]
-        else:
-            pos = self.pos_A_B[:n_cells, 0]
-
-        f, ax = plt.subplots(1, n_cells, figsize=(4 * n_cells, 3))
-        for cell in range(n_cells):
-            pos_i = pos[cell]
-            init_sample = int(pos_i.shape[0] * (time_interval[0] * 60.0) / (np.amax(pos_i[:, 0])))
-            finish_sample = int(pos_i.shape[0] * (time_interval[1] * 60.0) / (np.amax(pos_i[:, 0])))
-            finish_sample - init_sample
-            cmap = mpl.cm.get_cmap("plasma")
-            norm = plt.Normalize(init_sample, finish_sample)
-            aux_x, aux_y = [], []
-            prev_x, prev_y = pos_i[init_sample, 1], pos_i[finish_sample, 2]
-            for sample_i in range(init_sample, finish_sample, plot_every):
-                x, y = pos_i[sample_i, 1], pos_i[sample_i, 2]
-                aux_x.append(x)
-                aux_y.append(y)
-                ax[cell].plot(
-                    (prev_x, x),
-                    (prev_y, y),
-                    "-",
-                    color=cmap(norm(sample_i)),
-                    alpha=0.4,
-                    lw=0.5,
-                )
-                prev_x = x
-                prev_y = y
-            ax[cell].set_ylim((-100, 100))
-            ax[cell].set_xlim((-100, 100))
-            sc = ax[cell].scatter(
-                aux_x,
-                aux_y,
-                c=np.arange(init_sample, finish_sample, plot_every),
-                vmin=init_sample,
-                vmax=finish_sample,
-                cmap="plasma",
-                alpha=0.4,
-                s=2,
-            )
-            ax[cell].axhline(y=0, color="black")
-            ticks = np.linspace(init_sample, finish_sample, num=10)
-            tickslabels = np.round(np.linspace(init_sample / 50 / 60, finish_sample / 50 / 60, num=10), 1)
-            cbar = plt.colorbar(sc, ax=ax[cell], ticks=ticks)
-            cbar.ax.set_yticklabels(tickslabels, fontsize=8)
-            cbar.ax.set_ylabel("Time [min]", rotation=270, labelpad=12)
-        return ax
 
     def get_recorded_session(self, recording_index=None):
         # Not used, override to avoid issues
         return [None, None, None]
-
 
 if __name__ == "__main__":
     data = Wernle2018Data()
