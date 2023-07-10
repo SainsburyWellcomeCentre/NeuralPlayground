@@ -96,6 +96,7 @@ class AgentCore(object):
             Path to retrieve the agent
         """
         # self.__dict__ = pd.read_pickle(save_path)
+        # TODO: for some reason, ruff has a problem with this: self = pd.read_pickle(save_path)
         pd.read_pickle(save_path)
 
     def __eq__(self, other):
