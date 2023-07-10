@@ -28,6 +28,7 @@ class SimulationManager(object):
         """
         self.full_results_path = self.results_path
         self.simulation_paths = []
+        self.run_paths = []
         str_path = self.full_results_path
         for sim in self.simulation_list:
             sim_path = os.path.join(self.full_results_path, sim.simulation_id)
@@ -37,6 +38,7 @@ class SimulationManager(object):
                 # writing path for each run index and date time
                 run_path = os.path.join(sim_path, f"run_{run}_{get_date_time()}")
                 check_dir(run_path)
+                self.run_paths.append(run_path)
                 state_log_path = os.path.join(run_path, "state.log")
                 sim._update_log_state(message="in_queue", save_path=state_log_path)
                 str_path += f"\n    {run_path}"
@@ -53,7 +55,13 @@ class SimulationManager(object):
         return mssg_str
 
     def run_all(self):
-        pass
+        """Run all the simulations in the list"""
+        for sim_index, sim in enumerate(self.simulation_list):
+            for run_index in range(self.runs_per_sim):
+                sim_path = self.run_paths[run_index + sim_index * self.runs_per_sim]
+                print("Running simulation at path:")
+                print(sim_path)
+                sim.run_sim(save_path=sim_path)
 
     def run_single_sim(self, sim_index):
         pass
@@ -133,8 +141,11 @@ class SingleSim(object):
         env.save_environment(os.path.join(save_path, "arena"))
 
     def save_params(self, save_path: str):
-        save_path = os.path.join(save_path, "params.sim")
-        pickle.dump(self.__dict__, open(save_path, "wb"), protocol=pickle.HIGHEST_PROTOCOL)
+        save_path_txt = os.path.join(save_path, "params.txt")
+        save_path_params = os.path.join(save_path, "params.sim")
+        pickle.dump(self.__dict__, open(save_path_params, "wb"), protocol=pickle.HIGHEST_PROTOCOL)
+        with open(save_path_txt, "w") as f:
+            f.write(str(self))
 
     def load_params(self, load_path: str):
         self.__dict__ = pd.read_pickle(load_path)

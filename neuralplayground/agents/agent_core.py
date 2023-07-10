@@ -84,7 +84,8 @@ class AgentCore(object):
         save_path: str
             Path to save the agent
         """
-        pickle.dump(self.__dict__, open(os.path.join(save_path), "wb"), pickle.HIGHEST_PROTOCOL)
+        # pickle.dump(self.__dict__, open(os.path.join(save_path), "wb"), pickle.HIGHEST_PROTOCOL)
+        pickle.dump(self, open(os.path.join(save_path), "wb"), pickle.HIGHEST_PROTOCOL)
 
     def restore_agent(self, save_path: str):
         """Restore saved environment
@@ -94,7 +95,8 @@ class AgentCore(object):
         save_path: str
             Path to retrieve the agent
         """
-        self.__dict__ = pd.read_pickle(save_path)
+        # self.__dict__ = pd.read_pickle(save_path)
+        pd.read_pickle(save_path)
 
     def __eq__(self, other):
         diff = DeepDiff(self.__dict__, other.__dict__)
