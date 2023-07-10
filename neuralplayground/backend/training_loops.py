@@ -13,6 +13,18 @@ def default_training_loop(agent: AgentCore, env: Environment, n_steps: int):
     return agent, env
 
 
+def episode_based_training_loop(agent: AgentCore, env: Environment, t_episode: int, n_episode: int):
+    obs, state = env.reset()
+    for i in range(n_episode):
+        for j in range(t_episode):
+            action = agent.act(obs)
+            agent.update()
+            obs, state, reward = env.step(action)
+            obs = obs[:2]
+
+    return agent, env
+
+
 def merge_room_training(agent: AgentCore, env: Environment, n_steps: int):
     pass
 
