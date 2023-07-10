@@ -51,6 +51,8 @@ class TrajectoryConfig(NPGConfig):
         self.TICK_LABEL_FONTSIZE = kwargs["tick_label_fontsize"]
         self.PLOT_EVERY_POINTS = kwargs["plot_every_points"]
         self.GRID = kwargs["grid"]
+        self.TITLE_FONTSIZE = kwargs["title_fontsize"]
+        self.COLORBAR_LABEL_FONTSIZE = kwargs["colorbar_label_fontsize"]
 
 
 class RateMapConfig(NPGConfig):
@@ -78,6 +80,7 @@ class RateMapConfig(NPGConfig):
         self.BIN_SIZE = kwargs["bin_size"]
         self.LABEL_FONTSIZE = kwargs["label_fontsize"]
         self.TICK_LABEL_FONTSIZE = kwargs["tick_label_fontsize"]
+        self.TITLE_FONTSIZE = kwargs["title_fontsize"]
         self.COLORBAR_LABEL_FONTSIZE = kwargs["colorbar_label_fontsize"]
 
 
