@@ -2,6 +2,7 @@ import os
 import shutil
 
 import yaml
+from colorama import Fore
 
 import neuralplayground
 
@@ -43,3 +44,21 @@ def generate_config_file(dir_path: str = None):
     new_config_file_path = os.path.join(dir_path, "config_params.yaml")
 
     shutil.copyfile(os.path.join(neuralplayground.__path__[0], "config", "default_config.yaml"), new_config_file_path)
+
+
+def _get_state_labels():
+    """Get the state labels
+
+    Returns
+    -------
+    state_labels: list
+        List of state labels
+    """
+    state_labels = {
+        "in_queue": Fore.YELLOW + "in_queue" + Fore.RESET,
+        "running": Fore.BLUE + "running" + Fore.RESET,
+        "finished": Fore.GREEN + "finished" + Fore.RESET,
+        "error": Fore.RED + "error" + Fore.RESET,
+    }
+
+    return state_labels

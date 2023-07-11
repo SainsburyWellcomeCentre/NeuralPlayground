@@ -6,13 +6,25 @@ import pandas as pd
 
 from neuralplayground.agents import AgentCore
 from neuralplayground.arenas import Environment
+from neuralplayground.config import STATE_LABELS
 from neuralplayground.utils import check_dir, get_date_time
 
 
 class SimulationManager(object):
     """Class to manage the runs of multiple combinations of agents, environments, parameters and training loops"""
 
-    def __init__(self, simulation_list, runs_per_sim: int, manager_id: str = "default_comparison", verbose: bool = False):
+    def __init__(
+        self,
+        simulation_list: list = [],
+        runs_per_sim: int = 5,
+        manager_id: str = "default_comparison",
+        verbose: bool = False,
+        existing_simulation: str = None,
+    ):
+        if existing_simulation is not None:
+            self._init_existing_sim(existing_simulation)
+            return
+
         self.simulation_list = simulation_list
         self.runs_per_sim = runs_per_sim
         self.manager_id = manager_id
@@ -20,6 +32,11 @@ class SimulationManager(object):
         self.verbose = verbose
         if self.verbose:
             print(self)
+
+    def _init_existing_sim(self, existing_simulation: str):
+        """Initialize the simulation manager with existing simulations"""
+        param_sims = os.path.join(existing_simulation, "simulation.params")
+        self.__dict__ = pickle.load(open(param_sims, "rb"))
 
     def generate_sim_paths(self):
         """Generate the paths for the simulations
@@ -43,6 +60,8 @@ class SimulationManager(object):
                 sim._update_log_state(message="in_queue", save_path=state_log_path)
                 str_path += f"\n    {run_path}"
 
+        self.save_params(self.full_results_path)
+
         if self.verbose:
             print(str_path)
 
@@ -61,12 +80,37 @@ class SimulationManager(object):
                 sim_path = self.run_paths[run_index + sim_index * self.runs_per_sim]
                 print("Running simulation at path:")
                 print(sim_path)
-                sim.run_sim(save_path=sim_path)
+                try:
+                    sim.run_sim(save_path=sim_path)
+                except Exception:
+                    sim._update_log_state(message="error", save_path=os.path.join(sim_path, "state.log"))
+
+    def save_params(self, save_path: str):
+        save_path_params = os.path.join(save_path, "simulation.params")
+        pickle.dump(self.__dict__, open(save_path_params, "wb"), protocol=pickle.HIGHEST_PROTOCOL)
+
+    def check_run_status(self):
+        """Check the status of all the simulations"""
+        print("Checking status of simulations")
+        str_path = self.full_results_path
+        for i, sim in enumerate(self.simulation_list):
+            sim_path = os.path.join(self.full_results_path, sim.simulation_id)
+            self.simulation_paths.append(sim_path)
+            str_path += f"\n  {sim_path}"
+            for run in range(self.runs_per_sim):
+                run_path = self.run_paths[run + i * self.runs_per_sim]
+                state_log_path = os.path.join(run_path, "state.log")
+                state_str = self._get_state(state_log_path)
+                state_str_color = STATE_LABELS[state_str]
+                str_path += f"\n    {run_path}: {state_str_color}"
+        print(str_path)
+
+    def _get_state(self, state_path):
+        with open(state_path, "r") as f:
+            state_str = f.readline().split("\n")[0]
+        return state_str
 
     def run_single_sim(self, sim_index):
-        pass
-
-    def check_runs(self):
         pass
 
     def set_config(self):
@@ -97,6 +141,7 @@ class SingleSim(object):
         run_log_path = os.path.join(save_path, "run.log")
         error_log_path = os.path.join(save_path, "error.log")
         state_log_path = os.path.join(save_path, "state.log")
+        self._update_log_state("running", state_log_path)
 
         original_stdout = sys.stdout
         original_stderr = sys.stderr
@@ -110,26 +155,23 @@ class SingleSim(object):
 
         # Initializing models
         print("---> Initializing models")
-        self._update_log_state("initializing_models", state_log_path)
         agent, env = self._init_models()
 
         # Training loop
         print("---> Training loop")
-        self._update_log_state("training_loop", state_log_path)
         trained_agent, trained_env = self.training_loop(agent, env, **self.training_loop_params)
 
         # Saving models
         print("---> Saving models")
-        self._update_log_state("saving_models", state_log_path)
         self._save_models(save_path, trained_agent, trained_env)
 
         print("---> Simulation finished")
-        self._update_log_state("successful_run", state_log_path)
 
         sys.stdout.close()
         sys.stderr.close()
         sys.stdout = original_stdout
         sys.stderr = original_stderr
+        self._update_log_state("finished", state_log_path)
 
     def _init_models(self):
         agent = self.agent_class(**self.agent_params)
