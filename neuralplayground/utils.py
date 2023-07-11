@@ -354,3 +354,9 @@ def get_date_time():
 def dict_to_json(dict, path):
     with open(path, "w") as outfile:
         json.dump(dict, outfile)
+
+
+def load_json(path):
+    with open(path, "r") as infile:
+        dict = json.load(infile)
+    return dict
