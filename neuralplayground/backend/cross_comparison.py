@@ -1,6 +1,7 @@
 import os
 import pickle
 import sys
+import traceback
 
 import pandas as pd
 
@@ -80,10 +81,17 @@ class SimulationManager(object):
                 sim_path = self.run_paths[run_index + sim_index * self.runs_per_sim]
                 print("Running simulation at path:")
                 print(sim_path)
+                original_stdout = sys.stdout
+                original_stderr = sys.stderr
                 try:
                     sim.run_sim(save_path=sim_path)
                 except Exception:
                     sim._update_log_state(message="error", save_path=os.path.join(sim_path, "state.log"))
+                    sys.stdout = open(os.path.join(sim_path, "error.log"), "a")
+                    print(traceback.format_exc())
+                    sys.stdout.close()
+                sys.stdout = original_stdout
+                sys.stderr = original_stderr
 
     def save_params(self, save_path: str):
         save_path_params = os.path.join(save_path, "simulation.params")
@@ -141,16 +149,17 @@ class SingleSim(object):
         run_log_path = os.path.join(save_path, "run.log")
         error_log_path = os.path.join(save_path, "error.log")
         state_log_path = os.path.join(save_path, "state.log")
-        self._update_log_state("running", state_log_path)
 
         original_stdout = sys.stdout
         original_stderr = sys.stderr
+
         sys.stdout = open(run_log_path, "w")
         sys.stderr = open(error_log_path, "w")
 
+        self._update_log_state("running", state_log_path)
+
         # Saving simulation parameters
         print("---> Saving simulation parameters")
-        self._update_log_state("saving_params", state_log_path)
         self.save_params(save_path)
 
         # Initializing models
@@ -166,12 +175,12 @@ class SingleSim(object):
         self._save_models(save_path, trained_agent, trained_env)
 
         print("---> Simulation finished")
+        self._update_log_state("finished", state_log_path)
 
         sys.stdout.close()
         sys.stderr.close()
         sys.stdout = original_stdout
         sys.stderr = original_stderr
-        self._update_log_state("finished", state_log_path)
 
     def _init_models(self):
         agent = self.agent_class(**self.agent_params)

@@ -1,4 +1,5 @@
 from neuralplayground.backend import SimulationManager
+from neuralplayground.backend.default_simulation import sim_object1, sim_object2
 
 
 def main():
@@ -17,20 +18,24 @@ def main():
     # sim_object2.run_sim("try_results_sim3/")
     # print(sim_object2)
 
-    # sim_manager = SimulationManager(
-    #     [sim_object1, sim_object2],
-    #     runs_per_sim=5,
-    #     manager_id="test_dev",
-    #     verbose=True,
-    # )
-    #
-    # sim_manager.generate_sim_paths()
-    #
-    # sim_manager.run_all()
+    # sim_object2.run_sim("try_results_sim4/")
 
-    aux_manager_2 = SimulationManager(existing_simulation="test_dev")
-    print(aux_manager_2)
-    aux_manager_2.check_run_status()
+    sim_manager = SimulationManager(
+        [sim_object1, sim_object2],
+        runs_per_sim=5,
+        manager_id="test_dev",
+        verbose=True,
+    )
+
+    sim_manager.generate_sim_paths()
+
+    sim_manager.run_all()
+
+    sim_manager.check_run_status()
+
+    # aux_manager_2 = SimulationManager(existing_simulation="test_dev")
+    # print(aux_manager_2)
+    # aux_manager_2.check_run_status()
 
 
 if __name__ == "__main__":
