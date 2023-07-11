@@ -37,7 +37,6 @@ class TrajectoryConfig(NPGConfig):
     """
 
     def __init__(self, **kwargs):
-        self.FIGURE_SIZE = kwargs["figure_size"]
         self.TRAJECTORY_COLORMAP = kwargs["trajectory_colormap"]
         self.TRAJECTORY_ALPHA = kwargs["trajectory_alpha"]
         self.EXTERNAL_WALL_COLOR = kwargs["external_wall_color"]
@@ -49,7 +48,6 @@ class TrajectoryConfig(NPGConfig):
         self.SCATTER_MARKER_SIZE = kwargs["scatter_marker_size"]
         self.LABEL_FONTSIZE = kwargs["label_fontsize"]
         self.TICK_LABEL_FONTSIZE = kwargs["tick_label_fontsize"]
-        self.PLOT_EVERY_POINTS = kwargs["plot_every_points"]
         self.GRID = kwargs["grid"]
         self.TITLE_FONTSIZE = kwargs["title_fontsize"]
         self.COLORBAR_LABEL_FONTSIZE = kwargs["colorbar_label_fontsize"]
@@ -75,13 +73,13 @@ class RateMapConfig(NPGConfig):
     """
 
     def __init__(self, **kwargs):
-        self.FIGURE_SIZE = kwargs["figure_size"]
         self.RATEMAP_COLORMAP = kwargs["ratemap_colormap"]
         self.BIN_SIZE = kwargs["bin_size"]
         self.LABEL_FONTSIZE = kwargs["label_fontsize"]
         self.TICK_LABEL_FONTSIZE = kwargs["tick_label_fontsize"]
         self.TITLE_FONTSIZE = kwargs["title_fontsize"]
         self.COLORBAR_LABEL_FONTSIZE = kwargs["colorbar_label_fontsize"]
+        self.GRID = kwargs["grid"]
 
 
 class PlotsConfig(NPGConfig):

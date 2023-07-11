@@ -25,8 +25,11 @@ def make_plot_trajectories(arena_limits, x, y, ax, plot_every):
     ax: mpl.axes._subplots.AxesSubplot (matplotlib axis from subplots)
         Modified axis where the trajectory is plotted
     """
+
     # Plotting borders of the arena
+    # PLOT_CONFIG.TRAJECTORY.TRAJECTORY_COLORMAP = "bla"
     config_vars = PLOT_CONFIG.TRAJECTORY
+
     ax.plot(
         [arena_limits[0, 0], arena_limits[0, 0]],
         [arena_limits[1, 0], arena_limits[1, 1]],
@@ -70,11 +73,11 @@ def make_plot_trajectories(arena_limits, x, y, ax, plot_every):
     ax.set_xlabel("width", fontsize=config_vars.LABEL_FONTSIZE)
     ax.set_ylabel("depth", fontsize=config_vars.LABEL_FONTSIZE)
     ax.set_title("position", fontsize=config_vars.TITLE_FONTSIZE)
-    ax.grid(False)
+    ax.grid(config_vars.GRID)
 
-    cmap = mpl.cm.get_cmap(config_vars.TRAJECTORY_COLORMAP)
-    norm = plt.Normalize(0, np.size(x))
-    sc = ax.scatter(aux_x, aux_y, c=np.arange(len(aux_x)), vmin=0, vmax=len(x), cmap=cmap(norm(i)), alpha=0.6, s=0.1)
+    sc = ax.scatter(
+        aux_x, aux_y, c=np.arange(len(aux_x)), vmin=0, vmax=len(x), cmap=config_vars.TRAJECTORY_COLORMAP, alpha=0.6, s=0.1
+    )
 
     # Setting colorbar to show number of sampled (time steps) recorded
     cbar = plt.colorbar(sc, ax=ax, ticks=[0, len(x)])
@@ -118,7 +121,7 @@ def make_plot_rate_map(h, ax, title, title_x, title_y, title_cbar):
     ax.set_title(title, fontsize=config_vars.TITLE_FONTSIZE)
     ax.set_ylabel(title_y, fontsize=config_vars.LABEL_FONTSIZE)
     ax.set_xlabel(title_x, fontsize=config_vars.LABEL_FONTSIZE)
-    ax.grid(False)
+    ax.grid(config_vars.GRID)
     ax.set_xticks([])
     ax.set_yticks([])
     # Save if save_path is not None

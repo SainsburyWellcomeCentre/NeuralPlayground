@@ -1,5 +1,12 @@
 from neuralplayground.backend import SimulationManager
-from neuralplayground.backend.default_simulation import sim_object1, sim_object2
+from neuralplayground.backend.default_simulation import (
+    sim_object1,
+    sim_object2,
+    sim_object3,
+    sim_object4,
+    sim_object5,
+    sim_object6,
+)
 
 
 def main():
@@ -18,7 +25,12 @@ def main():
     # sim_object2.run_sim("try_results_sim3/")
     # print(sim_object2)
 
-    sim_manager = SimulationManager([sim_object1, sim_object2], runs_per_sim=5, manager_id="test_dev", verbose=True)
+    sim_manager = SimulationManager(
+        [sim_object1, sim_object2, sim_object3, sim_object4, sim_object5, sim_object6],
+        runs_per_sim=5,
+        manager_id="test_dev",
+        verbose=True,
+    )
 
     sim_manager.generate_sim_paths()
     sim_manager.run_all()

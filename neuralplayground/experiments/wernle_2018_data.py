@@ -519,9 +519,12 @@ class Wernle2018Data(Hafting2008Data):
             ax[i, 1].axhline(y=50, color="white", linestyle="--")
         return ratemaps_before, ratemaps_after, ax
 
+
+
     def get_recorded_session(self, recording_index=None):
         # Not used, override to avoid issues
         return [None, None, None]
+
 
 if __name__ == "__main__":
     data = Wernle2018Data()

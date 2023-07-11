@@ -145,6 +145,7 @@ class Stachenfeld2018(AgentCore):
         self.srmat = []
         self.srmat_sum = []
         self.srmat_ground = []
+        self.srmat_full_td = []
         self.transmat_norm = []
         self.inital_obs_variable = None
         self.obs_history = []  # Reset observation history
@@ -369,7 +370,8 @@ class Stachenfeld2018(AgentCore):
                 )
                 curr_state = next_state
                 t_elapsed += 1
-        return srmat_full
+                self.srmat_full_td = srmat_full
+        return self.srmat_full_td
 
     def plot_transition(self, save_path: str = None, ax: mpl.axes.Axes = None):
         """

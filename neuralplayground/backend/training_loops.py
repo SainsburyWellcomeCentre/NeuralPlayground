@@ -15,6 +15,7 @@ def default_training_loop(agent: AgentCore, env: Environment, n_steps: int):
 
 def episode_based_training_loop(agent: AgentCore, env: Environment, t_episode: int, n_episode: int):
     obs, state = env.reset()
+    obs = obs[:2]
     for i in range(n_episode):
         for j in range(t_episode):
             action = agent.act(obs)
