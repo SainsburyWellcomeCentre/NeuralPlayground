@@ -1,3 +1,4 @@
+import json
 import os
 from datetime import datetime
 
@@ -348,3 +349,8 @@ def get_date_time():
     dt_string = now.strftime("%d-%m-%Y_%H-%M-%S-%f")[:-3]
     now = str(dt_string)
     return now
+
+
+def dict_to_json(dict, path):
+    with open(path, "w") as outfile:
+        json.dump(dict, outfile)

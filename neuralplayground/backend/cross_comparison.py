@@ -6,7 +6,7 @@ import pandas as pd
 
 from neuralplayground.agents import AgentCore
 from neuralplayground.arenas import Environment
-from neuralplayground.utils import check_dir, get_date_time
+from neuralplayground.utils import check_dir, dict_to_json, get_date_time
 
 
 class SimulationManager(object):
@@ -144,8 +144,7 @@ class SingleSim(object):
         save_path_txt = os.path.join(save_path, "params.txt")
         save_path_params = os.path.join(save_path, "params.sim")
         pickle.dump(self.__dict__, open(save_path_params, "wb"), protocol=pickle.HIGHEST_PROTOCOL)
-        with open(save_path_txt, "w") as f:
-            f.write(str(self))
+        dict_to_json(self.__dict__, save_path_txt)
 
     def load_params(self, load_path: str):
         self.__dict__ = pd.read_pickle(load_path)
