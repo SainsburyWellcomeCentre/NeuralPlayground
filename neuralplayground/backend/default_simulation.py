@@ -39,7 +39,7 @@ sim1_params = {
         "agent_step_size": 0.5,
     },
     "training_loop": default_training_loop,
-    "training_loop_params": {"n_steps": 100},
+    "training_loop_params": {"n_steps": 1000},
 }
 
 sim2_params = {
@@ -63,7 +63,7 @@ sim2_params = {
         "twoD": True,
     },
     "training_loop": episode_based_training_loop,
-    "training_loop_params": {"t_episode": 10, "n_episode": 10},
+    "training_loop_params": {"t_episode": 100, "n_episode": 100},
 }
 
 sim3_params = {
@@ -85,7 +85,7 @@ sim3_params = {
         "twoD": True,
     },
     "training_loop": episode_based_training_loop,
-    "training_loop_params": {"t_episode": 10, "n_episode": 10},
+    "training_loop_params": {"t_episode": 100, "n_episode": 100},
 }
 
 sim4_params = {
@@ -108,14 +108,14 @@ sim4_params = {
         "agent_step_size": 0.1,
         "resolution": 100,
         "ro": 1,
-        "room_width": 20.0,
-        "room_depth": 20.0,
+        "room_width": 200.0,
+        "room_depth": 200.0,
         "disable_tqdm": True,
     },
     "env_class": Wernle2018,
     "env_params": {"merge_time": 20, "switch_time": 10, "time_step_size": 0.2, "agent_step_size": 3},
     "training_loop": default_training_loop,
-    "training_loop_params": {"n_steps": 100},
+    "training_loop_params": {"n_steps": 1000},
 }
 sim5_params = {
     "simulation_id": "weber_2018_in_Haftinglike",
@@ -138,7 +138,7 @@ sim5_params = {
         "resolution": 100,
         "ro": 1,
         "room_width": 20.0,
-        "room_depth": 20.0,
+        "room_depth": 2,
         "disable_tqdm": True,
     },
     "env_class": Simple2D,
@@ -150,7 +150,7 @@ sim5_params = {
         "agent_step_size": 0.5,
     },
     "training_loop": default_training_loop,
-    "training_loop_params": {"n_steps": 100},
+    "training_loop_params": {"n_steps": 1000},
 }
 
 sim6_params = {
@@ -187,7 +187,7 @@ sim6_params = {
         "switch_time": 270.0,
     },
     "training_loop": default_training_loop,
-    "training_loop_params": {"n_steps": 100},
+    "training_loop_params": {"n_steps": 1000},
 }
 
 
