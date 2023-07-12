@@ -5,6 +5,7 @@ Carpenter et al. 2015
 """
 
 import numpy as np
+
 from .simple2d import Simple2D
 
 
@@ -13,9 +14,16 @@ class ConnectedRooms(Simple2D):
     Simulated environment from https://doi.org/10.1016/j.cub.2015.02.037.
     Default parameters from experimental setting.
     """
-    def __init__(self, environment_name: str = "ConnectedRooms", corridor_ysize: float = 40.0,
-                 singleroom_ysize: float = 90.0, singleroom_xsize: float = 90, door_size: float = 10.0,
-                 **env_kwargs):
+
+    def __init__(
+        self,
+        environment_name: str = "ConnectedRooms",
+        corridor_ysize: float = 40.0,
+        singleroom_ysize: float = 90.0,
+        singleroom_xsize: float = 90,
+        door_size: float = 10.0,
+        **env_kwargs,
+    ):
         """
         Parameters
         ----------
@@ -52,7 +60,21 @@ class ConnectedRooms(Simple2D):
         # Walls from limit
 
         self.custom_walls.append(np.array([[0, 0], [0, -self.singleroom_ysize]]))
-        self.custom_walls.append(np.array([[-self.singleroom_xsize, 0], [-(self.singleroom_xsize/2+self.door_size/2), 0]]))
-        self.custom_walls.append(np.array([[-(self.singleroom_xsize/2-self.door_size/2), 0], [0, 0]]))
-        self.custom_walls.append(np.array([[0, 0], [self.singleroom_xsize/2-self.door_size/2, 0]]))
-        self.custom_walls.append(np.array([[self.singleroom_xsize/2+self.door_size/2, 0], [self.singleroom_xsize, 0]]))
+        self.custom_walls.append(
+            np.array(
+                [
+                    [-self.singleroom_xsize, 0],
+                    [-(self.singleroom_xsize / 2 + self.door_size / 2), 0],
+                ]
+            )
+        )
+        self.custom_walls.append(np.array([[-(self.singleroom_xsize / 2 - self.door_size / 2), 0], [0, 0]]))
+        self.custom_walls.append(np.array([[0, 0], [self.singleroom_xsize / 2 - self.door_size / 2, 0]]))
+        self.custom_walls.append(
+            np.array(
+                [
+                    [self.singleroom_xsize / 2 + self.door_size / 2, 0],
+                    [self.singleroom_xsize, 0],
+                ]
+            )
+        )

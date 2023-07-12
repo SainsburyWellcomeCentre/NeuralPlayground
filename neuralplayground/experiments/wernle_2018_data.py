@@ -1,30 +1,39 @@
 import os.path
+import warnings
+from typing import Union
 
-import pandas as pd
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-import scipy.io as sio
 import numpy as np
+import pandas as pd
+import scipy.io as sio
+
 import neuralplayground
-import warnings
-from neuralplayground.utils import get_2D_ratemap
+from neuralplayground.datasets import fetch_data_path
 from neuralplayground.experiments.hafting_2008_data import Hafting2008Data
-from typing import Union
+from neuralplayground.utils import get_2D_ratemap
+from neuralplayground.plotting.plot_utils import make_plot_trajectories , make_plot_rate_map
 
 
 class Wernle2018Data(Hafting2008Data):
-    """ Data class for https://www.nature.com/articles/s41593-017-0036-6
+    """Data class for https://www.nature.com/articles/s41593-017-0036-6
     The data can be obtained from https://doi.org/10.11582/2017.00023
     """
 
-    def __init__(self, data_path: str = None, recording_index: int = None,
-                 experiment_name: str = "FullWernleData", verbose: bool = False):
-        """ Wernle2018Data init, just initializing parent class Hafting2008Data
+    def __init__(
+        self,
+        data_path: str = None,
+        recording_index: int = None,
+        experiment_name: str = "FullWernleData",
+        verbose: bool = False,
+    ):
+        """Wernle2018Data init, just initializing parent class Hafting2008Data
 
         Parameters
         ----------
         data_path: str
-            if None, load the data sample in the package, else load data from given path
+            if None, fetch the data from the NeuralPlayground data repository,
+            else load data from given path
         recording_index: int
             if None, load data from default recording index
         experiment_name: str
@@ -32,13 +41,18 @@ class Wernle2018Data(Hafting2008Data):
         verbose:
             if True, it will print original readme and data structure when initializing this object
         """
-        super().__init__(data_path=data_path, recording_index=recording_index,
-                         experiment_name=experiment_name, verbose=verbose)
+        super().__init__(
+            data_path=data_path,
+            recording_index=recording_index,
+            experiment_name=experiment_name,
+            verbose=verbose,
+        )
 
     def _find_data_path(self, data_path: str):
-        """Set self.data_path to the data directory within the package"""
+        """Fetch data from NeuralPlayground data repository 
+        if no data path is supplied by the user"""
         if data_path is None:
-            self.data_path = os.path.join(neuralplayground.__path__[0], "experiments/wernle_2018/")
+            self.data_path = fetch_data_path("wernle_2018")
         else:
             self.data_path = data_path
 
@@ -48,7 +62,11 @@ class Wernle2018Data(Hafting2008Data):
 
         # Some of the recorded data in the list do not include positional data
         if type(rev_vars) is list:
-            time_array, x, y = session_data["time"], session_data["posx"], session_data["posy"]
+            _, x, y = (
+                session_data["time"],
+                session_data["posx"],
+                session_data["posy"],
+            )
         else:
             warnings.warn("This index does not have position data")
             return
@@ -58,7 +76,7 @@ class Wernle2018Data(Hafting2008Data):
         self.position = np.stack([x, y], axis=1) * 100
         head_direction = np.diff(self.position, axis=0)
         # Compute head direction from position derivative
-        head_direction = head_direction/np.sqrt(np.sum(head_direction**2, axis=1) + tolerance)[..., np.newaxis]
+        head_direction = head_direction / np.sqrt(np.sum(head_direction**2, axis=1) + tolerance)[..., np.newaxis]
         self.head_direction = head_direction
 
     def _load_data(self):
@@ -94,43 +112,82 @@ class Wernle2018Data(Hafting2008Data):
         # The following is the recording progression of grid cell patterns for 19 different cells
         # over 10 different rats
 
-        self.ratemap_dev = sio.loadmat(os.path.join(self.data_path, self.inner_path,
-                                                    r"Figure 4/ratemapsDevelopment.mat"))["ratemapsDevelopment"]
+        self.ratemap_dev = sio.loadmat(os.path.join(self.data_path, self.inner_path, r"Figure 4/ratemapsDevelopment.mat"))[
+            "ratemapsDevelopment"
+        ]
 
-        self.pos_A_B = sio.loadmat(os.path.join(self.data_path, self.inner_path,
-                                                r"Figure 4/posA_B.mat"))["posA_B"]
+        self.pos_A_B = sio.loadmat(os.path.join(self.data_path, self.inner_path, r"Figure 4/posA_B.mat"))["posA_B"]
 
-        self.pos_AB = sio.loadmat(os.path.join(self.data_path, self.inner_path,
-                                               r"Figure 4/posAB.mat"))["posAB"]
-        self.spikes_AB = sio.loadmat(os.path.join(self.data_path, self.inner_path,
-                                                  r"Figure 4/spkAB.mat"))["spkAB"]
+        self.pos_AB = sio.loadmat(os.path.join(self.data_path, self.inner_path, r"Figure 4/posAB.mat"))["posAB"]
+        self.spikes_AB = sio.loadmat(os.path.join(self.data_path, self.inner_path, r"Figure 4/spkAB.mat"))["spkAB"]
         # Setting Arena Limits in cm
         self.arena_limits = np.array([[-100, 100], [-100, 100]])
 
     def _create_dataframe(self):
-        """ Generate dataframe for easy display and access of data """
+        """Generate dataframe for easy display and access of data"""
         self.list = []
         rec_index = 0
 
         # Two types of data available, ratemaps, and full trajectories with spikes
         for i in range(self.ratemap_dev.shape[0]):
             # full trajectories with spikes
-            self.list.append({"rec_index": rec_index, "session": i, "recorded_vars": ["time", "posx", "posy", "speed_index", "spikes", "ratemap_dev"], "before_merge": False})
+            self.list.append(
+                {
+                    "rec_index": rec_index,
+                    "session": i,
+                    "recorded_vars": [
+                        "time",
+                        "posx",
+                        "posy",
+                        "speed_index",
+                        "spikes",
+                        "ratemap_dev",
+                    ],
+                    "before_merge": False,
+                }
+            )
             rec_index += 1
-            self.list.append({"rec_index": rec_index, "session": i, "recorded_vars": ["time", "posx", "posy", "speed_index", "ratemap_dev"], "before_merge": True})
+            self.list.append(
+                {
+                    "rec_index": rec_index,
+                    "session": i,
+                    "recorded_vars": [
+                        "time",
+                        "posx",
+                        "posy",
+                        "speed_index",
+                        "ratemap_dev",
+                    ],
+                    "before_merge": True,
+                }
+            )
             rec_index += 1
 
         for i in range(self.ratemap.shape[0]):
             # Ratemaps before and after merge
-            self.list.append({"rec_index": rec_index, "session": i, "recorded_vars": "ratemap", "before_merge": True})
+            self.list.append(
+                {
+                    "rec_index": rec_index,
+                    "session": i,
+                    "recorded_vars": "ratemap",
+                    "before_merge": True,
+                }
+            )
             rec_index += 1
-            self.list.append({"rec_index": rec_index, "session": i, "recorded_vars": "ratemap", "before_merge": False})
+            self.list.append(
+                {
+                    "rec_index": rec_index,
+                    "session": i,
+                    "recorded_vars": "ratemap",
+                    "before_merge": False,
+                }
+            )
             rec_index += 1
 
         self.recording_list = pd.DataFrame(self.list).set_index("rec_index")
 
     def get_recording_data(self, recording_index: Union[int, list, tuple] = None):
-        """ Get experimental data for a given recordin index1
+        """Get experimental data for a given recordin index1
 
         Parameters
         ----------
@@ -154,30 +211,50 @@ class Wernle2018Data(Hafting2008Data):
                 if type(session_info["recorded_vars"]) is list:
                     sess_index = session_info["session"]
                     if session_info["before_merge"]:
-                        sess_data = {"time": self.pos_A_B[sess_index, 0][:, 0],
-                                     "posx": self.pos_A_B[sess_index, 0][:, 1],
-                                     "posy": self.pos_A_B[sess_index, 0][:, 2],
-                                     "speed_index": self.pos_A_B[sess_index, 0][:, 3],
-                                     "ratemap_dev": self.ratemap_dev[sess_index, 0]}
+                        sess_data = {
+                            "time": self.pos_A_B[sess_index, 0][:, 0],
+                            "posx": self.pos_A_B[sess_index, 0][:, 1],
+                            "posy": self.pos_A_B[sess_index, 0][:, 2],
+                            "speed_index": self.pos_A_B[sess_index, 0][:, 3],
+                            "ratemap_dev": self.ratemap_dev[sess_index, 0],
+                        }
                     else:
-                        sess_data = {"time": self.pos_AB[sess_index, 0][:, 0],
-                                     "posx": self.pos_AB[sess_index, 0][:, 1],
-                                     "posy": self.pos_AB[sess_index, 0][:, 2],
-                                     "speed_index": self.pos_AB[sess_index, 0][:, 3],
-                                     "spikes": self.spikes_AB[sess_index, 0][:, 0],
-                                     "ratemap_dev": self.ratemap_dev[sess_index, 1]}
-                    rev_vars = list(sess_data.keys()) + ["dev", ]
+                        sess_data = {
+                            "time": self.pos_AB[sess_index, 0][:, 0],
+                            "posx": self.pos_AB[sess_index, 0][:, 1],
+                            "posy": self.pos_AB[sess_index, 0][:, 2],
+                            "speed_index": self.pos_AB[sess_index, 0][:, 3],
+                            "spikes": self.spikes_AB[sess_index, 0][:, 0],
+                            "ratemap_dev": self.ratemap_dev[sess_index, 1],
+                        }
+                    rev_vars = list(sess_data.keys()) + [
+                        "dev",
+                    ]
                     identifiers = {"sess_index": sess_index}
                     data_list.append([sess_data, rev_vars, identifiers])
 
                 elif session_info["recorded_vars"] == "ratemap":
                     sess_index = session_info["session"]
-                    rev_vars = ["ratemap",]
+                    rev_vars = [
+                        "ratemap",
+                    ]
                     identifiers = {"sess_index": sess_index}
                     if session_info["before_merge"]:
-                        data_list.append([{"ratemap": self.ratemap[sess_index, 0]}, rev_vars, identifiers])
+                        data_list.append(
+                            [
+                                {"ratemap": self.ratemap[sess_index, 0]},
+                                rev_vars,
+                                identifiers,
+                            ]
+                        )
                     else:
-                        data_list.append([{"ratemap": self.ratemap[sess_index, 1]}, rev_vars, identifiers])
+                        data_list.append(
+                            [
+                                {"ratemap": self.ratemap[sess_index, 1]},
+                                rev_vars,
+                                identifiers,
+                            ]
+                        )
 
             return data_list
 
@@ -187,19 +264,25 @@ class Wernle2018Data(Hafting2008Data):
                 sess_index = session_info["session"]
                 identifiers = {"sess_index": sess_index}
                 if session_info["before_merge"]:
-                    sess_data = {"time": self.pos_A_B[sess_index, 0][:, 0],
-                                 "posx": self.pos_A_B[sess_index, 0][:, 1],
-                                 "posy": self.pos_A_B[sess_index, 0][:, 2],
-                                 "speed_index": self.pos_A_B[sess_index, 0][:, 3],
-                                 "ratemap_dev": self.ratemap_dev[sess_index, 0]}
+                    sess_data = {
+                        "time": self.pos_A_B[sess_index, 0][:, 0],
+                        "posx": self.pos_A_B[sess_index, 0][:, 1],
+                        "posy": self.pos_A_B[sess_index, 0][:, 2],
+                        "speed_index": self.pos_A_B[sess_index, 0][:, 3],
+                        "ratemap_dev": self.ratemap_dev[sess_index, 0],
+                    }
                 else:
-                    sess_data = {"time": self.pos_AB[sess_index, 0][:, 0],
-                                 "posx": self.pos_AB[sess_index, 0][:, 1],
-                                 "posy": self.pos_AB[sess_index, 0][:, 2],
-                                 "speed_index": self.pos_AB[sess_index, 0][:, 3],
-                                 "spikes": self.spikes_AB[sess_index, 0][:, 0],
-                                 "ratemap_dev": self.ratemap_dev[sess_index, 1]}
-                rev_vars = list(sess_data.keys()) + ["dev", ]
+                    sess_data = {
+                        "time": self.pos_AB[sess_index, 0][:, 0],
+                        "posx": self.pos_AB[sess_index, 0][:, 1],
+                        "posy": self.pos_AB[sess_index, 0][:, 2],
+                        "speed_index": self.pos_AB[sess_index, 0][:, 3],
+                        "spikes": self.spikes_AB[sess_index, 0][:, 0],
+                        "ratemap_dev": self.ratemap_dev[sess_index, 1],
+                    }
+                rev_vars = list(sess_data.keys()) + [
+                    "dev",
+                ]
                 return sess_data, rev_vars, identifiers
 
             elif session_info["recorded_vars"] == "ratemap":
@@ -212,12 +295,15 @@ class Wernle2018Data(Hafting2008Data):
                 rev_vars = "ratemap"
                 return sess_data, rev_vars, identifiers
 
-    def plot_recording_tetr(self, recording_index: Union[int, tuple, list] = None,
-                            save_path: Union[str, tuple, list] = None,
-                            ax: Union[mpl.axes.Axes, tuple, list] = None,
-                            tetrode_id: Union[str, tuple, list] = None,
-                            bin_size: float = 2.0):
-        """ Plot tetrode ratemap from spike data for a given recording index or a list of recording index.
+    def plot_recording_tetr(
+        self,
+        recording_index: Union[int, tuple, list] = None,
+        save_path: Union[str, tuple, list] = None,
+        ax: Union[mpl.axes.Axes, tuple, list] = None,
+        tetrode_id: Union[str, tuple, list] = None,
+        bin_size: float = 2.0,
+    ):
+        """Plot tetrode ratemap from spike data for a given recording index or a list of recording index.
         If given a list or tuple as argument, all arguments must be list, tuple, or None.
 
         Parameters
@@ -281,13 +367,24 @@ class Wernle2018Data(Hafting2008Data):
         # Check of the session has spikes to compute ratemap
         # Plot pre-computed ratemap otherwise
         if type(rev_vars) is list and "spikes" in rev_vars:
-            time_array, test_spikes, x, y = session_data["time"], session_data["spikes"], session_data["posx"], \
-                                            session_data["posy"]
+            time_array, test_spikes, x, y = (
+                session_data["time"],
+                session_data["spikes"],
+                session_data["posx"],
+                session_data["posy"],
+            )
 
-            h, binx, biny = get_2D_ratemap(time_array, test_spikes, x, y, x_size=int(arena_width/bin_size),
-                                           y_size=int(arena_depth/bin_size), filter_result=True)
+            h, binx, biny = get_2D_ratemap(
+                time_array,
+                test_spikes,
+                x,
+                y,
+                x_size=int(arena_width / bin_size),
+                y_size=int(arena_depth / bin_size),
+                filter_result=True,
+            )
 
-        elif type(rev_vars) is list and not "spikes" in rev_vars:
+        elif type(rev_vars) is list and "spikes" not in rev_vars:
             warnings.warn("No spike data pre merging")
             return
         else:
@@ -301,7 +398,7 @@ class Wernle2018Data(Hafting2008Data):
 
         sess_index = self.recording_list.iloc[recording_index]["session"]
         # Use auxiliary function to make the plot
-        self._make_tetrode_plot(h, ax, "sess_index_"+str(sess_index)+"_"+merged_mssg, save_path)
+        ax=make_plot_rate_map(h, ax, "sess_index_" + str(sess_index) + "_" + merged_mssg,"width","depth","Firing rate")
         # Save if save_path is not None
         if save_path is None:
             pass
@@ -310,11 +407,14 @@ class Wernle2018Data(Hafting2008Data):
         # Return ratemap values, x bin limits and y bin limits
         return h, binx, biny
 
-    def plot_trajectory(self, recording_index: Union[int, tuple, list] = None,
-                        save_path: Union[str, tuple, list] = None,
-                        ax: Union[mpl.axes.Axes, tuple, list] = None,
-                        plot_every: int = 20):
-        """ Plot animal trajectory from a given recording index, corresponding to a recording session
+    def plot_trajectory(
+        self,
+        recording_index: Union[int, tuple, list] = None,
+        save_path: Union[str, tuple, list] = None,
+        ax: Union[mpl.axes.Axes, tuple, list] = None,
+        plot_every: int = 20,
+    ):
+        """Plot animal trajectory from a given recording index, corresponding to a recording session
 
         Parameters
         ----------
@@ -362,17 +462,22 @@ class Wernle2018Data(Hafting2008Data):
 
         session_data, rev_vars, identifiers = self.get_recording_data(recording_index)
 
-        arena_width = self.arena_limits[0, 1] - self.arena_limits[0, 0]
-        arena_depth = self.arena_limits[1, 1] - self.arena_limits[1, 0]
+        self.arena_limits[0, 1] - self.arena_limits[0, 0]
+        self.arena_limits[1, 1] - self.arena_limits[1, 0]
 
         if type(rev_vars) is list:
-            time_array, x, y = session_data["time"], session_data["posx"], session_data["posy"]
+            time_array, x, y = (
+                session_data["time"],
+                session_data["posx"],
+                session_data["posy"],
+            )
         else:
             warnings.warn("This index does not have position data")
             return
 
         # Helper function to format the trajectory plot
-        ax = self._make_trajectory_plot(x, y, ax, plot_every)
+
+        ax =  make_plot_trajectories(self.arena_limits, x, y, ax, plot_every)
         if save_path is None:
             pass
         else:
@@ -380,7 +485,7 @@ class Wernle2018Data(Hafting2008Data):
         return x, y, time_array
 
     def plot_merging_comparison(self, session_index: Union[int, list, tuple]):
-        """ Plot ratemaps before and after merging for a given session index
+        """Plot ratemaps before and after merging for a given session index
 
         Parameters
         ----------
@@ -399,76 +504,22 @@ class Wernle2018Data(Hafting2008Data):
             n_cells = len(session_index)
         else:
             n_cells = 1
-            session_index = [session_index, ]
-        f, ax = plt.subplots(n_cells, 2, figsize=(8, 5*n_cells))
+            session_index = [
+                session_index,
+            ]
+        f, ax = plt.subplots(n_cells, 2, figsize=(8, 5 * n_cells))
         ratemaps_before = []
         ratemaps_after = []
         for i in range(n_cells):
-            ax[i, 0].imshow(self.ratemap[session_index[i], 0], cmap="jet")
-            ax[i, 1].imshow(self.ratemap[session_index[i], 1], cmap="jet")
+            make_plot_rate_map(self.ratemap[session_index[i], 0],  ax[i, 0], "Before merging", "width", "depth","Firing rate")
+            make_plot_rate_map(self.ratemap[session_index[i], 1], ax[i, 1], "After merging", "width", "depth", "Firing rate")
             ratemaps_before.append(self.ratemap[session_index[i], 0])
             ratemaps_after.append(self.ratemap[session_index[i], 1])
             ax[i, 0].axhline(y=50, color="white")
             ax[i, 1].axhline(y=50, color="white", linestyle="--")
-        ax[0, 0].set_title("Before merging")
-        ax[0, 1].set_title("After merging")
         return ratemaps_before, ratemaps_after, ax
 
-    def plot_development(self, n_cells: int = 3,
-                         time_interval: Union[tuple, list] = (1.0, 2.0),
-                         merged: bool = False,
-                         plot_every: int = 10):
-        """ Prototype function for evolution of ratemaps through time
 
-        Parameters
-        ----------
-        n_cells: int
-            Number of cells to plot, from 0 to 19
-        time_interval: 2D-tuple or list with floats
-            Time inverval from experiment, if merged true, then time inverval after merging
-        merged: bool
-            If True, make plot for data after merging
-        plot_every: int
-            time steps skipped to make the plot to reduce cluttering
-
-        Returns
-        -------
-        ax: mpl.axes._subplots.AxesSubplot (matplotlib axis from subplots)
-            Modified axis where the trajectory is plotted
-        """
-        if merged:
-            pos = self.pos_AB[:n_cells, 0]
-        else:
-            pos = self.pos_A_B[:n_cells, 0]
-
-        f, ax = plt.subplots(1, n_cells, figsize=(4*n_cells, 3))
-        for cell in range(n_cells):
-            pos_i = pos[cell]
-            init_sample = int(pos_i.shape[0] * (time_interval[0]*60.0)/(np.amax(pos_i[:, 0])))
-            finish_sample = int(pos_i.shape[0] * (time_interval[1]*60.0)/(np.amax(pos_i[:, 0])))
-            n_samples = finish_sample - init_sample
-            cmap = mpl.cm.get_cmap("plasma")
-            norm = plt.Normalize(init_sample, finish_sample)
-            aux_x, aux_y = [], []
-            prev_x, prev_y = pos_i[init_sample, 1], pos_i[finish_sample, 2]
-            for sample_i in range(init_sample, finish_sample, plot_every):
-                x, y = pos_i[sample_i, 1], pos_i[sample_i, 2]
-                aux_x.append(x)
-                aux_y.append(y)
-                ax[cell].plot((prev_x, x), (prev_y, y), "-", color=cmap(norm(sample_i)), alpha=0.4, lw=0.5)
-                prev_x = x
-                prev_y = y
-            ax[cell].set_ylim((-100, 100))
-            ax[cell].set_xlim((-100, 100))
-            sc = ax[cell].scatter(aux_x, aux_y, c=np.arange(init_sample, finish_sample, plot_every),
-                                  vmin=init_sample, vmax=finish_sample, cmap="plasma", alpha=0.4, s=2)
-            ax[cell].axhline(y=0, color="black")
-            ticks = np.linspace(init_sample, finish_sample, num=10)
-            tickslabels = np.round(np.linspace(init_sample/50/60, finish_sample/50/60, num=10), 1)
-            cbar = plt.colorbar(sc, ax=ax[cell], ticks=ticks)
-            cbar.ax.set_yticklabels(tickslabels, fontsize=8)
-            cbar.ax.set_ylabel("Time [min]", rotation=270, labelpad=12)
-        return ax
 
     def get_recorded_session(self, recording_index=None):
         # Not used, override to avoid issues

@@ -1,0 +1,25 @@
+plot_config:
+  trajectory_plot:
+    trajectory_colormap: "plasma"
+    trajectory_alpha: 0.6
+    external_wall_color: "C3"
+    external_wall_thickness: 3
+    custom_wall_color: "C0"
+    custom_wall_thickness: 3
+    scatter_alpha: 1
+    scatter_marker: "o"
+    scatter_marker_size: 1
+    label_fontsize: 24
+    tick_label_fontsize: 12
+    colorbar_label_fontsize: 24
+    title_fontsize: 24
+    grid: False
+
+  ratemap_plot:
+    ratemap_colormap: "jet"
+    bin_size: 2.0
+    label_fontsize: 24
+    tick_label_fontsize: 12
+    colorbar_label_fontsize: 24
+    title_fontsize: 24
+    grid: False

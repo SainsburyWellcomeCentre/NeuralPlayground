@@ -1,0 +1,59 @@
+name: tests
+
+on:
+  push:
+    branches:
+      - '*'
+    tags:
+      - '*'
+  pull_request:
+
+jobs:
+
+  linting:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: neuroinformatics-unit/actions/lint@v2.0.0
+
+  manifest:
+    name: Check Manifest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: neuroinformatics-unit/actions/check_manifest@v2.0.0
+
+  test:
+    needs: [linting, manifest]
+    name: ${{ matrix.os }} py${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        # Run all supported Python versions on linux
+        python-version: ["3.8", "3.9", "3.10", "3.11"]
+        os: [ubuntu-latest]
+    steps:
+      - uses: neuroinformatics-unit/actions/test@v2.0.0
+        with:
+          python-version: ${{ matrix.python-version }}
+          use-xvfb: true
+
+  build_sdist_wheels:
+    name: Build source distribution
+    needs: [test]
+    if: github.event_name == 'push' && github.ref_type == 'tag'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: neuroinformatics-unit/actions/build_sdist_wheels@v2.0.0
+
+  upload_all:
+    name: Publish build distributions
+    needs: [build_sdist_wheels]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/download-artifact@v3
+      with:
+        name: artifact
+        path: dist
+    - uses: pypa/gh-action-pypi-publish@v1.5.0
+      with:
+        user: __token__
+        password: ${{ secrets.TWINE_API_KEY }}

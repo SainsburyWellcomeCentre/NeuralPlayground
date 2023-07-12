@@ -1,18 +1,20 @@
 """
 Base class for models that can interact with environments in this repo
-Any neuralplayground model should inherit this class in order to interact with environments and compare against experimental results
+Any neuralplayground model should inherit this class in order to interact with
+environments and compare against experimental results.
 We expect to make profound changes in this module as we add more EHC model to the repo
 """
-import numpy as np
-import pickle
-from deepdiff import DeepDiff
 import os
+import pickle
+
+import numpy as np
 import pandas as pd
+from deepdiff import DeepDiff
 from scipy.stats import levy_stable
 
 
 class AgentCore(object):
-    """ Abstract class for all EHC models
+    """Abstract class for all EHC models
 
     Attributes
     ----------
@@ -27,6 +29,7 @@ class AgentCore(object):
     global_steps: int
         Record of number of updates done on the weights
     """
+
     def __init__(self, model_name="default_model", **mod_kwargs):
         self.model_name = model_name
         self.mod_kwargs = mod_kwargs
@@ -37,15 +40,15 @@ class AgentCore(object):
         self.metadata = {"mod_kwargs": mod_kwargs}
         self.obs_history = []
         self.global_steps = 0
- 
+
     def reset(self):
-        """Erase all memory from the model, initialize all relevant parameters and build from scratch """
+        """Erase all memory from the model, initialize all relevant parameters and build from scratch"""
         pass
 
     def neural_response(self):
-        """ Function that returns some representation that will be compared against real experimental data """
+        """Function that returns some representation that will be compared against real experimental data"""
         pass
-        
+
     def act(self, obs, policy_func=None):
         """
         The base model executes a random action from a normal distribution
@@ -62,7 +65,9 @@ class AgentCore(object):
         """
         self.obs_history.append(obs)
         # if len(self.obs_history) >= 1000:  # reset every 1000
-        self.obs_history = [obs, ]
+        self.obs_history = [
+            obs,
+        ]
         if policy_func is not None:
             return policy_func(obs)
         action = np.random.normal(scale=self.agent_step_size, size=(2,))
@@ -72,26 +77,27 @@ class AgentCore(object):
         pass
 
     def save_agent(self, save_path: str):
-        """ Save current state and information in general to re-instantiate the environment
+        """Save current state and information in general to re-instantiate the environment
 
         Parameters
         ----------
         save_path: str
             Path to save the agent
         """
-        pickle.dump(self.__dict__,
-                    open(os.path.join(save_path), "wb"),
-                    pickle.HIGHEST_PROTOCOL)
+        # pickle.dump(self.__dict__, open(os.path.join(save_path), "wb"), pickle.HIGHEST_PROTOCOL)
+        pickle.dump(self, open(os.path.join(save_path), "wb"), pickle.HIGHEST_PROTOCOL)
 
     def restore_agent(self, save_path: str):
-        """ Restore saved environment
+        """Restore saved environment
 
         Parameters
         ----------
         save_path: str
             Path to retrieve the agent
         """
-        self.__dict__ = pd.read_pickle(save_path)
+        # self.__dict__ = pd.read_pickle(save_path)
+        # TODO: for some reason, ruff has a problem with this: self = pd.read_pickle(save_path)
+        pd.read_pickle(save_path)
 
     def __eq__(self, other):
         diff = DeepDiff(self.__dict__, other.__dict__)
@@ -102,9 +108,10 @@ class AgentCore(object):
 
 
 class RandomAgent(AgentCore):
-    """ Simple agent with random trajectories """
+    """Simple agent with random trajectories"""
+
     def __init__(self, step_size: float = 1.0):
-        """ Initialization
+        """Initialization
 
         Parameters
         ----------
@@ -115,7 +122,7 @@ class RandomAgent(AgentCore):
         self.step_size = step_size
 
     def act(self, obs):
-        """ The base model executes a random action from a normal distribution
+        """The base model executes a random action from a normal distribution
         Parameters
         ----------
         obs:
@@ -130,12 +137,21 @@ class RandomAgent(AgentCore):
 
 
 class LevyFlightAgent(RandomAgent):
-    """ Based on https://en.wikipedia.org/wiki/L%C3%A9vy_flight
+    """Based on https://en.wikipedia.org/wiki/L%C3%A9vy_flight
     and https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.levy_stable.html#scipy.stats.levy_stable
     Still experimental, need hyperparameter tuning and perhaps some momentum"""
-    def __init__(self, alpha: float = 0.3, beta: float = 1, loc: float = 1.0, scale: float = 0.8,
-                 step_size: float = 0.3, max_action_size: float = 50, max_step_size: float = 10):
-        """ Initializing levy flight agent
+
+    def __init__(
+        self,
+        alpha: float = 0.3,
+        beta: float = 1,
+        loc: float = 1.0,
+        scale: float = 0.8,
+        step_size: float = 0.3,
+        max_action_size: float = 50,
+        max_step_size: float = 10,
+    ):
+        """Initializing levy flight agent
         From original documentation:
         The probability density above is defined in the “standardized” form. To shift and/or scale the distribution
         use the loc and scale parameters. Specifically, levy_stable.pdf(x, alpha, beta, loc, scale) is identically
@@ -167,7 +183,7 @@ class LevyFlightAgent(RandomAgent):
         self.action_buffer = []
 
     def _act(self, obs):
-        """ Auxiliary action method to compute
+        """Auxiliary action method to compute
 
         Parameters
         ----------
@@ -182,7 +198,7 @@ class LevyFlightAgent(RandomAgent):
         # Pick direction
         direction = super().act(obs)
         # Normalize direction to step size
-        direction = direction / np.sqrt(np.sum(direction ** 2)) * self.step_size
+        direction = direction / np.sqrt(np.sum(direction**2)) * self.step_size
         # Sample step size
         r = np.clip(self.levy.rvs(), a_min=0, a_max=self.max_action_size)
         # Return step size from levy in a random direction
@@ -190,7 +206,7 @@ class LevyFlightAgent(RandomAgent):
         return d_pos
 
     def act(self, obs):
-        """ Sample levy flight steps. If steps are too large (action_size > max_step_size),
+        """Sample levy flight steps. If steps are too large (action_size > max_step_size),
         it will divide it in several steps in the same direction.
 
         Parameters
@@ -213,9 +229,9 @@ class LevyFlightAgent(RandomAgent):
             """
             action = self._act(obs)
             action_size = np.sqrt(np.sum(action**2))
-            normalized_action = action/action_size
+            normalized_action = action / action_size
             if action_size > self.max_step_size:
-                n_sub_steps = int(np.ceil(action_size/self.max_action_size))
+                n_sub_steps = int(np.ceil(action_size / self.max_action_size))
                 sub_actions = [normalized_action for i in range(n_sub_steps)]
                 self.action_buffer += sub_actions
                 return self.action_buffer.pop()
