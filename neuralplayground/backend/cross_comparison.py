@@ -12,7 +12,30 @@ from neuralplayground.utils import check_dir, get_date_time
 
 
 class SimulationManager(object):
-    """Class to manage the runs of multiple combinations of agents, environments, parameters and training loops"""
+    """Class to manage the runs of multiple combinations of agents, environments, parameters and training loops
+
+    Attributes
+    ----------
+    simulation_list: list of SingleSim objects
+        List of SingleSim objects to run
+    runs_per_sim: int
+        Number of runs per simulation
+    manager_id: str
+        ID of the simulation manager
+    results_path: str
+        Path to the results of the simulation manager
+    verbose: bool
+        If True, print information about the simulation manager
+
+    Methods
+    -------
+    generate_sim_paths()
+        Generate the paths for the simulations
+    run_all()
+        Run all the simulations in the simulation manager list, runs_per_sim times
+    check_run_status()
+        Prints the status of the simulations in the simulation manager
+    """
 
     def __init__(
         self,
@@ -22,6 +45,21 @@ class SimulationManager(object):
         verbose: bool = False,
         existing_simulation: str = None,
     ):
+        """Initialize the simulation manager
+
+        Parameters
+        ----------
+        simulation_list: list of SingleSim objects
+            List of SingleSim objects to run (defined below in the code)
+        runs_per_sim: int
+            Number of runs per simulation
+        manager_id: str
+            ID of the simulation manager
+        verbose: bool
+            If True, print information about the simulation manager
+        existing_simulation: str
+            Path to an existing simulation manager, it will load the parameters from the existing simulation if provided
+        """
         if existing_simulation is not None:
             self._init_existing_sim(existing_simulation)
             return
@@ -40,23 +78,23 @@ class SimulationManager(object):
         self.__dict__ = pickle.load(open(param_sims, "rb"))
 
     def generate_sim_paths(self):
-        """Generate the paths for the simulations
-        If the path does not exist, it will be created
-        if the path exists, it will save the results in the existing path
-        """
+        """Generate the paths for the simulations"""
         self.full_results_path = self.results_path
         self.simulation_paths = []
         self.run_paths = []
         str_path = self.full_results_path
+        # creating the path for the simulation manager
         for sim in self.simulation_list:
             sim_path = os.path.join(self.full_results_path, sim.simulation_id)
             self.simulation_paths.append(sim_path)
             str_path += f"\n  {sim_path}"
+            # creating the path for each run
             for run in range(self.runs_per_sim):
                 # writing path for each run index and date time
                 run_path = os.path.join(sim_path, f"run_{run}_{get_date_time()}")
                 check_dir(run_path)
                 self.run_paths.append(run_path)
+                # writing state log
                 state_log_path = os.path.join(run_path, "state.log")
                 sim._update_log_state(message="in_queue", save_path=state_log_path)
                 str_path += f"\n    {run_path}"
@@ -67,6 +105,7 @@ class SimulationManager(object):
             print(str_path)
 
     def __str__(self):
+        """Print the simulation manager information"""
         sim_list = [sim.simulation_id for sim in self.simulation_list]
         mssg_str = (
             f'SimulationManager "{self.manager_id}" \nwith {sim_list} simulations'
@@ -75,25 +114,31 @@ class SimulationManager(object):
         return mssg_str
 
     def run_all(self):
-        """Run all the simulations in the list"""
+        """Run all the SingleSim in the simulation manager list, runs_per_sim times"""
+        # running all the simulations
         for sim_index, sim in enumerate(self.simulation_list):
+            # running all the runs for each simulation
             for run_index in range(self.runs_per_sim):
                 sim_path = self.run_paths[run_index + sim_index * self.runs_per_sim]
                 print("Running simulation at path:")
                 print(sim_path)
+                # setting run logs and error logs
                 original_stdout = sys.stdout
                 original_stderr = sys.stderr
                 try:
                     sim.run_sim(save_path=sim_path)
                 except Exception:
+                    # Logging the error
                     sim._update_log_state(message="error", save_path=os.path.join(sim_path, "state.log"))
                     sys.stdout = open(os.path.join(sim_path, "error.log"), "a")
                     print(traceback.format_exc())
                     sys.stdout.close()
+                # Recover the original stdout and stderr
                 sys.stdout = original_stdout
                 sys.stderr = original_stderr
 
     def save_params(self, save_path: str):
+        """Save the parameters of the simulation manager"""
         save_path_params = os.path.join(save_path, "simulation.params")
         pickle.dump(self.__dict__, open(save_path_params, "wb"), protocol=pickle.HIGHEST_PROTOCOL)
 
@@ -114,18 +159,46 @@ class SimulationManager(object):
         print(str_path)
 
     def _get_state(self, state_path):
+        """Get the state of the simulation from the state log"""
         with open(state_path, "r") as f:
             state_str = f.readline().split("\n")[0]
         return state_str
 
-    def run_single_sim(self, sim_index):
-        pass
-
-    def set_config(self):
-        pass
-
 
 class SingleSim(object):
+    """Single simulation object
+
+    Attributes
+    ----------
+    agent_class : Agent
+        The agent class to be used in the simulation
+    agent_params : dict
+        The parameters of the agent
+    env_class : Environment
+        The environment class to be used in the simulation
+    env_params : dict
+        The parameters of the environment
+    training_loop : python function
+        The training loop to be used in the simulation
+    training_loop_params : dict
+        The parameters of the training loop
+    simulation_id : str
+        The id of the simulation
+
+    Methods
+    -------
+    run_sim(save_path: str)
+        Run the simulation and save the results in save_path
+    _init_model(save_path: str)
+        Initialize the model and save it in save_path
+    _save_model(save_path: str)
+        Save the model in save_path
+    save_params(save_path: str)
+        Save the parameters of the simulation
+    _update_log_state(message: str, save_path: str)
+        Update the state log of the simulation
+    """
+
     def __init__(
         self,
         agent_class=None,
@@ -136,6 +209,26 @@ class SingleSim(object):
         training_loop_params=None,
         simulation_id: str = None,
     ):
+        """Initialize the SingleSim object
+
+        Parameters
+        ----------
+        agent_class : Agent
+            The agent class to be used in the simulation
+        agent_params : dict
+            The parameters of the agent
+        env_class : Environment
+            The environment class to be used in the simulation
+        env_params : dict
+            The parameters of the environment
+        training_loop : python function
+            The training loop function to be used in the simulation
+            see training_loops.py for examples in this same module
+        training_loop_params : dict
+            The parameters of the training loop (neither the agent nor the environment)
+        simulation_id : str
+            The id of the simulation
+        """
         self.agent_class = agent_class
         self.agent_params = agent_params
         self.env_class = env_class
@@ -145,6 +238,15 @@ class SingleSim(object):
         self.simulation_id = simulation_id
 
     def run_sim(self, save_path: str):
+        """Run the simulation and save the results in save_path
+
+        Parameters
+        ----------
+        save_path : str
+            The path where the results of the simulation will be saved
+        """
+
+        # Setting the save path and logs
         check_dir(save_path)
         run_log_path = os.path.join(save_path, "run.log")
         error_log_path = os.path.join(save_path, "error.log")
@@ -156,6 +258,7 @@ class SingleSim(object):
         sys.stdout = open(run_log_path, "w")
         sys.stderr = open(error_log_path, "w")
 
+        # Initializing the state log
         self._update_log_state("running", state_log_path)
 
         # Saving simulation parameters
@@ -168,30 +271,35 @@ class SingleSim(object):
 
         # Training loop
         print("---> Training loop")
-        trained_agent, trained_env = self.training_loop(agent, env, **self.training_loop_params)
+        trained_agent, trained_env, training_hist = self.training_loop(agent, env, **self.training_loop_params)
 
         # Saving models
         print("---> Saving models")
-        self._save_models(save_path, trained_agent, trained_env)
+        self._save_models(save_path, trained_agent, trained_env, training_hist)
 
         print("---> Simulation finished")
         self._update_log_state("finished", state_log_path)
 
+        # Closing logs
         sys.stdout.close()
         sys.stderr.close()
         sys.stdout = original_stdout
         sys.stderr = original_stderr
 
     def _init_models(self):
+        """Initialize the models"""
         agent = self.agent_class(**self.agent_params)
         env = self.env_class(**self.env_params)
         return agent, env
 
-    def _save_models(self, save_path: str, agent: AgentCore, env: Environment):
+    def _save_models(self, save_path: str, agent: AgentCore, env: Environment, training_hist: dict):
+        """Save the models and the training history"""
         agent.save_agent(os.path.join(save_path, "agent"))
         env.save_environment(os.path.join(save_path, "arena"))
+        pickle.dump(training_hist, open(os.path.join(save_path, "training_hist.dict"), "wb"), protocol=pickle.HIGHEST_PROTOCOL)
 
     def save_params(self, save_path: str):
+        """Save the parameters of the simulation for reproducibility"""
         save_path_params = os.path.join(save_path, "params.dict")
         pickle.dump(self.__dict__, open(save_path_params, "wb"), protocol=pickle.HIGHEST_PROTOCOL)
 
@@ -199,6 +307,7 @@ class SingleSim(object):
         self.__dict__ = pd.read_pickle(load_path)
 
     def _update_log_state(self, message: str, save_path: str):
+        """Update the state log of the simulation"""
         state_log = open(save_path, "w")
         state_log.write(message)
         state_log.close()

@@ -336,6 +336,7 @@ class Weber2018(AgentCore):
 
         self.we = np.clip(self.we, a_min=0, a_max=np.amax(self.we))  # Negative weights to zero
         self.wi = np.clip(self.wi, a_min=0, a_max=np.amax(self.wi))
+        return {"delta_we": delta_we, "delta_wi": delta_wi}
 
     def full_average_update(self, exc_normalization: bool = True):
         """
@@ -410,3 +411,16 @@ class Weber2018(AgentCore):
             plt.close("all")
         else:
             return ax
+
+    def get_ratemap_matrix(self):
+        """
+        Get the ratemap matrix of the network
+
+        Returns
+        -------
+        ratemap_matrix : ndarray
+            (self.resolution_width, self.resolution_depth) with the ratemap matrix
+        """
+        r_out_im = self.get_full_output_rate()
+        r_out_im = r_out_im.reshape((self.resolution_width, self.resolution_depth))
+        return r_out_im

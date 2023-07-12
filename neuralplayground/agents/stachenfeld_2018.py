@@ -330,13 +330,13 @@ class Stachenfeld2018(AgentCore):
         L = b.reshape(a.shape + (self.n_state,))
         curr_state_vec = L
 
-        update_val = curr_state_vec + self.gamma * self.srmat[:, next_state] - self.srmat[:, self.curr_state]
-        self.srmat[:, self.curr_state] = self.srmat[:, self.curr_state] + self.learning_rate * update_val
+        td_error = curr_state_vec + self.gamma * self.srmat[:, next_state] - self.srmat[:, self.curr_state]
+        self.srmat[:, self.curr_state] = self.srmat[:, self.curr_state] + self.learning_rate * td_error
 
-        self.grad_history.append(np.sqrt(np.sum(update_val**2)))
+        self.grad_history.append(np.sqrt(np.sum(td_error**2)))
         self.curr_state = next_state
 
-        return self.srmat
+        return {"td_error": td_error}
 
     def update_successor_rep_td_full(self, n_episode: int = None, t_episode: int = None):
         """
@@ -423,3 +423,9 @@ class Stachenfeld2018(AgentCore):
         else:
             plt.savefig(save_path, bbox_inches="tight")
         return ax
+
+    def get_ratemap_matrix(self, eigen_vector: int = 0):
+        sr = self.successor_rep_solution()
+        evals, evecs = np.linalg.eig(sr)
+        r_out_im = evals[:, eigen_vector].reshape((self.resolution_width, self.resolution_depth))
+        return r_out_im

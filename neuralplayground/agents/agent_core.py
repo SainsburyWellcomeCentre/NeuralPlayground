@@ -45,10 +45,6 @@ class AgentCore(object):
         """Erase all memory from the model, initialize all relevant parameters and build from scratch"""
         pass
 
-    def neural_response(self):
-        """Function that returns some representation that will be compared against real experimental data"""
-        pass
-
     def act(self, obs, policy_func=None):
         """
         The base model executes a random action from a normal distribution
@@ -64,10 +60,10 @@ class AgentCore(object):
             action value which in this case is random number draw from a Gaussian
         """
         self.obs_history.append(obs)
-        # if len(self.obs_history) >= 1000:  # reset every 1000
-        self.obs_history = [
-            obs,
-        ]
+        if len(self.obs_history) >= 1000:  # reset every 1000
+            self.obs_history = [
+                obs,
+            ]
         if policy_func is not None:
             return policy_func(obs)
         action = np.random.normal(scale=self.agent_step_size, size=(2,))
@@ -105,6 +101,10 @@ class AgentCore(object):
             return True
         else:
             return False
+
+    def get_ratemap_matrix(self):
+        """Function that returns some representation that will be compared against real experimental data"""
+        pass
 
 
 class RandomAgent(AgentCore):

@@ -6,7 +6,6 @@ from neuralplayground.backend import default_training_loop, episode_based_traini
 
 from .cross_comparison import SingleSim
 
-# Experiment 1: Weber 2018
 sim1_params = {
     "simulation_id": "weber_2018_in_simple2D",
     "agent_class": Weber2018,
