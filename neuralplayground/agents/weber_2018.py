@@ -392,6 +392,29 @@ class Weber2018(AgentCore):
             (3,) with 3 axis to make plots from matplotlib, if None it will create an entire figure
         """
         if ax is None:
+            f, ax = plt.subplots()
+        r_out_im = self.get_full_output_rate()
+        r_out_im = r_out_im.reshape((self.resolution_width, self.resolution_depth))
+        make_plot_rate_map(r_out_im.T, ax, "Out rate", "width", "depth", "Firing rate")
+
+        if save_path is not None:
+            plt.savefig(save_path, bbox_inches="tight")
+            plt.close("all")
+        else:
+            return ax
+
+    def plot_all_rates(self, save_path: str = None, ax: mpl.axes.Axes = None):
+        """
+        Plot current rates and an example of inhibitory and excitatory neuron
+
+        Parameters
+        ----------
+        save_path : str
+            Path to save the figure. Default None, it doesn't save the figure
+        ax : ndarray of matplotlib.axis
+            (3,) with 3 axis to make plots from matplotlib, if None it will create an entire figure
+        """
+        if ax is None:
             f, ax = plt.subplots(1, 3, figsize=(14, 5))
 
         r_out_im = self.get_full_output_rate()
