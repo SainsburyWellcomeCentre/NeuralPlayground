@@ -8,6 +8,7 @@ Check examples/Stachenfeld_2018_example.ipynb
 """
 
 import sys
+from typing import Union
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -429,3 +430,16 @@ class Stachenfeld2018(AgentCore):
         evals, evecs = np.linalg.eig(sr)
         r_out_im = evals[:, eigen_vector].reshape((self.resolution_width, self.resolution_depth))
         return r_out_im
+
+    def plot_ratemap(self, eigen_vector: Union[int, list, tuple] = 0, ax: mpl.axes.Axes = None):
+        if isinstance(eigen_vector, int):
+            ratemap_mat = self.get_ratemap_matrix(eigen_vector)
+            if ax is None:
+                f, ax = plt.subplots(1, 1, figsize=(4, 5))
+            make_plot_rate_map(ratemap_mat, ax, "Ratemap", "width", "depth", "Firing rate")
+        else:
+            if ax is None:
+                f, ax = plt.subplots(1, len(eigen_vector), figsize=(4 * len(eigen_vector), 5))
+            for i, eig in enumerate(eigen_vector):
+                ratemap_mat = self.get_ratemap_matrix(eig)
+                make_plot_rate_map(ratemap_mat, ax[i], "Ratemap", "width", "depth", "Firing rate")
