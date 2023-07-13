@@ -82,7 +82,6 @@ def make_plot_trajectories(arena_limits, x, y, ax, plot_every):
     # Setting colorbar to show number of sampled (time steps) recorded
     cbar = plt.colorbar(sc, ax=ax, ticks=[0, len(x)])
     cbar.ax.tick_params(labelsize=config_vars.TICK_LABEL_FONTSIZE)
-    ax.set_ylabel("N steps", fontsize=config_vars.LABEL_FONTSIZE, rotation=270)
     cbar.ax.set_yticklabels([0, len(x)], fontsize=config_vars.COLORBAR_LABEL_FONTSIZE)
     lower_lim, upper_lim = np.amin(arena_limits), np.amax(arena_limits)
     ax.set_xlim([lower_lim, upper_lim])
@@ -126,3 +125,34 @@ def make_plot_rate_map(h, ax, title, title_x, title_y, title_cbar):
     ax.set_yticks([])
     # Save if save_path is not None
     return ax
+
+
+def make_agent_comparison(env, parameters, agents, exp=None, ax=None):
+    if exp is not None or not hasattr(env, "show_data"):
+        f, ax = plt.subplots(2, len(agents) + 2, figsize=(8 * (len(agents) + 2), 7))
+    else:
+        f, ax = plt.subplots(2, len(agents) + 1, figsize=(8 * (len(agents) + 1), 7))
+    env.plot_trajectory(ax=ax[1, 0])
+    ax[0, 0].set_axis_off()
+    for i, text in enumerate(parameters[0]["env_params"]):
+        ax[0, 0].text(0, 1, "Env param", fontsize=10)
+        variable = parameters[0]["env_params"][text]
+        ax[0, 0].text(0, 0.9 - (i * 0.1), text + ": " + str(variable), fontsize=10)
+    for i, agent in enumerate(agents):
+        agent.plot_rates(ax=ax[1][i + 1])
+        for k, text in enumerate(parameters[i]["agent_params"]):
+            if k > 9:
+                variable = parameters[i]["agent_params"][text]
+                ax[0, i + 1].text(0.7, 1 - ((k - 9) * 0.1), text + ": " + str(variable), fontsize=10)
+                ax[0, i + 1].set_axis_off()
+            else:
+                ax[0, i + 1].text(0, 1, "Agent param", fontsize=10)
+                variable = parameters[i]["agent_params"][text]
+                ax[0, i + 1].text(0, 0.9 - ((k) * 0.1), text + ": " + str(variable), fontsize=10)
+                ax[0, i + 1].set_axis_off()
+    if hasattr(env, "show_data"):
+        ax[0, i + 2].set_axis_off()
+        env.plot_recording_tetr(ax=ax[1][i + 2])
+    if exp is not None:
+        ax[0, i + 2].set_axis_off()
+        exp.plot_recording_tetr(ax=ax[1][i + 2])
