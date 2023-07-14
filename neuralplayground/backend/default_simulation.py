@@ -191,6 +191,41 @@ sim6_params = {
 }
 
 
+sim7_params = {
+    "simulation_id": "weber_2018_in_Sargolini2006",
+    "env_class": Sargolini2006,
+    "env_params": {
+        "use_behavioral_data": True,
+        "time_step_size": 0.1,
+        "agent_step_size": None,
+    },
+    "agent_class": Weber2018,
+    "agent_params": {
+        "exc_eta": 2e-4,
+        "inh_eta": 8e-4,
+        "model_name": "weber_2018",
+        "sigma_exc": np.array([0.05, 0.05]),
+        "sigma_inh": np.array([0.1, 0.1]),
+        "Ne": 4900,
+        "Ni": 1225,
+        "Nef": 1,
+        "Nif": 1,
+        "alpha_i": 1,
+        "alpha_e": 1,
+        "we_init": 1.0,
+        "wi_init": 1.5,
+        "agent_step_size": 0.1,
+        "resolution": 100,
+        "ro": 1,
+        "room_width": 100,
+        "room_depth": 100,
+        "disable_tqdm": True,
+    },
+    "training_loop": default_training_loop,
+    "training_loop_params": {"n_steps": 1000},
+}
+
+
 # Time in minutes to remove
 sim_object1 = SingleSim(**sim1_params)
 sim_object2 = SingleSim(**sim2_params)
@@ -198,3 +233,4 @@ sim_object3 = SingleSim(**sim3_params)
 sim_object4 = SingleSim(**sim4_params)
 sim_object5 = SingleSim(**sim5_params)
 sim_object6 = SingleSim(**sim6_params)
+sim_object7 = SingleSim(**sim7_params)

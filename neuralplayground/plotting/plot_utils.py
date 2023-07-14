@@ -128,7 +128,7 @@ def make_plot_rate_map(h, ax, title, title_x, title_y, title_cbar):
 
 
 def make_agent_comparison(env, parameters, agents, exp=None, ax=None):
-    if exp is not None or not hasattr(env, "show_data"):
+    if exp is not None or hasattr(env, "show_data"):
         f, ax = plt.subplots(2, len(agents) + 2, figsize=(8 * (len(agents) + 2), 7))
     else:
         f, ax = plt.subplots(2, len(agents) + 1, figsize=(8 * (len(agents) + 1), 7))
@@ -139,7 +139,7 @@ def make_agent_comparison(env, parameters, agents, exp=None, ax=None):
         variable = parameters[0]["env_params"][text]
         ax[0, 0].text(0, 0.9 - (i * 0.1), text + ": " + str(variable), fontsize=10)
     for i, agent in enumerate(agents):
-        agent.plot_rates(ax=ax[1][i + 1])
+        agent.plot_rate_map(ax=ax[1][i + 1])
         for k, text in enumerate(parameters[i]["agent_params"]):
             if k > 9:
                 variable = parameters[i]["agent_params"][text]

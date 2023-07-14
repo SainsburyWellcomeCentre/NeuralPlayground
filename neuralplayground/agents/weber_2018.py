@@ -380,7 +380,7 @@ class Weber2018(AgentCore):
         for i in range(self.xy_combinations.shape[0]):
             self.update(exc_normalization=exc_normalization, pos=xy_array[i, :])
 
-    def plot_ratesmap(self, save_path: str = None, ax: mpl.axes.Axes = None):
+    def plot_rate_map(self, save_path: str = None, ax: mpl.axes.Axes = None):
         """
         Plot current rates and an example of inhibitory and excitatory neuron
 

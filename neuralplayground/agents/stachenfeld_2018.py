@@ -396,7 +396,13 @@ class Stachenfeld2018(AgentCore):
             plt.close("all")
         return ax
 
-    def plot_eigen(self, matrix: np.ndarray, save_path: str, eigen=(0, 1), ax: mpl.axes.Axes = None):
+    def plot_eigen(
+        self,
+        matrix: np.ndarray,
+        save_path: str,
+        eigen_vectors=(0, 1),
+        ax: mpl.axes.Axes = None,
+    ):
         """ "
         Plot the matrix and the 4 largest modes of its eigen-decomposition
 
@@ -411,12 +417,12 @@ class Stachenfeld2018(AgentCore):
         """
         evals, evecs = np.linalg.eig(matrix)
         if ax is None:
-            f, ax = plt.subplots(1, len(eigen), figsize=(4 * len(eigen), 5))
-            if len(eigen) == 1:
-                evecs_0 = evecs[:, eigen[0]].reshape(self.depth, self.width).real
+            f, ax = plt.subplots(1, len(eigen_vectors), figsize=(4 * len(eigen_vectors), 5))
+            if len(eigen_vectors) == 1:
+                evecs_0 = evecs[:, eigen_vectors[0]].reshape(self.depth, self.width).real
                 make_plot_rate_map(evecs_0, ax, "Eig_0", "width", "depth", "Firing rate")
             else:
-                for i, eig in enumerate(eigen):
+                for i, eig in enumerate(eigen_vectors):
                     evecs_0 = evecs[:, eig].reshape(self.depth, self.width).real
                     make_plot_rate_map(evecs_0, ax[i], "Eig" + str(eig), "width", "depth", "Firing rate")
         if save_path is None:
@@ -425,21 +431,38 @@ class Stachenfeld2018(AgentCore):
             plt.savefig(save_path, bbox_inches="tight")
         return ax
 
-    def get_ratemap_matrix(self, eigen_vector: int = 0):
-        sr = self.successor_rep_solution()
-        evals, evecs = np.linalg.eig(sr)
-        r_out_im = evals[:, eigen_vector].reshape((self.resolution_width, self.resolution_depth))
+    def get_rate_map_matrix(
+        self,
+        sr_matrix,
+        eigen_vector: int = 0,
+    ):
+        if sr_matrix is None:
+            sr_matrix = self.successor_rep_solution()
+        evals, evecs = np.linalg.eig(sr_matrix)
+        r_out_im = evecs[:, eigen_vector].reshape((self.resolution_width, self.resolution_depth)).real
         return r_out_im
 
-    def plot_ratemap(self, eigen_vector: Union[int, list, tuple] = 0, ax: mpl.axes.Axes = None):
-        if isinstance(eigen_vector, int):
-            ratemap_mat = self.get_ratemap_matrix(eigen_vector)
+    def plot_rate_map(
+        self,
+        sr_matrix=None,
+        eigen_vectors: Union[int, list, tuple] = 0,
+        ax: mpl.axes.Axes = None,
+        save_path: str = None,
+    ):
+        if isinstance(eigen_vectors, int):
+            rate_map_mat = self.get_rate_map_matrix(sr_matrix, eigen_vector=eigen_vectors)
+
             if ax is None:
                 f, ax = plt.subplots(1, 1, figsize=(4, 5))
-            make_plot_rate_map(ratemap_mat, ax, "Ratemap", "width", "depth", "Firing rate")
+            make_plot_rate_map(rate_map_mat, ax, "Rate map: Eig0", "width", "depth", "Firing rate")
         else:
             if ax is None:
-                f, ax = plt.subplots(1, len(eigen_vector), figsize=(4 * len(eigen_vector), 5))
-            for i, eig in enumerate(eigen_vector):
-                ratemap_mat = self.get_ratemap_matrix(eig)
-                make_plot_rate_map(ratemap_mat, ax[i], "Ratemap", "width", "depth", "Firing rate")
+                f, ax = plt.subplots(1, len(eigen_vectors), figsize=(4 * len(eigen_vectors), 5))
+            for i, eig in enumerate(eigen_vectors):
+                rate_map_mat = self.get_rate_map_matrix(sr_matrix, eigen_vector=eig)
+                make_plot_rate_map(rate_map_mat, ax[i], "Rate map: " + "Eig" + str(eig), "width", "depth", "Firing rate")
+        if save_path is None:
+            pass
+        else:
+            plt.savefig(save_path, bbox_inches="tight")
+            return ax
