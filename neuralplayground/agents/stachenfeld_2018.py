@@ -396,41 +396,6 @@ class Stachenfeld2018(AgentCore):
             plt.close("all")
         return ax
 
-    def plot_eigen(
-        self,
-        matrix: np.ndarray,
-        save_path: str,
-        eigen_vectors=(0, 1),
-        ax: mpl.axes.Axes = None,
-    ):
-        """ "
-        Plot the matrix and the 4 largest modes of its eigen-decomposition
-
-        Parameters
-        ----------
-        matrix: array
-            The matrix that will be plotted
-        eigen:  np.ndarray
-            Which eigenvectors you would like to plot
-        save_path: string
-            Path to save the plot
-        """
-        evals, evecs = np.linalg.eig(matrix)
-        if ax is None:
-            f, ax = plt.subplots(1, len(eigen_vectors), figsize=(4 * len(eigen_vectors), 5))
-            if len(eigen_vectors) == 1:
-                evecs_0 = evecs[:, eigen_vectors[0]].reshape(self.depth, self.width).real
-                make_plot_rate_map(evecs_0, ax, "Eig_0", "width", "depth", "Firing rate")
-            else:
-                for i, eig in enumerate(eigen_vectors):
-                    evecs_0 = evecs[:, eig].reshape(self.depth, self.width).real
-                    make_plot_rate_map(evecs_0, ax[i], "Eig" + str(eig), "width", "depth", "Firing rate")
-        if save_path is None:
-            pass
-        else:
-            plt.savefig(save_path, bbox_inches="tight")
-        return ax
-
     def get_rate_map_matrix(
         self,
         sr_matrix,

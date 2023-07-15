@@ -26,6 +26,7 @@ def default_training_loop(agent: AgentCore, env: Environment, n_steps: int):
 
     obs, state = env.reset()
     training_hist = []
+    obs = obs[:2]
     for j in range(round(n_steps)):
         # Observe to choose an action
         action = agent.act(obs)
@@ -33,6 +34,7 @@ def default_training_loop(agent: AgentCore, env: Environment, n_steps: int):
         obs, state, reward = env.step(action)
         update_output = agent.update()
         training_hist.append(update_output)
+        obs = obs[:2]
     process_training_hist(training_hist)
     return agent, env, dict
 
