@@ -151,6 +151,7 @@ class Hafting2008(Simple2D):
             List of available experiment, columns with rat_id, recording session and recorded variables
         """
         self.experiment.show_data(full_dataframe=full_dataframe)
+        return self.experiment.show_data(full_dataframe=full_dataframe)
 
     def plot_recording_tetr(
         self,

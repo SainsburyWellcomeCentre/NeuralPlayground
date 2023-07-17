@@ -17,8 +17,6 @@ def make_plot_trajectories(arena_limits, x, y, ax, plot_every):
         axis from subplot from matplotlib where the ratemap will be plotted.
     plot_every: int
         time steps skipped to make the plot to reduce cluttering
-    fontsize: int
-        fontsize of labels in the plot
 
     Returns
     -------
@@ -102,6 +100,12 @@ def make_plot_rate_map(h, ax, title, title_x, title_y, title_cbar):
     title: str
         plot title, tetrode id by default when called
     title_y:  str
+        y axis label, "depth" by default when called
+    title_x: str
+        x axis label, "width" by default when called
+    title_cbar: str
+        colorbar label, "spikes per bin" by default when called
+
     Returns
     -------
     ax: mpl.axes._subplots.AxesSubplot (matplotlib axis from subplots)
@@ -109,7 +113,6 @@ def make_plot_rate_map(h, ax, title, title_x, title_y, title_cbar):
     """
 
     # Formating ratemap plot
-
     config_vars = PLOT_CONFIG.RATEMAP
     sc = ax.imshow(h, cmap=config_vars.RATEMAP_COLORMAP)
     cbar = plt.colorbar(sc, ax=ax, ticks=[np.min(h), np.max(h)], orientation="horizontal")
@@ -123,11 +126,28 @@ def make_plot_rate_map(h, ax, title, title_x, title_y, title_cbar):
     ax.grid(config_vars.GRID)
     ax.set_xticks([])
     ax.set_yticks([])
-    # Save if save_path is not None
     return ax
 
 
-def make_agent_comparison(env, parameters, agents, exp=None, ax=None):
+def make_agent_comparison(env, parameters, agents, exp=None, recording_index=None, tetrode_id=None):
+    """Plot function to compare agents in a given environment
+
+    Parameters
+    ----------
+    env : object of class Environment
+    parameters :
+    agents: list of objects of class Agent
+    exp: object of class Experiment
+    ax : matplotlib axis
+
+    Returns
+    -------
+    ax: matplotlib axis
+
+
+    """
+    config_vars = PLOT_CONFIG.AGENT_COMPARISON
+
     if exp is not None or hasattr(env, "show_data"):
         f, ax = plt.subplots(2, len(agents) + 2, figsize=(8 * (len(agents) + 2), 7))
     else:
@@ -135,24 +155,93 @@ def make_agent_comparison(env, parameters, agents, exp=None, ax=None):
     env.plot_trajectory(ax=ax[1, 0])
     ax[0, 0].set_axis_off()
     for i, text in enumerate(parameters[0]["env_params"]):
-        ax[0, 0].text(0, 1, "Env param", fontsize=10)
+        ax[0, 0].text(0, 1, "Env param", fontsize=config_vars.FONTSIZE)
         variable = parameters[0]["env_params"][text]
-        ax[0, 0].text(0, 0.9 - (i * 0.1), text + ": " + str(variable), fontsize=10)
+        ax[0, 0].text(0, 0.9 - (i * 0.1), text + ": " + str(variable), fontsize=config_vars.FONTSIZE)
     for i, agent in enumerate(agents):
         agent.plot_rate_map(ax=ax[1][i + 1])
         for k, text in enumerate(parameters[i]["agent_params"]):
             if k > 9:
                 variable = parameters[i]["agent_params"][text]
-                ax[0, i + 1].text(0.7, 1 - ((k - 9) * 0.1), text + ": " + str(variable), fontsize=10)
+                ax[0, i + 1].text(0.7, 1 - ((k - 9) * 0.1), text + ": " + str(variable), fontsize=config_vars.FONTSIZE)
                 ax[0, i + 1].set_axis_off()
             else:
-                ax[0, i + 1].text(0, 1, "Agent param", fontsize=10)
+                ax[0, i + 1].text(0, 1, "Agent param", fontsize=config_vars.FONTSIZE)
                 variable = parameters[i]["agent_params"][text]
-                ax[0, i + 1].text(0, 0.9 - ((k) * 0.1), text + ": " + str(variable), fontsize=10)
+                ax[0, i + 1].text(0, 0.9 - ((k) * 0.1), text + ": " + str(variable), fontsize=config_vars.FONTSIZE)
                 ax[0, i + 1].set_axis_off()
-    if hasattr(env, "show_data"):
-        ax[0, i + 2].set_axis_off()
-        env.plot_recording_tetr(ax=ax[1][i + 2])
+    # experiment
     if exp is not None:
+        ax[0, i + 2].text(0, 1.1, exp.experiment_name, fontsize=config_vars.FONTSIZE)
         ax[0, i + 2].set_axis_off()
-        exp.plot_recording_tetr(ax=ax[1][i + 2])
+        render_mpl_table(exp.show_data(), ax=ax[0, i + 2])
+        exp.plot_recording_tetr(recording_index=recording_index, tetrode_id=tetrode_id, ax=ax[1][i + 2])
+    elif hasattr(env, "show_data"):
+        ax[0, i + 2].text(0, 1.1, env.environment_name, fontsize=config_vars.FONTSIZE)
+        ax[0, i + 2].set_axis_off()
+        render_mpl_table(
+            data=env.show_data(),
+            ax=ax[0, i + 2],
+        )
+        env.plot_recording_tetr(recording_index=recording_index, tetrode_id=tetrode_id, ax=ax[1][i + 2])
+
+    return ax
+
+
+def render_mpl_table(data, ax=None, **kwargs):
+    """https://stackoverflow.com/questions/19726663/how-to-save-the-pandas-dataframe-series-data-as-a-figure
+
+    Render an image of a table contained in a pandas dataframe.
+
+    Parameters
+    ----------
+    data : pandas.DataFrame
+        DataFrame to render.
+
+    col_width : float, optional
+        Width of columns in table.
+
+    row_height : float, optional
+        Height of rows in table.
+
+    font_size : int, optional
+        Font size in table.
+
+    bbox : list, optional
+        Bounding box (coordinates) for the table.
+
+    ax : matplotlib.axes._subplots.AxesSubplot, optional
+        Axis to render table in.
+
+    kwargs : dict, optional
+        Dictionary of extra keyword arguments to pass to
+        :meth:`matplotlib.table.Table`.
+
+    Returns
+    -------
+
+    fig : matplotlib.figure.Figure
+        Figure containing the table.
+
+    ax : matplotlib.axes._subplots.AxesSubplot
+        Axis the table was rendered in.
+
+    """
+    config_vars = PLOT_CONFIG.TABLE
+    if ax is None:
+        size = (np.array(data.shape[::-1]) + np.array([0, 1])) * np.array([config_vars.col_width, config_vars.row_height])
+        fig, ax = plt.subplots(figsize=size)
+        ax.axis("off")
+    mpl_table = ax.table(cellText=data.values, bbox=config_vars.BBOX, colLabels=data.columns, **kwargs)
+    mpl_table.auto_set_font_size(False)
+    mpl_table.auto_set_column_width(col=list(range(len(data.columns))))
+    mpl_table.set_fontsize(config_vars.TABLE_FONTSIZE)
+
+    for k, cell in mpl_table._cells.items():
+        cell.set_edgecolor(config_vars.EDGE_COLOR)
+        if k[0] == 0 or k[1] < config_vars.HEADER_COLUMNS:
+            cell.set_text_props(weight="bold", color="w")
+            cell.set_facecolor(config_vars.HEADER_COLOR)
+        else:
+            cell.set_facecolor(config_vars.ROW_COLOR[k[0] % len(config_vars.ROW_COLOR)])
+    return ax.get_figure(), ax

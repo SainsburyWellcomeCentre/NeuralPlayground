@@ -14,6 +14,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 
+from neuralplayground.comparison import GridScorer
 from neuralplayground.plotting.plot_utils import make_plot_rate_map
 
 from .agent_core import AgentCore
@@ -349,9 +350,7 @@ class Stachenfeld2018(AgentCore):
                 successor representation matrix
 
         """
-
         random_state = np.random.RandomState(1234)
-
         t_elapsed = 0
         srmat0 = np.eye(self.n_state)
         srmat_full = srmat0.copy()
@@ -373,6 +372,33 @@ class Stachenfeld2018(AgentCore):
                 t_elapsed += 1
                 self.srmat_full_td = srmat_full
         return self.srmat_full_td
+
+    def get_rate_map_matrix(
+        self,
+        sr_matrix=None,
+        eigen_vector: int = 10,
+    ):
+        if sr_matrix is None:
+            sr_matrix = self.successor_rep_solution()
+        evals, evecs = np.linalg.eig(sr_matrix)
+        r_out_im = evecs[:, eigen_vector].reshape((self.resolution_width, self.resolution_depth)).real
+        return r_out_im
+
+    def get_grid_score(self, plot=False, eigen_vector=10):
+        """
+        Get the grid score of the network
+
+        Returns
+        -------
+        grid_score : float
+            Grid score of the network
+        """
+        r_out_im = self.get_rate_map_matrix(eigen_vector=eigen_vector)
+        GridScorer_SR = GridScorer(self.resolution_width)
+        score = GridScorer_SR.get_scores(np.asarray(r_out_im))
+        if plot:
+            GridScorer_SR.plot_sac(score[0])
+        return score[1]
 
     def plot_transition(self, save_path: str = None, ax: mpl.axes.Axes = None):
         """
@@ -396,21 +422,10 @@ class Stachenfeld2018(AgentCore):
             plt.close("all")
         return ax
 
-    def get_rate_map_matrix(
-        self,
-        sr_matrix,
-        eigen_vector: int = 0,
-    ):
-        if sr_matrix is None:
-            sr_matrix = self.successor_rep_solution()
-        evals, evecs = np.linalg.eig(sr_matrix)
-        r_out_im = evecs[:, eigen_vector].reshape((self.resolution_width, self.resolution_depth)).real
-        return r_out_im
-
     def plot_rate_map(
         self,
         sr_matrix=None,
-        eigen_vectors: Union[int, list, tuple] = 0,
+        eigen_vectors: Union[int, list, tuple] = 10,
         ax: mpl.axes.Axes = None,
         save_path: str = None,
     ):

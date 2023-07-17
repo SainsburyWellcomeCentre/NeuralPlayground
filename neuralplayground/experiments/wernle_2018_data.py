@@ -105,6 +105,7 @@ class Wernle2018Data(Hafting2008Data):
         """
 
         # Load ratemaps
+        self.best_recording_index = 200  # Nice session recording as default
         self.inner_path = "nn_Data+Code/data/"
         self.ratemap = sio.loadmat(os.path.join(self.data_path, self.inner_path, "Figures_1_2_3/ratemaps.mat"))
         self.ratemap = self.ratemap["ratemaps"]
@@ -259,6 +260,8 @@ class Wernle2018Data(Hafting2008Data):
             return data_list
 
         else:
+            if recording_index is None:
+                recording_index = self.best_recording_index
             session_info = self.recording_list.iloc[recording_index]
             if type(session_info["recorded_vars"]) is list:
                 sess_index = session_info["session"]
@@ -334,6 +337,9 @@ class Wernle2018Data(Hafting2008Data):
         (when using list pr tuple as argument, this function return a list or tuple of the variables listed above)
         """
         # Recursive call of this function in case of list or tuple
+        if recording_index is None:
+            recording_index = self.best_recording_index
+
         if type(recording_index) is list or type(recording_index) is tuple:
             axis_list = []
             for i, ind in enumerate(recording_index):
@@ -357,6 +363,32 @@ class Wernle2018Data(Hafting2008Data):
         # Generate axis in case ax is None
         if ax is None:
             f, ax = plt.subplots(1, 1, figsize=(10, 8))
+
+        # Recall recorded data
+
+        h, binx, biny = self.recording_tetr()
+
+        # Adding merging status to plot title
+
+        merged = self.recording_list.iloc[recording_index]["before_merge"]
+        merged_mssg = "merged" if not merged else "before_merge"
+
+        sess_index = self.recording_list.iloc[recording_index]["session"]
+        # Use auxiliary function to make the plot
+        ax=make_plot_rate_map(h, ax, "sess_index_" + str(sess_index) + "_" + merged_mssg,"width","depth","Firing rate")
+        # Save if save_path is not None
+        if save_path is None:
+            pass
+        else:
+            plt.savefig(save_path, bbox_inches="tight")
+        # Return ratemap values, x bin limits and y bin limits
+        return ax
+
+    def recording_tetr(self, recording_index: Union[int, tuple, list] = None,
+                            save_path: Union[str, tuple, list] = None,
+                            tetrode_id: Union[str, tuple, list] = None,
+                            bin_size: float = 2.0):
+
 
         # Recall recorded data
         session_data, rev_vars, rat_info = self.get_recording_data(recording_index)
@@ -383,7 +415,6 @@ class Wernle2018Data(Hafting2008Data):
                 y_size=int(arena_depth / bin_size),
                 filter_result=True,
             )
-
         elif type(rev_vars) is list and "spikes" not in rev_vars:
             warnings.warn("No spike data pre merging")
             return
@@ -392,20 +423,8 @@ class Wernle2018Data(Hafting2008Data):
             binx = np.linspace(self.arena_limits[0, 0], self.arena_limits[0, 1], num=h.shape[1])
             biny = np.linspace(self.arena_limits[1, 0], self.arena_limits[1, 1], num=h.shape[0])
 
-        # Adding merging status to plot title
-        merged = self.recording_list.iloc[recording_index]["before_merge"]
-        merged_mssg = "merged" if not merged else "before_merge"
-
-        sess_index = self.recording_list.iloc[recording_index]["session"]
-        # Use auxiliary function to make the plot
-        ax=make_plot_rate_map(h, ax, "sess_index_" + str(sess_index) + "_" + merged_mssg,"width","depth","Firing rate")
-        # Save if save_path is not None
-        if save_path is None:
-            pass
-        else:
-            plt.savefig(save_path, bbox_inches="tight")
-        # Return ratemap values, x bin limits and y bin limits
         return h, binx, biny
+
 
     def plot_trajectory(
         self,
@@ -440,6 +459,9 @@ class Wernle2018Data(Hafting2008Data):
             array with the timestamps in seconds per position of the given session
 
         """
+        if recording_index is None:
+            recording_index = self.best_recording_index
+
         if type(recording_index) is list or type(recording_index) is tuple:
             axis_list = []
             for i, ind in enumerate(recording_index):

@@ -9,17 +9,30 @@ plot_config:
     scatter_alpha: 1
     scatter_marker: "o"
     scatter_marker_size: 1
-    label_fontsize: 24
+    label_fontsize: 16
     tick_label_fontsize: 12
-    colorbar_label_fontsize: 24
-    title_fontsize: 24
+    colorbar_label_fontsize: 16
+    title_fontsize: 16
     grid: False
 
   ratemap_plot:
     ratemap_colormap: "jet"
     bin_size: 2.0
-    label_fontsize: 24
+    label_fontsize: 18
     tick_label_fontsize: 12
-    colorbar_label_fontsize: 24
-    title_fontsize: 24
+    colorbar_label_fontsize: 16
+    title_fontsize: 16
     grid: False
+
+  agent_comparison_plot:
+    fontsize: 10
+
+  table_plot:
+    table_fontsize: 7
+    col_width: 30
+    row_height: 0.625
+    header_color: "C0"
+    row_colors: ["#f1f1f2", "w"]
+    edge_color: "w"
+    bbox: [0, 0, 1, 1]
+    header_columns: 0
