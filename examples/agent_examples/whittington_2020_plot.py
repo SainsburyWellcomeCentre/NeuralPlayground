@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from tqdm import tqdm
 import os
 import numpy as np
+import pickle
 import torch
 import importlib.util
 
@@ -81,21 +82,26 @@ agent = Whittington2020(model_name=mod_name,
                         use_behavioural_data=False)
 
 # Run around environment
-observation, state = env.reset(random_state=True, custom_state=None)
-while agent.n_walk < 5000:
-    if agent.n_walk % 100 == 0:
-        print(agent.n_walk)
-    action = agent.batch_act(observation)
-    observation, state = env.step(action, normalize_step=True)
-model_input, history, environments = agent.collect_final_trajectory()
-environments = [env.collect_environment_info(model_input, history, environments)]
-torch.save(environments, 'NPG_environments')
-torch.save(model_input, 'NPG_model_input')
+# observation, state = env.reset(random_state=True, custom_state=None)
+# while agent.n_walk < 5000:
+#     if agent.n_walk % 100 == 0:
+#         print(agent.n_walk)
+#     action = agent.batch_act(observation)
+#     observation, state = env.step(action, normalize_step=True)
+# model_input, history, environments = agent.collect_final_trajectory()
+# environments = [env.collect_environment_info(model_input, history, environments)]
 
-# environments = torch.load(base_path + '/final_environments')
-# model_input = torch.load(base_path + '/final_model_input')
-environments = torch.load(base_win_path + '/NPG_environments')
-model_input = torch.load(base_win_path + '/NPG_model_input')
+# # Save environments and model_input using pickle
+# with open('NPG_environments.pkl', 'wb') as f:
+#     pickle.dump(environments, f)
+# with open('NPG_model_input.pkl', 'wb') as f:
+#     pickle.dump(model_input, f)
+
+# Load environments and model_input using pickle
+with open('NPG_environments.pkl', 'rb') as f:
+    environments = pickle.load(f)
+with open('NPG_model_input.pkl', 'rb') as f:
+    model_input = pickle.load(f)
 
 with torch.no_grad():
     forward = tem(model_input, prev_iter=None)
