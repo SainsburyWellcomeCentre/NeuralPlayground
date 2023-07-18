@@ -340,12 +340,13 @@ class Stachenfeld2018(AgentCore):
 
         return {"td_error": td_error}
 
-    def update_successor_rep_td_full(self, n_episode: int = None, t_episode: int = None):
+    def update_successor_rep_td_full(self, n_episode: int = 100, t_episode: int = 100):
         """
         Compute the successor representation matrix using TD learning
 
         Returns:
         ----------
+
             srmat_full: (n_state, n_state)
                 successor representation matrix
 
