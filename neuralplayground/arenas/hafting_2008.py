@@ -164,6 +164,16 @@ class Hafting2008(Simple2D):
         """Check plot_recording_tetrode method from neuralplayground.experiments.Hafting2008Data"""
         return self.experiment.plot_recording_tetr(recording_index, save_path, ax, tetrode_id, bin_size)
 
+    def recording_tetr(
+        self,
+        recording_index: Union[int, tuple, list] = None,
+        save_path: Union[str, tuple, list] = None,
+        tetrode_id: Union[str, tuple, list] = None,
+        bin_size: float = 2.0,
+    ):
+        """Check plot_recording_tetrode method from neuralplayground.experiments.Hafting2008Data"""
+        return self.experiment.recording_tetr(recording_index, save_path, tetrode_id, bin_size)
+
     def plot_recorded_trajectory(
         self,
         recording_index: Union[int, tuple, list] = None,

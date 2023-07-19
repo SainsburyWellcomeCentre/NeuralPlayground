@@ -9,19 +9,19 @@ plot_config:
     scatter_alpha: 1
     scatter_marker: "o"
     scatter_marker_size: 1
-    label_fontsize: 16
-    tick_label_fontsize: 12
-    colorbar_label_fontsize: 16
-    title_fontsize: 16
+    label_fontsize: 14
+    tick_label_fontsize: 10
+    colorbar_label_fontsize: 14
+    title_fontsize: 14
     grid: False
 
   ratemap_plot:
     ratemap_colormap: "jet"
     bin_size: 2.0
-    label_fontsize: 18
-    tick_label_fontsize: 12
-    colorbar_label_fontsize: 16
-    title_fontsize: 16
+    label_fontsize: 14
+    tick_label_fontsize: 10
+    colorbar_label_fontsize: 14
+    title_fontsize: 14
     grid: False
 
   agent_comparison_plot:

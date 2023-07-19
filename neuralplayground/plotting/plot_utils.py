@@ -1,6 +1,7 @@
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 
 from neuralplayground.config import PLOT_CONFIG
 
@@ -129,65 +130,6 @@ def make_plot_rate_map(h, ax, title, title_x, title_y, title_cbar):
     return ax
 
 
-def make_agent_comparison(env, parameters, agents, exp=None, recording_index=None, tetrode_id=None):
-    """Plot function to compare agents in a given environment
-
-    Parameters
-    ----------
-    env : object of class Environment
-    parameters :
-    agents: list of objects of class Agent
-    exp: object of class Experiment
-    ax : matplotlib axis
-
-    Returns
-    -------
-    ax: matplotlib axis
-
-
-    """
-    config_vars = PLOT_CONFIG.AGENT_COMPARISON
-
-    if exp is not None or hasattr(env, "show_data"):
-        f, ax = plt.subplots(2, len(agents) + 2, figsize=(8 * (len(agents) + 2), 7))
-    else:
-        f, ax = plt.subplots(2, len(agents) + 1, figsize=(8 * (len(agents) + 1), 7))
-    env.plot_trajectory(ax=ax[1, 0])
-    ax[0, 0].set_axis_off()
-    for i, text in enumerate(parameters[0]["env_params"]):
-        ax[0, 0].text(0, 1, "Env param", fontsize=config_vars.FONTSIZE)
-        variable = parameters[0]["env_params"][text]
-        ax[0, 0].text(0, 0.9 - (i * 0.1), text + ": " + str(variable), fontsize=config_vars.FONTSIZE)
-    for i, agent in enumerate(agents):
-        agent.plot_rate_map(ax=ax[1][i + 1])
-        for k, text in enumerate(parameters[i]["agent_params"]):
-            if k > 9:
-                variable = parameters[i]["agent_params"][text]
-                ax[0, i + 1].text(0.7, 1 - ((k - 9) * 0.1), text + ": " + str(variable), fontsize=config_vars.FONTSIZE)
-                ax[0, i + 1].set_axis_off()
-            else:
-                ax[0, i + 1].text(0, 1, "Agent param", fontsize=config_vars.FONTSIZE)
-                variable = parameters[i]["agent_params"][text]
-                ax[0, i + 1].text(0, 0.9 - ((k) * 0.1), text + ": " + str(variable), fontsize=config_vars.FONTSIZE)
-                ax[0, i + 1].set_axis_off()
-    # experiment
-    if exp is not None:
-        ax[0, i + 2].text(0, 1.1, exp.experiment_name, fontsize=config_vars.FONTSIZE)
-        ax[0, i + 2].set_axis_off()
-        render_mpl_table(exp.show_data(), ax=ax[0, i + 2])
-        exp.plot_recording_tetr(recording_index=recording_index, tetrode_id=tetrode_id, ax=ax[1][i + 2])
-    elif hasattr(env, "show_data"):
-        ax[0, i + 2].text(0, 1.1, env.environment_name, fontsize=config_vars.FONTSIZE)
-        ax[0, i + 2].set_axis_off()
-        render_mpl_table(
-            data=env.show_data(),
-            ax=ax[0, i + 2],
-        )
-        env.plot_recording_tetr(recording_index=recording_index, tetrode_id=tetrode_id, ax=ax[1][i + 2])
-
-    return ax
-
-
 def render_mpl_table(data, ax=None, **kwargs):
     """https://stackoverflow.com/questions/19726663/how-to-save-the-pandas-dataframe-series-data-as-a-figure
 
@@ -219,19 +161,18 @@ def render_mpl_table(data, ax=None, **kwargs):
 
     Returns
     -------
-
     fig : matplotlib.figure.Figure
         Figure containing the table.
 
     ax : matplotlib.axes._subplots.AxesSubplot
         Axis the table was rendered in.
-
     """
     config_vars = PLOT_CONFIG.TABLE
     if ax is None:
         size = (np.array(data.shape[::-1]) + np.array([0, 1])) * np.array([config_vars.col_width, config_vars.row_height])
         fig, ax = plt.subplots(figsize=size)
         ax.axis("off")
+    ax.set_axis_off()
     mpl_table = ax.table(cellText=data.values, bbox=config_vars.BBOX, colLabels=data.columns, **kwargs)
     mpl_table.auto_set_font_size(False)
     mpl_table.auto_set_column_width(col=list(range(len(data.columns))))
@@ -245,3 +186,65 @@ def render_mpl_table(data, ax=None, **kwargs):
         else:
             cell.set_facecolor(config_vars.ROW_COLOR[k[0] % len(config_vars.ROW_COLOR)])
     return ax.get_figure(), ax
+
+
+def make_agent_comparison(env, parameters, agents, exp=None, recording_index=None, tetrode_id=None, GridScorer=None):
+    """Plot function to compare agents in a given environment
+
+    Parameters
+    ----------
+    env : object of class Environment
+    parameters :
+    agents: list of objects of class Agent
+    exp: object of class Experiment
+    ax : matplotlib axis
+
+    Returns
+    -------
+    ax: matplotlib axis
+    """
+    config_vars = PLOT_CONFIG.AGENT_COMPARISON
+    if exp is not None or hasattr(env, "show_data"):
+        f, ax = plt.subplots(3, len(agents) + 2, figsize=(10 * (len(agents) + 2), 10))
+    else:
+        f, ax = plt.subplots(3, len(agents) + 1, figsize=(10 * (len(agents) + 1), 10))
+
+    env.plot_trajectory(ax=ax[1, 0])
+
+    ax[2, 0].set_axis_off()
+    ax[0, 0].text(0, 1.1, "Env_param", fontsize=config_vars.FONTSIZE)
+
+    render_mpl_table(
+        data=pd.DataFrame(parameters[0]["env_params"]),
+        ax=ax[0, 0],
+    )
+    for i, agent in enumerate(agents):
+        GridScorer_SR = GridScorer(agent.resolution_width)
+        GridScorer_SR.plot_grid_score(r_out_im=agent.get_rate_map_matrix(), plot=False, ax=ax[2, i + 1])
+        agent.plot_rate_map(ax=ax[1][i + 1])
+        render_mpl_table(
+            data=pd.DataFrame(parameters[i]["agent_params"], index=[0]),
+            ax=ax[0, i + 1],
+        )
+        ax[0, i + 1].text(0, 1.1, "Agent_param", fontsize=config_vars.FONTSIZE)
+
+    # experiment
+    if exp is not None:
+        ax[0, i + 2].text(0, 1.1, exp.experiment_name, fontsize=config_vars.FONTSIZE)
+        render_mpl_table(exp.show_data(), ax=ax[0, i + 2])
+        exp.plot_recording_tetr(recording_index=recording_index, tetrode_id=tetrode_id, ax=ax[1][i + 2])
+        r_out_im, x_bin, y_bin = exp.recording_tetr()
+        GridScorer_SR = GridScorer(x_bin - 1)
+        GridScorer_SR.plot_grid_score(r_out_im=r_out_im, plot=True, ax=ax[2, i + 2])
+    elif hasattr(env, "show_data"):
+        ax[0, i + 2].text(0, 1.1, env.environment_name, fontsize=config_vars.FONTSIZE)
+        ax[0, i + 2].set_axis_off()
+        render_mpl_table(
+            data=env.show_data(),
+            ax=ax[0, i + 2],
+        )
+        env.plot_recording_tetr(recording_index=recording_index, tetrode_id=tetrode_id, ax=ax[1][i + 2])
+        r_out_im, x_bin, y_bin = env.recording_tetr()
+        GridScorer_SR = GridScorer(x_bin - 1)
+        GridScorer_SR.plot_grid_score(r_out_im=r_out_im, plot=True, ax=ax[2, i + 2])
+    return ax

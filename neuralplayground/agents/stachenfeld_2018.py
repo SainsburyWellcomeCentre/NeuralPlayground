@@ -7,6 +7,7 @@ This implementation can interact with environments from the package as shown in 
 Check examples/Stachenfeld_2018_example.ipynb
 """
 
+import random
 import sys
 from typing import Union
 
@@ -14,7 +15,6 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 
-from neuralplayground.comparison import GridScorer
 from neuralplayground.plotting.plot_utils import make_plot_rate_map
 
 from .agent_core import AgentCore
@@ -346,7 +346,6 @@ class Stachenfeld2018(AgentCore):
 
         Returns:
         ----------
-
             srmat_full: (n_state, n_state)
                 successor representation matrix
 
@@ -385,22 +384,6 @@ class Stachenfeld2018(AgentCore):
         r_out_im = evecs[:, eigen_vector].reshape((self.resolution_width, self.resolution_depth)).real
         return r_out_im
 
-    def get_grid_score(self, plot=False, eigen_vector=10):
-        """
-        Get the grid score of the network
-
-        Returns
-        -------
-        grid_score : float
-            Grid score of the network
-        """
-        r_out_im = self.get_rate_map_matrix(eigen_vector=eigen_vector)
-        GridScorer_SR = GridScorer(self.resolution_width)
-        score = GridScorer_SR.get_scores(np.asarray(r_out_im))
-        if plot:
-            GridScorer_SR.plot_sac(score[0])
-        return score[1]
-
     def plot_transition(self, save_path: str = None, ax: mpl.axes.Axes = None):
         """
         Plot the input matrix and compare it to the transition matrix from the rectangular
@@ -426,7 +409,7 @@ class Stachenfeld2018(AgentCore):
     def plot_rate_map(
         self,
         sr_matrix=None,
-        eigen_vectors: Union[int, list, tuple] = 10,
+        eigen_vectors: Union[int, list, tuple] = random.randint(5, 19),
         ax: mpl.axes.Axes = None,
         save_path: str = None,
     ):
@@ -435,7 +418,7 @@ class Stachenfeld2018(AgentCore):
 
             if ax is None:
                 f, ax = plt.subplots(1, 1, figsize=(4, 5))
-            make_plot_rate_map(rate_map_mat, ax, "Rate map: Eig0", "width", "depth", "Firing rate")
+            make_plot_rate_map(rate_map_mat, ax, "Rate map: Eig" + str(eigen_vectors), "width", "depth", "Firing rate")
         else:
             if ax is None:
                 f, ax = plt.subplots(1, len(eigen_vectors), figsize=(4 * len(eigen_vectors), 5))

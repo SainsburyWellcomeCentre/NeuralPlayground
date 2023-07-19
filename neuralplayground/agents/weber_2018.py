@@ -14,7 +14,6 @@ import numpy as np
 from scipy.stats import multivariate_normal
 from tqdm import tqdm
 
-from neuralplayground.comparison import GridScorer
 from neuralplayground.plotting.plot_utils import make_plot_rate_map
 
 from .agent_core import AgentCore
@@ -395,22 +394,6 @@ class Weber2018(AgentCore):
         r_out_im = self.get_full_output_rate()
         r_out_im = r_out_im.reshape((self.resolution_width, self.resolution_depth))
         return r_out_im
-
-    def get_grid_score(self, plot=False):
-        """
-        Get the grid score of the network
-
-        Returns
-        -------
-        grid_score : float
-            Grid score of the network
-        """
-        r_out_im = self.get_rate_map_matrix()
-        GridScorer_Webber = GridScorer(self.resolution_width)
-        score = GridScorer_Webber.get_scores(np.asarray(r_out_im))
-        if plot:
-            GridScorer_Webber.plot_sac(score[0])
-        return score[1]
 
     def plot_rate_map(self, save_path: str = None, ax: mpl.axes.Axes = None):
         """

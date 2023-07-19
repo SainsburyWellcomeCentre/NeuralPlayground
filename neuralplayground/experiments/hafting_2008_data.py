@@ -12,7 +12,7 @@ from IPython.display import display
 from neuralplayground.datasets import fetch_data_path
 from neuralplayground.utils import clean_data, get_2D_ratemap
 from neuralplayground.plotting.plot_utils import make_plot_trajectories , make_plot_rate_map
-from neuralplayground.comparison import GridScorer
+
 
 from .experiment_core import Experiment
 
@@ -268,22 +268,6 @@ class Hafting2008Data(Experiment):
 
         return time_array, test_spikes, x, y
 
-    def get_grid_score(self, plot=False):
-        """
-        Get the grid score of the network
-
-        Returns
-        -------
-        grid_score : float
-            Grid score of the network
-        """
-        r_out_im ,x_bin, y_bin  = self.recording_tetr( )
-  # , tetrode_id="T6C1")
-        GridScorer_exp = GridScorer(x_bin.size - 1)
-        score = GridScorer_exp.get_scores(np.asarray(r_out_im))
-        if plot:
-            GridScorer_exp.plot_sac(score[0])
-        return score[1]
 
     def plot_recording_tetr(
         self,
@@ -468,8 +452,6 @@ class Hafting2008Data(Experiment):
         """
 
         # Recursive call of this function in case of list or tuple
-
-        # Recall recorded data
         session_data, rev_vars, rat_info = self.get_recording_data(recording_index)
         if tetrode_id is None:
             tetrode_id = self._find_tetrode(rev_vars)

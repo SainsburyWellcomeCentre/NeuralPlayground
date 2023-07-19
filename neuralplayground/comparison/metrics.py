@@ -387,13 +387,13 @@ class GridScorer(object):
             return np.sort(theta.compress(theta >= 0))[0]
 
     def plot_sac(
-        self, sac, mask_params=None, ax=None, title=None, *args, **kwargs
+        self, sac, mask_params=None, ax=None, title=None, score="", *args, **kwargs
     ):  # pylint: disable=keyword-arg-before-vararg
         """Plot spatial autocorrelogram."""
         if ax is None:
             ax = plt.gca()
         # Plot the sac
-        ax = make_plot_rate_map(sac, ax, "sac", "width", "depth", "sac rate")
+        ax = make_plot_rate_map(sac, ax, "sac plot with gridscore:" + score, "width", "depth", "sac rate")
         # ax.imshow(sac, interpolation="none", *args, **kwargs)
         # ax.pcolormesh(useful_sac, *args, **kwargs)
         # Plot a ring for the adequate mask
@@ -483,3 +483,22 @@ class GridScorer(object):
             (rotationalCorrVals[150], rotationalCorrVals[30], rotationalCorrVals[90])
         )
         return gridscore, rotationalCorrVals, rotationArr
+
+    def plot_grid_score(self, r_out_im, plot=True, ax=None):
+        """
+        Get the grid score of the network
+        Returns
+        -------
+        grid_score : float
+            Grid score of the network
+        """
+        score = self.get_scores(np.asarray(r_out_im))
+        if plot:
+            if ax is None:
+                fig, ax = plt.subplots()
+            gridscore = str(np.around(score[1]["gridscore"], decimals=4, out=None))
+            self.plot_sac(sac=score[0], ax=ax, score=gridscore)
+        else:
+            ax.text(0, 0.7, "Grid_score: " + str(np.around(score[1]["gridscore"], decimals=4, out=None)), fontsize=10)
+            ax.set_axis_off()
+        return score

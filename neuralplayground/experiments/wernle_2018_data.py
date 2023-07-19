@@ -105,7 +105,7 @@ class Wernle2018Data(Hafting2008Data):
         """
 
         # Load ratemaps
-        self.best_recording_index = 200  # Nice session recording as default
+        self.best_recording_index = 100  # Nice session recording as default
         self.inner_path = "nn_Data+Code/data/"
         self.ratemap = sio.loadmat(os.path.join(self.data_path, self.inner_path, "Figures_1_2_3/ratemaps.mat"))
         self.ratemap = self.ratemap["ratemaps"]
