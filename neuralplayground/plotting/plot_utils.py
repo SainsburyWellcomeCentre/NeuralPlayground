@@ -188,7 +188,7 @@ def render_mpl_table(data, ax=None, **kwargs):
     return ax.get_figure(), ax
 
 
-def make_agent_comparison(env, parameters, agents, exp=None, recording_index=None, tetrode_id=None, GridScorer=None):
+def make_agent_comparison(envs, parameters, agents, exps=None, recording_index=None, tetrode_id=None, GridScorer=None):
     """Plot function to compare agents in a given environment
 
     Parameters
@@ -204,47 +204,60 @@ def make_agent_comparison(env, parameters, agents, exp=None, recording_index=Non
     ax: matplotlib axis
     """
     config_vars = PLOT_CONFIG.AGENT_COMPARISON
-    if exp is not None or hasattr(env, "show_data"):
-        f, ax = plt.subplots(3, len(agents) + 2, figsize=(10 * (len(agents) + 2), 10))
+    for j, env in enumerate(envs):
+        if hasattr(env, "show_data"):
+            exp_data = True
+        else:
+            exp_data = False
+
+    if exps is not None and exp_data:
+        f, ax = plt.subplots(5, len(agents) + len(envs) + len(exps), figsize=(10 * (len(agents) + 2), 10))
+    elif exp_data:
+        f, ax = plt.subplots(5, len(agents) + len(envs), figsize=(10 * (len(agents) + 1), 10))
     else:
-        f, ax = plt.subplots(3, len(agents) + 1, figsize=(10 * (len(agents) + 1), 10))
+        f, ax = plt.subplots(3, len(agents) + len(envs), figsize=(10 * (len(agents) + 1), 10))
 
-    env.plot_trajectory(ax=ax[1, 0])
+    for k, env in enumerate(envs):
+        ax[0, k].text(0, 1.1, "Env_param", fontsize=config_vars.FONTSIZE)
+        env.plot_trajectory(ax=ax[1, k])
+        ax[2, k].set_axis_off()
+        render_mpl_table(
+            pd.DataFrame([parameters[0]["env_params"]]),
+            ax=ax[0, k],
+        )
+        if hasattr(env, "show_data"):
+            ax[2, k].text(0, 1.1, env.environment_name, fontsize=config_vars.FONTSIZE)
+            ax[2, k].set_axis_off()
+            render_mpl_table(
+                data=env.show_data(),
+                ax=ax[2, k],
+            )
+            env.plot_recording_tetr(recording_index=recording_index, tetrode_id=tetrode_id, ax=ax[3][k])
+            r_out_im, x_bin, y_bin = env.recording_tetr()
+            GridScorer_SR = GridScorer(x_bin - 1)
+            GridScorer_SR.plot_grid_score(r_out_im=r_out_im, plot=True, ax=ax[4][k])
+        else:
+            ax[2][k].set_axis_off()
+            ax[3][k].set_axis_off()
+            ax[4][k].set_axis_off()
 
-    ax[2, 0].set_axis_off()
-    ax[0, 0].text(0, 1.1, "Env_param", fontsize=config_vars.FONTSIZE)
-
-    render_mpl_table(
-        data=pd.DataFrame(parameters[0]["env_params"]),
-        ax=ax[0, 0],
-    )
     for i, agent in enumerate(agents):
+        ax[0, 1 + k + i].text(0, 1.1, "Agent_param", fontsize=config_vars.FONTSIZE)
+        agent.plot_rate_map(ax=ax[1][1 + i + k])
         GridScorer_SR = GridScorer(agent.resolution_width)
-        GridScorer_SR.plot_grid_score(r_out_im=agent.get_rate_map_matrix(), plot=False, ax=ax[2, i + 1])
-        agent.plot_rate_map(ax=ax[1][i + 1])
-        render_mpl_table(
-            data=pd.DataFrame(parameters[i]["agent_params"], index=[0]),
-            ax=ax[0, i + 1],
-        )
-        ax[0, i + 1].text(0, 1.1, "Agent_param", fontsize=config_vars.FONTSIZE)
+        GridScorer_SR.plot_grid_score(r_out_im=agent.get_rate_map_matrix(), plot=False, ax=ax[2, 1 + i + k])
+        render_mpl_table(data=pd.DataFrame([parameters[i]["agent_params"]]), ax=ax[0, 1 + i + k])
+        ax[3][1 + i + k].set_axis_off()
+        ax[4][1 + i + k].set_axis_off()
 
-    # experiment
-    if exp is not None:
-        ax[0, i + 2].text(0, 1.1, exp.experiment_name, fontsize=config_vars.FONTSIZE)
-        render_mpl_table(exp.show_data(), ax=ax[0, i + 2])
-        exp.plot_recording_tetr(recording_index=recording_index, tetrode_id=tetrode_id, ax=ax[1][i + 2])
-        r_out_im, x_bin, y_bin = exp.recording_tetr()
-        GridScorer_SR = GridScorer(x_bin - 1)
-        GridScorer_SR.plot_grid_score(r_out_im=r_out_im, plot=True, ax=ax[2, i + 2])
-    elif hasattr(env, "show_data"):
-        ax[0, i + 2].text(0, 1.1, env.environment_name, fontsize=config_vars.FONTSIZE)
-        ax[0, i + 2].set_axis_off()
-        render_mpl_table(
-            data=env.show_data(),
-            ax=ax[0, i + 2],
-        )
-        env.plot_recording_tetr(recording_index=recording_index, tetrode_id=tetrode_id, ax=ax[1][i + 2])
-        r_out_im, x_bin, y_bin = env.recording_tetr()
-        GridScorer_SR = GridScorer(x_bin - 1)
-        GridScorer_SR.plot_grid_score(r_out_im=r_out_im, plot=True, ax=ax[2, i + 2])
+    for m, exp in enumerate(exps):
+        if exp is not None:
+            ax[0, i + k + m + 2].text(0, 1.1, exp.experiment_name, fontsize=config_vars.FONTSIZE)
+            render_mpl_table(exp.show_data(), ax=ax[0, i + k + m + 2])
+            exp.plot_recording_tetr(recording_index=recording_index, tetrode_id=tetrode_id, ax=ax[1][i + k + m + 2])
+            r_out_im, x_bin, y_bin = exp.recording_tetr()
+            GridScorer_SR = GridScorer(x_bin - 1)
+            GridScorer_SR.plot_grid_score(r_out_im=r_out_im, plot=True, ax=ax[2][i + k + m + 2])
+            ax[3][i + k + m + 2].set_axis_off()
+            ax[4][i + k + m + 2].set_axis_off()
     return ax
