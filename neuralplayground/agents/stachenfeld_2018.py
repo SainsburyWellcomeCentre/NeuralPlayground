@@ -128,8 +128,8 @@ class Stachenfeld2018(AgentCore):
         # Variables for the SR-agent state space
         self.resolution_depth = int(self.state_density * self.room_depth)
         self.resolution_width = int(self.state_density * self.room_width)
-        self.x_array = np.linspace(-self.room_width / 2, self.room_width / 2, num=self.resolution_depth)
-        self.y_array = np.linspace(self.room_depth / 2, -self.room_depth / 2, num=self.resolution_width)
+        self.x_array = np.linspace(self.room_depth / 2, -self.room_depth / 2, num=self.resolution_width)
+        self.y_array = np.linspace(-self.room_width / 2, self.room_width / 2, num=self.resolution_depth)
         self.mesh = np.array(np.meshgrid(self.x_array, self.y_array))
         self.xy_combinations = self.mesh.T.reshape(-1, 2)
         self.width = int(self.room_width * self.state_density)
