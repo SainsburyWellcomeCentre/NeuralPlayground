@@ -24,9 +24,9 @@ In what follows we describe the general format for each of the three main compon
 To add an agent to the library begin by creating a file with the naming convention of "author_date.py" where "author" is the name of the lead author who from the work which introduced the agent/model and "date" is the year the work was published. In this file implement the new class for the agent with class naming format "AuthorDate". Ensure that this class inherits the "AgentCore" class found in "agent_core.py". Consequently your new class will inherit the minimal set of attributes and methods necessary to function flexibly within the other pipelines implemented by NeuralPlayground. These core attributes are as follows:
 
 > * model_name : str 
->     - The name of the new agent class you are implementing. Can be any valid string and will usually be used for labelling plots or printing to terminal. \
+>     - The name of the new agent class you are implementing. Can be any valid string and will usually be used for labelling plots or printing to terminal.
 > * mod_kwargs: dict 
->     - Dictionary of keyword arguments passed to the "\__init__()" function during instantiation of the object. \
+>     - Dictionary of keyword arguments passed to the "\__init__()" function during instantiation of the object.
 > * metadata: dict
 >     - Dictionary reserved for containing specific description details for each model. By default it just captures all keyword arguments passed in during 	    instantiation of a new object.
 > * obs_history: list 
@@ -52,8 +52,8 @@ Additionally the class will also inherit the necessary methods that the rest of 
 >
 > * neural_response() <!-- I still think this needs to return something. The base_class needs to work with the full 												pipeline -->
 >     - Accepts: None
->     - Returns: None <!-- Can't be none if we say it will be compared to experimental data --> \
->     - Description: Returns the neural representation of the model performing the given task. Output will be compared against real experimental data. \
+>     - Returns: None <!-- Can't be none if we say it will be compared to experimental data -->
+>     - Description: Returns the neural representation of the model performing the given task. Output will be compared against real experimental data.
 >
 > * act()
 >     - Accepts:
@@ -89,12 +89,12 @@ Additionally the class will also inherit the necessary methods that the rest of 
 >     - Returns: None 
 >     - Description: Restores and re-instantiate the environment from scratch using the state and object information stored in the file at "save_path". 
 >
-> * \_\_eq\_\_() <!-- check what this does --> \
->     - Accepts: \
->         - other: dict \
->             - Default: None \
->             - Description: <!-- todo --> \
->     - Returns: bool <!-- do I just name the variable here? --> \
->         - Description: True if dictionaries are the same, False if they are different. \
->     - Description: Determines whether two dictionaries are the same or equal. \
+> * \_\_eq\_\_() <!-- check what this does -->
+>     - Accepts:
+>         - other: dict
+>             - Default: None
+>             - Description: <!-- todo -->
+>     - Returns: bool <!-- do I just name the variable here? -->
+>         - Description: True if dictionaries are the same, False if they are different.
+>     - Description: Determines whether two dictionaries are the same or equal.
 
