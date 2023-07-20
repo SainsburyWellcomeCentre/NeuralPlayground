@@ -261,7 +261,7 @@ def make_agent_comparison(envs, parameters, agents, exps=None, recording_index=N
         for m, exp in enumerate(exps):
             if exp is not None:
                 ax[0, i + k + m + 2].text(0, 1.1, exp.experiment_name, fontsize=config_vars.FONTSIZE)
-                render_mpl_table(exp.show_data(), ax=ax[0, i + k + m + 2])
+                render_mpl_table(exp.recording_list, ax=ax[0, i + k + m + 2])
                 exp.plot_recording_tetr(recording_index=recording_index, tetrode_id=tetrode_id, ax=ax[1][i + k + m + 2])
                 r_out_im, x_bin, y_bin = exp.recording_tetr()
                 GridScorer_SR = GridScorer(x_bin - 1)
