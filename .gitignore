@@ -59,3 +59,6 @@ coverage.xml
 *.png
 
 *.egg-info
+
+# PyPI distribution / packages
+dist/
