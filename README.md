@@ -37,24 +37,37 @@ reproducible computational understanding of the hippocampus and entorhinal corte
 Try our short tutorial online in Colab. <a href="https://githubtocolab.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/colab_example.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
 
 ## 2. Installation
-You can create a new environment using conda, and the yml file with all the right
-dependencies by running
-```
-git clone https://github.com/SainsburyWellcomeCentre/NeuralPlayground/
-conda create --name NPG
-conda activate NPG
-conda install pip
-```
 
-For now, install using pip for local editing and testing
+### Create a conda environment
+We advise you to install the package in a virtual environment,
+to avoid conflicts with other packages. For example, using `conda`:
+
+```python
+conda create --name NPG-env python=3.10
+conda activate NPG-env
 ```
-pip install -e .
+### Pip install
+
+You can use `pip` get the latest release of NeuralPlayground from PyPI.
+```python
+# install the latest release
+pip install NeuralPlayground
+
+# upgrade to the latest release
+pip install -U NeuralPlayground
+
+# install a particular release
+pip install NeuralPlayground==0.0.1
 ```
-or
-```
+### Install for development
+
+If you want to contribute to the project, get the latest development version
+from GitHub, and install it in editable mode, including the "dev" dependencies:
+```bash
+git clone https://github.com/SainsburyWellcomeCentre/NeuralPlayground/
+cd NeuralPlayground
 pip install -e '.[dev]'
 ```
-if you want to install the dependencies for development.
 
 ## 3. Project
 
