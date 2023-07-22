@@ -71,6 +71,7 @@ class Hafting2008(Simple2D):
             recording_index=recording_index,
         )
         self.arena_limits = self.experiment.arena_limits
+        self.recording_list = self.experiment.recording_list
         self.arena_x_limits, self.arena_y_limits = (
             self.arena_limits[0, :],
             self.arena_limits[1, :],

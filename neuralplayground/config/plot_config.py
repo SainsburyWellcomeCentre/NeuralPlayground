@@ -97,7 +97,10 @@ class AgentCompatisonConfig(NPGConfig):
     """
 
     def __init__(self, **kwargs):
+        self.FIGSIZE = kwargs["figsize"]
         self.FONTSIZE = kwargs["fontsize"]
+        self.PLOT_SAC_EXP = kwargs["plot_sac_exp"]
+        self.PLOT_SAC_AGT = kwargs["plot_sac_agt"]
 
 
 class TableConfig(NPGConfig):
@@ -129,12 +132,14 @@ class TableConfig(NPGConfig):
         self.TABLE_FONTSIZE = kwargs["table_fontsize"]
         self.ROW_COLOR = kwargs["row_colors"]
         self.HEADER_COLOR = kwargs["header_color"]
+        self.TEXT_COLOR = kwargs["text_color"]
         self.EDGE_COLOR = kwargs["edge_color"]
         self.HEADER_COLUMNS = kwargs["header_columns"]
         self.BBOX = kwargs["bbox"]
 
 
 class PlotsConfig(NPGConfig):
+
     """Config object for plots, all plots are config are stored in this object
     Attributes
     ----------
@@ -146,7 +151,6 @@ class PlotsConfig(NPGConfig):
         Config object for agent comparison plots
     TABLE: TableConfig
         Config object for table plots
-
     """
 
     def __init__(self, plot_config: dict):

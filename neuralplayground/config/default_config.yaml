@@ -25,14 +25,19 @@ plot_config:
     grid: False
 
   agent_comparison_plot:
+    figsize: [12, 16]
     fontsize: 10
+    plot_sac_exp: True
+    plot_sac_agt: True
+
 
   table_plot:
     table_fontsize: 7
     col_width: 30
-    row_height: 0.625
+    row_height: 0.225
     header_color: "C0"
     row_colors: ["#f1f1f2", "w"]
-    edge_color: "w"
+    text_color: "w"
+    edge_color: "k"
     bbox: [0, 0, 1, 1]
     header_columns: 0
