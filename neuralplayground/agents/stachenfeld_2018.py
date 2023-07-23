@@ -338,7 +338,7 @@ class Stachenfeld2018(AgentCore):
         self.grad_history.append(np.sqrt(np.sum(td_error**2)))
         self.curr_state = next_state
 
-        return {"td_error": td_error}
+        return {"state_td_error": td_error}
 
     def update_successor_rep_td_full(self, n_episode: int = 100, t_episode: int = 100):
         """

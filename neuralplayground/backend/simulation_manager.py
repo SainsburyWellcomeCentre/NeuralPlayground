@@ -237,7 +237,7 @@ class SingleSim(object):
         self.training_loop_params = training_loop_params
         self.simulation_id = simulation_id
 
-    def run_sim(self, save_path: str):
+    def run_sim(self, save_path: str = None):
         """Run the simulation and save the results in save_path
 
         Parameters
@@ -247,6 +247,8 @@ class SingleSim(object):
         """
 
         # Setting the save path and logs
+        if save_path is None:
+            save_path = os.path.join(os.getcwd(), "results_sim")
         check_dir(save_path)
         run_log_path = os.path.join(save_path, "run.log")
         error_log_path = os.path.join(save_path, "error.log")
@@ -303,8 +305,13 @@ class SingleSim(object):
         save_path_params = os.path.join(save_path, "params.dict")
         pickle.dump(self.__dict__, open(save_path_params, "wb"), protocol=pickle.HIGHEST_PROTOCOL)
 
-    def load_params(self, load_path: str):
-        self.__dict__ = pd.read_pickle(load_path)
+    def load_params(self, load_path: str = None):
+        """Load the parameters of the simulation for reproducibility"""
+        if load_path is None:
+            param_path = os.path.join(os.getcwd(), "results_sim", "params.dict")
+        else:
+            param_path = os.path.join(load_path, "params.dict")
+        self.__dict__ = pd.read_pickle(param_path)
 
     def _update_log_state(self, message: str, save_path: str):
         """Update the state log of the simulation"""
@@ -321,3 +328,28 @@ class SingleSim(object):
         str_rep += f"Training loop: {self.training_loop}\n"
         str_rep += f"Training loop params: {self.training_loop_params}\n"
         return str_rep
+
+    def load_results(self, results_path: str = None):
+        """Load the results of a simulation from a path"""
+        if results_path is None:
+            results_path = os.path.join(os.getcwd(), "results_sim")
+        self.load_params(os.path.join(results_path))
+        trained_agent = pd.read_pickle(os.path.join(results_path, "agent"))
+        trained_env = pd.read_pickle(os.path.join(results_path, "arena"))
+        training_hist = pd.read_pickle(os.path.join(results_path, "training_hist.dict"))
+        return trained_agent, trained_env, training_hist
+
+    def show_logs(self, results_path: str = None, log_type: str = "error"):
+        """Show the logs of the simulation"""
+        if results_path is None:
+            results_path = os.path.join(os.getcwd(), "results_sim")
+        if log_type == "error":
+            log_path = os.path.join(os.getcwd(), results_path, "error.log")
+        elif log_type == "run":
+            log_path = os.path.join(os.getcwd(), results_path, "run.log")
+        elif log_type == "state":
+            log_path = os.path.join(os.getcwd(), results_path, "state.log")
+        else:
+            raise ValueError("log_type must be either 'error' or 'run'")
+        with open(log_path, "r") as log_file:
+            print(log_file.read())
