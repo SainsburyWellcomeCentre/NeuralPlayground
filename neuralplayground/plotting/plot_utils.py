@@ -116,7 +116,7 @@ def make_plot_rate_map(h, ax, title, title_x, title_y, title_cbar):
     # Formating ratemap plot
     config_vars = PLOT_CONFIG.RATEMAP
     sc = ax.imshow(h, cmap=config_vars.RATEMAP_COLORMAP)
-    cbar = plt.colorbar(sc, ax=ax, ticks=[np.min(h), np.max(h)], orientation="horizontal",fraction=0.046 )
+    cbar = plt.colorbar(sc, ax=ax, ticks=[np.min(h), np.max(h)], orientation="horizontal", fraction=0.046)
     cbar.ax.set_xlabel(title_cbar, fontsize=config_vars.COLORBAR_LABEL_FONTSIZE)
     cbar.ax.set_xticklabels(
         [np.round(np.min(h), decimals=2), np.round(np.max(h), decimals=2)], fontsize=config_vars.TICK_LABEL_FONTSIZE
@@ -174,7 +174,7 @@ def render_mpl_table(data, ax=None, **kwargs):
         fig, ax = plt.subplots(figsize=size)
         ax.axis("off")
     ax.set_axis_off()
-    mpl_table = ax.table(cellText=data.values, bbox=config_vars.BBOX, colLabels=data.columns, **kwargs,cellLoc='center')
+    mpl_table = ax.table(cellText=data.values, bbox=config_vars.BBOX, colLabels=data.columns, **kwargs, cellLoc="center")
     mpl_table.auto_set_font_size(False)
     mpl_table.auto_set_column_width(col=list(range(len(data.columns))))
     mpl_table.set_fontsize(config_vars.TABLE_FONTSIZE)
@@ -212,14 +212,26 @@ def make_agent_comparison(envs, parameters, agents, exps=None, recording_index=N
 
     if exps is not None:
         if exp_data:
-            f, ax = plt.subplots(5, len(agents) + len(envs) + len(exps), figsize=(config_vars.FIGSIZE[0] * (len(agents) + 2), config_vars.FIGSIZE[1]))
+            f, ax = plt.subplots(
+                5,
+                len(agents) + len(envs) + len(exps),
+                figsize=(config_vars.FIGSIZE[0] * (len(agents) + 2), config_vars.FIGSIZE[1]),
+            )
         else:
-            f, ax = plt.subplots(3, len(agents) + len(envs) + len(exps), figsize=(config_vars.FIGSIZE[0] * (len(agents) + 1), config_vars.FIGSIZE[1]))
+            f, ax = plt.subplots(
+                3,
+                len(agents) + len(envs) + len(exps),
+                figsize=(config_vars.FIGSIZE[0] * (len(agents) + 1), config_vars.FIGSIZE[1]),
+            )
     else:
         if exp_data:
-            f, ax = plt.subplots(5, len(agents) + len(envs), figsize=(config_vars.FIGSIZE[0] * (len(agents) + 1), config_vars.FIGSIZE[1]))
+            f, ax = plt.subplots(
+                5, len(agents) + len(envs), figsize=(config_vars.FIGSIZE[0] * (len(agents) + 1), config_vars.FIGSIZE[1])
+            )
         else:
-            f, ax = plt.subplots(3, len(agents) + len(envs), figsize=(config_vars.FIGSIZE[0] * (len(agents) + 1), config_vars.FIGSIZE[1]))
+            f, ax = plt.subplots(
+                3, len(agents) + len(envs), figsize=(config_vars.FIGSIZE[0] * (len(agents) + 1), config_vars.FIGSIZE[1])
+            )
 
     for k, env in enumerate(envs):
         ax[0, k].text(0, 1.1, "Env_param", fontsize=config_vars.FONTSIZE)
@@ -239,7 +251,7 @@ def make_agent_comparison(envs, parameters, agents, exps=None, recording_index=N
             env.plot_recording_tetr(recording_index=recording_index, tetrode_id=tetrode_id, ax=ax[3][k])
             r_out_im, x_bin, y_bin = env.recording_tetr()
             GridScorer_SR = GridScorer(x_bin - 1)
-            GridScorer_SR.plot_grid_score(r_out_im=r_out_im, plot=  config_vars.PLOT_SAC_EXP, ax=ax[4][k])
+            GridScorer_SR.plot_grid_score(r_out_im=r_out_im, plot=config_vars.PLOT_SAC_EXP, ax=ax[4][k])
         else:
             if exp_data:
                 ax[2][k].set_axis_off()
@@ -249,11 +261,13 @@ def make_agent_comparison(envs, parameters, agents, exps=None, recording_index=N
                 ax[2][k].set_axis_off()
 
     for i, agent in enumerate(agents):
-        ax[0, 1 +  k + i].text(0, 1.1, "Agent_param", fontsize=config_vars.FONTSIZE)
+        ax[0, 1 + k + i].text(0, 1.1, "Agent_param", fontsize=config_vars.FONTSIZE)
         if hasattr(agent, "plot_rate_map"):
             agent.plot_rate_map(ax=ax[1][1 + i + k])
             GridScorer_SR = GridScorer(agent.resolution_width)
-            GridScorer_SR.plot_grid_score(r_out_im=agent.get_rate_map_matrix(), plot = config_vars.PLOT_SAC_AGT, ax=ax[2, 1 + i + k])
+            GridScorer_SR.plot_grid_score(
+                r_out_im=agent.get_rate_map_matrix(), plot=config_vars.PLOT_SAC_AGT, ax=ax[2, 1 + i + k]
+            )
             render_mpl_table(data=pd.DataFrame([parameters[i]["agent_params"]]), ax=ax[0, 1 + i + k])
         if exp_data:
             ax[3][1 + i + k].set_axis_off()

@@ -342,7 +342,7 @@ class GridScorer(object):
         stGrd : dict
             Dictionary of grid cell properties.
 
-                """
+        """
         sac = self.autoCorr2D(rate_map, ~np.isfinite(rate_map), tol=1e-11)
         stGrd = self.grid_field_props(sac)
 
@@ -438,7 +438,7 @@ class GridScorer(object):
         ax : matplotlib.axes.Axes
             The axes the plot was drawn on.
 
-                """
+        """
         if ax is None:
             ax = plt.gca()
         # Plot the sac

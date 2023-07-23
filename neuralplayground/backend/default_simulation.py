@@ -4,7 +4,7 @@ from neuralplayground.agents import Stachenfeld2018, Weber2018
 from neuralplayground.arenas import Hafting2008, MergingRoom, Sargolini2006, Simple2D, Wernle2018
 from neuralplayground.backend import default_training_loop, episode_based_training_loop
 
-from .cross_comparison import SingleSim
+from .simulation_manager import SingleSim
 
 sim1_params = {
     "simulation_id": "weber_2018_in_simple2D",
