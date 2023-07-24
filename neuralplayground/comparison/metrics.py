@@ -528,7 +528,7 @@ class GridScorer(object):
             # get the correlation between the original and rotated images
             rotationalCorrVals[angle] = stats.pearsonr(autoCorrMiddleRescaled.ravel()[~allNans], rotatedA.ravel()[~allNans])[0]
             rotationArr[idx] = rotationalCorrVals[angle]
-        gridscore = np.min((rotationalCorrVals[60], rotationalCorrVals[120])) - np.max(
+        gridscore = np.nanmin((rotationalCorrVals[60], rotationalCorrVals[120])) - np.nanmax(
             (rotationalCorrVals[150], rotationalCorrVals[30], rotationalCorrVals[90])
         )
         return gridscore, rotationalCorrVals, rotationArr
