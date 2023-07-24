@@ -3,6 +3,7 @@ import sys
 sys.path.append("../")
 
 import numpy as np
+import matplotlib.pyplot as plt
 import torch
 import random
 import time
@@ -15,6 +16,7 @@ import neuralplayground.agents.whittington_2020_extras.whittington_2020_utils as
 import neuralplayground.agents.whittington_2020_extras.whittington_2020_parameters as parameters
 from .agent_core import AgentCore
 import neuralplayground.agents.whittington_2020_extras.whittington_2020_model as model
+from neuralplayground.plotting.plot_utils import make_plot_rate_map
 
 class Whittington2020(AgentCore):
     """
@@ -382,6 +384,73 @@ class Whittington2020(AgentCore):
         final_model_input.extend(single_model_input)
 
         return final_model_input, history, environments
+    
+    def plot_rate_map(self, rate_maps):
+        """
+        Plot the TEM rate maps.
+
+        Parameters
+        ----------
+        rate_maps: ndarray, shape (5, N)
+            The rate maps for TEM, where N is the number of cells in each frequency.
+
+        Returns
+        -------
+        figs: list
+            A list of matplotlib figures containing the rate map plots for each frequency.
+        axes: list
+            A list of arrays of matplotlib axes containing the individual rate map plots for each frequency.
+        """
+
+        frequencies = ['Theta', 'Delta', 'Beta', 'Gamma', 'High Gamma']
+        figs = []
+        axes = []
+
+        for i in range(5):
+            n_cells = rate_maps[0][i].shape[1]
+            num_cols = 6  # Number of subplots per row
+            num_rows = np.ceil(n_cells / num_cols).astype(int)
+
+            # Create the figure for the current frequency
+            fig, axs = plt.subplots(nrows=num_rows, ncols=num_cols, figsize=(15, 10))
+            fig.suptitle(f'{frequencies[i]} Rate Maps', fontsize=16)
+
+            # Create a single colorbar for the entire figure
+            cbar_ax = fig.add_axes([0.91, 0.15, 0.02, 0.7])
+
+            # Create the subplots for the current frequency
+            for j in range(n_cells):
+                if j >= n_cells:
+                    break
+                ax_row = j // num_cols
+                ax_col = j % num_cols
+
+                # Get the rate map for the current cell and frequency
+                rate_map = np.asarray(rate_maps[0][i]).T[j]
+
+                # Reshape the rate map into a matrix
+                rate_map_mat = np.reshape(rate_map, (self.room_widths[0], self.room_depths[0]))
+
+                # Plot the rate map in the corresponding subplot
+                title = f'Cell {j+1}'
+                make_plot_rate_map(rate_map_mat, axs[ax_row, ax_col], title, "", "", "", use_cbar=False)
+
+            # Hide unused subplots for the current frequency
+            for j in range(n_cells, num_rows * num_cols):
+                ax_row = j // num_cols
+                ax_col = j % num_cols
+                axs[ax_row, ax_col].axis('off')
+
+            # Add a single colorbar to the figure
+            cbar = fig.colorbar(axs[0, 0].get_images()[0], cax=cbar_ax)
+            cbar.set_label('Firing rate', fontsize=14)
+
+            figs.append(fig)
+            axes.append(axs)
+
+        return figs, axes
+
+
 
     def rate_maps(self, forward):
         # Store location x cell firing rate matrix for abstract and grounded location representation across environments

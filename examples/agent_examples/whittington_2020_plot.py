@@ -81,7 +81,7 @@ agent = Whittington2020(model_name=mod_name,
                         state_densities=env.state_densities,
                         use_behavioural_data=False)
 
-# Run around environment
+# # Run around environment
 # observation, state = env.reset(random_state=True, custom_state=None)
 # while agent.n_walk < 5000:
 #     if agent.n_walk % 100 == 0:
@@ -115,6 +115,9 @@ zero_shot = analyse.zero_shot(forward, tem, environments, include_stay_still=inc
 occupation = analyse.location_occupation(forward, tem, environments)
 g, p = analyse.rate_map(forward, tem, environments)
 from_acc, to_acc = analyse.location_accuracy(forward, tem, environments)
+
+agent.plot_rate_map(p)
+plt.show()
 
 # Plot results of agent comparison and zero-shot inference analysis
 filt_size = 41
