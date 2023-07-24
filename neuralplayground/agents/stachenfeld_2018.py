@@ -422,6 +422,10 @@ class Stachenfeld2018(AgentCore):
         else:
             if ax is None:
                 f, ax = plt.subplots(1, len(eigen_vectors), figsize=(4 * len(eigen_vectors), 5))
+            if isinstance(ax, mpl.axes.Axes):
+                ax = [
+                    ax,
+                ]
             for i, eig in enumerate(eigen_vectors):
                 rate_map_mat = self.get_rate_map_matrix(sr_matrix, eigen_vector=eig)
                 make_plot_rate_map(rate_map_mat, ax[i], "Rate map: " + "Eig" + str(eig), "width", "depth", "Firing rate")

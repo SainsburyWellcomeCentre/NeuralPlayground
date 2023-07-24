@@ -1,7 +1,6 @@
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
 
 from neuralplayground.config import PLOT_CONFIG
 
@@ -236,15 +235,15 @@ def make_agent_comparison(envs, parameters, agents, exps=None, recording_index=N
     for k, env in enumerate(envs):
         env.plot_trajectory(ax=ax[1, k])
         ax[2, k].set_axis_off()
-       # render_mpl_table( pd.DataFrame([parameters[0]["env_params"]]),ax=ax[0, k],)
+        # render_mpl_table( pd.DataFrame([parameters[0]["env_params"]]),ax=ax[0, k],)
         if hasattr(env, "show_data"):
             ax[0, k].text(0, 1.1, env.environment_name, fontsize=config_vars.FONTSIZE)
             ax[0, k].set_axis_off()
             for p, text in enumerate(parameters[k]["env_params"]):
-                    ax[0, k ].text(0, 1, "Event param", fontsize=10)
-                    variable = parameters[k]["env_params"][text]
-                    ax[0, k ].text(0, 0.9 - ((p) * 0.1), text + ": " + str(variable), fontsize=10)
-                    ax[0, k ].set_axis_off()
+                ax[0, k].text(0, 1, "Event param", fontsize=10)
+                variable = parameters[k]["env_params"][text]
+                ax[0, k].text(0, 0.9 - ((p) * 0.1), text + ": " + str(variable), fontsize=10)
+                ax[0, k].set_axis_off()
 
         if hasattr(env, "show_data"):
             ax[2, k].set_axis_off()
@@ -277,10 +276,10 @@ def make_agent_comparison(envs, parameters, agents, exps=None, recording_index=N
                     ax[0, i + k + 1].text(0.7, 1 - ((j - 9) * 0.1), text + ": " + str(variable), fontsize=10)
                     ax[0, i + k + 1].set_axis_off()
                 else:
-                    ax[0, i + k +  1].text(0, 1, "Agent param", fontsize=10)
+                    ax[0, i + k + 1].text(0, 1, "Agent param", fontsize=10)
                     variable = parameters[i]["agent_params"][text]
                     ax[0, i + k + 1].text(0, 0.9 - ((j) * 0.1), text + ": " + str(variable), fontsize=10)
-                    ax[0, i + k+  1].set_axis_off()
+                    ax[0, i + k + 1].set_axis_off()
 
             # render_mpl_table(data=pd.DataFrame([parameters[i]["agent_params"]]), ax=ax[0, 1 + i + k])
         if exp_data:
