@@ -56,13 +56,35 @@
       "contributions": [
         "mentoring"
       ]
+    },
+    {
+      "login": "niksirbi",
+      "name": "Niko Sirmpilatze",
+      "avatar_url": "https://avatars.githubusercontent.com/u/20923448?v=4",
+      "profile": "http://nikosirmpilatze.com",
+      "contributions": [
+        "infra",
+        "maintenance",
+        "tool"
+      ]
+    },
+    {
+      "login": "adamltyson",
+      "name": "Adam Tyson",
+      "avatar_url": "https://avatars.githubusercontent.com/u/13147259?v=4",
+      "profile": "http://adamltyson.com",
+      "contributions": [
+        "maintenance",
+        "infra"
+      ]
     }
   ],
   "contributorsPerLine": 7,
-  "projectName": "EHC_model_comparison",
-  "projectOwner": "ClementineDomine",
+  "projectName": "NeuralPlayground",
+  "projectOwner": "SainsburyWellcomeCentre",
   "repoType": "github",
   "repoHost": "https://github.com",
   "skipCi": true,
-  "commitConvention": "angular"
+  "commitConvention": "angular",
+  "commitType": "docs"
 }
