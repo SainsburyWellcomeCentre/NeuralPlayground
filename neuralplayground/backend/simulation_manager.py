@@ -1,5 +1,6 @@
 import os
 import pickle
+import shutil
 import sys
 import traceback
 
@@ -122,20 +123,7 @@ class SimulationManager(object):
                 sim_path = self.run_paths[run_index + sim_index * self.runs_per_sim]
                 print("Running simulation at path:")
                 print(sim_path)
-                # setting run logs and error logs
-                original_stdout = sys.stdout
-                original_stderr = sys.stderr
-                try:
-                    sim.run_sim(save_path=sim_path)
-                except Exception:
-                    # Logging the error
-                    sim._update_log_state(message="error", save_path=os.path.join(sim_path, "state.log"))
-                    sys.stdout = open(os.path.join(sim_path, "error.log"), "a")
-                    print(traceback.format_exc())
-                    sys.stdout.close()
-                # Recover the original stdout and stderr
-                sys.stdout = original_stdout
-                sys.stderr = original_stderr
+                self._logged_run(sim, sim_path)
 
     def save_params(self, save_path: str):
         """Save the parameters of the simulation manager"""
@@ -168,11 +156,52 @@ class SimulationManager(object):
             print("log for run: ", run)
             sim_object.show_logs(run_path, log_type=log_type)
 
+    def rerun_simulation(self, simulation_index: int = 0):
+        str_path = "rerun simulation at path: "
+        sim_path = self.simulation_paths[simulation_index]
+        sim_object = self.simulation_list[simulation_index]
+        str_path += f"\n  {sim_path}"
+        shutil.rmtree(sim_path)
+        # creating the path for each run
+        for run in range(self.runs_per_sim):
+            # writing path for each run index and date time
+            run_path = os.path.join(sim_path, f"run_{run}_{get_date_time()}")
+            check_dir(run_path)
+            self.run_paths[run + simulation_index * self.runs_per_sim] = run_path
+            # writing state log
+            state_log_path = os.path.join(run_path, "state.log")
+            sim_object._update_log_state(message="in_queue", save_path=state_log_path)
+            str_path += f"\n    {run_path}"
+        print(str_path)
+
+        for run in range(self.runs_per_sim):
+            sim_path = self.run_paths[run + simulation_index * self.runs_per_sim]
+            sim = sim_object
+            print("Running simulation at path:")
+            print(sim_path)
+            self._logged_run(sim, sim_path)
+
     def _get_state(self, state_path):
         """Get the state of the simulation from the state log"""
         with open(state_path, "r") as f:
             state_str = f.readline().split("\n")[0]
         return state_str
+
+    def _logged_run(self, sim, sim_path):
+        # setting run logs and error logs
+        original_stdout = sys.stdout
+        original_stderr = sys.stderr
+        try:
+            sim.run_sim(save_path=sim_path)
+        except Exception:
+            # Logging the error
+            sim._update_log_state(message="error", save_path=os.path.join(sim_path, "state.log"))
+            sys.stdout = open(os.path.join(sim_path, "error.log"), "a")
+            print(traceback.format_exc())
+            sys.stdout.close()
+        # Recover the original stdout and stderr
+        sys.stdout = original_stdout
+        sys.stderr = original_stderr
 
 
 class SingleSim(object):
