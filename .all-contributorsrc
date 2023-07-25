@@ -86,6 +86,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "JarvisDevon",
+      "name": "Devon Jarvis",
+      "avatar_url": "https://avatars.githubusercontent.com/u/30460455?v=4",
+      "profile": "https://github.com/JarvisDevon",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
