@@ -158,6 +158,16 @@ class SimulationManager(object):
                 str_path += f"\n    {run_path}: {state_str_color}"
         print(str_path)
 
+    def show_logs(self, simulation_index: int = 0, log_type: str = "error"):
+        """Show the logs of a simulation"""
+        sim_path = self.simulation_paths[simulation_index]
+        sim_object = self.simulation_list[simulation_index]
+        print(f"Showing logs for simulation at path: {sim_path}")
+        for run in range(self.runs_per_sim):
+            run_path = self.run_paths[run + simulation_index * self.runs_per_sim]
+            print("log for run: ", run)
+            sim_object.show_logs(run_path, log_type=log_type)
+
     def _get_state(self, state_path):
         """Get the state of the simulation from the state log"""
         with open(state_path, "r") as f:
