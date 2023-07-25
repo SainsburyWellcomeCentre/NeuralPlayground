@@ -105,7 +105,7 @@ To add an environment we follow a similar convention to the Agent class. If the 
 # agent_core.py
 The core attributes are as follows:
 
-> * `state` : *array* 
+> * `state` : *array* <!-- all these vars say "Define within each subclass for specific environments" when used in functions which kind of defeats the point -->
 >     - Empty array for this abstract class. Designed to contain the present state of the environment.
 > * `history`: *list*
 >     - Contains the transition history of all states in the environment. Differs from the history of an agent which may not fully observe the full state. Here this is the history of the full state of the environment.
@@ -128,20 +128,45 @@ Additionally the class will also inherit the necessary methods that the rest of 
 
 > * `__init__( )`
 >     - Accepts:  
->         - `model_name` : *str* 
->             - Default: "default_model" 
->         - `**mod_kwargs`: *dict* 
+>         - `environment_name` : *str* 
+>             - Default: "Environment"
+>         - `time_step_size` : *float*
+>             - Default: 1.0
+>         - `env_kwargs`: *dict* 
 >             - Default: {}
 >     - Returns: None
->     - Description: Function which initialises an object of the class. Naming the object is the only required input. All other inputs are passed as keyword 	arguments that are used to create metadata or custom attributes or provide further functionality to custom methods.
+>     - Description: Function which initialises an object of the class. Naming the object is the only required input. All other inputs are passed as keyword arguments that are used to create metadata or custom attributes or provide further functionality to custom methods.
 >
-> * `reset()` <!-- in the code the act function populates obs_history but this doesn't reset it -->
+> * `make_observation()`
+>     - Accepts: None
+>     - Returns:
+>         - `self.state` : *array*
+>             - Description:  Variable containing the state of the environment (eg. position in the environment)
+>     - Description: Takes the state and returns an array of sensory information for an agent. In more complex cases, the observation might be different from the internal state of the environment or partially observable.
+>
+> * `step()`
+>     - Accepts:
+>         - `action` : *array*
+>             - Description: Type is currently set to match environment but any type can be used as long as the function is able to still return the necessary variables.  
+>     - Returns:
+>         - `observation`: *array*
+>             - Description: Any set of observation that can be encountered by the agent in the environment (position, visual features,...)  
+>         - `self.state` : *array*
+>             - Description:  Variable containing the state of the environment (eg. position in the environment)
+>         - `reward`: int <!-- why int? -->
+>     - Description: Runs the environment dynamics resulting from a given action. Increments global counters and returns the resultant observation by the agent, new state of the environment (which is not necessarily the same as the agent's observation of the environment) and the reward.
+> 
+> * `_increase_global_step()`
 >     - Accepts: None
 >     - Returns: None
->     - Description: Erases all memory from the model, re-initialises all relevant parameters and builds the original object from scratch.
->
-> * `neural_response()`
+>     - Description: Increments the `self.global_steps` and `self.global_time` counters.
+> 
+> * `reset()`
 >     - Accepts: None
->     - Returns: None
->     - Description: Returns the neural representation of the model performing the given task. Output will be compared against real experimental data.
+>     - Returns:
+>         - `observation`: *array*
+>             - Description: Any set of observation that can be encountered by the agent in the environment (position, visual features,...)
+>         - `self.state` : *array*
+>             - Description:  Variable containing the state of the environment (eg. position in the environment) 
+>     - Description: Re-initialize state. Returns observation and state after the reset. Also returns time and step counters to 0.
 
