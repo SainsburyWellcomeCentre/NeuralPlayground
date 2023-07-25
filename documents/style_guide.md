@@ -98,3 +98,50 @@ Additionally the class will also inherit the necessary methods that the rest of 
 >         - Description: True if dictionaries are the same, False if they are different.
 >     - Description: Determines whether two dictionaries are the same or equal.
 
+## Environment/Arena
+
+To add an environment we follow a similar convention to the Agent class. If the environment is based on a publication begin by creating a file with the naming convention of "author_date.py" where "author" is the name of the lead author and "date" is the year the work was published. Otherwise create a file with a descriptive name such as "connected_rooms.py". There are two possible classes which a new class could inherit to obtain the minimal set of attributes and methods necessary to function flexibly within the other pipelines implemented by NeuralPlayground. Firstly "agent_core.py" which provides the most basic interface necessary. Secondly, "simple2d.py" provides a richer interface which can be used to create 2-dimensional navigation based domains and inherits "agent_core.py". We will begin by describing "agent_core.py" and then move on to describe "simple2d.py".
+
+# agent_core.py
+The core attributes are as follows:
+
+> * `state` : *array* 
+>     - Empty array for this abstract class. Designed to contain the present state of the environment.
+> * `history`: *list*
+>     - Contains the transition history of all states in the environment. Differs from the history of an agent which may not fully observe the full state. Here this is the history of the full state of the environment.
+> * `time_step_size`: *float*
+>     - The number of seconds by which the "in-world" time progresses when calling the `step()` method.
+> * `metadata`: *dict* 
+>     - Contains extra metadata that might be available in other classes.
+> * `env_kwags`: *dict*
+>     - Arguments given to the init method.
+> * `global_steps` : *int* 
+>     - Counts the number of calls to the `step()` method. Set to 0 when calling `reset()`.
+> * `global_time`: *float*
+>     - Total "in-world" time simulated through calls to the `step()` method since the last reset. Then `global_time = time_step_size * global_steps`.
+> * `observation_space`: *gym.spaces*
+>     - Specifies the range of observations which the environment can generate as in OpenAI Gym.
+> * `action_space`: *gym.spaces* 
+>     - Specifies the range of valid actions which an agent can take in the environment as in OpenAI Gym.
+
+Additionally the class will also inherit the necessary methods that the rest of the library will use to interface with its objects. These are as follows:
+
+> * `__init__( )`
+>     - Accepts:  
+>         - `model_name` : *str* 
+>             - Default: "default_model" 
+>         - `**mod_kwargs`: *dict* 
+>             - Default: {}
+>     - Returns: None
+>     - Description: Function which initialises an object of the class. Naming the object is the only required input. All other inputs are passed as keyword 	arguments that are used to create metadata or custom attributes or provide further functionality to custom methods.
+>
+> * `reset()` <!-- in the code the act function populates obs_history but this doesn't reset it -->
+>     - Accepts: None
+>     - Returns: None
+>     - Description: Erases all memory from the model, re-initialises all relevant parameters and builds the original object from scratch.
+>
+> * `neural_response()`
+>     - Accepts: None
+>     - Returns: None
+>     - Description: Returns the neural representation of the model performing the given task. Output will be compared against real experimental data.
+
