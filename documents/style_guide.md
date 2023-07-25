@@ -102,7 +102,7 @@ Additionally the class will also inherit the necessary methods that the rest of 
 
 To add an environment we follow a similar convention to the Agent class. If the environment is based on a publication begin by creating a file with the naming convention of "author_date.py" where "author" is the name of the lead author and "date" is the year the work was published. Otherwise create a file with a descriptive name such as "connected_rooms.py". There are two possible classes which a new class could inherit to obtain the minimal set of attributes and methods necessary to function flexibly within the other pipelines implemented by NeuralPlayground. Firstly "agent_core.py" which provides the most basic interface necessary. Secondly, "simple2d.py" provides a richer interface which can be used to create 2-dimensional navigation based domains and inherits "agent_core.py". We will begin by describing "agent_core.py" and then move on to describe "simple2d.py".
 
-# agent_core.py
+### agent_core.py
 The core attributes are as follows:
 
 > * `state` : *array* <!-- all these vars say "Define within each subclass for specific environments" when used in functions which kind of defeats the point -->
@@ -169,4 +169,41 @@ Additionally the class will also inherit the necessary methods that the rest of 
 >         - `self.state` : *array*
 >             - Description:  Variable containing the state of the environment (eg. position in the environment) 
 >     - Description: Re-initialize state. Returns observation and state after the reset. Also returns time and step counters to 0.
-
+> 
+> * `save_environment()`
+>     - Accepts:
+>         - `save_path`: *str*
+>             - Description: Path to the file that the environment state will be saved to 
+>     - Returns: None
+>     - Description: Save current variables of the environment to re-instantiate it in the same state later
+>
+> * `restore_environment()`
+>     - Accepts:
+>         - `save_path`: *str* <!-- var name -->
+>             - Description: Path to the file that the environment state can be retrieved from 
+>     - Returns: None
+>     - Description: Restores the variables of the environment based on the stated save in `save_path`
+>
+> * `__eq__()`
+>     - Accepts:
+>         - `other`: *Environment*
+>             - Description: Another instantiation of the environment
+>     - Returns: *bool*
+>     - Description: Checks if two environments are equal by comparing all of its attributes. True if self and other are the same exact environment
+>
+> * `get_trajectory_data()`
+>     - Accepts: None 
+>     - Returns:
+>         - `self.history`: *list*
+>             - Description: Contains the transition history of all states in the environment. Differs from the history of an agent which may not
+>     - Description: Returns state history of the environment since last reset.
+>
+> * `reward_function()`
+>     - Accepts:
+>         - `action`: *array*
+>             - Description: Type is currently set to match environment but any type can be used as long as the function is able to still return the necessary variables. Some encoding of a valid action in the environment which can determine the value of the action in the given state.
+>         - `state`: *array*
+>             - Description: Variable containing a possible state of the environment (eg. position in the environment). Does not have to be the current state of the environment.
+>     - Returns:
+>         - `reward`: *float*
+>             - Description: Reward of taking the given action in the given state.
