@@ -6,7 +6,7 @@ from neuralplayground.backend import default_training_loop, episode_based_traini
 
 from .simulation_manager import SingleSim
 
-sim1_params = {
+weber_in_2d_params = {
     "simulation_id": "weber_2018_in_simple2D",
     "agent_class": Weber2018,
     "agent_params": {
@@ -42,7 +42,7 @@ sim1_params = {
     "training_loop_params": {"n_steps": 1000},
 }
 
-sim2_params = {
+stachenfeld_in_2d_params = {
     "simulation_id": "stachenfeld_2018_in_simple2D",
     "agent_class": Stachenfeld2018,
     "env_class": Simple2D,
@@ -66,7 +66,7 @@ sim2_params = {
     "training_loop_params": {"t_episode": 100, "n_episode": 100},
 }
 
-sim3_params = {
+stachenfeld_in_sargolini_params = {
     "simulation_id": "stachenfeld_2018_in_Sargolini2006",
     "agent_class": Stachenfeld2018,
     "env_class": Sargolini2006,
@@ -88,7 +88,7 @@ sim3_params = {
     "training_loop_params": {"t_episode": 100, "n_episode": 100},
 }
 
-sim4_params = {
+weber_in_sargolini_params = {
     "simulation_id": "weber_2018_in_Sargolini2006",
     "env_class": Sargolini2006,
     "env_params": {
@@ -123,7 +123,7 @@ sim4_params = {
 }
 
 
-sim5_params = {
+stachenfeld_in_hafting_params = {
     "simulation_id": "stachenfeld_2018_in_Hafting2008",
     "agent_class": Stachenfeld2018,
     "env_class": Hafting2008,
@@ -145,7 +145,7 @@ sim5_params = {
     "training_loop_params": {"t_episode": 100, "n_episode": 100},
 }
 
-sim6_params = {
+weber_in_hafting_params = {
     "simulation_id": "weber_2018_in_Hafting2008",
     "agent_class": Weber2018,
     "agent_params": {
@@ -179,7 +179,7 @@ sim6_params = {
     "training_loop_params": {"n_steps": 1000},
 }
 
-sim7_params = {
+weber_in_wernle_params = {
     "simulation_id": "weber_2018_in_Wernle",
     "agent_class": Weber2018,
     "agent_params": {
@@ -210,7 +210,7 @@ sim7_params = {
 }
 
 
-sim8_params = {
+weber_in_merging_room_params = {
     "simulation_id": "weber_2018_in_Merging_Room",
     "agent_class": Weber2018,
     "agent_params": {
@@ -249,11 +249,11 @@ sim8_params = {
 
 
 # Time in minutes to remove
-sim_object1 = SingleSim(**sim1_params)
-sim_object2 = SingleSim(**sim2_params)
-sim_object3 = SingleSim(**sim3_params)
-sim_object4 = SingleSim(**sim4_params)
-sim_object5 = SingleSim(**sim5_params)
-sim_object6 = SingleSim(**sim6_params)
-sim_object7 = SingleSim(**sim7_params)
-sim_object8 = SingleSim(**sim8_params)
+weber_in_wernle = SingleSim(**weber_in_wernle_params)
+weber_in_sargolini = SingleSim(**weber_in_sargolini_params)
+weber_in_merging_room = SingleSim(**weber_in_merging_room_params)
+weber_in_hafting = SingleSim(**weber_in_hafting_params)
+weber_in_2d = SingleSim(**weber_in_2d_params)
+stachenfeld_in_hafting = SingleSim(**stachenfeld_in_hafting_params)
+stachenfeld_in_2d = SingleSim(**stachenfeld_in_2d_params)
+stachenfeld_in_sargolini = SingleSim(**stachenfeld_in_sargolini_params)
