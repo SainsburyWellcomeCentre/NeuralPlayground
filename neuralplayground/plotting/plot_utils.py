@@ -90,7 +90,7 @@ def make_plot_trajectories(arena_limits, x, y, ax, plot_every):
     return ax
 
 
-def make_plot_rate_map(h, ax, title, title_x, title_y, title_cbar, use_cbar=True):
+def make_plot_rate_map(h, ax, title, title_x, title_y, title_cbar):
     """plot function with formating of ratemap plot
 
     Parameters
@@ -113,12 +113,11 @@ def make_plot_rate_map(h, ax, title, title_x, title_y, title_cbar, use_cbar=True
 
     config_vars = PLOT_CONFIG.RATEMAP
     sc = ax.imshow(h, cmap=config_vars.RATEMAP_COLORMAP)
-    if use_cbar:
-        cbar = plt.colorbar(sc, ax=ax, ticks=[np.min(h), np.max(h)], orientation="horizontal")
-        cbar.ax.set_xlabel(title_cbar, fontsize=config_vars.COLORBAR_LABEL_FONTSIZE)
-        cbar.ax.set_xticklabels(
-            [np.round(np.min(h), decimals=2), np.round(np.max(h), decimals=2)], fontsize=config_vars.TICK_LABEL_FONTSIZE
-        )
+    cbar = plt.colorbar(sc, ax=ax, ticks=[np.min(h), np.max(h)], orientation="horizontal")
+    cbar.ax.set_xlabel(title_cbar, fontsize=config_vars.COLORBAR_LABEL_FONTSIZE)
+    cbar.ax.set_xticklabels(
+        [np.round(np.min(h), decimals=2), np.round(np.max(h), decimals=2)], fontsize=config_vars.TICK_LABEL_FONTSIZE
+    )
     ax.set_title(title, fontsize=config_vars.TITLE_FONTSIZE)
     ax.set_ylabel(title_y, fontsize=config_vars.LABEL_FONTSIZE)
     ax.set_xlabel(title_x, fontsize=config_vars.LABEL_FONTSIZE)

@@ -10,15 +10,12 @@ import importlib.util
 # NeuralPlayground Imports
 from neuralplayground.arenas.discritized_objects import DiscreteObjectEnvironment
 from neuralplayground.arenas.batch_environment import BatchEnvironment
-from neuralplayground.arenas.hafting_2008 import Hafting2008
 from neuralplayground.agents.whittington_2020 import Whittington2020
-import neuralplayground.agents.whittington_2020_extras.whittington_2020_parameters as parameters
 import neuralplayground.agents.whittington_2020_extras.whittington_2020_analyse as analyse
 import neuralplayground.agents.whittington_2020_extras.whittington_2020_plot as plot
-# import analyse
-# import plot
 
 # NeuralPlayground Experiment Imports
+from neuralplayground.arenas.hafting_2008 import Hafting2008
 from neuralplayground.experiments import Sargolini2006Data
 
 # Select trained model
@@ -116,7 +113,7 @@ occupation = analyse.location_occupation(forward, tem, environments)
 g, p = analyse.rate_map(forward, tem, environments)
 from_acc, to_acc = analyse.location_accuracy(forward, tem, environments)
 
-agent.plot_rate_map(p)
+agent.plot_rate_map(g)
 plt.show()
 
 # Plot results of agent comparison and zero-shot inference analysis
@@ -128,8 +125,6 @@ plt.plot(analyse.smooth(np.mean(np.array([env for env_i, env in enumerate(correc
 plt.ylim(0, 1)
 plt.legend()
 plt.title('Zero-shot inference: ' + str(np.mean([np.mean(env) for env_i, env in enumerate(zero_shot) if envs_to_avg[env_i]]) * 100) + '%')
-
-plot.plot_cells(p[env_to_plot], g[env_to_plot], environments[env_to_plot], n_f_ovc=(params['n_f_ovc'] if 'n_f_ovc' in params else 0), columns = 25)
 
 plt.figure()
 ax = plt.subplot(1,2,1)
