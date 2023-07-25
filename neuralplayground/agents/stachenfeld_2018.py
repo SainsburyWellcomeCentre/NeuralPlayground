@@ -409,10 +409,13 @@ class Stachenfeld2018(AgentCore):
     def plot_rate_map(
         self,
         sr_matrix=None,
-        eigen_vectors: Union[int, list, tuple] = random.randint(5, 19),
+        eigen_vectors: Union[int, list, tuple] = None,
         ax: mpl.axes.Axes = None,
         save_path: str = None,
     ):
+        if eigen_vectors is None:
+            eigen_vectors = random.randint(5, 19)
+
         if isinstance(eigen_vectors, int):
             rate_map_mat = self.get_rate_map_matrix(sr_matrix, eigen_vector=eigen_vectors)
 
