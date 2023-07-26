@@ -1,4 +1,3 @@
-
 # Style Guide 
 
 We are following to the best of our abilities the [PEP8](https://www.python.org/dev/peps/pep-0008/) and [numpy docstring](https://numpydoc.readthedocs.io/en/latest/format.html) style convention. Note: Pycharm has an inbuild checking framework that will help you follow the style guide. 
@@ -273,3 +272,65 @@ Additionally your class will also inherit the necessary methods that the rest of
 >         - `self.state`: *ndarray*
 >             - Description: Vector of the x and y coordinate of the position of the animal in the environment (ndarray has shape (2,)).
 >     - Description: Reset the environment variables and history.
+>
+> * `step()`
+>     - Accepts:
+>         - `action`: *ndarray (2,)*
+>             - Default: `False`
+>             - Description: Array containing the action of the agent, in this case the delta_x and detla_y increment to position.
+>         - `normalize_step`: *bool*
+>             - Default: None
+>             - Description: If true, the action is normalized to have unit size, then scaled by the agent step size.
+>     - Returns:
+>         - `reward`: *float*
+>             - Description: The reward that the agent receives for taking the given action in the current state
+>         - `new_state`: *ndarray*
+>             - Description: Updated state with the coordinates of the body position and head directions respectively.
+>         - `observation`: *ndarray*
+>             - Description: Array of the new observation of the agent in the environment (which is not necessarily the same as the state of the environment).
+>     - Description: Given an action for the current state of the environment, runs the environment dynamics for the action and increases global counters. Then returns the new observation, new state and reward resulting from the action in that state.
+>
+> * `validate_action()`
+>     - Accepts:
+>         - `pre_state`: *ndarray (2,)*
+>             - Description: 2d position of the agent in the environment before the action.
+>         - `new_state`: *ndarray (2,)*
+>             - Description: Potential 2d position of the agent in the environment after the action.
+>     - Returns:
+>         - `new_state`: *ndarray (2,)*
+>             - Description: The corrected new state. If it is not crossing the wall, then the new_state stays the same, if the state cross the wall, new_state will be corrected to a valid place without crossing the wall.
+>         - `crossed_wall`: *bool*
+>             - Description: True if the change in state crossed a wall and was corrected.
+>     - Description: Check if the new state is crossing any walls in the arena by taking an action. Corrects the new state if a wall is crossed.
+>
+> * `plot_trajectory()`
+>     - Accepts:
+>         - `history_data`: *list*
+>             - Default: None
+>             - Description: If None, it will use history data saved as attribute of the arena. Othwerwise use as a custom function holding list of interactions.
+>         - `ax`: *mpl.axes._subplots.AxesSubplot (matplotlib axis from subplots)*
+>             - Default: None
+>             - Description: axis from subplot from matplotlib where the trajectory will be plotted.
+>         - `return_figure`: *bool*
+>             - Default: `False`
+>             - Description: If true, it will return the figure variable generated to make the plot.
+>         - `save_path`: *str*, *list of str* or *tuple of str*
+>             - Default: `False`
+>             - Description: The saving path of the generated figure, if None, no figure is saved.
+>         - `plot_every`: *int*
+>             - Default: 1
+>             - Description: Number of time steps between plot points on the figure.  
+>     - Returns:
+>         - `ax`: *mpl.axes._subplots.AxesSubplot (matplotlib axis from subplots)*
+>             - Description: Modified axis where the trajectory is plotted.
+>         - `f`: *matplotlib.figure*
+>             - Description: If return_figure parameters is True this figure will be returned.
+>     - Description: Plot the Trajectory of the agent in the environment.
+>
+> * `render()`
+>     - Accepts:
+>         - `history_length`: *int*
+>             - Default: 30
+>             - Description: Number of time steps maintained in the render of the history. 
+>     - Returns: None
+>     - Description: Render the environment live through iterations.
