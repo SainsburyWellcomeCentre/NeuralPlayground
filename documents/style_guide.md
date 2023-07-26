@@ -102,7 +102,7 @@ Additionally the class will also inherit the necessary methods that the rest of 
 
 To add an environment we follow a similar convention to the Agent class. If the environment is based on a publication begin by creating a file with the naming convention of "author_date.py" where "author" is the name of the lead author and "date" is the year the work was published. Otherwise create a file with a descriptive name such as "connected_rooms.py". There are two possible classes which a new class could inherit to obtain the minimal set of attributes and methods necessary to function flexibly within the other pipelines implemented by NeuralPlayground. Firstly "agent_core.py" which provides the most basic interface necessary. Secondly, "simple2d.py" provides a richer interface which can be used to create 2-dimensional navigation based domains and inherits "agent_core.py". We will begin by describing "agent_core.py" and then move on to describe "simple2d.py".
 
-### agent_core.py
+### arena_core.py
 The core attributes are as follows:
 
 > * `state` : *array* <!-- all these vars say "Define within each subclass for specific environments" when used in functions which kind of defeats the point -->
@@ -231,4 +231,45 @@ In addition some new attributes are added:
 > * `agent_step_size`: *float*
 >     - Size of the step when executing movement, `agent_step_size*global_steps` will give a measure of the total distance traversed by the agent.
 
-Additionally the class will also inherit the necessary methods that the rest of the library will use to interface with its objects. These are as follows:
+Additionally your class will also inherit the necessary methods that the rest of the library will use to interface with its objects. "simple2d.py" overloads the following functions from "arena_core.py" These are as follows:
+
+> * `__init__( )` <!-- this function doesn't set defaults for any of the necessary added variables. It also expects them as kwarge, this seems like an issue. It calls the super init on the dictionary but super only sets a value for time_step_size. It also does have an if statement checking these kwarg are there -->
+>     - Accepts:  
+>         - `environment_name` : *str* 
+>             - Default: "2DEnv"
+>         - `time_step_size` : *float*
+>             - Default: 1.0
+>         - `env_kwargs`: *dict* 
+>             - Default: {}
+>     - Returns: None
+>     - Description: Function which initialises an object of the class. Naming the object is the only required input. All other inputs are passed as keyword arguments that are used to create metadata or custom attributes or provide further functionality to custom methods.
+>
+>  * `_create_default_walls( )` 
+>     - Accepts: None
+>     - Returns: None
+>     - Description: Generate walls to outline the arena based on the limits given in kwargs when initializing the object.
+        Each wall is presented by a matrix
+            [[xi, yi],
+             [xf, yf]]
+        where xi and yi are x y coordinates of one limit of the wall, and xf and yf are coordinates of the other limit.
+        Walls are added to default_walls list, to then merge it with custom ones.
+>
+> * `_create_custom_walls()`
+>     - Accepts: None
+>     - Returns: None 
+>     - Description: Custom walls method used to add new walls within the outlined boundary of the room. In this case it is empty since the environment is a simple square room. Override this method to generate more walls, see jupyter notebook with examples.
+>  
+> * `reset()`
+>     - Accepts:
+>         - `random_state`: *bool*
+>             - Default: `False`
+>             - Description: If True, sample a new position uniformly within the arena, use default otherwise.
+>         - `custom_state`: *np.ndarray*
+>             - Default: None
+>             - Description: If given, use this array to set the initial state.
+>     - Returns:
+>         - `observation`: *ndarray*
+>             - Description: Array of the observation of the agent in the environment. Because this is a fully observable environment, make_observation returns the state of the environment (Could be modified as the environments are evolves)
+>         - `self.state`: *ndarray*
+>             - Description: Vector of the x and y coordinate of the position of the animal in the environment (ndarray has shape (2,)).
+>     - Description: Reset the environment variables and history.
