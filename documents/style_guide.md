@@ -207,3 +207,28 @@ Additionally the class will also inherit the necessary methods that the rest of 
 >     - Returns:
 >         - `reward`: *float*
 >             - Description: Reward of taking the given action in the given state.
+
+### simple2d.py
+The overloaded attributes which "simple2d.py" makes more specialized are as follows:
+
+> * `state` : *ndarray*
+>     - Contains:
+>         - `head_direction` : *ndarray*
+>             - Contains the x and y coordinates of the agent's head relative to the body. <!-- check relative to body -->
+>         - `position` : *ndarray*
+>             - Contains the x and y coordinates of the agent's position in the environment.
+>     - Description: Contains the x, y coordinate of the position and head direction of the agent (will be further developed).
+> * `history`: *list of dicts*
+>     - Saved history over simulation steps (action, state, new_state, reward, global_steps)
+
+In addition some new attributes are added:
+> * `room_width`: *int*
+>     - Size of the environment in the x axis (0th axis of an ndarray array; the number of rows).
+> * `room_depth`: *int*
+>     - Size of the environment in the y axis (1st axis of an ndarray array; the number of columns).
+> * `observation`: *ndarray*
+>     - This is a  fully observable environment. Array of the current observation of the agent in the environment (Could be modified as the environment evolves) `make_observation()` returns the state. <!-- why do you need the var and the function -->
+> * `agent_step_size`: *float*
+>     - Size of the step when executing movement, `agent_step_size*global_steps` will give a measure of the total distance traversed by the agent.
+
+Additionally the class will also inherit the necessary methods that the rest of the library will use to interface with its objects. These are as follows:
