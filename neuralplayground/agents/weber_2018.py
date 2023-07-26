@@ -336,6 +336,7 @@ class Weber2018(AgentCore):
 
         self.we = np.clip(self.we, a_min=0, a_max=np.amax(self.we))  # Negative weights to zero
         self.wi = np.clip(self.wi, a_min=0, a_max=np.amax(self.wi))
+        return {"delta_we": delta_we, "delta_wi": delta_wi}
 
     def full_average_update(self, exc_normalization: bool = True):
         """
@@ -379,7 +380,45 @@ class Weber2018(AgentCore):
         for i in range(self.xy_combinations.shape[0]):
             self.update(exc_normalization=exc_normalization, pos=xy_array[i, :])
 
-    def plot_rates(self, save_path: str = None, ax: mpl.axes.Axes = None):
+    def get_rate_map_matrix(
+        self,
+    ):
+        """
+        Get the ratemap matrix of the network
+
+        Returns
+        -------
+        ratemap_matrix : ndarray
+            (self.resolution_width, self.resolution_depth) with the ratemap matrix
+        """
+        r_out_im = self.get_full_output_rate()
+        r_out_im = r_out_im.reshape((self.resolution_width, self.resolution_depth))
+        return r_out_im
+
+    def plot_rate_map(self, save_path: str = None, ax: mpl.axes.Axes = None):
+        """
+        Plot current rates and an example of inhibitory and excitatory neuron
+
+        Parameters
+        ----------
+        save_path : str
+            Path to save the figure. Default None, it doesn't save the figure
+        ax : ndarray of matplotlib.axis
+            (3,) with 3 axis to make plots from matplotlib, if None it will create an entire figure
+        """
+        if ax is None:
+            f, ax = plt.subplots()
+        r_out_im = self.get_full_output_rate()
+        r_out_im = r_out_im.reshape((self.resolution_width, self.resolution_depth))
+        make_plot_rate_map(r_out_im.T, ax, "Out rate", "width", "depth", "Firing rate")
+
+        if save_path is not None:
+            plt.savefig(save_path, bbox_inches="tight")
+            plt.close("all")
+        else:
+            return ax
+
+    def plot_all_rates(self, save_path: str = None, ax: mpl.axes.Axes = None):
         """
         Plot current rates and an example of inhibitory and excitatory neuron
 

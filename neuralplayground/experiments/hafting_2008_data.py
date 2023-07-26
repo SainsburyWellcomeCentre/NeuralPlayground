@@ -13,6 +13,7 @@ from neuralplayground.datasets import fetch_data_path
 from neuralplayground.utils import clean_data, get_2D_ratemap
 from neuralplayground.plotting.plot_utils import make_plot_trajectories , make_plot_rate_map
 
+
 from .experiment_core import Experiment
 
 
@@ -267,6 +268,7 @@ class Hafting2008Data(Experiment):
 
         return time_array, test_spikes, x, y
 
+
     def plot_recording_tetr(
         self,
         recording_index: Union[int, tuple, list] = None,
@@ -331,12 +333,16 @@ class Hafting2008Data(Experiment):
         # Generate axis in case ax is None
         if ax is None:
             f, ax = plt.subplots(1, 1, figsize=(10, 8))
-
         # Compute ratemap matrices from data
+        session_data, rev_vars, rat_info = self.get_recording_data(recording_index)
+        if tetrode_id is None:
+            tetrode_id = self._find_tetrode(rev_vars)
+
+
         h, binx, biny = self.recording_tetr(recording_index, save_path, tetrode_id, bin_size)
 
         # Use auxiliary function to make the plot
-        ax = make_plot_rate_map(h, ax, tetrode_id,"width","depth","Firing rate")
+        ax = make_plot_rate_map(h, ax, 'rat: '+str(rat_info['rat_id'])+' sess: '+str(rat_info['sess'])+' tetrode: '+tetrode_id,"width","depth","Firing rate")
         if save_path is None:
             return h, binx, biny
         else:
@@ -446,8 +452,6 @@ class Hafting2008Data(Experiment):
         """
 
         # Recursive call of this function in case of list or tuple
-
-        # Recall recorded data
         session_data, rev_vars, rat_info = self.get_recording_data(recording_index)
         if tetrode_id is None:
             tetrode_id = self._find_tetrode(rev_vars)
@@ -462,6 +466,4 @@ class Hafting2008Data(Experiment):
         h, binx, biny = get_2D_ratemap(time_array, test_spikes, x, y, x_size=int(arena_width / bin_size),
                                        y_size=int(arena_depth / bin_size), filter_result=True)
 
-
-        # Return ratemap values, x bin limits and y bin limits
         return h, binx, biny

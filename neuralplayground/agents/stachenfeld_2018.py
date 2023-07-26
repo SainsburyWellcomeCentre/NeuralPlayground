@@ -7,7 +7,9 @@ This implementation can interact with environments from the package as shown in 
 Check examples/Stachenfeld_2018_example.ipynb
 """
 
+import random
 import sys
+from typing import Union
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -126,8 +128,8 @@ class Stachenfeld2018(AgentCore):
         # Variables for the SR-agent state space
         self.resolution_depth = int(self.state_density * self.room_depth)
         self.resolution_width = int(self.state_density * self.room_width)
-        self.x_array = np.linspace(-self.room_width / 2, self.room_width / 2, num=self.resolution_depth)
-        self.y_array = np.linspace(self.room_depth / 2, -self.room_depth / 2, num=self.resolution_width)
+        self.x_array = np.linspace(-self.room_width / 2, self.room_width / 2, num=self.resolution_width)
+        self.y_array = np.linspace(self.room_depth / 2, -self.room_depth / 2, num=self.resolution_depth)
         self.mesh = np.array(np.meshgrid(self.x_array, self.y_array))
         self.xy_combinations = self.mesh.T.reshape(-1, 2)
         self.width = int(self.room_width * self.state_density)
@@ -330,15 +332,15 @@ class Stachenfeld2018(AgentCore):
         L = b.reshape(a.shape + (self.n_state,))
         curr_state_vec = L
 
-        update_val = curr_state_vec + self.gamma * self.srmat[:, next_state] - self.srmat[:, self.curr_state]
-        self.srmat[:, self.curr_state] = self.srmat[:, self.curr_state] + self.learning_rate * update_val
+        td_error = curr_state_vec + self.gamma * self.srmat[:, next_state] - self.srmat[:, self.curr_state]
+        self.srmat[:, self.curr_state] = self.srmat[:, self.curr_state] + self.learning_rate * td_error
 
-        self.grad_history.append(np.sqrt(np.sum(update_val**2)))
+        self.grad_history.append(np.sqrt(np.sum(td_error**2)))
         self.curr_state = next_state
 
-        return self.srmat
+        return {"state_td_error": td_error}
 
-    def update_successor_rep_td_full(self, n_episode: int = None, t_episode: int = None):
+    def update_successor_rep_td_full(self, n_episode: int = 100, t_episode: int = 100):
         """
         Compute the successor representation matrix using TD learning
 
@@ -348,9 +350,7 @@ class Stachenfeld2018(AgentCore):
                 successor representation matrix
 
         """
-
         random_state = np.random.RandomState(1234)
-
         t_elapsed = 0
         srmat0 = np.eye(self.n_state)
         srmat_full = srmat0.copy()
@@ -372,6 +372,17 @@ class Stachenfeld2018(AgentCore):
                 t_elapsed += 1
                 self.srmat_full_td = srmat_full
         return self.srmat_full_td
+
+    def get_rate_map_matrix(
+        self,
+        sr_matrix=None,
+        eigen_vector: int = 10,
+    ):
+        if sr_matrix is None:
+            sr_matrix = self.successor_rep_solution()
+        evals, evecs = np.linalg.eig(sr_matrix)
+        r_out_im = evecs[:, eigen_vector].reshape((self.resolution_width, self.resolution_depth)).real
+        return r_out_im
 
     def plot_transition(self, save_path: str = None, ax: mpl.axes.Axes = None):
         """
@@ -395,31 +406,34 @@ class Stachenfeld2018(AgentCore):
             plt.close("all")
         return ax
 
-    def plot_eigen(self, matrix: np.ndarray, save_path: str, eigen=(0, 1), ax: mpl.axes.Axes = None):
-        """ "
-        Plot the matrix and the 4 largest modes of its eigen-decomposition
+    def plot_rate_map(
+        self,
+        sr_matrix=None,
+        eigen_vectors: Union[int, list, tuple] = None,
+        ax: mpl.axes.Axes = None,
+        save_path: str = None,
+    ):
+        if eigen_vectors is None:
+            eigen_vectors = random.randint(5, 19)
 
-        Parameters
-        ----------
-        matrix: array
-            The matrix that will be plotted
-        eigen:  np.ndarray
-            Which eigenvectors you would like to plot
-        save_path: string
-            Path to save the plot
-        """
-        evals, evecs = np.linalg.eig(matrix)
-        if ax is None:
-            f, ax = plt.subplots(1, len(eigen), figsize=(4 * len(eigen), 5))
-            if len(eigen) == 1:
-                evecs_0 = evecs[:, eigen[0]].reshape(self.depth, self.width).real
-                make_plot_rate_map(evecs_0, ax, "Eig_0", "width", "depth", "Firing rate")
-            else:
-                for i, eig in enumerate(eigen):
-                    evecs_0 = evecs[:, eig].reshape(self.depth, self.width).real
-                    make_plot_rate_map(evecs_0, ax[i], "Eig" + str(eig), "width", "depth", "Firing rate")
+        if isinstance(eigen_vectors, int):
+            rate_map_mat = self.get_rate_map_matrix(sr_matrix, eigen_vector=eigen_vectors)
+
+            if ax is None:
+                f, ax = plt.subplots(1, 1, figsize=(4, 5))
+            make_plot_rate_map(rate_map_mat, ax, "Rate map: Eig" + str(eigen_vectors), "width", "depth", "Firing rate")
+        else:
+            if ax is None:
+                f, ax = plt.subplots(1, len(eigen_vectors), figsize=(4 * len(eigen_vectors), 5))
+            if isinstance(ax, mpl.axes.Axes):
+                ax = [
+                    ax,
+                ]
+            for i, eig in enumerate(eigen_vectors):
+                rate_map_mat = self.get_rate_map_matrix(sr_matrix, eigen_vector=eig)
+                make_plot_rate_map(rate_map_mat, ax[i], "Rate map: " + "Eig" + str(eig), "width", "depth", "Firing rate")
         if save_path is None:
             pass
         else:
             plt.savefig(save_path, bbox_inches="tight")
-        return ax
+            return ax

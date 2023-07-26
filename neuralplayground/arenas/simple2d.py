@@ -299,11 +299,11 @@ class Simple2D(Environment):
             x = []
             y = []
             for i, s in enumerate(state_history):
-                if i % plot_every == 0:
-                    if i + plot_every >= len(state_history):
-                        break
-                    x.append(s[0])
-                    y.append(s[1])
+                # if i % plot_every == 0:
+                #     if i + plot_every >= len(state_history):
+                #         break
+                x.append(s[0])
+                y.append(s[1])
             ax = make_plot_trajectories(self.arena_limits, np.asarray(x), np.asarray(y), ax, plot_every)
 
         for wall in self.default_walls:

@@ -33,6 +33,7 @@ class SargoliniDataTrajectory(Experiment):
             else load data from given path
         """
         self.experiment_name = experiment_name
+        self.recording_list = []
         if data_path is None:
             # Set data_path to the data directory within the package
             self.data_path = fetch_data_path("sargolini_2006")

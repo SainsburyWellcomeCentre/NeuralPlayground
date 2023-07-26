@@ -1,16 +1,25 @@
-# Copyright 2018 Google LLC
+# Copyright https://en.wikipedia.org/wiki/List_of_baryons
+# MIT License
 #
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
+# Copyright (c) 2018 eng-tools
 #
-#     https://www.apache.org/licenses/LICENSE-2.0
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
 #
-# Unless required by apndimageplicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
 # ==============================================================================
 
 """Grid score calculations.
@@ -33,6 +42,7 @@ class GridScorer(object):
 
     def __init__(self, nbins):
         """Scoring ratemaps given trajectories.
+
         Args:
           nbins: Number of bins per dimension in the ratemap.
           coords_range: Environment coordinates range.
@@ -138,11 +148,13 @@ class GridScorer(object):
             * a binary mask around the extent of the 6 central fields
             * values of the rotation procedure used to calculate gridness
             * ellipse axes and angle (if allProps is True and the it worked)
+
         Notes
         -----
         The output from this method can be used as input to the show() method
         of this class.
         When it is the plot produced will display a lot more informative.
+
         See Also
         --------
         ephysiopy.common.binning.autoCorr2D()
@@ -316,7 +328,21 @@ class GridScorer(object):
             return np.hypot(x, y), np.arctan2(y, x)
 
     def get_scores(self, rate_map):
-        """Get summary of scrores for grid cells."""
+        """Get summary of scrores for grid cells.
+
+        Parameters:
+        -----------
+        rate_map : np.ndarray
+            2D array of firing rate map.
+
+        Returns:
+        --------
+        sac : np.ndarray
+            2D array of spatial autocorrelation.
+        stGrd : dict
+            Dictionary of grid cell properties.
+
+        """
         sac = self.autoCorr2D(rate_map, ~np.isfinite(rate_map), tol=1e-11)
         stGrd = self.grid_field_props(sac)
 
@@ -387,13 +413,36 @@ class GridScorer(object):
             return np.sort(theta.compress(theta >= 0))[0]
 
     def plot_sac(
-        self, sac, mask_params=None, ax=None, title=None, *args, **kwargs
+        self, sac, mask_params=None, ax=None, title=None, score="", *args, **kwargs
     ):  # pylint: disable=keyword-arg-before-vararg
-        """Plot spatial autocorrelogram."""
+        """Plot spatial autocorrelogram.
+        Parameters
+
+        ----------
+        sac : np.ndarray
+            2D array of spatial autocorrelation.
+        mask_params : tuple, optional
+            (inner_radius, outer_radius) of the ring mask.
+        ax : matplotlib.axes.Axes, optional
+            The axes to plot on.
+        title : str, optional
+            The title of the plot.
+        score : str, optional
+            The score of the plot.
+        *args, **kwargs : optional
+            Additional arguments to pass to ax.imshow().
+
+        Returns
+
+        -------
+        ax : matplotlib.axes.Axes
+            The axes the plot was drawn on.
+
+        """
         if ax is None:
             ax = plt.gca()
         # Plot the sac
-        ax = make_plot_rate_map(sac, ax, "sac", "width", "depth", "sac rate")
+        ax = make_plot_rate_map(sac, ax, "sac plot with gridscore:" + score, "width", "depth", "sac rate")
         # ax.imshow(sac, interpolation="none", *args, **kwargs)
         # ax.pcolormesh(useful_sac, *args, **kwargs)
         # Plot a ring for the adequate mask
@@ -479,7 +528,36 @@ class GridScorer(object):
             # get the correlation between the original and rotated images
             rotationalCorrVals[angle] = stats.pearsonr(autoCorrMiddleRescaled.ravel()[~allNans], rotatedA.ravel()[~allNans])[0]
             rotationArr[idx] = rotationalCorrVals[angle]
-        gridscore = np.min((rotationalCorrVals[60], rotationalCorrVals[120])) - np.max(
+        gridscore = np.nanmin((rotationalCorrVals[60], rotationalCorrVals[120])) - np.nanmax(
             (rotationalCorrVals[150], rotationalCorrVals[30], rotationalCorrVals[90])
         )
         return gridscore, rotationalCorrVals, rotationArr
+
+    def plot_grid_score(self, r_out_im, plot=True, ax=None):
+        """
+        Get the grid score of the network
+
+        Parameters
+        ----------
+        r_out_im : np.ndarray
+            2D array of spatial autocorrelation.
+        plot : bool, optional
+            Whether to plot the spatial autocorrelation.
+        ax : matplotlib.axes.Axes, optional
+            The axes to plot on.
+
+        Returns
+        -------
+        grid_score : float
+            Grid score of the network
+        """
+        score = self.get_scores(np.asarray(r_out_im))
+        if plot:
+            if ax is None:
+                fig, ax = plt.subplots()
+            gridscore = str(np.around(score[1]["gridscore"], decimals=4, out=None))
+            self.plot_sac(sac=score[0], ax=ax, score=gridscore)
+        else:
+            ax.text(0, 0.7, "Grid_score: " + str(np.around(score[1]["gridscore"], decimals=4, out=None)), fontsize=10)
+            ax.set_axis_off()
+        return score
