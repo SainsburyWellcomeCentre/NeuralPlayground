@@ -236,14 +236,14 @@ def make_agent_comparison(envs, parameters, agents, exps=None, recording_index=N
         env.plot_trajectory(ax=ax[1, k])
         ax[2, k].set_axis_off()
         # render_mpl_table( pd.DataFrame([parameters[0]["env_params"]]),ax=ax[0, k],)
-        if hasattr(env, "show_data"):
-            ax[0, k].text(0, 1.1, env.environment_name, fontsize=config_vars.FONTSIZE)
+
+        ax[0, k].text(0, 1.1, env.environment_name, fontsize=config_vars.FONTSIZE)
+        ax[0, k].set_axis_off()
+        for p, text in enumerate(parameters[k]["env_params"]):
+            ax[0, k].text(0, 1, "Event param", fontsize=10)
+            variable = parameters[k]["env_params"][text]
+            ax[0, k].text(0, 0.9 - ((p) * 0.1), text + ": " + str(variable), fontsize=10)
             ax[0, k].set_axis_off()
-            for p, text in enumerate(parameters[k]["env_params"]):
-                ax[0, k].text(0, 1, "Event param", fontsize=10)
-                variable = parameters[k]["env_params"][text]
-                ax[0, k].text(0, 0.9 - ((p) * 0.1), text + ": " + str(variable), fontsize=10)
-                ax[0, k].set_axis_off()
 
         if hasattr(env, "show_data"):
             ax[2, k].set_axis_off()
