@@ -1,31 +1,34 @@
-import torch
-import numpy as np
 import copy as cp
-import os
 import datetime
 import logging
+import os
+
+import numpy as np
+import torch
+
 
 def inv_var_weight(mus, sigmas):
     """
     Calculates tensors of inverse-variance weighted averages and tensors of inverse-variance weighted standard deviations.
     Parameters
     ----------
-        mus : list of torch tensors 
+        mus : list of torch tensors
             List of tensors of means of distributions
         sigmas : list of torch tensors
             List of tensors of standard deviations of distributions
     """
     # Stack vectors together along first dimension
-    mus = torch.stack(mus, dim = 0)
-    sigmas = torch.stack(sigmas, dim = 0)
+    mus = torch.stack(mus, dim=0)
+    sigmas = torch.stack(sigmas, dim=0)
     # Calculate inverse variance weighted variance from sum over reciprocal of squared sigmas
-    inv_var_var = 1.0 / torch.sum(1.0 / (sigmas**2), dim = 0)
+    inv_var_var = 1.0 / torch.sum(1.0 / (sigmas**2), dim=0)
     # Calculate inverse variance weighted average
-    inv_var_avg = torch.sum(mus / (sigmas**2), dim = 0) * inv_var_var
+    inv_var_avg = torch.sum(mus / (sigmas**2), dim=0) * inv_var_var
     # Convert weigthed variance to sigma
     inv_var_sigma = torch.sqrt(inv_var_var)
     # And return results
     return inv_var_avg, inv_var_sigma
+
 
 def softmax(x):
     """
@@ -34,11 +37,13 @@ def softmax(x):
     # Return torch softmax
     return torch.nn.Softmax(dim=-1)(x)
 
+
 def normalise(x):
     """
     Normalises (L2) vector of input to unit norm, using torch normalise function.
     """
     return torch.nn.functional.normalize(x, p=2, dim=-1)
+
 
 def relu(x):
     """
@@ -46,11 +51,14 @@ def relu(x):
     """
     return torch.nn.functional.relu(x)
 
+
 def leaky_relu(x):
     """
-    Applies leaky (meaning small negative slope instead of zeros) rectified linear activation unit to tensors of inputs, using torch leaky relu funcion
+    Applies leaky (meaning small negative slope instead of zeros) rectified linear activation unit to tensors
+    of inputs, using torch leaky relu funcion
     """
     return torch.nn.functional.leaky_relu(x)
+
 
 def squared_error(value, target):
     """
@@ -68,10 +76,11 @@ def squared_error(value, target):
     """
     # Return torch MSE loss
     if type(value) is list:
-        loss = [0.5 * torch.sum(torch.nn.MSELoss(reduction='none')(value[i], target[i]),dim=-1) for i in range(len(value))]
+        loss = [0.5 * torch.sum(torch.nn.MSELoss(reduction="none")(value[i], target[i]), dim=-1) for i in range(len(value))]
     else:
-        loss = 0.5 * torch.sum(torch.nn.MSELoss(reduction='none')(value, target),dim=-1)
+        loss = 0.5 * torch.sum(torch.nn.MSELoss(reduction="none")(value, target), dim=-1)
     return loss
+
 
 def cross_entropy(value, target):
     """
@@ -89,10 +98,11 @@ def cross_entropy(value, target):
     """
     # Return torch BCE loss
     if type(value) is list:
-        loss = [torch.nn.CrossEntropyLoss(reduction='none')(val, targ) for val, targ in zip(value, target)]
+        loss = [torch.nn.CrossEntropyLoss(reduction="none")(val, targ) for val, targ in zip(value, target)]
     else:
-        loss = torch.nn.CrossEntropyLoss(reduction='none')(value, target)
+        loss = torch.nn.CrossEntropyLoss(reduction="none")(value, target)
     return loss
+
 
 def downsample(value, target_dim):
     """
@@ -111,21 +121,24 @@ def downsample(value, target_dim):
     # Get input dimension
     value_dim = value.size()[-1]
     # Set places to break up input vector into chunks
-    edges = np.append(np.round(np.arange(0, value_dim, float(value_dim) / target_dim)),value_dim).astype(int)
+    edges = np.append(np.round(np.arange(0, value_dim, float(value_dim) / target_dim)), value_dim).astype(int)
     # Create downsampling matrix
-    downsample = torch.zeros((value_dim,target_dim), dtype = torch.float)
+    downsample = torch.zeros((value_dim, target_dim), dtype=torch.float)
     # Fill downsampling matrix with chunks
     for curr_entry in range(target_dim):
-        downsample[edges[curr_entry]:edges[curr_entry+1],curr_entry] = torch.tensor(1.0/(edges[curr_entry+1]-edges[curr_entry]), dtype=torch.float)
+        downsample[edges[curr_entry] : edges[curr_entry + 1], curr_entry] = torch.tensor(
+            1.0 / (edges[curr_entry + 1] - edges[curr_entry]), dtype=torch.float
+        )
     # Do downsampling by matrix multiplication
-    return torch.matmul(value,downsample)
+    return torch.matmul(value, downsample)
+
 
 def make_directories():
     """
     Returns directories for storing data during a model training run.
     """
     # Get current date for saving folder
-    date = datetime.datetime.today().strftime('%Y-%m-%d')
+    date = datetime.datetime.today().strftime("%Y-%m-%d")
     # Initialise the run and dir_check to create a new run folder within the current date
     run = 0
     dir_check = True
@@ -134,12 +147,12 @@ def make_directories():
     # Find the current run: the first run that doesn't exist yet
     while dir_check:
         # Construct new paths
-        run_path = '../Summaries2/' + date + '/torch_run' + str(run) + '/'
-        train_path = run_path + 'train'
-        model_path = run_path + 'model'
-        save_path = run_path + 'save'
-        script_path = run_path + 'script'
-        envs_path = script_path + '/envs'
+        run_path = "../Summaries2/" + date + "/torch_run" + str(run) + "/"
+        train_path = run_path + "train"
+        model_path = run_path + "model"
+        save_path = run_path + "save"
+        script_path = run_path + "script"
+        envs_path = script_path + "/envs"
         run += 1
         # And once a path doesn't exist yet: create new folders
         if not os.path.exists(train_path) and not os.path.exists(model_path) and not os.path.exists(save_path):
@@ -152,6 +165,7 @@ def make_directories():
     # Return folders to new path
     return run_path, train_path, model_path, save_path, script_path, envs_path
 
+
 def set_directories(date, run):
     """
     Returns directories for storing data during a model training run.
@@ -159,14 +173,15 @@ def set_directories(date, run):
     # Initialise all pahts
     train_path, model_path, save_path, script_path, run_path = None, None, None, None, None
     # Find the current run: the first run that doesn't exist yet
-    run_path = '../Summaries/' + date + '/run' + str(run) + '/'
-    train_path = run_path + 'train'
-    model_path = run_path + 'model'
-    save_path = run_path + 'save'
-    script_path = run_path + 'script'
-    envs_path = script_path + '/envs'
+    run_path = "../Summaries/" + date + "/run" + str(run) + "/"
+    train_path = run_path + "train"
+    model_path = run_path + "model"
+    save_path = run_path + "save"
+    script_path = run_path + "script"
+    envs_path = script_path + "/envs"
     # Return folders to new path
     return run_path, train_path, model_path, save_path, script_path, envs_path
+
 
 def make_logger(run_path):
     """
@@ -186,15 +201,16 @@ def make_logger(run_path):
     # Remove anly existing handlers so you don't output to old files, or to new files twice
     logger.handlers = []
     # Create a file handler, but only if the handler does
-    handler = logging.FileHandler(run_path + 'report.log')
+    handler = logging.FileHandler(run_path + "report.log")
     handler.setLevel(logging.INFO)
     # Create a logging format
-    formatter = logging.Formatter('%(asctime)s: %(message)s')
+    formatter = logging.Formatter("%(asctime)s: %(message)s")
     handler.setFormatter(formatter)
     # Add the handlers to the logger
     logger.addHandler(handler)
     # Return the logger object
     return logger
+
 
 def prepare_data_maps(data, prev_cell_maps, positions, pars):
     """
@@ -204,7 +220,7 @@ def prepare_data_maps(data, prev_cell_maps, positions, pars):
         data : list of torch tensors
             List of tensors of data
         prev_cell_maps : list of torch tensors
-            List of tensors of previous cell maps   
+            List of tensors of previous cell maps
         positions : list of torch tensors
             List of tensors of positions
         pars : dict
@@ -212,7 +228,7 @@ def prepare_data_maps(data, prev_cell_maps, positions, pars):
     Returns
     -------
         cell_list : list of torch tensors
-            List of tensors of cell maps    
+            List of tensors of cell maps
         positions : list of torch tensors
             List of tensors of positions
     """
@@ -230,6 +246,7 @@ def prepare_data_maps(data, prev_cell_maps, positions, pars):
     cell_list = [gs_all, ps_all]
 
     return cell_list, positions
+
 
 def cell_norm_online(cells, positions, current_cell_mat, pars):
     """
@@ -250,9 +267,9 @@ def cell_norm_online(cells, positions, current_cell_mat, pars):
             List of tensors of new cell maps
     """
     # for separate environments within each batch
-    envs = pars['diff_env_batches_envs']
-    n_states = pars['n_states_world']
-    n_envs_save = pars['n_envs_save']
+    envs = pars["diff_env_batches_envs"]
+    n_states = pars["n_states_world"]
+    n_envs_save = pars["n_envs_save"]
 
     num_cells = np.shape(cells)[1]
     n_trials = np.shape(cells)[2]
@@ -263,14 +280,15 @@ def cell_norm_online(cells, positions, current_cell_mat, pars):
 
     for env in range(n_envs_save):
         for ii in range(n_trials):
-            position = int(positions[ii][env]['id'])
+            position = int(positions[ii][env]["id"])
             cell_mat[env][position, :] += cells[env, :, ii]
         try:
             new_cell_mat[env] = cell_mat[env] + current_cell_mat[env]
-        except:
+        except (ValueError, TypeError):
             new_cell_mat[env] = cell_mat[env]
 
     return new_cell_mat
+
 
 def check_wall(pre_state, new_state, wall, wall_closenes=1e-5, tolerance=1e-9):
     """
@@ -299,7 +317,7 @@ def check_wall(pre_state, new_state, wall, wall_closenes=1e-5, tolerance=1e-9):
     b = pre_state - wall[0, :]
     try:
         intersection = np.linalg.inv(A) @ b
-    except:
+    except Exception:
         intersection = np.linalg.inv(A + np.identity(A.shape[0]) * tolerance) @ b
     smaller_than_one = intersection <= 1
     larger_than_zero = intersection >= 0
