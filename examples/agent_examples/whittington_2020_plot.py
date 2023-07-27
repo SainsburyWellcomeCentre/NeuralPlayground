@@ -12,7 +12,6 @@ from neuralplayground.arenas.discritized_objects import DiscreteObjectEnvironmen
 from neuralplayground.arenas.batch_environment import BatchEnvironment
 from neuralplayground.agents.whittington_2020 import Whittington2020
 import neuralplayground.agents.whittington_2020_extras.whittington_2020_analyse as analyse
-import neuralplayground.agents.whittington_2020_extras.whittington_2020_plot as plot
 
 # NeuralPlayground Experiment Imports
 from neuralplayground.arenas.hafting_2008 import Hafting2008
@@ -115,24 +114,15 @@ from_acc, to_acc = analyse.location_accuracy(forward, tem, environments)
 
 # Plot rate maps for grid or place cells
 agent.plot_rate_map(g)
-plt.show()
 
-# # Plot results of agent comparison and zero-shot inference analysis
-# filt_size = 41
-# plt.figure()
-# plt.plot(analyse.smooth(np.mean(np.array([env for env_i, env in enumerate(correct_model) if envs_to_avg[env_i]]),0)[1:], filt_size), label='tem')
-# plt.plot(analyse.smooth(np.mean(np.array([env for env_i, env in enumerate(correct_node) if envs_to_avg[env_i]]),0)[1:], filt_size), label='node')
-# plt.plot(analyse.smooth(np.mean(np.array([env for env_i, env in enumerate(correct_edge) if envs_to_avg[env_i]]),0)[1:], filt_size), label='edge')
-# plt.ylim(0, 1)
-# plt.legend()
-# plt.title('Zero-shot inference: ' + str(np.mean([np.mean(env) for env_i, env in enumerate(zero_shot) if envs_to_avg[env_i]]) * 100) + '%')
-
-# plt.figure()
-# ax = plt.subplot(1,2,1)
-# plot.plot_map(environments[env_to_plot], np.array(to_acc[env_to_plot]), ax)
-# ax.set_title('Accuracy to location')
-# ax = plt.subplot(1,2,2)
-# plot.plot_map(environments[env_to_plot], np.array(from_acc[env_to_plot]), ax)
-# ax.set_title('Accuracy from location')
+# Plot results of agent comparison and zero-shot inference analysis
+filt_size = 41
+plt.figure()
+plt.plot(analyse.smooth(np.mean(np.array([env for env_i, env in enumerate(correct_model) if envs_to_avg[env_i]]),0)[1:], filt_size), label='tem')
+plt.plot(analyse.smooth(np.mean(np.array([env for env_i, env in enumerate(correct_node) if envs_to_avg[env_i]]),0)[1:], filt_size), label='node')
+plt.plot(analyse.smooth(np.mean(np.array([env for env_i, env in enumerate(correct_edge) if envs_to_avg[env_i]]),0)[1:], filt_size), label='edge')
+plt.ylim(0, 1)
+plt.legend()
+plt.title('Zero-shot inference: ' + str(np.mean([np.mean(env) for env_i, env in enumerate(zero_shot) if envs_to_avg[env_i]]) * 100) + '%')
 
 # plt.show()

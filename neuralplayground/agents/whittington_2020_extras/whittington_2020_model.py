@@ -11,7 +11,16 @@ import neuralplayground.agents.whittington_2020_extras.whittington_2020_utils as
 
 
 class Model(torch.nn.Module):
+    """
+    Model class for TEM model. Inherits from torch.nn.Module, so it can be used as a torch module, and all parameters are automatically registered as trainable parameters.
+    """
     def __init__(self, params):
+        """
+        Initialise model with parameters.
+        Parameters
+        -----------
+            params: dict of parameters, usually generated from parameters() in parameters.py
+        """
         # First call super class init function to set up torch.nn.Module style model and inherit it's functionality
         super(Model, self).__init__()
         # Copy hyperparameters (e.g. network sizes) from parameter dict, usually generated from parameters() in parameters.py
@@ -20,6 +29,17 @@ class Model(torch.nn.Module):
         self.init_trainable()
 
     def forward(self, walk, prev_iter=None, prev_M=None):
+        """
+        Forward pass of TEM model. This consists of a transition, followed by an inference and a generative step, for each step of the walk.
+        Parameters
+        -----------
+            walk: list of [place, observation, action] tuples, where place is a list of locations, observation is a one-hot vector of sensory observation, and action is a one-hot vector of action taken
+            prev_iter: list of Iteration objects, which contain all variables of the model for each step of the previous walk. If None, all variables are initialised as zero.
+            prev_M: list of memory connectivity matrices for each frequency module. If None, all connectivity matrices are initialised as zero.
+        Returns
+        -----------
+            steps: list of Iteration objects, which contain all variables of the model for each step of the walk.
+        """
         # The previous iteration may contain walks without action. These are new walks, for which some parameters need to be reset.
         steps = self.init_walks(prev_iter)
         # Forward pass: perform a TEM iteration for each set of [place, observation, action], and produce inferred and generated variables for each step.
@@ -39,6 +59,28 @@ class Model(torch.nn.Module):
         return steps
 
     def iteration(self, x, locations, a_prev, M_prev, x_prev, g_prev):
+        """
+        Perform a single iteration of the TEM model. This consists of a transition step, followed by an inference step and a generative step.
+        Parameters
+        -----------
+            x: sensory observation, one-hot vector
+            locations: list of locations
+            a_prev: previous action, one-hot vector
+            M_prev: previous memory connectivity matrix
+            x_prev: previous sensory experience
+            g_prev: previous abstract location
+        Returns
+        -----------
+            L: list of losses for this iteration
+            M: list of memory connectivity matrices for this iteration
+            gt_gen: list of generated abstract (grid cell) locations for this iteration
+            p_gen: list of generated place cell locations for this iteration
+            x_gen: list of generated observations for this iteration
+            x_logits: list of logits for generated observations for this iteration
+            x_inf: list of inferred observations for this iteration
+            g_inf: list of inferred abstract (grid cell) locations for this iteration
+            p_inf: list of inferred grounded (place cell) locations for this iteration
+        """
         # First, do the transition step, as it will be necessary for both the inference and generative part of the model
         gt_gen, gt_inf = self.gen_g(a_prev, g_prev, locations)
         # Run inference model: infer grounded location p_inf (hippocampus), abstract location g_inf (entorhinal). Also keep filtered sensory observation (x_inf), and retrieved grounded location p_inf_x
@@ -51,11 +93,27 @@ class Model(torch.nn.Module):
         if self.hyper['use_p_inf']:            # Inference memory is identical to generative memory if using common memory, and updated separatedly if not
             M.append(M[0] if self.hyper['common_memory'] else self.hebbian(M_prev[1], torch.cat(p_inf, dim=1), torch.cat(p_inf_x, dim=1), do_hierarchical_connections=False))
         # Calculate loss of this step
-        L = self.loss(gt_gen, p_gen, x_logits, x, g_inf, p_inf, p_inf_x, M_prev)
+        L = self.loss(gt_gen, p_gen, x_logits, x, g_inf, p_inf, p_inf_x)
         # Return all iteration values
         return L, M, gt_gen, p_gen, x_gen, x_logits, x_inf, g_inf, p_inf
 
     def inference(self, x, locations, M_prev, x_prev, g_gen):
+        """
+        Perform inference step of the TEM model. 
+        Parameters
+        -----------
+            x: sensory observation, one-hot vector
+            locations: list of locations
+            M_prev: previous memory connectivity matrix
+            x_prev: previous sensory experience
+            g_gen: previous abstract location
+        Returns
+        -----------
+            x_f: filtered sensory experience
+            g: inferred abstract (grid cell) locations
+            p_x: retrieved grounded (place cell) locations from memory by sensory experience
+            p: inferred grounded (place cell) locations
+        """
         # Compress sensory observation from one-hot to two-hot (or alternatively, whatever an MLP makes of it)
         x_c = self.f_c(x)
         # Temporally filter sensory observation by mixing it with previous experience
@@ -75,6 +133,24 @@ class Model(torch.nn.Module):
         return x_f, g, p_x, p
 
     def generative(self, M_prev, p_inf, g_inf, g_gen):
+        """
+        Perform generative step of the TEM model.
+        Parameters
+        -----------
+            M_prev: previous memory connectivity matrix
+            p_inf: inferred grounded (place cell) locations
+            g_inf: inferred abstract (grid cell) locations
+            g_gen: previous abstract locations
+        Returns
+        -----------
+            x_p: generated observation from inferred grounded location
+            x_g: generated observation from grounded location retrieved from inferred abstract location
+            x_gt: generated observation from grounded location retrieved from abstract location by transitioning
+            x_p_logits: logits for generated observation from inferred grounded location
+            x_g_logits: logits for generated observation from grounded location retrieved from inferred abstract location
+            x_gt_logits: logits for generated observation from grounded location retrieved from abstract location by transitioning
+            p_g_inf: grounded location retrieved from inferred abstract location
+        """
         # Generate observation from inferred grounded location, using only the highest frequency. Also keep non-softmaxed logits which are used in the loss later
         x_p, x_p_logits = self.gen_x(p_inf[0])
         # Retrieve grounded location from memory by pattern completion on inferred abstract location
@@ -88,7 +164,22 @@ class Model(torch.nn.Module):
         # Return all generated observations and their corresponding logits
         return (x_p, x_g, x_gt), (x_p_logits, x_g_logits, x_gt_logits), p_g_inf
 
-    def loss(self, g_gen, p_gen, x_logits, x, g_inf, p_inf, p_inf_x, M_prev):
+    def loss(self, g_gen, p_gen, x_logits, x, g_inf, p_inf, p_inf_x):
+        """
+        Calculate losses of the current TEM iteration for each of the generated and inferred variable.
+        Parameters
+        -----------
+            g_gen: previous abstract (grid cell) locations
+            p_gen: previous grounded (place cell) locations
+            x_logits: logits for generated observation from grounded location retrieved from abstract location by transitioning
+            x: sensory observation, one-hot vector
+            g_inf: inferred abstract (grid cell) locations
+            p_inf: inferred grounded (place cell) locations
+            p_inf_x: retrieved grounded (place cell) locations from memory by sensory experience
+        Returns
+        -----------
+            L: list of losses for this iteration
+        """
         # Calculate loss function, separately for each component because you might want to reweight contributions later
         # L_p_gen is squared error loss between inferred grounded location and grounded location retrieved from inferred abstract location
         L_p_g = torch.sum(torch.stack(utils.squared_error(p_inf, p_gen), dim=0), dim=0)
@@ -114,6 +205,9 @@ class Model(torch.nn.Module):
         return L
 
     def init_trainable(self):
+        """
+        Initialise all trainable parameters of the TEM model. This is done in a separate function so that it can be called again after loading a model from file.
+        """
         # Scale factor in Laplacian transform for each frequency module. High frequency comes first, low frequency comes last. Learn inverse sigmoid instead of scale factor directly, so domain of alpha is -inf, inf
         self.alpha = torch.nn.ParameterList([torch.nn.Parameter(
             torch.tensor(np.log(self.hyper['f_initial'][f] / (1 - self.hyper['f_initial'][f])), dtype=torch.float)) for
@@ -179,6 +273,18 @@ class Model(torch.nn.Module):
         self.MLP_c_star = MLP(self.hyper['n_x_f'][0], self.hyper['n_x'], hidden_dim=20 * self.hyper['n_x_c'])
 
     def init_iteration(self, g, x, a, M):
+        """
+        Initialise a new iteration of the TEM model.
+        Parameters
+        -----------
+            g: previous abstract (grid cell) locations
+            x: sensory observation, one-hot vector
+            a: previous action, one-hot vector
+            M: previous memory connectivity matrix
+        Returns
+        -----------
+            iteration: Iteration object, which contains all variables of the model for this iteration.
+        """
         # On the very first iteration, update the batch size based on the data. This is useful when doing analysis on the network with different batch sizes compared to training
         self.hyper['batch_size'] = x.shape[0]
         # Initalise hebbian memory connectivity matrix [M_gen, M_inf] if it wasn't initialised yet
@@ -198,6 +304,15 @@ class Model(torch.nn.Module):
         return Iteration(g=g, x=x, a=a, M=M, x_inf=x_inf, g_inf=g_inf)
 
     def init_walks(self, prev_iter):
+        """
+        Initialise a new walk of the TEM model.
+        Parameters
+        -----------
+            prev_iter: list of Iteration objects, which contain all variables of the model for each step of the previous walk. If None, all variables are initialised as zero.
+        Returns
+        -----------
+            prev_iter: list of Iteration objects, which contain all variables of the model for each step of the previous walk. If None, all variables are initialised as zero.
+        """
         # Only reset parameters for previous iteration if a previous iteration was actually provided - if it wasn't, all parameters will be reset when creating a fresh Iteration object in init_iteration
         if prev_iter is not None:
             # The supplied previous iteration might have new walks starting, with empty actions. For these walks some parameters need to be reset
@@ -217,6 +332,19 @@ class Model(torch.nn.Module):
         return prev_iter
 
     def gen_g(self, a_prev, g_prev, locations):
+        """
+        Perform transition step of the TEM model. This consists of a transition from previous abstract location to new abstract location using weights specific to 
+        action taken for each frequency module.
+        Parameters
+        -----------
+            a_prev: previous action, one-hot vector
+            g_prev: previous abstract (grid cell) locations
+            locations: list of locations
+        Returns
+        -----------
+            g_gen: generated abstract (grid cell) locations
+            g: abstract (grid cell) locations
+        """
         # Transition from previous abstract location to new abstract location using weights specific to action taken for each frequency module
         mu_g = self.f_mu_g_path(a_prev, g_prev)
         sigma_g = self.f_sigma_g_path(a_prev, g_prev)
@@ -231,6 +359,16 @@ class Model(torch.nn.Module):
         return g_gen, (g, sigma_g)
 
     def gen_p(self, g, M_prev):
+        """
+        Generate grounded location from abstract location by pattern completion on abstract location. This is used in the generative model to generate observations from grounded location.
+        Parameters
+        -----------
+            g: abstract (grid cell) locations
+            M_prev: previous memory connectivity matrix
+        Returns
+        -----------
+            p: generated grounded (place cell) locations
+        """
         # We want to use g as an index for memory retrieval, but it doesn't have the right dimensions (these are grid cells, we need place cells). We need g_ instead
         g_ = self.g2g_(g)
         # Retreive memory: do pattern completion on abstract location to get grounded location
@@ -243,6 +381,16 @@ class Model(torch.nn.Module):
         return p
 
     def gen_x(self, p):
+        """
+        Generate observation from grounded location by MLP. This is used in the generative model to generate observations from grounded location.
+        Parameters
+        -----------
+            p: grounded (place cell) locations
+        Returns
+        -----------
+            x: generated observation
+            logits: logits for generated observation
+        """
         # Get categorical distribution over observations from grounded location
         # If you actually want to sample observation, you need a reparaterisation trick for categorical distributions
         # Sampling would be the correct way to do this, since observations are discrete, and it's also what the TEM paper says
@@ -256,6 +404,19 @@ class Model(torch.nn.Module):
         return x, logits
 
     def inf_g(self, p_x, g_gen, x, locations):
+        """
+        Infer abstract location from the combination of [grounded location retrieved from memory by sensory experience] and [previous abstract location and action (path integration)]
+        Parameters
+        -----------
+            p_x: retrieved grounded (place cell) locations from memory by sensory experience
+            g_gen: previous abstract (grid cell) locations
+            x: sensory observation, one-hot vector
+            locations: list of locations
+        Returns
+        -----------
+            mu_g: inferred abstract (grid cell) locations
+            sigma_g: standard deviation of inferred abstract (grid cell) locations
+        """
         # Infer abstract location from the combination of [grounded location retrieved from memory by sensory experience] ...
         if self.hyper['use_p_inf']:
             # Not in paper, but makes sense from symmetry with f_x: first get g from p by "summing over sensory preferences" g = p * W_repeat^T
@@ -322,6 +483,16 @@ class Model(torch.nn.Module):
         return g
 
     def inf_p(self, x_, g_):
+        """
+        Infer grounded location from sensory experience and inferred abstract location for each module
+        Parameters
+        -----------
+            x_: sensory input to memory
+            g_: abstract (grid cell) locations
+        Returns
+        -----------
+            p: inferred grounded (place cell) locations
+        """
         # Infer grounded location from sensory experience and inferred abstract location for each module
         p = []
         # Use the same transformation for each frequency module: leaky relu for sparsity
@@ -337,6 +508,16 @@ class Model(torch.nn.Module):
         return p
 
     def x_prev2x(self, x_prev, x_c):
+        """
+        Perform temporal filtering on sensory experience for each frequency module
+        Parameters
+        -----------
+            x_prev: previous sensory experience
+            x_c: current sensory experience
+        Returns
+        -----------
+            x: filtered sensory experience
+        """
         # Calculate factor for filtering from sigmoid of learned parameter
         alpha = [torch.nn.Sigmoid()(self.alpha[f]) for f in range(self.hyper['n_f'])]
         # Do exponential temporal filtering for each frequency modulemod
@@ -344,6 +525,15 @@ class Model(torch.nn.Module):
         return x
 
     def x2x_(self, x):
+        """
+        Prepare sensory input for input to memory by weighting and normalisation for each frequency module
+        Parameters
+        -----------
+            x: sensory observation, one-hot vector
+        Returns
+        -----------
+            x_: weighted and normalised sensory input to memory
+        """
         # Prepare sensory input for input to memory by weighting and normalisation for each frequency module
         # Get normalised sensory input for each frequency module
         normalised = self.f_n(x)
@@ -353,6 +543,15 @@ class Model(torch.nn.Module):
         return x_
 
     def g2g_(self, g):
+        """
+        Prepare abstract location for input to memory by reshaping and down-sampling for each frequency module
+        Parameters
+        -----------
+            g: abstract (grid cell) locations
+        Returns
+        -----------
+            g_: downsampled abstract (grid cell) locations
+        """
         # Prepares abstract location for input to memory by reshaping and down-sampling for each frequency module
         # Get downsampled abstract location for each frequency module
         downsampled = self.f_g(g)
@@ -361,6 +560,18 @@ class Model(torch.nn.Module):
         return g_
 
     def f_mu_g_path(self, a_prev, g_prev, no_direc=None):
+        """
+        Perform transition step of the TEM model. This consists of a transition from previous abstract location to new abstract location using weights specific to
+        action taken for each frequency module.
+        Parameters
+        -----------
+            a_prev: previous action, one-hot vector
+            g_prev: previous abstract (grid cell) locations
+            no_direc: list of booleans indicating for which walks the transition direction should be omitted (e.g. no shiny objects, or in inference model: set to all false)
+        Returns
+        -----------
+            g_step: new abstract (grid cell) locations
+        """
         # If there are no environments where the transition direction needs to be omitted (e.g. no shiny objects, or in inference model: set to all false
         no_direc = [False for _ in a_prev] if no_direc is None else no_direc
         # Remove all Nones from a_prev: these are walks where there was no previous action, so no step needs to be calculated for those
@@ -402,9 +613,18 @@ class Model(torch.nn.Module):
                 in range(self.hyper['n_f'])]
 
     def f_sigma_g_path(self, a_prev, g_prev):
+        """
+        Use multi layer perceptron to generate standard deviation from all previous abstract locations, including those that were just initialised and not real previous locations.
+        Parameters
+        -----------
+            a_prev: previous action, one-hot vector
+            g_prev: previous abstract (grid cell) locations
+        Returns
+        -----------
+            sigma_g: standard deviation of new abstract (grid cell) locations
+        """
         # Keep track of which walks these valid step actions are for
         a_do_step = [a != None for a in a_prev]
-        # Multi layer perceptron to generate standard deviation from all previous abstract locations, including those that were just initialised and not real previous locations
         from_g = self.MLP_sigma_g_path(g_prev)
         # And take exponent to get prior sigma for the walks that didn't have a previous location
         from_prior = [torch.exp(logsig) for logsig in self.logsig_g_init]
@@ -414,17 +634,42 @@ class Model(torch.nn.Module):
                 range(self.hyper['n_f'])]
 
     def f_mu_g_mem(self, g_downsampled):
-        # Multi layer perceptron to generate mean of abstract location from down-sampled abstract location, obtained by summing over sensory dimension of grounded location
+        """
+        Use multi layer perceptron to generate mean of abstract location from down-sampled abstract location, obtained by summing over sensory dimension of grounded location.
+        Parameters
+        -----------
+            g_downsampled: downsampled abstract (grid cell) locations
+        Returns
+        -----------
+            mu_g_mem: inferred abstract (grid cell) locations
+        """
         return self.MLP_mu_g_mem(g_downsampled)
 
     def f_sigma_g_mem(self, g_downsampled):
-        # Multi layer perceptron to generate standard deviation of abstract location from down-sampled abstract location, obtained by summing over sensory dimension of grounded location
+        """
+        Use multi layer perceptron to generate standard deviation of abstract location from down-sampled abstract location, obtained by summing over sensory dimension of grounded location.
+        Parameters
+        -----------
+            g_downsampled: downsampled abstract (grid cell) locations
+        Returns
+        -----------
+            sigma_g_mem: standard deviation of inferred abstract (grid cell) locations
+        """
         sigma = self.MLP_sigma_g_mem(g_downsampled)
         # Not in paper, but also offset this sigma over training, so you can reduce influence of inferred p early on
         return [sigma[f] + self.hyper['p2g_scale_offset'] * self.hyper['p2g_sig_val'] for f in range(self.hyper['n_f'])]
 
     def f_mu_g_shiny(self, shiny):
-        # Multi layer perceptron to generate mean of abstract location from boolean location shiny-ness
+        """
+        Use multi layer perceptron to generate mean of abstract location from boolean location shiny-ness. Outputs to object vector cell modules if they're separated, 
+        else to all abstract location modules
+        Parameters
+        -----------
+            shiny: boolean location shiny-ness
+        Returns
+        -----------
+            mu_g: inferred abstract (grid cell) locations
+        """
         mu_g = self.MLP_mu_g_shiny(shiny)
         # Take absolute because James wants object vector cells to be positive
         mu_g = [torch.abs(mu) for mu in mu_g]
@@ -433,14 +678,42 @@ class Model(torch.nn.Module):
         return g
 
     def f_sigma_g_shiny(self, shiny):
-        # Multi layer perceptron to generate standard deviation of abstract location from boolean location shiny-ness
+        """
+        Use multi layer perceptron to generate standard deviation of abstract location from boolean location shiny-ness. Outputs to object vector cell modules if they're separated,
+        else to all abstract location modules
+        Parameters
+        -----------
+            shiny: boolean location shiny-ness
+        Returns
+        -----------
+            sigma_g: standard deviation of inferred abstract (grid cell) locations
+        """
         return self.MLP_sigma_g_shiny(shiny)
 
     def f_sigma_p(self, p):
-        # Multi layer perceptron to generate standard deviation of grounded location retrieval
+        """
+        Use multi layer perceptron to generate standard deviation of grounded location retrieval.
+        Parameters
+        -----------
+            p: grounded (place cell) locations
+        Returns
+        -----------
+            sigma_p: standard deviation of grounded (place cell) locations
+        """
         return self.MLP_sigma_p(p)
 
     def f_x(self, p):
+        """
+        Use multi layer perceptron to generate observation from grounded location. Do this by first calculating categorical probability distribution over observations for a given 
+        ground location, then sampling from that distribution.
+        Parameters
+        -----------
+            p: grounded (place cell) locations
+        Returns
+        -----------
+            x: generated observation
+            logits: logits for generated observation
+        """
         # Calculate categorical probability distribution over observations for a given ground location
         # p has dimensions n_p[0]. We'll need to transform those to temporally filtered sensory experience, before we can decompress
         # p is the flattened (by concatenating rows - like reading sentences) outer product of g and x (p = g^T * x).
@@ -454,37 +727,96 @@ class Model(torch.nn.Module):
         return probability, logits
 
     def f_c_star(self, compressed):
-        # Multi layer perceptron to decompress sensory experience at highest frequency
+        """
+        Use multi layer perceptron to decompress sensory experience at highest frequency
+        Parameters
+        -----------
+            compressed: compressed sensory experience
+        Returns
+        -----------
+            decompressed: decompressed sensory experience
+        """
         return self.MLP_c_star(compressed)
 
     def f_c(self, decompressed):
+        """
+        Use multi layer perceptron to compress sensory experience at highest frequency
+        Parameters
+        -----------
+            decompressed: decompressed sensory experience
+        Returns
+        -----------
+            compressed: compressed sensory experience
+        """
         # Compress sensory observation from one-hot provided by world to two-hot for ease of computation
         return torch.stack([self.hyper['two_hot_table'][i] for i in torch.argmax(decompressed, dim=1)], dim=0)
 
     def f_n(self, x):
-        # Normalise sensory observation for each frequency module
+        """
+        Normalise sensory observation for each frequency module.
+        Parameters
+        -----------
+            x: sensory observation, one-hot vector
+        Returns
+        -----------
+            normalised: normalised sensory observation
+        """
         normalised = [utils.normalise(utils.relu(x[f] - torch.mean(x[f]))) for f in range(self.hyper['n_f'])]
         return normalised
 
     def f_g(self, g):
-        # Downsample abstract location for each frequency module
+        """
+        Downsample abstract location for each frequency module.
+        Parameters
+        -----------
+            g: abstract (grid cell) locations
+        Returns
+        -----------
+            downsampled: downsampled abstract (grid cell) locations
+        """
         downsampled = [torch.matmul(g[f], self.hyper['g_downsample'][f]) for f in range(self.hyper['n_f'])]
         return downsampled
 
     def f_g_clamp(self, g):
-        # Calculate activation for abstract location, thresholding between -1 and 1
+        """
+        Calculate activation for abstract location, thresholding between -1 and 1.
+        Parameters
+        -----------
+            g: abstract (grid cell) locations
+        Returns
+        -----------
+            activation: activation for abstract (grid cell) locations
+        """
         activation = [torch.clamp(g_f, min=-1, max=1) for g_f in g]
         return activation
 
     def f_p(self, p):
-        # Calculate activation for inferred grounded location, using a leaky relu for sparsity. Either apply to full multi-frequency grounded location or single frequency module
+        """
+        Calculate activation for inferred grounded location, using a leaky relu for sparsity. Either apply to full multi-frequency grounded location or single frequency module.
+        Parameters
+        -----------
+            p: grounded (place cell) locations
+        Returns
+        -----------
+            activation: activation for grounded (place cell) locations
+        """
         activation = [utils.leaky_relu(torch.clamp(p_f, min=-1, max=1)) for p_f in p] if type(
             p) is list else utils.leaky_relu(torch.clamp(p, min=-1, max=1))
         return activation
 
     def attractor(self, p_query, M, retrieve_it_mask=None):
-        # Retreive grounded location from attractor network memory with weights M by pattern-completing query
-        # For example, initial attractor input can come from abstract location (g_) or sensory experience (x_)
+        """
+        Retrieve grounded location from attractor network memory with weights M by pattern-completing query. For example, initial attractor input can come from abstract location
+        (g_) or sensory experience (x_).
+        Parameters
+        -----------
+            p_query: initial attractor input
+            M: memory connectivity matrix
+            retrieve_it_mask: mask for hierarchical retrieval
+        Returns
+        -----------
+            p: retrieved grounded (place cell) locations
+        """
         # Start by flattening query grounded locations across frequency modules
         h_t = torch.cat(p_query, dim=1)
         # Apply activation function to initial memory index
@@ -504,6 +836,18 @@ class Model(torch.nn.Module):
         return p;
 
     def hebbian(self, M_prev, p_inferred, p_generated, do_hierarchical_connections=True):
+        """
+        Update attractor network memory by Hebbian learning of pattern. For example, initial attractor input can come from abstract location (g_) or sensory experience (x_).
+        Parameters
+        -----------
+            M_prev: previous memory connectivity matrix
+            p_inferred: inferred grounded (place cell) locations
+            p_generated: generated grounded (place cell) locations
+            do_hierarchical_connections: whether to use hierarchical connections
+        Returns
+        -----------
+            M: updated memory connectivity matrix
+        """
         # Create new ground memory for attractor network by setting weights to outer product of learned vectors
         # p_inferred corresponds to p in the paper, and p_generated corresponds to p^.
         # The order of p + p^ and p - p^ is reversed since these are row vectors, instead of column vectors in the paper.
@@ -518,7 +862,13 @@ class Model(torch.nn.Module):
 
 
 class MLP(torch.nn.Module):
+    """
+    Class for multi layer perceptron with multiple modules. Each module has two layers: input->hidden and hidden->output.
+    """
     def __init__(self, in_dim, out_dim, activation=(torch.nn.functional.elu, None), hidden_dim=None, bias=(True, True)):
+        """
+        Initialise multi layer perceptron with multiple modules.
+        """
         # First call super class init function to set up torch.nn.Module style model and inherit it's functionality
         super(MLP, self).__init__()
         # Check if this network consists of module: are input and output dimensions lists? If not, make them (but remember it wasn't)
@@ -554,6 +904,13 @@ class MLP(torch.nn.Module):
                         self.w[n][from_layer].bias.fill_(0.0)
 
     def set_weights(self, from_layer, value):
+        """
+        Set weights for each module from a given layer to a given value.
+        Parameters
+        -----------
+            from_layer: layer from which to set weights
+            value: value to set weights to
+        """
         # If single value is provided: copy it for each module
         if type(value) is not list:
             input_value = [value for n in range(self.N)]
@@ -571,6 +928,15 @@ class MLP(torch.nn.Module):
                     self.w[n][from_layer].weight.fill_(input_value[n])
 
     def forward(self, data):
+        """
+        Run input data through MLP network.
+        Parameters
+        -----------
+            data: input data
+        Returns
+        -----------
+            output: output data
+        """
         # Make input data into list, if this network doesn't consist of modules
         if self.is_list:
             input_data = data
@@ -599,7 +965,13 @@ class MLP(torch.nn.Module):
 
 
 class LSTM(torch.nn.Module):
+    """
+    Class for LSTM with multiple layers.
+    """
     def __init__(self, in_dim, hidden_dim, out_dim, n_layers=1, n_a=4):
+        """
+        Initialise LSTM with multiple layers.
+        """
         # First call super class init function to set up torch.nn.Module style model and inherit it's functionality
         super(LSTM, self).__init__()
         # LSTM layer
@@ -610,6 +982,17 @@ class LSTM(torch.nn.Module):
         self.n_a = n_a
 
     def forward(self, data, prev_hidden=None):
+        """
+        Run input data through LSTM network.
+        Parameters
+        -----------
+            data: input data
+            prev_hidden: previous hidden state
+        Returns
+        -----------
+            out: output data
+            lstm_hidden: hidden state
+        """
         # If previous hidden and cell state are not provided: initialise them randomly
         if prev_hidden is None:
             hidden_state = torch.randn(self.lstm.num_layers, data.shape[0], self.lstm.hidden_size)
@@ -625,6 +1008,15 @@ class LSTM(torch.nn.Module):
         return out, lstm_hidden
 
     def prepare_data(self, data_in):
+        """
+        Prepare input data for LSTM network.
+        Parameters
+        -----------
+            data_in: input data
+        Returns
+        -----------
+            data: prepared input data
+        """
         # Transform list of actions of each step into batch of one-hot row vectors
         actions = [torch.zeros((len(step[2]), self.n_a)).scatter_(1, torch.tensor(step[2]).unsqueeze(1), 1.0) for step
                    in data_in]
@@ -637,8 +1029,14 @@ class LSTM(torch.nn.Module):
 
 
 class Iteration:
+    """
+    Class for storing all data from one iteration of the model.
+    """
     def __init__(self, g=None, x=None, a=None, L=None, M=None, g_gen=None, p_gen=None, x_gen=None, x_logits=None,
                  x_inf=None, g_inf=None, p_inf=None):
+        """
+        Initialise iteration with all data from one iteration of the model.
+        """
         # Copy all inputs
         self.g = g
         self.x = x
@@ -654,6 +1052,12 @@ class Iteration:
         self.p_inf = p_inf
 
     def correct(self):
+        """
+        Calculate accuracy of model prediction for this iteration.
+        Returns
+        -----------
+            accuracy: accuracy of model prediction for this iteration
+        """
         # Detach observation and all predictions
         observation = self.x.detach().numpy()
         predictions = [tensor.detach().numpy() for tensor in self.x_gen]
@@ -662,6 +1066,12 @@ class Iteration:
         return accuracy
 
     def detach(self):
+        """
+        Detach all tensors contained in this iteration.
+        Returns
+        -----------
+            self: iteration with all tensors detached
+        """
         # Detach all tensors contained in this iteration
         self.L = [tensor.detach() for tensor in self.L]
         self.M = [tensor.detach() for tensor in self.M]

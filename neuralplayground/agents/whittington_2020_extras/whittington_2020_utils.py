@@ -6,10 +6,15 @@ import datetime
 import logging
 
 def inv_var_weight(mus, sigmas):
-    '''
-    Accepts lists batches of row vectors of means and standard deviations, with batches along dim 0
-    Return tensors of inverse-variance weighted averages and tensors of inverse-variance weighted standard deviations
-    '''
+    """
+    Calculates tensors of inverse-variance weighted averages and tensors of inverse-variance weighted standard deviations.
+    Parameters
+    ----------
+        mus : list of torch tensors 
+            List of tensors of means of distributions
+        sigmas : list of torch tensors
+            List of tensors of standard deviations of distributions
+    """
     # Stack vectors together along first dimension
     mus = torch.stack(mus, dim = 0)
     sigmas = torch.stack(sigmas, dim = 0)
@@ -23,41 +28,44 @@ def inv_var_weight(mus, sigmas):
     return inv_var_avg, inv_var_sigma
 
 def softmax(x):
-    '''
-    Applies softmax to tensors of inputs, using torch softmax funcion
-    Assumes x is a 1D vector, or batches of row vectors with the batches along dim 0
-    '''
+    """
+    Calculates softmax of input tensor x.
+    """
     # Return torch softmax
     return torch.nn.Softmax(dim=-1)(x)
 
 def normalise(x):
-    '''
-    Normalises vector of input to unit norm, using torch normalise funcion
-    Assumes x is a 1D vector, or batches of row vectors with the batches along dim 0
-    '''
-    # Return torch normalise with p=2 for L2 norm
+    """
+    Normalises (L2) vector of input to unit norm, using torch normalise function.
+    """
     return torch.nn.functional.normalize(x, p=2, dim=-1)
 
 def relu(x):
-    '''
+    """
     Applies rectified linear activation unit to tensors of inputs, using torch relu funcion
-    '''
-    # Return torch relu
+    """
     return torch.nn.functional.relu(x)
 
 def leaky_relu(x):
-    '''
+    """
     Applies leaky (meaning small negative slope instead of zeros) rectified linear activation unit to tensors of inputs, using torch leaky relu funcion
-    '''
-    # Return torch leaky relu [torch.nn.functional.leaky_relu(val) for val in x] if type(x) is list else
+    """
     return torch.nn.functional.leaky_relu(x)
 
 def squared_error(value, target):
-    '''
-    Calculates mean squared error (L2 norm) between (list of) tensors value and target by using torch MSE loss
-    Include a factor 0.5 to squared error by convention
-    Set reduction to none, then get mean over last dimension to keep losses of different batches separate
-    '''
+    """
+    Calculates mean squared error (L2 norm) between (list of) tensors value and target by using torch MSE loss.
+    Parameters
+    ----------
+        value : torch tensor
+            Tensor of values
+        target : torch tensor
+            Tensor of targets
+    Returns
+    -------
+        loss : torch tensor
+            Tensor of mean squared errors
+    """
     # Return torch MSE loss
     if type(value) is list:
         loss = [0.5 * torch.sum(torch.nn.MSELoss(reduction='none')(value[i], target[i]),dim=-1) for i in range(len(value))]
@@ -66,10 +74,19 @@ def squared_error(value, target):
     return loss
 
 def cross_entropy(value, target):
-    '''
-    Calculates binary cross entropy between tensors value and target by using torch cross entropy loss
-    Set reduction to none, then get mean over last dimension to keep losses of different batches separate
-    '''
+    """
+    Calculates binary cross entropy between tensors value and target by using torch cross entropy loss.
+    Parameters
+    ----------
+        value : torch tensor
+            Tensor of values
+        target : torch tensor
+            Tensor of targets
+    Returns
+    -------
+        loss : torch tensor
+            Tensor of binary cross entropies
+    """
     # Return torch BCE loss
     if type(value) is list:
         loss = [torch.nn.CrossEntropyLoss(reduction='none')(val, targ) for val, targ in zip(value, target)]
@@ -78,10 +95,19 @@ def cross_entropy(value, target):
     return loss
 
 def downsample(value, target_dim):
-    '''
-    Does downsampling by taking the an input vector, then averaging chunks to make it of requested dimension
-    Assumes x is a 1D vector, or batches of row vectors with the batches along dim 0
-    '''
+    """
+    Does downsampling by taking the an input vector, then averaging chunks to make it of requested dimension.
+    Parameters
+    ----------
+        value : torch tensor
+            Tensor of values
+        target_dim : int
+            Target dimension of output vector
+    Returns
+    -------
+        downsample : torch tensor
+            Tensor of values, downsampled to target_dim
+    """
     # Get input dimension
     value_dim = value.size()[-1]
     # Set places to break up input vector into chunks
@@ -95,9 +121,9 @@ def downsample(value, target_dim):
     return torch.matmul(value,downsample)
 
 def make_directories():
-    '''
-    Creates directories for storing data during a model training run
-    '''
+    """
+    Returns directories for storing data during a model training run.
+    """
     # Get current date for saving folder
     date = datetime.datetime.today().strftime('%Y-%m-%d')
     # Initialise the run and dir_check to create a new run folder within the current date
@@ -127,9 +153,9 @@ def make_directories():
     return run_path, train_path, model_path, save_path, script_path, envs_path
 
 def set_directories(date, run):
-    '''
-    Returns directories for storing data during a model training run from a given previous training run
-    '''
+    """
+    Returns directories for storing data during a model training run.
+    """
     # Initialise all pahts
     train_path, model_path, save_path, script_path, run_path = None, None, None, None, None
     # Find the current run: the first run that doesn't exist yet
@@ -143,9 +169,17 @@ def set_directories(date, run):
     return run_path, train_path, model_path, save_path, script_path, envs_path
 
 def make_logger(run_path):
-    '''
-    Creates logger so output during training can be stored to file in a consistent way
-    '''
+    """
+    Creates a logger object for logging training progress.
+    Parameters
+    ----------
+        run_path : str
+            Path to the run folder
+    Returns
+    -------
+        logger : logger object
+            Logger object for logging training progress
+    """
     # Create new logger
     logger = logging.getLogger(__name__)
     logger.setLevel(logging.INFO)
@@ -162,8 +196,26 @@ def make_logger(run_path):
     # Return the logger object
     return logger
 
-# Function used for saving torch variables as in TensorFlow version
 def prepare_data_maps(data, prev_cell_maps, positions, pars):
+    """
+    Prepare data for online cell normalisation.
+    Parameters
+    ----------
+        data : list of torch tensors
+            List of tensors of data
+        prev_cell_maps : list of torch tensors
+            List of tensors of previous cell maps   
+        positions : list of torch tensors
+            List of tensors of positions
+        pars : dict
+            Dictionary of parameters
+    Returns
+    -------
+        cell_list : list of torch tensors
+            List of tensors of cell maps    
+        positions : list of torch tensors
+            List of tensors of positions
+    """
     gs, ps, position = data
     gs_all, ps_all = prev_cell_maps
 
@@ -180,6 +232,23 @@ def prepare_data_maps(data, prev_cell_maps, positions, pars):
     return cell_list, positions
 
 def cell_norm_online(cells, positions, current_cell_mat, pars):
+    """
+    Online cell normalisation.
+    Parameters
+    ----------
+        cells : list of torch tensors
+            List of tensors of cells
+        positions : list of torch tensors
+            List of tensors of positions
+        current_cell_mat : list of torch tensors
+            List of tensors of current cell maps
+        pars : dict
+            Dictionary of parameters
+    Returns
+    -------
+        new_cell_mat : list of torch tensors
+            List of tensors of new cell maps
+    """
     # for separate environments within each batch
     envs = pars['diff_env_batches_envs']
     n_states = pars['n_states_world']
@@ -205,7 +274,6 @@ def cell_norm_online(cells, positions, current_cell_mat, pars):
 
 def check_wall(pre_state, new_state, wall, wall_closenes=1e-5, tolerance=1e-9):
     """
-
     Parameters
     ----------
     pre_state : (2,) 2d-ndarray

@@ -3,8 +3,26 @@ import torch
 import pdb
 import copy
 
-# Track prediction accuracy over walk, and calculate fraction of locations visited and actions taken to assess performance
 def performance(forward, model, environments):
+    """
+    Track prediction accuracy over walk, and calculate fraction of locations visited and actions taken to assess performance.
+    Parameters
+    ----------
+        forward : list
+            List of forward passes through the model, each containing the model input, the model output, and the model state.
+        model : TEM
+            The model that was used to generate the forward passes.
+        environments : list
+            List of environments that were used to generate the forward passes.
+    Returns
+    -------
+        all_correct : list
+            List of lists of booleans, indicating for each step whether the model predicted the observation correctly.
+        all_location_frac : list
+            List of lists of floats, indicating for each step the fraction of locations visited.
+        all_action_frac : list
+            List of lists of floats, indicating for each step the fraction of actions taken.
+    """
     # Keep track of whether model prediction were correct, as well as the fraction of nodes/edges visited, across environments
     all_correct, all_location_frac, all_action_frac = [], [], []
     # Run through environments and monitor performance in each
@@ -52,8 +70,24 @@ def performance(forward, model, environments):
     # Return
     return all_correct, all_location_frac, all_action_frac
 
-# Track prediction accuracy per location, after a transition towards the location
 def location_accuracy(forward, model, environments):
+    """
+    Track prediction accuracy per location, after a transition towards the location.
+    Parameters
+    ----------
+        forward : list
+            List of forward passes through the model, each containing the model input, the model output, and the model state.
+        model : TEM
+            The model that was used to generate the forward passes.
+        environments : list
+            List of environments that were used to generate the forward passes.
+    Returns
+    -------
+        accuracy_from : list
+            List of lists of floats, indicating for each location the fraction of correct predictions after arriving at that location.
+        accuracy_to : list
+            List of lists of floats, indicating for each location the fraction of correct predictions after leaving that location.
+    """
     # Keep track of whether model prediction were correct for each environment, separated by arrival and departure location
     accuracy_from, accuracy_to = [], []
     # Run through environments and monitor performance in each
@@ -73,8 +107,22 @@ def location_accuracy(forward, model, environments):
     # Return
     return accuracy_from, accuracy_to
 
-# Track occupation per location
 def location_occupation(forward, model, environments):
+    """
+    Track how often each location was visited during the walk.
+    Parameters
+    ----------
+        forward : list
+            List of forward passes through the model, each containing the model input, the model output, and the model state.
+        model : TEM
+            The model that was used to generate the forward passes.
+        environments : list
+            List of environments that were used to generate the forward passes.
+    Returns
+    -------
+        occupation : list
+            List of lists of integers, indicating for each location how often it was visited during the walk.
+    """
     # Keep track of how many times each location was visited
     occupation = []
     # Run through environments and monitor performance in each
@@ -90,8 +138,24 @@ def location_occupation(forward, model, environments):
     # Return occupation of states during walk across environments
     return occupation
 
-# Measure zero-shot inference for this model: see if it can predict an observation following a new action to a know location
 def zero_shot(forward, model, environments, include_stay_still=True):
+    """
+    Track whether the model can predict the observation correctly when it visits a location for the first time.
+    Parameters
+    ----------
+        forward : list
+            List of forward passes through the model, each containing the model input, the model output, and the model state.
+        model : TEM
+            The model that was used to generate the forward passes.
+        environments : list
+            List of environments that were used to generate the forward passes.
+        include_stay_still : bool
+            Whether to include standing still actions in the zero-shot inference analysis.
+    Returns
+    -------
+        all_correct_zero_shot : list
+            List of lists of booleans, indicating for each step whether the model predicted the observation correctly when visiting a location for the first time.
+    """
     # Get the number of actions in this model
     n_actions = model.hyper['n_actions'] + model.hyper['has_static_action']
     # Track for all opportunities for zero-shot inference if the predictions were correct across environments
@@ -129,8 +193,28 @@ def zero_shot(forward, model, environments, include_stay_still=True):
     # Return lists of success of zero-shot inference for all environments
     return all_correct_zero_shot
 
-# Compare TEM performance to a 'node' and an 'edge' agent, that remember previous observations and guess others
 def compare_to_agents(forward, model, environments, include_stay_still=True):
+    """
+    Compare TEM performance to a 'node' and an 'edge' agent, that remember previous observations and guess others.
+    Parameters
+    ----------
+        forward : list
+            List of forward passes through the model, each containing the model input, the model output, and the model state.
+        model : TEM
+            The model that was used to generate the forward passes.
+        environments : list
+            List of environments that were used to generate the forward passes.
+        include_stay_still : bool
+            Whether to include standing still actions in the zero-shot inference analysis.
+    Returns
+    -------
+        all_correct_model : list
+            List of lists of booleans, indicating for each step whether the model predicted the observation correctly.
+        all_correct_node : list
+            List of lists of booleans, indicating for each step whether the node agent predicted the observation correctly.
+        all_correct_edge : list
+            List of lists of booleans, indicating for each step whether the edge agent predicted the observation correctly.
+    """
     # Get the number of actions in this model
     n_actions = model.hyper['n_actions'] + model.hyper['has_static_action']
     # Store for each environment for each step whether is was predicted correctly by the model, and by a perfect node and perfect edge agent
@@ -176,8 +260,24 @@ def compare_to_agents(forward, model, environments, include_stay_still=True):
     # Return list of prediction success for all three agents across environments
     return all_correct_model, all_correct_node, all_correct_edge
 
-# Calculate rate maps for this model: what is the firing pattern for each cell at all locations?
 def rate_map(forward, model, environments):
+    """
+    Calculate the firing rate of each cell in the model for each location in each environment.
+    Parameters
+    ----------
+        forward : list
+            List of forward passes through the model, each containing the model input, the model output, and the model state.
+        model : TEM
+            The model that was used to generate the forward passes.
+        environments : list
+            List of environments that were used to generate the forward passes.
+    Returns
+    -------
+        all_g : list
+            List of lists of lists of floats, indicating for each frequency module, for each location, and for each cell the firing rate.
+        all_p : list
+            List of lists of lists of floats, indicating for each frequency module, for each location, and for each cell the firing rate.
+    """
     # Store location x cell firing rate matrix for abstract and grounded location representation across environments
     all_g, all_p = [], []
     # Go through environments and collect firing rates in each
@@ -206,8 +306,20 @@ def rate_map(forward, model, environments):
     # Return list of locations x cells matrix of firing rates for each frequency module for each environment
     return all_g, all_p
 
-# Helper function to generate input for the model
 def generate_input(environment, walk):
+    """
+    Generate model input from environment and walk.
+    Parameters
+    ----------
+        environment : Environment
+            Environment from which to generate the model input.
+        walk : list
+            List of lists of lists, indicating for each step the location, observation, and action.
+    Returns
+    -------
+        model_input : list
+            List of lists of lists, indicating for each step the location, observation, and action.
+    """
     # If no walk was provided: use the environment to generate one
     if walk is None:
         # Generate a single walk from environment with length depending on number of locations (so you're likely to visit each location)
@@ -222,10 +334,20 @@ def generate_input(environment, walk):
             step[2] = [step[2]]
     return walk
 
-# Smoothing function (originally written by James)
 def smooth(a, wsz):
-    # a: NumPy 1-D array containing the data to be smoothed
-    # WSZ: smoothing window size needs, which must be odd number,
+    """
+    Smooth a 1D array with a window size.   
+    Parameters
+    ----------
+        a : list
+            1D array to be smoothed.
+        wsz : int
+            Window size to use for smoothing.
+    Returns
+    -------
+        out : list
+            Smoothed 1D array.
+    """
     out0 = np.convolve(a, np.ones(wsz, dtype=int), 'valid') / wsz
     r = np.arange(1, wsz - 1, 2)
     start = np.cumsum(a[:wsz - 1])[::2] / r

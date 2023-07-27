@@ -3,8 +3,10 @@ import torch
 from scipy.special import comb
 
 
-# This contains one single function that generates a dictionary of parameters, which is provided to the model on initialisation
 def parameters():
+    """
+    Set all parameters for the TEM model. This is a function so that it can be called from other scripts, e.g. to load parameters from a file.
+    """
     params = {}
     # -- World parameters
     # Does this world include the standing still action?
@@ -233,6 +235,29 @@ def parameters():
 
 # This specifies how parameters are updated at every backpropagation iteration/gradient update
 def parameter_iteration(iteration, params):
+    """
+    Update parameters at every backpropagation iteration/gradient update.
+    Parameters
+    ----------
+        iteration : int
+            Current iteration/gradient update.
+        params : dict
+            Dictionary of parameters.
+    Returns
+    -------
+        eta : float
+            Hebbian rate of remembering.
+        lamb : float
+            Hebbian rate of forgetting.
+        p2g_scale_offset : float
+            Scaling of variance offset for grounded location inference.
+        lr : float
+            Learning rate.
+        walk_length_center : float
+            Center of walk length window, within which the walk lenghts of new walks are uniformly sampled.
+        loss_weights : torch.tensor
+            Current loss weights.
+    """
     # Calculate eta (rate of remembering) and lambda (rate of forgetting) for Hebbian memory updates
     eta = min((iteration + 1) / params['eta_it'], 1) * params['eta']
     lamb = min((iteration + 1) / params['lambda_it'], 1) * params['lambda']
@@ -260,6 +285,17 @@ def parameter_iteration(iteration, params):
     return eta, lamb, p2g_scale_offset, lr, walk_length_center, loss_weights
 
 def generate_n_walk(params):
+    """
+    Generate number of steps to roll out before backpropagation through time for each iteration.
+    Parameters
+    ----------
+        params : dict
+            Dictionary of parameters.
+    Returns
+    -------
+        n_walks : list
+            List of number of steps to roll out before backpropagation through time for each iteration.
+    """
     n_walks = []
     for iter in range(params['train_it']):
         n_steps = params['walk_it_max'] - params['walk_it_window'] * 0.5 - min(

@@ -113,6 +113,19 @@ class Whittington2020(AgentCore):
         self.prev_observations = [[-1,-1,[float('inf'), float('inf')]] for _ in range(self.batch_size)]
 
     def act(self, observation, policy_func=None):
+        """
+        The base model executes one of four action (up-down-right-left) with equal probability.
+        This is used to move on the rectangular environment states space (transmat).
+        This is done for a single environment.
+        Parameters
+        ----------
+        positions: array (16,2)
+            Observation from the environment class needed to choose the right action (Here the position).
+        Returns
+        -------
+        action : array (16,2)
+            Action values (Direction of the agent step) in this case executes one of four action (up-down-right-left) with equal probability.
+        """
         new_action = self.action_policy()
         if observation[0] == self.prev_observation[0]:
             self.prev_action = new_action
@@ -127,17 +140,16 @@ class Whittington2020(AgentCore):
 
     def batch_act(self, observations, policy_func=None):
         """
-        The base model executes one of four action (up-down-right-left) with equal probability.
-        This is used to move on the rectangular environment states space (transmat).
+        The base model executes one of four action (up-down-right-left) with equal probability. This is used to move on the rectangular environment states space (transmat).
         This is done for a batch of 16 environments.
         Parameters
         ----------
-        positions: array (16,2)
-            Observation from the environment class needed to choose the right action (Here the position).
+        observations: array (16,3/4)
+            Observation from the environment class needed to choose the right action (here the state ID and position). If behavioural data is used, the observation includes head direction.
         Returns
         -------
-        action : array (16,2)
-            Action values (Direction of the agent step) in this case executes one of four action (up-down-right-left) with equal probability.
+        new_actions : array (16,2)
+            Action values (direction of the agent step) in this case executes one of four action (up-down-right-left) with equal probability.
         """
         
         if self.use_behavioural_data:
@@ -147,8 +159,6 @@ class Whittington2020(AgentCore):
             self.obs_history.append(self.prev_observations.copy())
             self.prev_observations = observations
             self.n_walk += 1
-            # if all(self.prev_observations[0][2] != [float('inf'), float('inf')]):
-            #     print('yees')
 
         elif not self.use_behavioural_data:
             locations = [env[0] for env in observations]
@@ -183,13 +193,11 @@ class Whittington2020(AgentCore):
         Compute forward pass through model, updating weights, calculating TEM variables and collecting losses / accuracies
         """
         self.iter = int((len(self.obs_history) / 20) - 1)
-        # print(self.iter)
         self.global_steps += 1
         history = self.obs_history[-self.pars['n_rollout']:]
         locations = [[{'id': env_step[0], 'shiny': None} for env_step in step] for step in history]
         observations = [[env_step[1] for env_step in step] for step in history]
         actions = self.walk_actions[-self.pars['n_rollout']:]
-        # self.walk_actions = []
         self.n_walk = 0
         # Convert action vectors to action values
         action_values = self.step_to_actions(actions)
@@ -269,6 +277,9 @@ class Whittington2020(AgentCore):
             torch.save(self.tem.hyper, self.model_path + '/params_' + str(self.iter) + '.pt')
 
     def initialise(self):
+        """
+        Generate random distribution of objects and intialise optimiser, logger and relevant variables
+        """
         # Create directories for storing all information about the current run
         self.run_path, self.train_path, self.model_path, self.save_path, self.script_path, self.envs_path = utils.make_directories()
         # Save all python files in current directory to script directory
@@ -288,6 +299,9 @@ class Whittington2020(AgentCore):
         self.prev_iter = None
     
     def save_files(self):
+        """
+        Save all python files in current directory to script directory
+        """
         curr_path = os.path.dirname(os.path.abspath(__file__))
         shutil.copy2(os.path.abspath(os.path.join(os.getcwd(), os.path.abspath(os.path.join(curr_path, os.pardir)))) + '/agents/whittington_2020_extras/whittington_2020_model.py',
                      os.path.join(self.script_path, 'whittington_2020_model.py'))
@@ -366,6 +380,9 @@ class Whittington2020(AgentCore):
 
 
     def collect_final_trajectory(self):
+        """
+        Collect the final trajectory of the agent, including the locations, observations and actions taken.
+        """
         final_model_input = []
         environments = [[], self.n_actions, self.n_states[0], len(self.obs_history[-1][0][1])]
         history = self.obs_history[-self.n_walk:]
@@ -401,7 +418,6 @@ class Whittington2020(AgentCore):
         axes: list
             A list of arrays of matplotlib axes containing the individual rate map plots for each frequency.
         """
-
         frequencies = ['Theta', 'Delta', 'Beta', 'Gamma', 'High Gamma']
         figs = []
         axes = []

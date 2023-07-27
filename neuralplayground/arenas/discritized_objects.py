@@ -49,8 +49,20 @@ class DiscreteObjectEnvironment(Environment):
             The density of discrete states in the environment
     """
 
-    def __init__(self, recording_index: int = None, environment_name: str = "DiscreteObject", verbose: bool = False, 
-    experiment_class: str = None, **env_kwargs):
+    def __init__(self, recording_index: int = None, environment_name: str = "DiscreteObject", verbose: bool = False, experiment_class: str = None, **env_kwargs):
+        """
+        Initialize the class. env_kwargs arguments are specific for each of the child environments and described in their respective class.
+        Parameters
+        ----------
+            environment_name: str
+                Name of the environment
+            verbose: bool
+                If True, print information about the environment
+            experiment_class: str
+                Name of the class of the experiment to use
+            **env_kwargs:
+                Arguments specific to each environment
+        """
         super().__init__(environment_name, **env_kwargs)
         self.environment_name = environment_name
         self.use_behavioral_data = env_kwargs["use_behavioural_data"]
@@ -191,6 +203,13 @@ class DiscreteObjectEnvironment(Environment):
         return observation, self.state
 
     def generate_objects(self):
+        """
+        Generate objects in the environment. In this case, the objects are one-hot encoded vectors.
+        Returns
+        -------
+            objects: ndarray (n_states, n_objects)
+                Array of the objects in the environment, one-hot encoded
+        """
         poss_objects = np.zeros(shape=(self.n_objects, self.n_objects))
         for i in range(self.n_objects):
             for j in range(self.n_objects):
@@ -204,12 +223,34 @@ class DiscreteObjectEnvironment(Environment):
         return objects
 
     def make_object_observation(self, pos):
+        """
+        Make an observation of the object in the environment at the current position.
+        Parameters
+        ----------
+            pos: ndarray (2,)
+                Vector of the x and y coordinate of the position of the animal in the environment
+        Returns
+        -------
+            observation: ndarray (n_objects,)
+                Array of the observation of the agent in the environment, in this case the sensory object.
+        """
         index = self.pos_to_state(np.array(pos))
         object = self.objects[index]
 
         return [index, object, pos]
 
     def pos_to_state(self, pos):
+        """
+        Convert an (x,y) position to a discretised state index
+        Parameters
+        ----------
+            pos: ndarray (2,)
+                Vector of the x and y coordinate of the position of the animal in the environment
+        Returns
+        -------
+            index: int
+                Index of the state in the discretised state space
+        """
         if len(pos) > 2:
             pos = pos[:2]
         diff = (self.xy_combination - pos) ** 2
