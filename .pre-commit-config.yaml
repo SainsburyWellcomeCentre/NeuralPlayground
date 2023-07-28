@@ -12,6 +12,7 @@ repos:
             args: [--fix=lf]
           - id: requirements-txt-fixer
           - id: trailing-whitespace
+            exclude: 'README.md'
     - repo: https://github.com/charliermarsh/ruff-pre-commit
       rev: v0.0.265
       hooks:

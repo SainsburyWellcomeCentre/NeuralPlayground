@@ -77,6 +77,25 @@
         "maintenance",
         "infra"
       ]
+    },
+    {
+      "login": "rhayman",
+      "name": "rhayman",
+      "avatar_url": "https://avatars.githubusercontent.com/u/5619644?v=4",
+      "profile": "https://github.com/rhayman",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "JarvisDevon",
+      "name": "Devon Jarvis",
+      "avatar_url": "https://avatars.githubusercontent.com/u/30460455?v=4",
+      "profile": "https://github.com/JarvisDevon",
+      "contributions": [
+        "doc",
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
