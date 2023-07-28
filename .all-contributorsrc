@@ -1,0 +1,109 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "ClementineDomine",
+      "name": "Clementine Domine",
+      "avatar_url": "https://avatars.githubusercontent.com/u/18595111?v=4",
+      "profile": "https://github.com/ClementineDomine",
+      "contributions": [
+        "design",
+        "mentoring",
+        "code",
+        "data"
+      ]
+    },
+    {
+      "login": "rodrigcd",
+      "name": "rodrigcd",
+      "avatar_url": "https://avatars.githubusercontent.com/u/22643681?v=4",
+      "profile": "https://github.com/rodrigcd",
+      "contributions": [
+        "design",
+        "mentoring",
+        "code",
+        "data"
+      ]
+    },
+    {
+      "login": "LukeHollingsworth",
+      "name": "Luke Hollingsworth",
+      "avatar_url": "https://avatars.githubusercontent.com/u/93782020?v=4",
+      "profile": "https://github.com/LukeHollingsworth",
+      "contributions": [
+        "doc",
+        "code"
+      ]
+    },
+    {
+      "login": "asaxe",
+      "name": "Andrew Saxe",
+      "avatar_url": "https://avatars.githubusercontent.com/u/4165949?v=4",
+      "profile": "http://saxelab.org",
+      "contributions": [
+        "mentoring"
+      ]
+    },
+    {
+      "login": "DrCaswellBarry",
+      "name": "DrCaswellBarry",
+      "avatar_url": "https://avatars.githubusercontent.com/u/17472149?v=4",
+      "profile": "https://github.com/DrCaswellBarry",
+      "contributions": [
+        "mentoring"
+      ]
+    },
+    {
+      "login": "niksirbi",
+      "name": "Niko Sirmpilatze",
+      "avatar_url": "https://avatars.githubusercontent.com/u/20923448?v=4",
+      "profile": "http://nikosirmpilatze.com",
+      "contributions": [
+        "infra",
+        "maintenance",
+        "tool"
+      ]
+    },
+    {
+      "login": "adamltyson",
+      "name": "Adam Tyson",
+      "avatar_url": "https://avatars.githubusercontent.com/u/13147259?v=4",
+      "profile": "http://adamltyson.com",
+      "contributions": [
+        "maintenance",
+        "infra"
+      ]
+    },
+    {
+      "login": "rhayman",
+      "name": "rhayman",
+      "avatar_url": "https://avatars.githubusercontent.com/u/5619644?v=4",
+      "profile": "https://github.com/rhayman",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "JarvisDevon",
+      "name": "Devon Jarvis",
+      "avatar_url": "https://avatars.githubusercontent.com/u/30460455?v=4",
+      "profile": "https://github.com/JarvisDevon",
+      "contributions": [
+        "doc",
+        "code"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "projectName": "NeuralPlayground",
+  "projectOwner": "SainsburyWellcomeCentre",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "skipCi": true,
+  "commitConvention": "angular",
+  "commitType": "docs"
+}

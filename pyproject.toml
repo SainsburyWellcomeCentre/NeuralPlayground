@@ -1,0 +1,103 @@
+[project]
+name = "NeuralPlayground"
+authors = [
+  {name = "Clementine Domine"},
+  {name = "Rodrigo Carrasco-Davis", email = "rodrigo.carrasco.davis@gmail.com"},
+]
+description = "The standardised environment for the hippocampus and entorhinal cortex models"
+readme = "README.md"
+requires-python = ">=3.8.0"
+dynamic = ["version"]
+
+license = {text = "MIT"}
+
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Operating System :: OS Independent",
+    "License :: OSI Approved :: MIT License",
+]
+
+dependencies = [
+  "scipy",
+  "pandas",
+  "tqdm",
+  "jupyter",
+  "ipython",
+  "matplotlib",
+  "deepdiff",
+  "opencv-python",
+  "gymnasium",
+  "scikit-image",
+  "pooch",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/ClementineDomine/NeuralPlayground"
+"Bug tracker" = "https://github.com/ClementineDomine/NeuralPlayground/issues"
+"Documentation" = "https://github.com/ClementineDomine/NeuralPlayground"
+"Source code" = "https://github.com/ClementineDomine/NeuralPlayground"
+"User support" = "https://github.com/ClementineDomine/NeuralPlayground/issues"
+
+[project.optional-dependencies]
+dev = [
+  "pytest",
+  "pytest-cov",
+  "coverage",
+  "tox",
+  "black",
+  "mypy",
+  "pre-commit",
+  "ruff",
+  "setuptools_scm",
+]
+
+[build-system]
+requires = [
+    "setuptools>=45",
+    "wheel",
+    "setuptools_scm[toml]>=6.2",
+]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+include = ["neuralplayground*"]
+exclude = ["tests*"]
+
+[tool.pytest.ini_options]
+addopts = "--cov=neuralplayground"
+
+[tool.black]
+target-version = ['py38', 'py39', 'py310', 'py311']
+skip-string-normalization = false
+line-length = 127
+
+[tool.setuptools_scm]
+
+[tool.check-manifest]
+ignore = [
+  "*.yaml",
+  ".all-contributorsrc",
+  "tox.ini",
+  "tests/*",
+]
+
+[tool.ruff]
+line-length = 127
+exclude = ["__init__.py","build",".eggs"]
+select = ["I", "E", "F"]
+fix = true
+
+[tool.cibuildwheel]
+build = "cp38-* cp39-* cp310-* cp311-*"
+
+[tool.cibuildwheel.macos]
+archs = ["x86_64", "arm64"]

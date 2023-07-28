@@ -1,0 +1,64 @@
+# Prerequisites
+*.d
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# Editor
+.idea
+
+# Jupyter stuff
+*.ipynb_checkpoints*
+*__pycache__*
+
+*.DS_Store*
+
+*.icloud*
+
+# Unit tests / coverage reports / linting
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.*_cache/
+*test_crossrun_results*
+
+#Results
+*.pdf
+*.png
+
+*.egg-info
+
+# PyPI distribution / packages
+dist/

@@ -1,0 +1,29 @@
+cff-version: 1.0.0
+message: "To reference the latest version of NeuralPlayground:A Standardised Environment for Evaluating Models of Hippocampus and Entorhinal Cortex, please cite it as below."
+authors:
+  - name: "NeuralPlayground Community"
+title: "NeuralPlayground: A Standardised Environment for Evaluating Models of Hippocampus and Entorhinal Cortex"
+version:  0.6.0a1
+identifiers:
+  - description: The concept DOI for the collection containing all versions of the Citation File Format.
+    type: doi
+    value: "https://doi.org/10.57736/8377-7c73"
+license: "CC-BY-4.0"
+date-released: "2023-02-28"
+keywords:
+  - model
+doi: https://doi.org/10.57736/8377-7c73
+references:
+  - type: Software
+    authors:
+      - family-names: All contributors
+        given-names:  NeuralPlayground Community
+        affiliation: "UCL, London, UK"
+        email: "neuralplayground@gmail.com"
+        website: "https://github.com/Neuralplayground/"
+    title: NeuralPlayground 
+
+
+
+
+    
