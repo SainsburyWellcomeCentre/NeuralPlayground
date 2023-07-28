@@ -138,8 +138,8 @@ class Sargolini2006Data(Hafting2008Data):
         self.best_recording_index = 0  # Nice session recording as default
         # Arena limits from the experimental setting, first row x limits, second row y limits, in cm
         self.arena_limits = np.array([[-50.0, 50.0], [-50.0, 50.0]])
-        data_path_list = glob.glob(self.data_path + "*.mat")
-        mice_ids = np.unique([dp.split("/")[-1][:5] for dp in data_path_list])
+        data_path_list = glob.glob(os.path.join(self.data_path, "*.mat"))
+        mice_ids = np.unique([os.path.basename(dp)[:5] for dp in data_path_list])
         # Initialize data dictionary, later handled by this object itself (so don't worry about this)
         self.data_per_animal = {}
         for m_id in mice_ids:
