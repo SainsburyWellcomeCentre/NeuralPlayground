@@ -1,0 +1,43 @@
+plot_config:
+  trajectory_plot:
+    trajectory_colormap: "plasma"
+    trajectory_alpha: 0.6
+    external_wall_color: "C3"
+    external_wall_thickness: 3
+    custom_wall_color: "C0"
+    custom_wall_thickness: 3
+    scatter_alpha: 1
+    scatter_marker: "o"
+    scatter_marker_size: 1
+    label_fontsize: 14
+    tick_label_fontsize: 10
+    colorbar_label_fontsize: 14
+    title_fontsize: 14
+    grid: False
+
+  ratemap_plot:
+    ratemap_colormap: "jet"
+    bin_size: 2.0
+    label_fontsize: 14
+    tick_label_fontsize: 10
+    colorbar_label_fontsize: 14
+    title_fontsize: 14
+    grid: False
+
+  agent_comparison_plot:
+    figsize: [12, 16]
+    fontsize: 10
+    plot_sac_exp: True
+    plot_sac_agt: True
+
+
+  table_plot:
+    table_fontsize: 7
+    col_width: 30
+    row_height: 0.225
+    header_color: "C0"
+    row_colors: ["#f1f1f2", "w"]
+    text_color: "w"
+    edge_color: "k"
+    bbox: [0, 0, 1, 1]
+    header_columns: 0

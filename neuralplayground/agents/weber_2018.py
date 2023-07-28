@@ -14,6 +14,8 @@ import numpy as np
 from scipy.stats import multivariate_normal
 from tqdm import tqdm
 
+from neuralplayground.plotting.plot_utils import make_plot_rate_map
+
 from .agent_core import AgentCore
 
 
@@ -142,6 +144,10 @@ class Weber2018(AgentCore):
             self.resolution = mod_kwargs["resolution"]
         else:
             self.resolution = 50
+        if "disable_tqdm" in mod_kwargs.keys():
+            self.disable_tqdm = mod_kwargs["disable_tqdm"]
+        else:
+            self.disable_tqdm = False
 
         self.room_width, self.room_depth = (
             mod_kwargs["room_width"],
@@ -218,7 +224,7 @@ class Weber2018(AgentCore):
         depth_limit = self.room_depth / 2.0
         cell_list = []  # This will become a numpy array with the tuning curves in 2D (images)
         function_list = []  # List with parameters of each gaussian in the tuning curve
-        for i in tqdm(range(n_curves)):
+        for i in tqdm(range(n_curves), disable=self.disable_tqdm):
             gauss_list = []
             cell_i = 0
             for j in range(Nf):
@@ -330,6 +336,7 @@ class Weber2018(AgentCore):
 
         self.we = np.clip(self.we, a_min=0, a_max=np.amax(self.we))  # Negative weights to zero
         self.wi = np.clip(self.wi, a_min=0, a_max=np.amax(self.wi))
+        return {"delta_we": delta_we, "delta_wi": delta_wi}
 
     def full_average_update(self, exc_normalization: bool = True):
         """
@@ -373,7 +380,45 @@ class Weber2018(AgentCore):
         for i in range(self.xy_combinations.shape[0]):
             self.update(exc_normalization=exc_normalization, pos=xy_array[i, :])
 
-    def plot_rates(self, save_path: str = None, ax: mpl.axes.Axes = None):
+    def get_rate_map_matrix(
+        self,
+    ):
+        """
+        Get the ratemap matrix of the network
+
+        Returns
+        -------
+        ratemap_matrix : ndarray
+            (self.resolution_width, self.resolution_depth) with the ratemap matrix
+        """
+        r_out_im = self.get_full_output_rate()
+        r_out_im = r_out_im.reshape((self.resolution_width, self.resolution_depth))
+        return r_out_im
+
+    def plot_rate_map(self, save_path: str = None, ax: mpl.axes.Axes = None):
+        """
+        Plot current rates and an example of inhibitory and excitatory neuron
+
+        Parameters
+        ----------
+        save_path : str
+            Path to save the figure. Default None, it doesn't save the figure
+        ax : ndarray of matplotlib.axis
+            (3,) with 3 axis to make plots from matplotlib, if None it will create an entire figure
+        """
+        if ax is None:
+            f, ax = plt.subplots()
+        r_out_im = self.get_full_output_rate()
+        r_out_im = r_out_im.reshape((self.resolution_width, self.resolution_depth))
+        make_plot_rate_map(r_out_im.T, ax, "Out rate", "width", "depth", "Firing rate")
+
+        if save_path is not None:
+            plt.savefig(save_path, bbox_inches="tight")
+            plt.close("all")
+        else:
+            return ax
+
+    def plot_all_rates(self, save_path: str = None, ax: mpl.axes.Axes = None):
         """
         Plot current rates and an example of inhibitory and excitatory neuron
 
@@ -389,21 +434,15 @@ class Weber2018(AgentCore):
 
         r_out_im = self.get_full_output_rate()
         r_out_im = r_out_im.reshape((self.resolution_width, self.resolution_depth))
-
         exc_im = self.exc_cell_list[np.random.choice(np.arange(self.exc_cell_list.shape[0])), ...].reshape(
             (self.resolution_width, self.resolution_depth)
         )
         inh_im = self.inh_cell_list[np.random.choice(np.arange(self.inh_cell_list.shape[0])), ...].reshape(
             (self.resolution_width, self.resolution_depth)
         )
-
-        ax[0].imshow(exc_im.T, cmap="Reds")
-        ax[0].set_title("Exc rates", fontsize=14)
-        ax[1].imshow(inh_im.T, cmap="Blues")
-        ax[1].set_title("Inh rates", fontsize=14)
-        im = ax[2].imshow(r_out_im.T, cmap="jet")
-        ax[2].set_title("Out rate", fontsize=14)
-        plt.colorbar(im, ax=ax[2])
+        make_plot_rate_map(exc_im.T, ax[0], "Exc rates", "width", "depth", "Firing rate")
+        make_plot_rate_map(inh_im.T, ax[1], "Inh rates", "width", "depth", "Firing rate")
+        make_plot_rate_map(r_out_im.T, ax[2], "Out rate", "width", "depth", "Firing rate")
 
         if save_path is not None:
             plt.savefig(save_path, bbox_inches="tight")

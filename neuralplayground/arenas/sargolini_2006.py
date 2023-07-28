@@ -114,6 +114,3 @@ class BasicSargolini2006(Hafting2008):
 
     def plot_recording_tetr(self, **kwargs):
         print("No tetrode data available")
-
-    def plot_recorded_trajectory(self, **kwargs):
-        NotImplemented

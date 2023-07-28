@@ -12,6 +12,7 @@ import neuralplayground
 from neuralplayground.datasets import fetch_data_path
 from neuralplayground.experiments.hafting_2008_data import Hafting2008Data
 from neuralplayground.utils import get_2D_ratemap
+from neuralplayground.plotting.plot_utils import make_plot_trajectories , make_plot_rate_map
 
 
 class Wernle2018Data(Hafting2008Data):
@@ -104,6 +105,7 @@ class Wernle2018Data(Hafting2008Data):
         """
 
         # Load ratemaps
+        self.best_recording_index = 100  # Nice session recording as default
         self.inner_path = "nn_Data+Code/data/"
         self.ratemap = sio.loadmat(os.path.join(self.data_path, self.inner_path, "Figures_1_2_3/ratemaps.mat"))
         self.ratemap = self.ratemap["ratemaps"]
@@ -258,6 +260,8 @@ class Wernle2018Data(Hafting2008Data):
             return data_list
 
         else:
+            if recording_index is None:
+                recording_index = self.best_recording_index
             session_info = self.recording_list.iloc[recording_index]
             if type(session_info["recorded_vars"]) is list:
                 sess_index = session_info["session"]
@@ -333,6 +337,9 @@ class Wernle2018Data(Hafting2008Data):
         (when using list pr tuple as argument, this function return a list or tuple of the variables listed above)
         """
         # Recursive call of this function in case of list or tuple
+        if recording_index is None:
+            recording_index = self.best_recording_index
+
         if type(recording_index) is list or type(recording_index) is tuple:
             axis_list = []
             for i, ind in enumerate(recording_index):
@@ -356,6 +363,32 @@ class Wernle2018Data(Hafting2008Data):
         # Generate axis in case ax is None
         if ax is None:
             f, ax = plt.subplots(1, 1, figsize=(10, 8))
+
+        # Recall recorded data
+
+        h, binx, biny = self.recording_tetr()
+
+        # Adding merging status to plot title
+
+        merged = self.recording_list.iloc[recording_index]["before_merge"]
+        merged_mssg = "merged" if not merged else "before_merge"
+
+        sess_index = self.recording_list.iloc[recording_index]["session"]
+        # Use auxiliary function to make the plot
+        ax=make_plot_rate_map(h, ax, "sess_index_" + str(sess_index) + "_" + merged_mssg,"width","depth","Firing rate")
+        # Save if save_path is not None
+        if save_path is None:
+            pass
+        else:
+            plt.savefig(save_path, bbox_inches="tight")
+        # Return ratemap values, x bin limits and y bin limits
+        return ax
+
+    def recording_tetr(self, recording_index: Union[int, tuple, list] = None,
+                            save_path: Union[str, tuple, list] = None,
+                            tetrode_id: Union[str, tuple, list] = None,
+                            bin_size: float = 2.0):
+
 
         # Recall recorded data
         session_data, rev_vars, rat_info = self.get_recording_data(recording_index)
@@ -382,7 +415,6 @@ class Wernle2018Data(Hafting2008Data):
                 y_size=int(arena_depth / bin_size),
                 filter_result=True,
             )
-
         elif type(rev_vars) is list and "spikes" not in rev_vars:
             warnings.warn("No spike data pre merging")
             return
@@ -391,20 +423,8 @@ class Wernle2018Data(Hafting2008Data):
             binx = np.linspace(self.arena_limits[0, 0], self.arena_limits[0, 1], num=h.shape[1])
             biny = np.linspace(self.arena_limits[1, 0], self.arena_limits[1, 1], num=h.shape[0])
 
-        # Adding merging status to plot title
-        merged = self.recording_list.iloc[recording_index]["before_merge"]
-        merged_mssg = "merged" if not merged else "before_merge"
-
-        sess_index = self.recording_list.iloc[recording_index]["session"]
-        # Use auxiliary function to make the plot
-        self._make_tetrode_plot(h, ax, "sess_index_" + str(sess_index) + "_" + merged_mssg, save_path)
-        # Save if save_path is not None
-        if save_path is None:
-            pass
-        else:
-            plt.savefig(save_path, bbox_inches="tight")
-        # Return ratemap values, x bin limits and y bin limits
         return h, binx, biny
+
 
     def plot_trajectory(
         self,
@@ -439,6 +459,9 @@ class Wernle2018Data(Hafting2008Data):
             array with the timestamps in seconds per position of the given session
 
         """
+        if recording_index is None:
+            recording_index = self.best_recording_index
+
         if type(recording_index) is list or type(recording_index) is tuple:
             axis_list = []
             for i, ind in enumerate(recording_index):
@@ -475,7 +498,8 @@ class Wernle2018Data(Hafting2008Data):
             return
 
         # Helper function to format the trajectory plot
-        ax = self._make_trajectory_plot(x, y, ax, plot_every)
+
+        ax =  make_plot_trajectories(self.arena_limits, x, y, ax, plot_every)
         if save_path is None:
             pass
         else:
@@ -509,89 +533,15 @@ class Wernle2018Data(Hafting2008Data):
         ratemaps_before = []
         ratemaps_after = []
         for i in range(n_cells):
-            ax[i, 0].imshow(self.ratemap[session_index[i], 0], cmap="jet")
-            ax[i, 1].imshow(self.ratemap[session_index[i], 1], cmap="jet")
+            make_plot_rate_map(self.ratemap[session_index[i], 0],  ax[i, 0], "Before merging", "width", "depth","Firing rate")
+            make_plot_rate_map(self.ratemap[session_index[i], 1], ax[i, 1], "After merging", "width", "depth", "Firing rate")
             ratemaps_before.append(self.ratemap[session_index[i], 0])
             ratemaps_after.append(self.ratemap[session_index[i], 1])
             ax[i, 0].axhline(y=50, color="white")
             ax[i, 1].axhline(y=50, color="white", linestyle="--")
-        ax[0, 0].set_title("Before merging")
-        ax[0, 1].set_title("After merging")
         return ratemaps_before, ratemaps_after, ax
 
-    def plot_development(
-        self,
-        n_cells: int = 3,
-        time_interval: Union[tuple, list] = (1.0, 2.0),
-        merged: bool = False,
-        plot_every: int = 10,
-    ):
-        """Prototype function for evolution of ratemaps through time
 
-        Parameters
-        ----------
-        n_cells: int
-            Number of cells to plot, from 0 to 19
-        time_interval: 2D-tuple or list with floats
-            Time inverval from experiment, if merged true, then time inverval after merging
-        merged: bool
-            If True, make plot for data after merging
-        plot_every: int
-            time steps skipped to make the plot to reduce cluttering
-
-        Returns
-        -------
-        ax: mpl.axes._subplots.AxesSubplot (matplotlib axis from subplots)
-            Modified axis where the trajectory is plotted
-        """
-        if merged:
-            pos = self.pos_AB[:n_cells, 0]
-        else:
-            pos = self.pos_A_B[:n_cells, 0]
-
-        f, ax = plt.subplots(1, n_cells, figsize=(4 * n_cells, 3))
-        for cell in range(n_cells):
-            pos_i = pos[cell]
-            init_sample = int(pos_i.shape[0] * (time_interval[0] * 60.0) / (np.amax(pos_i[:, 0])))
-            finish_sample = int(pos_i.shape[0] * (time_interval[1] * 60.0) / (np.amax(pos_i[:, 0])))
-            finish_sample - init_sample
-            cmap = mpl.cm.get_cmap("plasma")
-            norm = plt.Normalize(init_sample, finish_sample)
-            aux_x, aux_y = [], []
-            prev_x, prev_y = pos_i[init_sample, 1], pos_i[finish_sample, 2]
-            for sample_i in range(init_sample, finish_sample, plot_every):
-                x, y = pos_i[sample_i, 1], pos_i[sample_i, 2]
-                aux_x.append(x)
-                aux_y.append(y)
-                ax[cell].plot(
-                    (prev_x, x),
-                    (prev_y, y),
-                    "-",
-                    color=cmap(norm(sample_i)),
-                    alpha=0.4,
-                    lw=0.5,
-                )
-                prev_x = x
-                prev_y = y
-            ax[cell].set_ylim((-100, 100))
-            ax[cell].set_xlim((-100, 100))
-            sc = ax[cell].scatter(
-                aux_x,
-                aux_y,
-                c=np.arange(init_sample, finish_sample, plot_every),
-                vmin=init_sample,
-                vmax=finish_sample,
-                cmap="plasma",
-                alpha=0.4,
-                s=2,
-            )
-            ax[cell].axhline(y=0, color="black")
-            ticks = np.linspace(init_sample, finish_sample, num=10)
-            tickslabels = np.round(np.linspace(init_sample / 50 / 60, finish_sample / 50 / 60, num=10), 1)
-            cbar = plt.colorbar(sc, ax=ax[cell], ticks=ticks)
-            cbar.ax.set_yticklabels(tickslabels, fontsize=8)
-            cbar.ax.set_ylabel("Time [min]", rotation=270, labelpad=12)
-        return ax
 
     def get_recorded_session(self, recording_index=None):
         # Not used, override to avoid issues

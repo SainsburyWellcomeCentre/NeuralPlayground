@@ -1,3 +1,7 @@
+import json
+import os
+from datetime import datetime
+
 import numpy as np
 from scipy.interpolate import interp1d
 from scipy.ndimage import gaussian_filter
@@ -332,3 +336,27 @@ class OnlineRateMap(object):
         self.nan = np.nan
         filtered_ratemap[nan_indexes] = self.nan
         return filtered_ratemap
+
+
+def check_dir(path):
+    if not os.path.isdir(path):
+        os.makedirs(path)
+
+
+def get_date_time():
+    # datetime object containing current date and time
+    now = datetime.now()
+    dt_string = now.strftime("%d-%m-%Y_%H-%M-%S-%f")[:-3]
+    now = str(dt_string)
+    return now
+
+
+def dict_to_json(dict, path):
+    with open(path, "w") as outfile:
+        json.dump(dict, outfile)
+
+
+def load_json(path):
+    with open(path, "r") as infile:
+        dict = json.load(infile)
+    return dict

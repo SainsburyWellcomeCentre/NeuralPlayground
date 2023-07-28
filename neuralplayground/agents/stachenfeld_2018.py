@@ -7,11 +7,15 @@ This implementation can interact with environments from the package as shown in 
 Check examples/Stachenfeld_2018_example.ipynb
 """
 
+import random
 import sys
+from typing import Union
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
+
+from neuralplayground.plotting.plot_utils import make_plot_rate_map
 
 from .agent_core import AgentCore
 
@@ -114,8 +118,6 @@ class Stachenfeld2018(AgentCore):
         self.gamma = mod_kwargs["discount"]
         self.threshold = mod_kwargs["threshold"]
         self.learning_rate = mod_kwargs["lr_td"]
-        self.t_episode = mod_kwargs["t_episode"]
-        self.n_episode = mod_kwargs["n_episode"]
         self.room_width = mod_kwargs["room_width"]
         self.room_depth = mod_kwargs["room_depth"]
         self.state_density = mod_kwargs["state_density"]
@@ -124,15 +126,15 @@ class Stachenfeld2018(AgentCore):
 
         self.reset()
         # Variables for the SR-agent state space
-        self.resolution_d = int(self.state_density * self.room_depth)
-        self.resolution_w = int(self.state_density * self.room_width)
-        self.x_array = np.linspace(-self.room_width / 2, self.room_width / 2, num=self.resolution_d)
-        self.y_array = np.linspace(self.room_depth / 2, -self.room_depth / 2, num=self.resolution_w)
+        self.resolution_depth = int(self.state_density * self.room_depth)
+        self.resolution_width = int(self.state_density * self.room_width)
+        self.x_array = np.linspace(-self.room_width / 2, self.room_width / 2, num=self.resolution_width)
+        self.y_array = np.linspace(self.room_depth / 2, -self.room_depth / 2, num=self.resolution_depth)
         self.mesh = np.array(np.meshgrid(self.x_array, self.y_array))
         self.xy_combinations = self.mesh.T.reshape(-1, 2)
-        self.w = int(self.room_width * self.state_density)
-        self.l = int(self.room_depth * self.state_density)
-        self.n_state = int(self.l * self.w)
+        self.width = int(self.room_width * self.state_density)
+        self.depth = int(self.room_depth * self.state_density)
+        self.n_state = int(self.depth * self.width)
         self.obs_history = []
         if twoD:
             self.create_transmat(self.state_density, "2D_env")
@@ -145,6 +147,7 @@ class Stachenfeld2018(AgentCore):
         self.srmat = []
         self.srmat_sum = []
         self.srmat_ground = []
+        self.srmat_full_td = []
         self.transmat_norm = []
         self.inital_obs_variable = None
         self.obs_history = []  # Reset observation history
@@ -165,7 +168,7 @@ class Stachenfeld2018(AgentCore):
 
 
         """
-        np.arange(self.n_state).reshape(self.l, self.w)
+        np.arange(self.n_state).reshape(self.depth, self.width)
 
         diff = self.xy_combinations - pos[np.newaxis, ...]
         dist = np.sum(diff**2, axis=1)
@@ -240,22 +243,22 @@ class Stachenfeld2018(AgentCore):
 
         if name_env == "2D_env":
             adjmat_triu = np.zeros((self.n_state, self.n_state))
-            node_layout = np.arange(self.n_state).reshape(self.l, self.w)
-            np.linspace(0, np.min([self.l / self.w, 1]), num=self.l)
-            np.linspace(0, np.min([self.w / self.l, 1]), num=self.w)
+            node_layout = np.arange(self.n_state).reshape(self.depth, self.width)
+            np.linspace(0, np.min([self.depth / self.width, 1]), num=self.depth)
+            np.linspace(0, np.min([self.width / self.depth, 1]), num=self.width)
             self.xy = []
 
-            for i in range(self.l):
-                for j in range(self.w):
+            for i in range(self.depth):
+                for j in range(self.width):
                     s = node_layout[i, j]
                     neighbours = []
                     if i - 1 >= 0:
                         neighbours.append(node_layout[i - 1, j])
-                    if i + 1 < self.l:
+                    if i + 1 < self.depth:
                         neighbours.append(node_layout[i + 1, j])
                     if j - 1 >= 0:
                         neighbours.append(node_layout[i, j - 1])
-                    if j + 1 < self.w:
+                    if j + 1 < self.width:
                         neighbours.append(node_layout[i, j + 1])
                     adjmat_triu[s, neighbours] = 1
 
@@ -274,9 +277,9 @@ class Stachenfeld2018(AgentCore):
 
         return self.transmat_norm
 
-    def update_successor_rep(self):
+    def successor_rep_solution(self):
         """
-        Compute the successor representation matrix using geometric sums.
+        Compute closed form solution of successor representation matrix using geometric sums.
 
         Returns:
         -------
@@ -329,15 +332,15 @@ class Stachenfeld2018(AgentCore):
         L = b.reshape(a.shape + (self.n_state,))
         curr_state_vec = L
 
-        update_val = curr_state_vec + self.gamma * self.srmat[:, next_state] - self.srmat[:, self.curr_state]
-        self.srmat[:, self.curr_state] = self.srmat[:, self.curr_state] + self.learning_rate * update_val
+        td_error = curr_state_vec + self.gamma * self.srmat[:, next_state] - self.srmat[:, self.curr_state]
+        self.srmat[:, self.curr_state] = self.srmat[:, self.curr_state] + self.learning_rate * td_error
 
-        self.grad_history.append(np.sqrt(np.sum(update_val**2)))
+        self.grad_history.append(np.sqrt(np.sum(td_error**2)))
         self.curr_state = next_state
 
-        return self.srmat
+        return {"state_td_error": td_error}
 
-    def update_successor_rep_td_full(self):
+    def update_successor_rep_td_full(self, n_episode: int = 100, t_episode: int = 100):
         """
         Compute the successor representation matrix using TD learning
 
@@ -348,18 +351,16 @@ class Stachenfeld2018(AgentCore):
 
         """
         random_state = np.random.RandomState(1234)
-
         t_elapsed = 0
         srmat0 = np.eye(self.n_state)
         srmat_full = srmat0.copy()
-        for i in range(self.n_episode):
+        for i in range(n_episode):
             curr_state = random_state.randint(self.n_state)
-            for j in range(self.t_episode):
+            for j in range(t_episode):
                 a = np.array([curr_state])
                 x = a.flatten()
                 b = np.eye(self.n_state)[x, : self.n_state]
                 L = b.reshape(a.shape + (self.n_state,))
-
                 curr_state_vec = L
                 random_state.multinomial(1, self.transmat_norm[curr_state, :])
                 next_state = np.where(random_state.multinomial(1, self.transmat_norm[curr_state, :]))[0][0]
@@ -369,10 +370,21 @@ class Stachenfeld2018(AgentCore):
                 )
                 curr_state = next_state
                 t_elapsed += 1
+                self.srmat_full_td = srmat_full
+        return self.srmat_full_td
 
-        return srmat_full
+    def get_rate_map_matrix(
+        self,
+        sr_matrix=None,
+        eigen_vector: int = 10,
+    ):
+        if sr_matrix is None:
+            sr_matrix = self.successor_rep_solution()
+        evals, evecs = np.linalg.eig(sr_matrix)
+        r_out_im = evecs[:, eigen_vector].reshape((self.resolution_width, self.resolution_depth)).real
+        return r_out_im
 
-    def plot_transition(self, matrix: np.ndarray, save_path: str = None, ax: mpl.axes.Axes = None):
+    def plot_transition(self, save_path: str = None, ax: mpl.axes.Axes = None):
         """
         Plot the input matrix and compare it to the transition matrix from the rectangular
         environment states space (rectangular- transmat).
@@ -384,45 +396,44 @@ class Stachenfeld2018(AgentCore):
         save_path: string
             Path to save the plot
         """
-        evals, evecs = np.linalg.eig(matrix)
+        T = self.get_T_from_M(self.srmat)
         if ax is None:
             f, ax = plt.subplots(1, 2, figsize=(14, 5))
-            ax[0].imshow(self.transmat_norm, cmap="jet")
-            ax[1].imshow(matrix, cmap="jet")
+            make_plot_rate_map(self.transmat_norm, ax[0], "Transition matrix", "states", "states", "State occupency")
+            make_plot_rate_map(T, ax[1], "Transition calculated from SR matrix", "states", "states", "State occupency")
         if save_path is not None:
             plt.savefig(save_path, bbox_inches="tight")
             plt.close("all")
         return ax
 
-    def plot_eigen(self, matrix: np.ndarray, save_path: str, eigen=(0, 1), ax: mpl.axes.Axes = None):
-        """ "
-        Plot the matrix and the 4 largest modes of its eigen-decomposition
+    def plot_rate_map(
+        self,
+        sr_matrix=None,
+        eigen_vectors: Union[int, list, tuple] = None,
+        ax: mpl.axes.Axes = None,
+        save_path: str = None,
+    ):
+        if eigen_vectors is None:
+            eigen_vectors = random.randint(5, 19)
 
-        Parameters
-        ----------
-        matrix: array
-            The matrix that will be plotted
-        eigen:  np.ndarray
-            Which eigenvectors you would like to plot
-        save_path: string
-            Path to save the plot
-        """
+        if isinstance(eigen_vectors, int):
+            rate_map_mat = self.get_rate_map_matrix(sr_matrix, eigen_vector=eigen_vectors)
 
-        evals, evecs = np.linalg.eig(matrix)
-
-        if ax is None:
-            f, ax = plt.subplots(1, len(eigen), figsize=(4 * len(eigen), 5))
-            if len(eigen) == 1:
-                evecs_0 = evecs[:, eigen[0]].reshape(self.l, self.w).real
-                im = ax.imshow(evecs_0, cmap="jet")
-                plt.colorbar(im, ax=ax)
-            else:
-                for i, eig in enumerate(eigen):
-                    evecs_0 = evecs[:, eig].reshape(self.l, self.w).real
-                    im = ax[i].imshow(evecs_0, cmap="jet")
-                plt.colorbar(im, ax=ax[i])
+            if ax is None:
+                f, ax = plt.subplots(1, 1, figsize=(4, 5))
+            make_plot_rate_map(rate_map_mat, ax, "Rate map: Eig" + str(eigen_vectors), "width", "depth", "Firing rate")
+        else:
+            if ax is None:
+                f, ax = plt.subplots(1, len(eigen_vectors), figsize=(4 * len(eigen_vectors), 5))
+            if isinstance(ax, mpl.axes.Axes):
+                ax = [
+                    ax,
+                ]
+            for i, eig in enumerate(eigen_vectors):
+                rate_map_mat = self.get_rate_map_matrix(sr_matrix, eigen_vector=eig)
+                make_plot_rate_map(rate_map_mat, ax[i], "Rate map: " + "Eig" + str(eig), "width", "depth", "Firing rate")
         if save_path is None:
             pass
         else:
             plt.savefig(save_path, bbox_inches="tight")
-        return ax
+            return ax

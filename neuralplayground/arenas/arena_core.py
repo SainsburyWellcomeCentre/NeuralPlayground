@@ -143,7 +143,8 @@ class Environment(Env):
         save_path: str
             Path to save the environment
         """
-        pickle.dump(self.__dict__, open(os.path.join(save_path), "wb"), pickle.HIGHEST_PROTOCOL)
+        # pickle.dump(self.__dict__, open(os.path.join(save_path), "wb"), pickle.HIGHEST_PROTOCOL)
+        pickle.dump(self, open(os.path.join(save_path), "wb"), pickle.HIGHEST_PROTOCOL)
 
     def restore_environment(self, save_path: str):
         """Restore environment saved using save_environment method
@@ -153,7 +154,9 @@ class Environment(Env):
         save_path: str
             Path to retrieve the environment
         """
-        self.__dict__ = pd.read_pickle(save_path)
+        # self.__dict__ = pd.read_pickle(save_path)
+        # TODO: for some reason, ruff has a problem with this: self = pd.read_pickle(save_path)
+        pd.read_pickle(save_path)
 
     def __eq__(self, other):
         """Check if two environments are equal by comparing all of its attributes
