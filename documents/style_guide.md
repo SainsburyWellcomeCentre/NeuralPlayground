@@ -532,5 +532,5 @@ The class does not contain its own attributes and only provides functions which 
 >             - Description: The bin limits of the ratemap on the y axis (returned as list or tupe depending on the argument type).
 >     - Description: The tetrode ratemap from spike data for a given recording index or a list of recording index. If given a list or tuple as argument, all arguments must be list, tuple, or None.
 
-The example usage of this class can then be found in the ["experimental_data_examples.ipynb"](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/experimental_examples/experimental_data_examples.ipynb) notebook as per the instructions on adding an experimental class.
+The example usage of this class can then be found in the ["experimental_data_examples.ipynb"](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/experimental_examples/experimental_data_examples.ipynb) notebook as per the instructions on adding an experimental class. <!-- this example notebook should probably be improved if we say people must make clear examples to add an experimental class -->
 
