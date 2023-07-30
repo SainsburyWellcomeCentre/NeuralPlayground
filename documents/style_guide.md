@@ -339,4 +339,35 @@ Additionally your class will also inherit the necessary methods that the rest of
 ## Experiment <!-- A bunch of the links below that I copied from the readme go to clem's user and not SWCs -->
 Implementing a style format for experimental classes is more complex due to the wide variety of data formats and experimental setups. For consistency and ease of future development, when creating a new experimental class the `Experiment` class should be inherited from "experiment_core.py". However, for the moment this class remains empty and provides no variables or functionality. It then becomes key that the steps described in [How To Contribute](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/tree/main/neuralplayground/experiments#3-how-to-contribute) are followed. In particular providing a minimal example of the functionality offered by the class in [Examples](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples/experimental_examples/) is very important. This allows for future developers to easily use the class (without having a base class available to extrapolate from) but also to find similarities between experimental classes. For example [Hafting2008Data](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/experiments/hafting_2008_data.py) offers a simple class for 2D Experimental data. Consequently our implementation of [Sargolini2006Data](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/experiments/sargolini_2006_data.py) inherits from [Hafting2008Data](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/experiments/hafting_2008_data.py). This is ideal and aligns well with the motivation of this package - to begin to standardise the presentation and interface with neuroscience research. For the purpose of example we will describe the style of [Hafting2008Data](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/experiments/hafting_2008_data.py).
 
-### Hafting2008Data
+### hafting_2008_data.py
+The original article of Hafting et al. 2008. can be found at https://www.nature.com/articles/nature06957. The data can be obtained from https://archive.norstore.no/pages/public/datasetDetail.jsf?id=C43035A4-5CC5-44F2-B207-126922523FD9. This class only consider animal raw animal trajectories and neural recordings.
+
+The class does not contain its own attributes and only provides functions which interface with the data. These functions are:
+> * `__init__( )`
+>     - Accepts:  
+>         - `data_path` : *str* 
+>             - Default: `None`
+>             - Description: If `None` then fetch the data from the NeuralPlayground data repository, else load data from the given path.
+>         - `recording_index` : *int*
+>             - Default: `None`
+>             - Description: If `None` then load data from default recording index.
+>         - `experiment_name`: *str* 
+>             - Default: "FullHaftingData"
+>             - Description: A string to identify the object in case multiple instances of the class are being used.
+>         - `verbose`: *bool*
+>             - Default: `False`
+>             - Description: If `True` then it will print original readme and data structure when initializing this object.
+>     - Returns: None
+>     - Description: Function which initialises an object of the class. Providing no inputs will default the object to reload the dataset from the repositories.
+>
+> * `set_animal_data()`
+>     - Accepts:
+>         - `recording_index`: *int*
+>             - Default: `0`
+>             - Description: Provides a unique digit for the recording.
+>         - `tolerance`: *float*
+>             - Default: `1e-10`
+>             - Description: Degree of allowable deviation or variance when calculating the head direction.
+>     - Returns: `None`
+>     - Description: Set position and head direction of the animal to be used by an Arena-based class later.
+>
