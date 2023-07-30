@@ -485,3 +485,52 @@ The class does not contain its own attributes and only provides functions which 
 >         - `biny`: *ndarray (nybins +1,)*
 >             - Description: The bin limits of the ratemap on the y axis (returned as list or tupe depending on the argument type).
 >     - Description: Plot tetrode ratemap from spike data for a given recording index or a list of recording index. If given a list or tuple as argument, all arguments must be list, tuple, or None.
+>
+> * `plot_trajectory()`
+>     - Accepts:
+>         - `recording_index`: *int, tuple of ints, list of ints*
+>             - Default: `None`
+>             - Description: The recording index to plot spike ratemap, if list or tuple, it will recursively call this function to make a plot per recording index. If this argument is list or tuple, the rest of variables must be list or tuple with their respective types, or keep the default None value.
+>         - `save_path`: *str, list of str, tuple of str*
+>             - Default: `None`
+>             - Description: The saving path of the generated figure. If None then no figure is saved
+>         - `ax`: *mpl.axes._subplots.AxesSubplot, list of ax, or tuple of ax*
+>             - Default: `None`
+>             - Description: An axis or list of axis from subplot from matplotlib where the ratemap will be plotted. If None, ax is generated with default options.
+>         - `plot_every`: *int*
+>             - Default: `20`
+>             - Description: The number of time steps skipped to make the plot to reduce cluttering.
+>     - Returns:
+>         - `x`: *ndarray (n_samples,)*
+>             - Description: The x position throughout recording of the given session.
+>         - `y`: *ndarray (n_samples,)*
+>             - Description: The y position throughout recording of the given session.
+>         - `time_array`: *ndarray (n_samples,)*
+>             - Description: An array with the timestamps in seconds per position of the given session.
+>     - Description: Plot of the animal trajectory from a given recording index, corresponding to a recording session.
+>  
+> * `recording_tetr()`
+>     - Accepts:
+>         - `recording_index`: *int, tuple of ints, list of ints*
+>             - Default: `None`
+>             - Description: The recording index to plot spike ratemap, if list or tuple, it will recursively call this function to make a plot per recording index. If this argument is list or tuple, the rest of variables must be list or tuple with their respective types, or keep the default None value.
+>         - `save_path`: *str, list of str, tuple of str*
+>             - Default: `None`
+>             - Description: The saving path of the generated figure. If None then no figure is saved
+>         - `tetrode_id`: *str, list of str, or tuple of str*
+>             - Default: `None`
+>             - Description: tetrode id in the corresponding session.
+>         - `bin_size`: *float*
+>             - Default: `2.0`
+>             - Description: The bin size to discretize space when computing ratemap 
+>     - Returns:
+>         - `h`: *ndarray (nybins, nxbins)*
+>             - Description: Number of spikes falling on each bin through the recorded session, nybins number of bins in y axis, nxbins number of bins in x axis (returned as list or tupe depending on the argument type).
+>         - `binx`: *ndarray (nxbins +1,)*
+>             - Description: The bin limits of the ratemap on the x axis (returned as list or tupe depending on the argument type).
+>         - `biny`: *ndarray (nybins +1,)*
+>             - Description: The bin limits of the ratemap on the y axis (returned as list or tupe depending on the argument type).
+>     - Description: The tetrode ratemap from spike data for a given recording index or a list of recording index. If given a list or tuple as argument, all arguments must be list, tuple, or None.
+
+The example usage of this class can then be found in the ["experimental_data_examples.ipynb"](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/experimental_examples/experimental_data_examples.ipynb) notebook as per the instructions on adding an experimental class.
+
