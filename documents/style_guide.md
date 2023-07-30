@@ -371,3 +371,117 @@ The class does not contain its own attributes and only provides functions which 
 >     - Returns: `None`
 >     - Description: Set position and head direction of the animal to be used by an Arena-based class later.
 >
+> * `_find_data_path()`
+>     - Accepts:
+>         - `data_path`: *str*
+>             - Default: `None`
+>             - Description: File path to data.
+>     - Returns: `None`
+>     - Description: Fetch data from NeuralPlayground data repository if no data path is supplied by the user or fetches the data from the path.
+>
+> * `_load_data()`
+>     - Accepts: `None`
+>     - Returns: `None`
+>     - Description: Parse data according to specific data format. If you are a user check the notebook examples.
+>  
+> * `_create_dataframe()`
+>     - Accepts: `None`
+>     - Returns: `None`
+>     - Description: Generates dataframe for easy display and access of data.
+>  
+> * `show_data()`
+>     - Accepts:
+>         - `full_dataframe`: *bool*
+>             - Default: `False`
+>             - Description: If True then it will show all available data, a small sample otherwise  
+>     - Returns:
+>         - `recording_list`: *Pandas dataframe*
+>             - Description: List of available data, columns with rat_id, recording session and recorded variables 
+>     - Description: Print of available data recorded in the experiment.
+>  
+> * `show_readme()`
+>     - Accepts: `None`
+>     - Returns: `None`
+>     - Description: Print original readme of the dataset.
+>  
+> * `get_recorded_session()`
+>     - Accepts:
+>         - `recording_index`: *int*
+>             - Default: `None`
+>             - Description: Recording identifier, index in pandas dataframe with listed data  
+>     - Returns:
+>         - `rat_id`: *str*
+>             - Description: The rat identifier from experiment
+>         - `sess`: *str*
+>             - Description: The recording session identifier from experiment
+>         - `recorded_vars`: *list of str*
+>             - Description: Variables recorded from a given session
+>     - Description: Get identifiers to sort the experimental data.
+>  
+> * `get_recording_data()`
+>     - Accepts:
+>         - `recording_index`: *int*
+>             - Default: `None`
+>             - Description: The recording identifier - an index in the pandas dataframe with listed data  
+>     - Returns:
+>         - `session_data`: *dict*
+>             - Description: Dictionary with recorded raw data from the session of the respective recording index. Format of this data follows original readme from the authors of the experiments.
+>         - `rec_vars`: *list of str*
+>             - Description: The keys of session_data dict and recorded variables for a given session
+>         - `identifiers`: *dict*
+>             - Description: Dictionary with rat_id and session_id of the returned session data
+>     - Description: Get experimental data for a given recordin index.
+> 
+> * `_find_tetrode()`
+>     - Accepts:
+>         - `rev_vars`: *list of strings*
+>             - Description: The recorded variables for a given session, tetrode id within it  
+>     - Returns:
+>         - `tetrode_id`: *str*
+>             - Description: The first tetrode id which is found in the recorded variable list.
+>     - Description: Static function to find tetrode id in a multiple tetrode recording session.
+>  
+> * `get_tetrode_data()`
+>     - Accepts:
+>         - `session_data`: *str*
+>             - Default: `None`
+>             - Description: If None the the session used corresponds to the default recording index
+>         - `tetrode_id`: *str*
+>             - Default: `None`
+>             - Description: The tetrode id in the corresponding session
+>     - Returns:
+>         - `time_array`: *ndarray*
+>             - Description: The array with the timestamps in seconds per position of the given session.
+>         - `test_spikes`: *ndarray*
+>             - Description: The spike times in seconds of the given session.
+>         - `x`: *ndarray*
+>             - Description: The x position throughout recording of the given session.
+>         - `y`: *ndarray*
+>             - Description: The y position throughout recording of the given session. 
+>     - Description: Return time stamp, position and spikes for a given session and tetrode.
+>  
+> * `plot_recording_tetr()`
+>     - Accepts:
+>         - `recording_index`: *int, tuple of ints, list of ints*
+>             - Default: `None`
+>             - Description: The recording index to plot spike ratemap, if list or tuple, it will recursively call this function to make a plot per recording index. If this argument is list or tuple, the rest of variables must be list or tuple with their respective types, or keep the default None value.
+>         - `save_path`: *str, list of str, tuple of str*
+>             - Default: `None`
+>             - Description: The saving path of the generated figure. If None then no figure is saved
+>         - `ax`: *mpl.axes._subplots.AxesSubplot, list of ax, or tuple of ax*
+>             - Default: `None`
+>             - Description: An axis or list of axis from subplot from matplotlib where the ratemap will be plotted. If None, ax is generated with default options.
+>         - `tetrode_id`: *str, list of str, or tuple of str*
+>             - Default: `None`
+>             - Description: tetrode id in the corresponding session.
+>         - `bin_size`: *float*
+>             - Default: `2.0`
+>             - Description: The bin size to discretize space when computing ratemap 
+>     - Returns:
+>         - `h`: *ndarray (nybins, nxbins)*
+>             - Description: Number of spikes falling on each bin through the recorded session, nybins number of bins in y axis, nxbins number of bins in x axis (returned as list or tupe depending on the argument type).
+>         - `binx`: *ndarray (nxbins +1,)*
+>             - Description: The bin limits of the ratemap on the x axis (returned as list or tupe depending on the argument type).
+>         - `biny`: *ndarray (nybins +1,)*
+>             - Description: The bin limits of the ratemap on the y axis (returned as list or tupe depending on the argument type).
+>     - Description: Plot tetrode ratemap from spike data for a given recording index or a list of recording index. If given a list or tuple as argument, all arguments must be list, tuple, or None.
