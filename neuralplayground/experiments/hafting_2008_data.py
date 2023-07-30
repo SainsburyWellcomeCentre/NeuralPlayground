@@ -22,6 +22,67 @@ class Hafting2008Data(Experiment):
     The data can be obtained from https://archive.norstore.no/pages/public/datasetDetail.jsf?id=C43035A4-5CC5-44F2-B207-126922523FD9
     This class only consider animal raw animal trajectories and neural recordings
     This class is also used for Sargolini2006Data due to its similar data structure
+
+    Attributes
+    ----------
+    data_path: str
+        if None, fetch the data from the NeuralPlayground data repository,
+        else load data from given path
+    best_recording_index: int
+        index of the best recording session to be used as default
+    arena_limits: ndarray (2,2)
+        limits of the arena in the experiment, first row x limits, second row y limits, in cm
+    data_per_animal: dict
+        dictionary with all the data from the experiment, organized by animal, session and recorded variables
+    recording_list: Pandas dataframe
+        List of available data, columns with rat_id, recording session and recorded variables
+    rat_id: str
+        rat identifier from experiment
+    sess: str
+        recording session identifier from experiment
+    rec_vars: list of str
+        Variables recorded from a given session
+    position: ndarray (n_samples, 2)
+        array with the x and y position throughout recording of the given session
+    head_direction: ndarray (n_samples, 2)
+        array with the x and y head direction throughout recording of the given session
+
+    Methods
+    -------
+    set_animal_data(recording_index: int = 0, tolerance: float = 1e-10)
+        Set position and head direction to be used by the Arena Class later
+    show_data(full_dataframe: bool = False)
+        Print of available data recorded in the experiment
+    show_readme()
+        Print original readme of the dataset
+    get_recorded_session(recording_index: int = None)
+        Get identifiers to sort the experimental data
+    get_recording_data(recording_index: int = None)
+        Get experimental data for a given recordin index
+    plot_recording_tetr(recording_index: Union[int, tuple, list] = None,
+                        save_path: Union[str, tuple, list] = None,
+                        ax: Union[mpl.axes.Axes, tuple, list] = None,
+                        tetrode_id: Union[str, tuple, list] = None,
+                        bin_size: float = 2.0)
+        Plot tetrode ratemap from spike data for a given recording index or a list of recording index.
+    plot_trajectory(recording_index: Union[int, tuple, list] = None,
+                    save_path: Union[str, tuple, list] = None,
+                    ax: Union[mpl.axes.Axes, tuple, list] = None,
+                    plot_every: int = 20)
+        Plot animal trajectory from a given recording index, corresponding to a recording session
+    recording_tetr(recording_index: Union[int, tuple, list] = None,
+                   save_path: Union[str, tuple, list] = None,
+                   tetrode_id: Union[str, tuple, list] = None,
+                   bin_size: float = 2.0)
+        tetrode ratemap from spike data for a given recording index or a list of recording index.
+    _find_tetrode(rev_vars: list)
+        Static function to find tetrode id in a multiple tetrode recording session
+    _find_data_path(data_path: str)
+        Fetch data from NeuralPlayground data repository if no data path is supplied by the user
+    _load_data()
+        Parse data according to specific data format if you are a user check the notebook examples
+    _create_dataframe()
+        Generate dataframe for easy display and access of data
     """
 
     def __init__(
@@ -30,6 +91,8 @@ class Hafting2008Data(Experiment):
         recording_index: int = None,
         experiment_name: str = "FullHaftingData",
         verbose: bool = False,
+        data_url: str = None,
+        paper_url: str = None,
     ):
         """Hafting2008Data Init
 
@@ -44,8 +107,18 @@ class Hafting2008Data(Experiment):
             string to identify object in case of multiple instances
         verbose:
             if True, it will print original readme and data structure when initializing this object
+        data_url: str
+            URL to the data used in the experiment, make sure it is publicly available for usage and download
+        paper_url: str
+            URL to the paper describing the experiment
         """
-        self.experiment_name = experiment_name
+
+        if data_url is None:
+            data_url = "https://archive.norstore.no/pages/public/datasetDetail.jsf?id=C43035A4-5CC5-44F2-B207-126922523FD9"
+        if paper_url is None:
+            paper_url = "https://www.nature.com/articles/nature06957"
+        super().__init__(experiment_name, data_url, paper_url)
+
         self._find_data_path(data_path)
         self._load_data()
         self._create_dataframe()

@@ -101,7 +101,7 @@ implemented model. Additionally, different Arenas can be initialised with artifi
 real-life experiments. We provide examples of module instantiation in the detailed jupyter notebooks found in 
 [examples_experiment](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples/experimental_examples), [examples_arena](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples/arena_examples) and [examples_agents](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples/agent_examples).
 <strong>Check our Tolman-Eichenbaum Machine Implementation 
-[this branch](https://github.com/ClementineDomine/NeuralPlayground/tree/whittington_2020) (work in progress).</strong>
+[this branch](https://github.com/ClementineDomine/NeuralPlayground/tree/whittington_2020) (work in progress), you will also need to install [pytorch](https://pytorch.org/).</strong>
 
 #### How to run interactions between modules
 

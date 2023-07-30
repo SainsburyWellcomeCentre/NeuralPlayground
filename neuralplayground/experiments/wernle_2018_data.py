@@ -18,6 +18,14 @@ from neuralplayground.plotting.plot_utils import make_plot_trajectories , make_p
 class Wernle2018Data(Hafting2008Data):
     """Data class for https://www.nature.com/articles/s41593-017-0036-6
     The data can be obtained from https://doi.org/10.11582/2017.00023
+
+    Refer to Hafting2008Data for more information into the available methods and attributes.
+    Additional methods in this class are the following:
+
+    Methods
+    -------
+    plot_merging_comparison(self, recording_index: int = None, tetrode_id: str = None, ax: mpl.axes = None)
+        Plot the merging (before and after) comparison for a given recording index and tetrode id
     """
 
     def __init__(
@@ -26,6 +34,8 @@ class Wernle2018Data(Hafting2008Data):
         recording_index: int = None,
         experiment_name: str = "FullWernleData",
         verbose: bool = False,
+        data_url: str = None,
+        paper_url: str = None,
     ):
         """Wernle2018Data init, just initializing parent class Hafting2008Data
 
@@ -41,11 +51,18 @@ class Wernle2018Data(Hafting2008Data):
         verbose:
             if True, it will print original readme and data structure when initializing this object
         """
+        if data_url is None:
+            data_url = "https://doi.org/10.11582/2017.00023"
+        if paper_url is None:
+            paper_url = "https://www.nature.com/articles/s41593-017-0036-6"
+
         super().__init__(
             data_path=data_path,
             recording_index=recording_index,
             experiment_name=experiment_name,
             verbose=verbose,
+            data_url=data_url,
+            paper_url=paper_url,
         )
 
     def _find_data_path(self, data_path: str):
