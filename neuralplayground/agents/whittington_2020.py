@@ -358,11 +358,6 @@ class Whittington2020(AgentCore):
         )
         shutil.copy2(
             os.path.abspath(os.path.join(os.getcwd(), os.path.abspath(os.path.join(curr_path, os.pardir))))
-            + "/agents/whittington_2020_extras/whittington_2020_plot.py",
-            os.path.join(self.script_path, "whittington_2020_plot.py"),
-        )
-        shutil.copy2(
-            os.path.abspath(os.path.join(os.getcwd(), os.path.abspath(os.path.join(curr_path, os.pardir))))
             + "/agents/whittington_2020_extras/whittington_2020_utils.py",
             os.path.join(self.script_path, "whittington_2020_utils.py"),
         )

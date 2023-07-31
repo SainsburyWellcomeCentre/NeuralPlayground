@@ -69,7 +69,7 @@ mod_name = "SimpleTEM"
 time_step_size = 1
 state_density = 1
 agent_step_size = 1 / state_density
-n_objects = 45
+n_objects = params["n_x"]
 
 # # Init environment from Hafting 2008 (optional, if chosen, comment out the )
 # env = Hafting2008(agent_step_size=agent_step_size,
@@ -107,7 +107,7 @@ agent = Whittington2020(
 
 # Reset environment and begin training (random_state=True is currently necessary)
 observation, state = env.reset(random_state=True, custom_state=None)
-for i in range(3):
+for i in range(params["train_it"]):
     print("Iteration: ", i)
     while agent.n_walk < params["n_rollout"]:
         actions = agent.batch_act(observation)
