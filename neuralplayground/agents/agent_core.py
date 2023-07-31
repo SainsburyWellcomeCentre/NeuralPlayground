@@ -70,7 +70,8 @@ class AgentCore(object):
         return action
 
     def update(self):
-        pass
+        """Update model parameters"""
+        return None
 
     def save_agent(self, save_path: str, raw_object: bool = True):
         """Save current state and information in general to re-instantiate the environment
