@@ -123,10 +123,14 @@ class Whittington2020(AgentCore):
         The base model executes one of four action (up-down-right-left) with equal probability.
         This is used to move on the rectangular environment states space (transmat).
         This is done for a single environment.
+
         Parameters
         ----------
         positions: array (16,2)
             Observation from the environment class needed to choose the right action (Here the position).
+        policy_func: function
+            Inherited from AgentCore, not used in this model, to change the policy modify action_policy method.
+
         Returns
         -------
         action : array (16,2)

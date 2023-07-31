@@ -75,7 +75,7 @@ class Weber2018(AgentCore):
     full_update(self, exc_normalization=True)
         Update weights using hebbian plasticity according to equation 2 for excitatory weights
         and equation 3, but using self.update function as a sub routine
-    plot_rates(self, save_path=None)
+    plot_rate_map(self, save_path=None)
         Plot current rates and an example of inhibitory and excitatory neuron
     """
 

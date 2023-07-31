@@ -28,6 +28,20 @@ class AgentCore(object):
         List of past observations while interacting with the environment in the act method
     global_steps: int
         Record of number of updates done on the weights
+
+    Methods
+    -------
+    reset(self):
+        Erase all memory from the model, initialize all relevant parameters and build from scratch
+    act(self, obs, policy_func=None):
+        Given an observation, return an action following a specific policy, if policy_func is None, then
+        return a random action
+    update(self):
+        Update model parameters, depends on the specific model
+    save_agent(self, save_path: str, raw_object: bool = True):
+        Save current state and information in general to re-instantiate the agent
+    restore_agent(self, save_path: str):
+        Restore saved agent
     """
 
     def __init__(self, model_name="default_model", **mod_kwargs):
@@ -43,7 +57,8 @@ class AgentCore(object):
 
     def reset(self):
         """Erase all memory from the model, initialize all relevant parameters and build from scratch"""
-        pass
+        self.obs_history = []
+        self.global_steps = 0
 
     def act(self, obs, policy_func=None):
         """

@@ -112,8 +112,10 @@ task.
 
 #### How to run comparisons
 
-As shown in the jupyter notebooks [Examples_comparison](https://github.com/ClementineDomine/NeuralPlayground/blob/main/examples/comparison_board_examples/comparison_board.ipynb). We show visual comparisons between results from agents 
-running with experimental behavior and results from the real experiment.
+We have a backend module to run simulations and compare the results with experimental data, you can find it in 
+[simulation_manager](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/comparisons_examples/simulation_manager.ipynb) 
+notebook. To plot these results, go to [comparison_from_manager](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/comparisons_examples/Comparision_from_manadger.ipynb) [Examples_comparison](https://github.com/ClementineDomine/NeuralPlayground/blob/main/examples/comparison_board_examples/comparison_board.ipynb). We show visual 
+comparisons between results from agents running with experimental behavior and results from the real experiment.
 
 ## 4. I-want-to-Contribute
 
