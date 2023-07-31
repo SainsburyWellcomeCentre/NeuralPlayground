@@ -58,6 +58,8 @@ In the plotting file, you can modify the following parameters:
 
 Pretrained TEM models are available in the repository. To use them, simply load the desired model by setting the appropriate path and index in the running file. You can then explore the model's predictions and representations.
 
+Changes to make: I want to streamline how I save and load model files in the running and plotting of TEM results, respectively. There is a standardised way we do this now which includes saving the agent and environment classes, as well as a file containing model parameters.
+
 ### Plotting Rate Maps
 
 You can visualize the rate maps of grid or place cells using the `agent.plot_rate_map` function in the plotting file.
