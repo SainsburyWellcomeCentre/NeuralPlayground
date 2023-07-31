@@ -109,9 +109,19 @@ class Environment(Env):
             The reward that the animal receives in this state transition
         """
         observation = self.make_observation()  # Build sensory info from current state
-        reward = self.reward_function(action, self.state)
+        reward = self.reward_function(action, self.state)  # If you get reward, it should be coded here
         self._increase_global_step()
+        new_state = self.state  # Define within each subclass for specific environments
+        transition = {
+            "action": action,
+            "state": self.state,
+            "next_state": new_state,
+            "reward": reward,
+            "step": self.global_steps,
+        }
+        self.history.append(transition)
         # state should be updated as well
+
         return observation, self.state, reward
 
     def _increase_global_step(self):
