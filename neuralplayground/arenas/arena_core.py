@@ -135,16 +135,22 @@ class Environment(Env):
         observation = self.make_observation()
         return observation, self.state
 
-    def save_environment(self, save_path: str):
+    def save_environment(self, save_path: str, raw_object: bool = True):
         """Save current variables of the object to re-instantiate the environment later
 
         Parameters
         ----------
         save_path: str
             Path to save the environment
+        raw_object: bool
+            If True, save the raw object, otherwise save the dictionary of attributes
+            If True, you can load the object by using env = pd.read_pickle(save_path)
+            if False, you can load the object by using env.restore_environment(save_path)
         """
-        # pickle.dump(self.__dict__, open(os.path.join(save_path), "wb"), pickle.HIGHEST_PROTOCOL)
-        pickle.dump(self, open(os.path.join(save_path), "wb"), pickle.HIGHEST_PROTOCOL)
+        if raw_object:
+            pickle.dump(self, open(os.path.join(save_path), "wb"), pickle.HIGHEST_PROTOCOL)
+        else:
+            pickle.dump(self.__dict__, open(os.path.join(save_path), "wb"), pickle.HIGHEST_PROTOCOL)
 
     def restore_environment(self, save_path: str):
         """Restore environment saved using save_environment method
@@ -152,11 +158,9 @@ class Environment(Env):
         Parameters
         ----------
         save_path: str
-            Path to retrieve the environment
+            Path to retrieve the environment saved using save_environment method (raw_object=False)
         """
-        # self.__dict__ = pd.read_pickle(save_path)
-        # TODO: for some reason, ruff has a problem with this: self = pd.read_pickle(save_path)
-        pd.read_pickle(save_path)
+        self.__dict__ = pd.read_pickle(save_path)
 
     def __eq__(self, other):
         """Check if two environments are equal by comparing all of its attributes

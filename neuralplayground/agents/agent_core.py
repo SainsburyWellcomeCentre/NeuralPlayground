@@ -72,16 +72,22 @@ class AgentCore(object):
     def update(self):
         pass
 
-    def save_agent(self, save_path: str):
+    def save_agent(self, save_path: str, raw_object: bool = True):
         """Save current state and information in general to re-instantiate the environment
 
         Parameters
         ----------
         save_path: str
             Path to save the agent
+        raw_object: bool
+            If True, save the raw object, otherwise save the dictionary of attributes
+            If True, you can load the object by using agent = pd.read_pickle(save_path)
+            if False, you can load the object by using agent.restore_environment(save_path)
         """
-        # pickle.dump(self.__dict__, open(os.path.join(save_path), "wb"), pickle.HIGHEST_PROTOCOL)
-        pickle.dump(self, open(os.path.join(save_path), "wb"), pickle.HIGHEST_PROTOCOL)
+        if raw_object:
+            pickle.dump(self, open(os.path.join(save_path), "wb"), pickle.HIGHEST_PROTOCOL)
+        else:
+            pickle.dump(self.__dict__, open(os.path.join(save_path), "wb"), pickle.HIGHEST_PROTOCOL)
 
     def restore_agent(self, save_path: str):
         """Restore saved environment
@@ -89,11 +95,9 @@ class AgentCore(object):
         Parameters
         ----------
         save_path: str
-            Path to retrieve the agent
+            Path to retrieve the environment saved using save_agent method (raw_object=False)
         """
-        # self.__dict__ = pd.read_pickle(save_path)
-        # TODO: for some reason, ruff has a problem with this: self = pd.read_pickle(save_path)
-        pd.read_pickle(save_path)
+        self.__dict__ = pd.read_pickle(save_path)
 
     def __eq__(self, other):
         diff = DeepDiff(self.__dict__, other.__dict__)
