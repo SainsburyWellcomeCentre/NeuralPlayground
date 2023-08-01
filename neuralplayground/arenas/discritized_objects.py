@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from neuralplayground.arenas.arena_core import Environment
-from neuralplayground.utils import check_crossing_wall
 from neuralplayground.plotting.plot_utils import make_plot_trajectories
+from neuralplayground.utils import check_crossing_wall
 
 
 class DiscreteObjectEnvironment(Environment):
