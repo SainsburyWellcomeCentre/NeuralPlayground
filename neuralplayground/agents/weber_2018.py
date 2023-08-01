@@ -318,25 +318,28 @@ class Weber2018(AgentCore):
             Run update for a given position. Defaults to None, then it is replaced with the
             last position in obs_history
         """
+
         if pos is None:
             pos = self.obs_history[-1]
-        r_out = self.get_output_rates(pos)
+        if not pos.any():
+            pass
+        else:
+            r_out = self.get_output_rates(pos)
+            # Excitatory weights update (eq 2)
+            delta_we = self.etaexc * self.get_rates(self.exc_cell_list, pos=pos) * r_out
+            # Inhibitory weights update (eq 3)
+            delta_wi = self.etainh * self.get_rates(self.inh_cell_list, pos=pos) * (r_out - self.ro)
+            self.grad_history.append(np.sqrt(np.sum(delta_we**2) + np.sum(delta_wi**2)))
 
-        # Excitatory weights update (eq 2)
-        delta_we = self.etaexc * self.get_rates(self.exc_cell_list, pos=pos) * r_out
-        # Inhibitory weights update (eq 3)
-        delta_wi = self.etainh * self.get_rates(self.inh_cell_list, pos=pos) * (r_out - self.ro)
-        self.grad_history.append(np.sqrt(np.sum(delta_we**2) + np.sum(delta_wi**2)))
+            self.we = self.we + delta_we
+            self.wi = self.wi + delta_wi
 
-        self.we = self.we + delta_we
-        self.wi = self.wi + delta_wi
+            if exc_normalization:
+                self.we = self.init_we_sum / np.sqrt(np.sum(self.we**2)) * self.we
 
-        if exc_normalization:
-            self.we = self.init_we_sum / np.sqrt(np.sum(self.we**2)) * self.we
-
-        self.we = np.clip(self.we, a_min=0, a_max=np.amax(self.we))  # Negative weights to zero
-        self.wi = np.clip(self.wi, a_min=0, a_max=np.amax(self.wi))
-        return {"delta_we": delta_we, "delta_wi": delta_wi}
+            self.we = np.clip(self.we, a_min=0, a_max=np.amax(self.we))  # Negative weights to zero
+            self.wi = np.clip(self.wi, a_min=0, a_max=np.amax(self.wi))
+            return {"delta_we": delta_we, "delta_wi": delta_wi}
 
     def full_average_update(self, exc_normalization: bool = True):
         """
@@ -375,6 +378,7 @@ class Weber2018(AgentCore):
         exc_normalization : bool
             True if excitatory weights are normalized after each update
         """
+
         random_permutation = np.arange(self.xy_combinations.shape[0])
         xy_array = self.xy_combinations[random_permutation, :]  # All points (x, y) in the grid
         for i in range(self.xy_combinations.shape[0]):
