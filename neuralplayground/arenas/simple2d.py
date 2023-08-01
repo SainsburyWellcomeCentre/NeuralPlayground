@@ -193,13 +193,13 @@ class Simple2D(Environment):
         observation = self.make_observation()
         return observation, self.state
 
-    def step(self, action: np.ndarray, normalize_step: bool = False):
+    def step(self, action: None, normalize_step: bool = False):
         """Runs the environment dynamics. Increasing global counters.
         Given some action, return observation, new state and reward.
 
         Parameters
         ----------
-        action: ndarray (2,)
+        action: None or ndarray (2,)
             Array containing the action of the agent, in this case the delta_x and detla_y increment to position
         normalize_step: bool
             If true, the action is normalized to have unit size, then scaled by the agent step size
@@ -213,13 +213,20 @@ class Simple2D(Environment):
         observation: ndarray
             Array of the observation of the agent in the environment
         """
-        if normalize_step:
-            action = action / np.linalg.norm(action)
-            new_state = self.state + self.agent_step_size * action
+        if action is None:
+            new_state = self.state
         else:
-            new_state = self.state + action
-        new_state, valid_action = self.validate_action(self.state, action, new_state)
-        reward = self.reward_function(action, self.state)  # If you get reward, it should be coded here
+            if normalize_step:
+                action = action / np.linalg.norm(action)
+                new_state = self.state + self.agent_step_size * action
+            else:
+                new_state = self.state + action
+            new_state, valid_action = self.validate_action(self.state, action, new_state)
+            # If you get reward, it should be coded here
+        self.state = new_state
+        observation = self.make_observation()
+        self._increase_global_step()
+        reward = self.reward_function(action, self.state)
         transition = {
             "action": action,
             "state": self.state,
@@ -228,9 +235,6 @@ class Simple2D(Environment):
             "step": self.global_steps,
         }
         self.history.append(transition)
-        self.state = new_state
-        observation = self.make_observation()
-        self._increase_global_step()
         return observation, new_state, reward
 
     def validate_action(self, pre_state, action, new_state):
