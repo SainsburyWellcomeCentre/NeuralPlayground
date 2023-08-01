@@ -34,7 +34,7 @@ class BatchEnvironment(Environment):
 
         self.room_widths = [np.diff(self.environments[i].arena_x_limits)[0] for i in range(self.batch_size)]
         self.room_depths = [np.diff(self.environments[i].arena_y_limits)[0] for i in range(self.batch_size)]
-        self.state_densities = [self.environments[i].state_density for i in range(self.batch_size)]
+        self.state_densities = [env_kwargs["state_density"] for i in range(self.batch_size)]
 
     def reset(self, random_state: bool = True, custom_state: np.ndarray = None):
         """
@@ -83,26 +83,28 @@ class BatchEnvironment(Environment):
         """
         all_observations = []
         all_states = []
+        all_rewards = []
         all_allowed = True
         for batch, env in enumerate(self.environments):
             action = actions[batch]
-            env_obs, env_state = env.step(action, normalize_step)
-            if self.use_behavioural_data:
+            env_obs, env_state, env_reward = env.step(action, normalize_step)
+            if self.use_behavioural_data and self.environments[0].environment_name == "DiscreteObject":
                 if env.state[0] == env.old_state[0]:
                     all_allowed = False
-            else:
-                if env.state[0] == env.old_state[0] and action != [0, 0]:
+            elif self.environments[0].environment_name == "DiscreteObject":
+                if env.state[0] == env.old_state[0] and all(action != [0, 0]):
                     all_allowed = False
             all_observations.append(env_obs)
             all_states.append(env_state)
+            all_rewards.append(env_reward)
 
-        if not all_allowed:
+        if not all_allowed and self.environments[0].environment_name == "DiscreteObject":
             for env in self.environments:
                 env.state = env.old_state
-        else:
+        elif all_allowed and self.environments[0].environment_name == "DiscreteObject":
             self.history.append([env.transition for env in self.environments])
 
-        return all_observations, all_states
+        return all_observations, all_states, all_rewards
 
     def plot_trajectory(
         self, history_data: list = None, ax=None, return_figure: bool = False, save_path: str = None, plot_every: int = 1
@@ -181,6 +183,20 @@ class BatchEnvironment(Environment):
             return ax, f
         else:
             return ax
+
+    def plot_trajectories(self):
+        fig, axs = plt.subplots(4, 4, figsize=(12, 12))
+        axs = axs.flatten()
+
+        # Iterate through each environment and plot its trajectory in a subplot
+        for i, environment in enumerate(self.environments):
+            axs[i] = environment.plot_trajectory(ax=axs[i])
+            axs[i].set_title(f"Environment {i+1}")
+
+        # Adjust spacing between subplots
+        plt.tight_layout()
+
+        return fig, axs
 
     def collect_environment_info(self, model_input, history, environments):
         """

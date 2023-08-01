@@ -5,6 +5,7 @@ import numpy as np
 
 from neuralplayground.arenas.arena_core import Environment
 from neuralplayground.utils import check_crossing_wall
+from neuralplayground.plotting.plot_utils import make_plot_trajectories
 
 
 class DiscreteObjectEnvironment(Environment):
@@ -339,32 +340,66 @@ class DiscreteObjectEnvironment(Environment):
             crossed_wall = crossed or crossed_wall
         return new_state, crossed_wall
 
-    # to be written again here
-    def plot_objects(self, history_data=None, ax=None, return_figure=False):
+    def plot_trajectory(
+        self,
+        history_data: list = None,
+        ax=None,
+        return_figure: bool = False,
+        save_path: str = None,
+        plot_every: int = 1,
+    ):
         """Plot the Trajectory of the agent in the environment
 
         Parameters
         ----------
-        history_data: None
-            default to access to the saved history of positions in the environment
-        ax: None
-            default to create ax
+        history_data: list of interactions
+            if None, use history data saved as attribute of the arena, use custom otherwise
+        ax: mpl.axes._subplots.AxesSubplot (matplotlib axis from subplots)
+            axis from subplot from matplotlib where the trajectory will be plotted.
+        return_figure: bool
+            If true, it will return the figure variable generated to make the plot
+        save_path: str, list of str, tuple of str
+            saving path of the generated figure, if None, no figure is saved
+
         Returns
         -------
-        Returns a plot of the trajectory of the animal in the environment
+        ax: mpl.axes._subplots.AxesSubplot (matplotlib axis from subplots)
+            Modified axis where the trajectory is plotted
+        f: matplotlib.figure
+            if return_figure parameters is True
         """
+        # Use or not saved history
         if history_data is None:
             history_data = self.history
+
+        # Generate Figure
         if ax is None:
             f, ax = plt.subplots(1, 1, figsize=(8, 6))
+
+        # Make plot of positions
+        if len(history_data) != 0:
+            state_history = [s["state"] for s in history_data]
+            x = []
+            y = []
+            for i, s in enumerate(state_history):
+                # if i % plot_every == 0:
+                #     if i + plot_every >= len(state_history):
+                #         break
+                x.append(s[0])
+                y.append(s[1])
+            ax = make_plot_trajectories(self.arena_limits, np.asarray(x), np.asarray(y), ax, plot_every)
 
         for wall in self.default_walls:
             ax.plot(wall[:, 0], wall[:, 1], "C3", lw=3)
 
+            # Draw custom walls
         for wall in self.custom_walls:
             ax.plot(wall[:, 0], wall[:, 1], "C0", lw=3)
 
+        if save_path is not None:
+            plt.savefig(save_path, bbox_inches="tight")
+
         if return_figure:
-            return f, ax
+            return ax, f
         else:
             return ax
