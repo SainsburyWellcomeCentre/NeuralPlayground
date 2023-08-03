@@ -467,3 +467,8 @@ class Hafting2008Data(Experiment):
                                        y_size=int(arena_depth / bin_size), filter_result=True)
 
         return h, binx, biny
+
+
+if __name__ == "__main__":
+    hafting_data = Hafting2008Data(verbose=False)
+    hafting_data.show_readme()

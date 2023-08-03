@@ -179,12 +179,12 @@ class Simple2D(Environment):
         self.global_time = 0
         self.history = []
         if random_state:
-            self.state = [
+            self.state = np.asarray([
                 np.random.uniform(low=self.arena_limits[0, 0], high=self.arena_limits[0, 1]),
                 np.random.uniform(low=self.arena_limits[1, 0], high=self.arena_limits[1, 1]),
-            ]
+            ])
         else:
-            self.state = [0, 0]
+            self.state = np.asarray([0, 0])
         self.state = np.array(self.state)
 
         if custom_state is not None:
@@ -223,7 +223,7 @@ class Simple2D(Environment):
                 new_state = self.state + action
             new_state, valid_action = self.validate_action(self.state, action, new_state)
             # If you get reward, it should be coded here
-        self.state = new_state
+        self.state = np.asarray(new_state)
         observation = self.make_observation()
         self._increase_global_step()
         reward = self.reward_function(action, self.state)
