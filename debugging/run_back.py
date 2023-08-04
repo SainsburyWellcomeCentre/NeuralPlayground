@@ -1,14 +1,29 @@
 from neuralplayground.backend import SimulationManager
 from neuralplayground.backend.default_simulation import (
-    weber_in_wernle, weber_in_merging_room, weber_in_sargolini, weber_in_hafting,
-    weber_in_2d, stachenfeld_in_wernle_1, stachenfeld_in_wernle_2, stachenfeld_in_merging_room_1,
-    stachenfeld_in_merging_room_2,
-    stachenfeld_in_sargolini, stachenfeld_in_hafting, stachenfeld_in_2d,
-    coreEnv_test_1, coreEnv_test_2, coreEnv_test_3, coreEnv_test_4,
-    coreAgentEnv_test, coreAgentEnv_test_2, coreAgent_test_1, coreAgent_test_2, coreAgent_test_3, coreAgent_test_4,
+    coreAgent_test_1,
+    coreAgent_test_2,
+    coreAgent_test_3,
+    coreAgent_test_4,
     coreAgent_test_5,
+    coreAgentEnv_test,
+    coreAgentEnv_test_2,
+    coreEnv_test_1,
+    coreEnv_test_2,
+    coreEnv_test_3,
+    coreEnv_test_4,
+    stachenfeld_in_2d,
+    stachenfeld_in_hafting,
+    stachenfeld_in_merging_room_1,
+    stachenfeld_in_merging_room_2,
+    stachenfeld_in_sargolini,
+    stachenfeld_in_wernle_1,
+    stachenfeld_in_wernle_2,
+    weber_in_2d,
+    weber_in_hafting,
+    weber_in_merging_room,
+    weber_in_sargolini,
+    weber_in_wernle,
 )
-
 
 
 def main():
@@ -31,19 +46,30 @@ def main():
 
     sim_manager = SimulationManager(
         [
-
-
-
-    weber_in_wernle, weber_in_merging_room, weber_in_sargolini, weber_in_hafting ,
-    weber_in_2d , stachenfeld_in_wernle_1 ,stachenfeld_in_wernle_2 ,stachenfeld_in_merging_room_1 ,stachenfeld_in_merging_room_2 ,
-    stachenfeld_in_sargolini, stachenfeld_in_hafting,stachenfeld_in_2d ,
-    coreEnv_test_1,coreEnv_test_2, coreEnv_test_3, coreEnv_test_4,
-     coreAgentEnv_test, coreAgentEnv_test_2, coreAgent_test_1,  coreAgent_test_2 ,coreAgent_test_3 , coreAgent_test_4 ,
-    coreAgent_test_5 ,
-
-
-
-    ],
+            weber_in_wernle,
+            weber_in_merging_room,
+            weber_in_sargolini,
+            weber_in_hafting,
+            weber_in_2d,
+            stachenfeld_in_wernle_1,
+            stachenfeld_in_wernle_2,
+            stachenfeld_in_merging_room_1,
+            stachenfeld_in_merging_room_2,
+            stachenfeld_in_sargolini,
+            stachenfeld_in_hafting,
+            stachenfeld_in_2d,
+            coreEnv_test_1,
+            coreEnv_test_2,
+            coreEnv_test_3,
+            coreEnv_test_4,
+            coreAgentEnv_test,
+            coreAgentEnv_test_2,
+            coreAgent_test_1,
+            coreAgent_test_2,
+            coreAgent_test_3,
+            coreAgent_test_4,
+            coreAgent_test_5,
+        ],
         runs_per_sim=2,
         manager_id="test_dev",
         verbose=True,

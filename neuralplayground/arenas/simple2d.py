@@ -179,10 +179,12 @@ class Simple2D(Environment):
         self.global_time = 0
         self.history = []
         if random_state:
-            self.state = np.asarray([
-                np.random.uniform(low=self.arena_limits[0, 0], high=self.arena_limits[0, 1]),
-                np.random.uniform(low=self.arena_limits[1, 0], high=self.arena_limits[1, 1]),
-            ])
+            self.state = np.asarray(
+                [
+                    np.random.uniform(low=self.arena_limits[0, 0], high=self.arena_limits[0, 1]),
+                    np.random.uniform(low=self.arena_limits[1, 0], high=self.arena_limits[1, 1]),
+                ]
+            )
         else:
             self.state = np.asarray([0, 0])
         self.state = np.array(self.state)

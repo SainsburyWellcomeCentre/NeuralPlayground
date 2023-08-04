@@ -324,9 +324,7 @@ class Stachenfeld2018(AgentCore):
             srmat: (n_state, n_state) successor representation matrix
         """
 
-
-
-        if hasattr(self, 'next_state'):
+        if hasattr(self, "next_state"):
             if self.inital_obs_variable is None:
                 self.curr_state = self.next_state
                 self.inital_obs_variable = True
