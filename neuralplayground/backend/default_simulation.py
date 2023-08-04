@@ -1,7 +1,7 @@
 import numpy as np
 
-from neuralplayground.agents import Stachenfeld2018, Weber2018, AgentCore
-from neuralplayground.arenas import Hafting2008, MergingRoom, Sargolini2006, Simple2D, Wernle2018,Environment
+from neuralplayground.agents import AgentCore, Stachenfeld2018, Weber2018
+from neuralplayground.arenas import Environment, Hafting2008, MergingRoom, Sargolini2006, Simple2D, Wernle2018
 from neuralplayground.backend import default_training_loop, episode_based_training_loop
 
 from .simulation_manager import SingleSim
@@ -68,7 +68,6 @@ stachenfeld_in_2d_params = {
 
 stachenfeld_in_sargolini_params = {
     "simulation_id": "stachenfeld_2018_in_Sargolini2006",
-
     "env_class": Sargolini2006,
     "env_params": {
         "use_behavioral_data": True,
@@ -182,7 +181,7 @@ weber_in_hafting_params = {
 
 stachenfeld_in_wernle_params_1 = {
     "simulation_id": "stachenfeld_2018_in_Wernle_2",
-"agent_class": Stachenfeld2018,
+    "agent_class": Stachenfeld2018,
     "agent_params": {
         "discount": 0.9,
         "threshold": 1e-6,
@@ -200,7 +199,7 @@ stachenfeld_in_wernle_params_1 = {
 
 stachenfeld_in_wernle_params_2 = {
     "simulation_id": "stachenfeld_2018_in_Wernle_2",
-"agent_class": Stachenfeld2018,
+    "agent_class": Stachenfeld2018,
     "agent_params": {
         "discount": 0.9,
         "threshold": 1e-6,
@@ -288,7 +287,7 @@ weber_in_merging_room_params = {
 
 stachenfeld_in_merging_room_1 = {
     "simulation_id": "stachenfeld_2018_in_Merging_Room_1",
-"agent_class": Stachenfeld2018,
+    "agent_class": Stachenfeld2018,
     "agent_params": {
         "discount": 0.9,
         "threshold": 1e-6,
@@ -309,12 +308,11 @@ stachenfeld_in_merging_room_1 = {
     },
     "training_loop": default_training_loop,
     "training_loop_params": {"n_steps": 1000},
-
 }
 
 stachenfeld_in_merging_room_2 = {
-"simulation_id": "stachenfeld_2018_in_Merging_Room_2",
-"agent_class": Stachenfeld2018,
+    "simulation_id": "stachenfeld_2018_in_Merging_Room_2",
+    "agent_class": Stachenfeld2018,
     "agent_params": {
         "discount": 0.9,
         "threshold": 1e-6,
@@ -337,7 +335,7 @@ stachenfeld_in_merging_room_2 = {
     "training_loop_params": {"t_episode": 100, "n_episode": 100},
 }
 
-''' Core Env tests '''
+""" Core Env tests """
 coreEnv_test_1 = {
     "simulation_id": "coreEnv_test_1",
     "agent_class": Weber2018,
@@ -365,7 +363,7 @@ coreEnv_test_1 = {
     "env_class": Environment,
     "env_params": {
         "time_step_size": 0.2,
-        "environment_name" : 'test',
+        "environment_name": "test",
     },
     "training_loop": default_training_loop,
     "training_loop_params": {"n_steps": 1000},
@@ -399,7 +397,7 @@ coreEnv_test_2 = {
     "env_class": Environment,
     "env_params": {
         "time_step_size": 0.2,
-        "environment_name" : 'test',
+        "environment_name": "test",
     },
     "training_loop": episode_based_training_loop,
     "training_loop_params": {"t_episode": 100, "n_episode": 100},
@@ -420,7 +418,7 @@ coreEnv_test_3 = {
     "env_class": Environment,
     "env_params": {
         "time_step_size": 0.2,
-        "environment_name" : 'test',
+        "environment_name": "test",
     },
     "training_loop": episode_based_training_loop,
     "training_loop_params": {"t_episode": 100, "n_episode": 100},
@@ -441,14 +439,14 @@ coreEnv_test_4 = {
     "env_class": Environment,
     "env_params": {
         "time_step_size": 0.2,
-        "environment_name" : 'test',
+        "environment_name": "test",
     },
     "training_loop": default_training_loop,
     "training_loop_params": {"n_steps": 1000},
 }
 
 
-'''both agent and env'''
+"""both agent and env"""
 
 coreAgentEnv_test = {
     "simulation_id": "coreAgentEnv_test",
@@ -459,7 +457,7 @@ coreAgentEnv_test = {
     "env_class": Environment,
     "env_params": {
         "time_step_size": 0.2,
-        "environment_name" : 'test',
+        "environment_name": "test",
     },
     "training_loop": default_training_loop,
     "training_loop_params": {"n_steps": 1000},
@@ -474,13 +472,13 @@ coreAgentEnv_test_2 = {
     "env_class": Environment,
     "env_params": {
         "time_step_size": 0.2,
-        "environment_name" : 'test',
+        "environment_name": "test",
     },
     "training_loop": episode_based_training_loop,
     "training_loop_params": {"t_episode": 100, "n_episode": 100},
 }
 
-'''agent '''
+"""agent """
 
 coreAgent_test_1 = {
     "simulation_id": "coreAgent_test_1",
@@ -541,7 +539,7 @@ coreAgent_test_4 = {
     "agent_params": {
         "model_name": "agent_test",
     },
-"env_class": Wernle2018,
+    "env_class": Wernle2018,
     "env_params": {"merge_time": 20, "switch_time": 10, "time_step_size": 0.2, "agent_step_size": 3},
     "training_loop": default_training_loop,
     "training_loop_params": {"n_steps": 1000},
@@ -554,20 +552,18 @@ coreAgent_test_5 = {
     "agent_params": {
         "model_name": "agent_test",
     },
-"env_class": MergingRoom,
-"env_params": {
-    "arena_x_limits": [-10, 10],
-    "arena_y_limits": [-10, 10],
-    "time_step_size": 0.2,
-    "agent_step_size": 10,
-    "merge_time": 270.0,
-    "switch_time": 270.0,
-},
+    "env_class": MergingRoom,
+    "env_params": {
+        "arena_x_limits": [-10, 10],
+        "arena_y_limits": [-10, 10],
+        "time_step_size": 0.2,
+        "agent_step_size": 10,
+        "merge_time": 270.0,
+        "switch_time": 270.0,
+    },
     "training_loop": default_training_loop,
     "training_loop_params": {"n_steps": 1000},
 }
-
-
 
 
 # Time in minutes to remove
