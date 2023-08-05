@@ -335,7 +335,7 @@ stachenfeld_in_merging_room_2 = {
     "training_loop_params": {"t_episode": 100, "n_episode": 100},
 }
 
-""" Core Env tests """
+
 coreEnv_test_1 = {
     "simulation_id": "coreEnv_test_1",
     "agent_class": Weber2018,
@@ -446,8 +446,6 @@ coreEnv_test_4 = {
 }
 
 
-"""both agent and env"""
-
 coreAgentEnv_test = {
     "simulation_id": "coreAgentEnv_test",
     "agent_class": AgentCore,
@@ -478,7 +476,6 @@ coreAgentEnv_test_2 = {
     "training_loop_params": {"t_episode": 100, "n_episode": 100},
 }
 
-"""agent """
 
 coreAgent_test_1 = {
     "simulation_id": "coreAgent_test_1",
