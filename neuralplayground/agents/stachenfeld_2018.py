@@ -39,12 +39,8 @@ class Stachenfeld2018(AgentCore):
             discounting factor
         learning_rate: scalar,
             scaling the magnitude of the TD update
-        t_episode: scalar,
-            maximum number of timesteps in one episode
         threoshold: scalar,
             upper bound for the update size
-        n_episode: scalar,
-            number of episodes
         transmat: (n_state, n_state)
             numpy array, transition matrix
         room_width: float
@@ -96,12 +92,8 @@ class Stachenfeld2018(AgentCore):
                  discounting factor
             learning_rate: scalar,
                 scaling the magnitude of the TD update
-            t_episode: scalar,
-                maximum number of timesteps in one episode
             threshold: scalar,
                upper bound for the update size
-            n_episode: scalar,
-                number of episodes
             twoD: bool
                 When true creates a (n_state, n_state) transition array for a rectangular 2D state space.
             room_width: float
