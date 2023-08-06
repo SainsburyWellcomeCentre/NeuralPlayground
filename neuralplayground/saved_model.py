@@ -27,8 +27,8 @@ DATASET_REGISTRY = pooch.create(
         "weber_2018_in_Sargolini2006.zip": "3c3ac58a7ef45a560a8a92b49c31e7724f6d5610c223de6fcf80ed1200a410ab",
         "stachenfeld_2018_in_simple2D.zip": "b0d2db8e2b5ee2d7a4f9b8ea1ba1366dafbbe72bb213363a8536fe930649487e",
         "stachenfeld_2018_in_Sargolini2006.zip": "7cadfbe2024d5e3ccbae13f9a2ba492791c3a5f82f740e6289c5eadd3d8d63d3",
-        "stachenfeld_2018_in_Hafting2008.zip": "afd6104b295477acfc2cbbcfe5c5cfd711d426516194e6faeec8a83117d45e3e",
-        "weber_2018_in_Wernle.zip": "afd6104b295477acfc2cbbcfe5c5cfd711d426516194e6faeec8a83117d45e3e",
+        "stachenfeld_2018_in_Hafting2008.zip": "f014be0d6f399b50ebc67e1c4530db24f76ce12fa210aeff2695717598517137",
+        "weber_2018_in_Wernle.zip": "78770840f56e8c7fb22182aa2530027e44be5a9eb9127cdcd291d86bbb3e6623",
 "weber_2018_in_Merging_Room.zip": "2aed903a302d0965637c42ab36a9547d2e824124872595af6ba1d763cc381531",
         # noqa: E501# noqa: E501
     },
