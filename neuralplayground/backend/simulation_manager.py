@@ -393,6 +393,7 @@ class SingleSim(object):
         with open(log_path, "r") as log_file:
             print(log_file.read())
 
+
 class PlotSim(object):
     """Single simulation object
 
@@ -486,9 +487,9 @@ class PlotSim(object):
         environments = [trained_env.collect_environment_info(model_input, history, environments)]
 
         # Save environments and model_input using pickle
-        with open(os.path.join(save_path, 'NPG_environments.pkl'), 'wb') as f:
+        with open(os.path.join(save_path, "NPG_environments.pkl"), "wb") as f:
             pickle.dump(environments, f)
-        with open(os.path.join(save_path, 'NPG_model_input.pkl'), 'wb') as f:
+        with open(os.path.join(save_path, "NPG_model_input.pkl"), "wb") as f:
             pickle.dump(model_input, f)
 
     def _init_models(self):

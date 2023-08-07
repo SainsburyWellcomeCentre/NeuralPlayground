@@ -1,19 +1,13 @@
-import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
+import importlib
 import os
 import pickle
-import torch
-import importlib
 
-from neuralplayground.agents import Whittington2020
-from neuralplayground.arenas import BatchEnvironment
-from neuralplayground.arenas import DiscreteObjectEnvironment
-from neuralplayground.backend import tem_plotting_loop
-from neuralplayground.backend import PlotSim
+import matplotlib.pyplot as plt
+import pandas as pd
+import torch
+
 import neuralplayground.agents.whittington_2020_extras.whittington_2020_analyse as analyse
-from neuralplayground.agents.whittington_2020_extras import whittington_2020_parameters as parameters
-from neuralplayground.experiments import Sargolini2006Data
+from neuralplayground.backend import PlotSim, tem_plotting_loop
 
 simulation_id = "TEM_custom_plot_sim"
 save_path = "NeuralPlayground/examples/agent_examples/results_sim/"
@@ -28,13 +22,15 @@ tem.load_state_dict(model_weights)
 tem.eval()
 
 plotting_loop_params = {"n_episode": 50}
-sim = PlotSim(simulation_id = simulation_id,
-                agent_class = training_dict["agent_class"],
-                agent_params = training_dict["agent_params"],
-                env_class = training_dict["env_class"],
-                env_params = training_dict["env_params"],
-                plotting_loop = tem_plotting_loop,
-                plotting_loop_params = plotting_loop_params)
+sim = PlotSim(
+    simulation_id=simulation_id,
+    agent_class=training_dict["agent_class"],
+    agent_params=training_dict["agent_params"],
+    env_class=training_dict["env_class"],
+    env_params=training_dict["env_params"],
+    plotting_loop=tem_plotting_loop,
+    plotting_loop_params=plotting_loop_params,
+)
 print(sim)
 sim.plot_sim(save_path)
 
@@ -54,7 +50,9 @@ shiny_envs = [False, False, False, False]
 env_to_plot = 0
 envs_to_avg = shiny_envs if shiny_envs[env_to_plot] else [not shiny_env for shiny_env in shiny_envs]
 
-correct_model, correct_node, correct_edge = analyse.compare_to_agents(forward, tem, environments, include_stay_still=include_stay_still)
+correct_model, correct_node, correct_edge = analyse.compare_to_agents(
+    forward, tem, environments, include_stay_still=include_stay_still
+)
 zero_shot = analyse.zero_shot(forward, tem, environments, include_stay_still=include_stay_still)
 occupation = analyse.location_occupation(forward, tem, environments)
 g, p = analyse.rate_map(forward, tem, environments)

@@ -1,9 +1,9 @@
 import copy
 import os
+import pickle
 import shutil
 import sys
 import time
-import pickle
 
 import matplotlib.pyplot as plt
 import numpy as np

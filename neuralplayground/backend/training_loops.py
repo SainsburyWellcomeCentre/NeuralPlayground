@@ -79,7 +79,7 @@ def episode_based_training_loop(agent: AgentCore, env: Environment, t_episode: i
 
 def tem_training_loop(agent: AgentCore, env: Environment, n_episode: int, params: dict):
     """Training loop for agents and environments that use a TEM-based update.
-    
+
     Parameters
     ----------
     agent : AgentCore
@@ -88,7 +88,7 @@ def tem_training_loop(agent: AgentCore, env: Environment, n_episode: int, params
         Environment in which the agent is trained.
     n_steps : int
         Number of steps to train the agent for.
-        
+
     Returns
     -------
     agent : AgentCore
@@ -107,6 +107,7 @@ def tem_training_loop(agent: AgentCore, env: Environment, n_episode: int, params
             obs, state, reward = env.step(actions, normalize_step=True)
         agent.update()
     return agent, env, training_dict
+
 
 def tem_plotting_loop(agent: AgentCore, env: Environment, n_episode: int):
     # Run around environment
