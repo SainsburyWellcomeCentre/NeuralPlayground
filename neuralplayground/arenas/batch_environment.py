@@ -22,6 +22,7 @@ class BatchEnvironment(Environment):
                 Keyword arguments for the environment
         """
         super().__init__(environment_name, **env_kwargs)
+        self.env_kwargs = env_kwargs.copy()
         self.batch_size = batch_size
         self.batch_x_limits = env_kwargs["arena_x_limits"]
         self.batch_y_limits = env_kwargs["arena_y_limits"]
@@ -92,7 +93,7 @@ class BatchEnvironment(Environment):
                 if env.state[0] == env.old_state[0]:
                     all_allowed = False
             elif self.environments[0].environment_name == "DiscreteObject":
-                if env.state[0] == env.old_state[0] and all(action != [0, 0]):
+                if env.state[0] == env.old_state[0] and action != [0, 0]:
                     all_allowed = False
             all_observations.append(env_obs)
             all_states.append(env_state)

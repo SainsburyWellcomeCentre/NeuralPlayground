@@ -230,7 +230,7 @@ class DiscreteObjectEnvironment(Environment):
         }
         # self.history.append(transition)
         self._increase_global_step()
-        return observation, self.state
+        return observation, self.state, reward
 
     def generate_objects(self):
         """
