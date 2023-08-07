@@ -3,6 +3,7 @@ import os
 import shutil
 import sys
 import time
+import pickle
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -82,6 +83,7 @@ class Whittington2020(AgentCore):
                 density of agent states (should be proportional to the step-size)
         """
         super().__init__()
+        self.mod_kwargs = mod_kwargs.copy()
         params = mod_kwargs["params"]
         self.room_widths = mod_kwargs["room_widths"]
         self.room_depths = mod_kwargs["room_depths"]
@@ -335,6 +337,18 @@ class Whittington2020(AgentCore):
         # Initialise whether a state has been visited for each world
         self.visited = [[False for _ in range(self.n_states[env])] for env in range(self.pars["batch_size"])]
         self.prev_iter = None
+
+    def save_agent(self, save_path: str):
+        """Save current state and information in general to re-instantiate the agent
+
+        Parameters
+        ----------
+        save_path: str
+            Path to save the agent
+        """
+        pickle.dump(self.tem.state_dict(), open(os.path.join(save_path), "wb"), pickle.HIGHEST_PROTOCOL)
+        with open(os.path.join(os.path.dirname(save_path), "agent_hyper"), "wb") as fp:
+            pickle.dump(self.tem.hyper, fp, pickle.HIGHEST_PROTOCOL)
 
     def save_files(self):
         """

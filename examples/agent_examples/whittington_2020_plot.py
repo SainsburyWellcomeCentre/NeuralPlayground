@@ -17,26 +17,23 @@ from neuralplayground.arenas.discritized_objects import DiscreteObjectEnvironmen
 from neuralplayground.experiments import Sargolini2006Data
 
 # Select trained model
-date = "2023-05-17"
-run = "0"
+date = "2023-08-07"
+run = "3"
 index = "19999"
-base_path = "/nfs/nhome/live/lhollingsworth/Documents/NeuralPlayground/NPG/EHC_model_comparison"
-npg_path = "/nfs/nhome/live/lhollingsworth/Documents/NeuralPlayground/NPG/EHC_model_comparison/examples"
-base_win_path = "H:/Documents/PhD/NeuralPlayground"
-win_path = "H:/Documents/PhD/NeuralPlayground/NPG/NeuralPlayground/examples"
+save_path = "NeuralPlayground/examples/"
 # Load the model: use import library to import module from specified path
 model_spec = importlib.util.spec_from_file_location(
-    "model", win_path + "/Summaries/" + date + "/torch_run" + run + "/script/whittington_2020_model.py"
+    "model", save_path + "/Summaries2/" + date + "/torch_run" + run + "/script/whittington_2020_model.py"
 )
 model = importlib.util.module_from_spec(model_spec)
 model_spec.loader.exec_module(model)
 
 # Load the parameters of the model
-params = torch.load(win_path + "/Summaries/" + date + "/torch_run" + run + "/model/params_" + index + ".pt")
+params = torch.load(save_path + "/Summaries2/" + date + "/torch_run" + run + "/model/params_" + index + ".pt")
 # Create a new tem model with the loaded parameters
 tem = model.Model(params)
 # Load the model weights after training
-model_weights = torch.load(win_path + "/Summaries/" + date + "/torch_run" + run + "/model/tem_" + index + ".pt")
+model_weights = torch.load(save_path + "/Summaries2/" + date + "/torch_run" + run + "/model/tem_" + index + ".pt")
 # Set the model weights to the loaded trained model weights
 tem.load_state_dict(model_weights)
 # Make sure model is in evaluate mode (not crucial because it doesn't currently use dropout or batchnorm layers)
