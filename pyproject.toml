@@ -35,6 +35,7 @@ dependencies = [
   "gymnasium",
   "scikit-image",
   "pooch",
+  "colorama",  
 ]
 
 [project.urls]
