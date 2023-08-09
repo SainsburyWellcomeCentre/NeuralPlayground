@@ -39,7 +39,7 @@ weber_in_2d_params = {
         "agent_step_size": 0.5,
     },
     "training_loop": default_training_loop,
-    "training_loop_params": {"n_steps": 1000},
+    "training_loop_params": {"n_steps": 10000},
 }
 
 stachenfeld_in_2d_params = {
@@ -63,11 +63,11 @@ stachenfeld_in_2d_params = {
         "twoD": True,
     },
     "training_loop": episode_based_training_loop,
-    "training_loop_params": {"t_episode": 100, "n_episode": 100},
+    "training_loop_params": {"t_episode": 1000, "n_episode": 100},
 }
 
 stachenfeld_in_sargolini_params = {
-    "simulation_id": "stachenfeld_2018_in_Sargolini2006",
+    "simulation_id": "stachenfeld_2018_in_sargolini2006",
     "env_class": Sargolini2006,
     "env_params": {
         "use_behavioral_data": True,
@@ -85,11 +85,11 @@ stachenfeld_in_sargolini_params = {
         "twoD": True,
     },
     "training_loop": episode_based_training_loop,
-    "training_loop_params": {"t_episode": 100, "n_episode": 100},
+    "training_loop_params": {"t_episode": 1000, "n_episode": 100},
 }
 
 weber_in_sargolini_params = {
-    "simulation_id": "weber_2018_in_Sargolini2006",
+    "simulation_id": "weber_2018_in_sargolini2006",
     "env_class": Sargolini2006,
     "env_params": {
         "use_behavioral_data": True,
@@ -119,12 +119,12 @@ weber_in_sargolini_params = {
         "disable_tqdm": True,
     },
     "training_loop": default_training_loop,
-    "training_loop_params": {"n_steps": 1000},
+    "training_loop_params": {"n_steps": 10000},
 }
 
 
 stachenfeld_in_hafting_params = {
-    "simulation_id": "stachenfeld_2018_in_Hafting2008",
+    "simulation_id": "stachenfeld_2018_in_hafting2008",
     "agent_class": Stachenfeld2018,
     "env_class": Hafting2008,
     "env_params": {
@@ -142,11 +142,11 @@ stachenfeld_in_hafting_params = {
         "twoD": True,
     },
     "training_loop": episode_based_training_loop,
-    "training_loop_params": {"t_episode": 100, "n_episode": 100},
+    "training_loop_params": {"t_episode": 1000, "n_episode": 100},
 }
 
 weber_in_hafting_params = {
-    "simulation_id": "weber_2018_in_Hafting2008",
+    "simulation_id": "weber_2018_in_hafting2008",
     "agent_class": Weber2018,
     "agent_params": {
         "exc_eta": 2e-4,
@@ -176,11 +176,11 @@ weber_in_hafting_params = {
         "agent_step_size": None,
     },
     "training_loop": default_training_loop,
-    "training_loop_params": {"n_steps": 1000},
+    "training_loop_params": {"n_steps": 10000},
 }
 
 stachenfeld_in_wernle_params_1 = {
-    "simulation_id": "stachenfeld_2018_in_Wernle_2",
+    "simulation_id": "stachenfeld_2018_in_wernle_2",
     "agent_class": Stachenfeld2018,
     "agent_params": {
         "discount": 0.9,
@@ -194,11 +194,11 @@ stachenfeld_in_wernle_params_1 = {
     "env_class": Wernle2018,
     "env_params": {"merge_time": 20, "switch_time": 10, "time_step_size": 0.2, "agent_step_size": 3},
     "training_loop": episode_based_training_loop,
-    "training_loop_params": {"t_episode": 100, "n_episode": 100},
+    "training_loop_params": {"t_episode": 1000, "n_episode": 100},
 }
 
 stachenfeld_in_wernle_params_2 = {
-    "simulation_id": "stachenfeld_2018_in_Wernle_2",
+    "simulation_id": "stachenfeld_2018_in_wernle_2",
     "agent_class": Stachenfeld2018,
     "agent_params": {
         "discount": 0.9,
@@ -212,12 +212,12 @@ stachenfeld_in_wernle_params_2 = {
     "env_class": Wernle2018,
     "env_params": {"merge_time": 20, "switch_time": 10, "time_step_size": 0.2, "agent_step_size": 3},
     "training_loop": default_training_loop,
-    "training_loop_params": {"n_steps": 1000},
+    "training_loop_params": {"n_steps": 10000},
 }
 
 
 weber_in_wernle_params = {
-    "simulation_id": "weber_2018_in_Wernle",
+    "simulation_id": "weber_2018_in_wernle",
     "agent_class": Weber2018,
     "agent_params": {
         "exc_eta": 2e-4,
@@ -243,12 +243,12 @@ weber_in_wernle_params = {
     "env_class": Wernle2018,
     "env_params": {"merge_time": 20, "switch_time": 10, "time_step_size": 0.2, "agent_step_size": 3},
     "training_loop": default_training_loop,
-    "training_loop_params": {"n_steps": 1000},
+    "training_loop_params": {"n_steps": 10000},
 }
 
 
 weber_in_merging_room_params = {
-    "simulation_id": "weber_2018_in_Merging_Room",
+    "simulation_id": "weber_2018_in_merging_room",
     "agent_class": Weber2018,
     "agent_params": {
         "exc_eta": 2e-4,
@@ -281,12 +281,12 @@ weber_in_merging_room_params = {
         "switch_time": 270.0,
     },
     "training_loop": default_training_loop,
-    "training_loop_params": {"n_steps": 1000},
+    "training_loop_params": {"n_steps": 10000},
 }
 
 
 stachenfeld_in_merging_room_1 = {
-    "simulation_id": "stachenfeld_2018_in_Merging_Room_1",
+    "simulation_id": "stachenfeld_2018_in_merging_room_1",
     "agent_class": Stachenfeld2018,
     "agent_params": {
         "discount": 0.9,
@@ -307,11 +307,11 @@ stachenfeld_in_merging_room_1 = {
         "switch_time": 270.0,
     },
     "training_loop": default_training_loop,
-    "training_loop_params": {"n_steps": 1000},
+    "training_loop_params": {"n_steps": 10000},
 }
 
 stachenfeld_in_merging_room_2 = {
-    "simulation_id": "stachenfeld_2018_in_Merging_Room_2",
+    "simulation_id": "stachenfeld_2018_in_merging_room_2",
     "agent_class": Stachenfeld2018,
     "agent_params": {
         "discount": 0.9,
@@ -332,12 +332,12 @@ stachenfeld_in_merging_room_2 = {
         "switch_time": 270.0,
     },
     "training_loop": episode_based_training_loop,
-    "training_loop_params": {"t_episode": 100, "n_episode": 100},
+    "training_loop_params": {"t_episode": 1000, "n_episode": 100},
 }
 
 
 coreEnv_test_1 = {
-    "simulation_id": "coreEnv_test_1",
+    "simulation_id": "coreenv_test_1",
     "agent_class": Weber2018,
     "agent_params": {
         "exc_eta": 2e-4,
@@ -366,12 +366,12 @@ coreEnv_test_1 = {
         "environment_name": "test",
     },
     "training_loop": default_training_loop,
-    "training_loop_params": {"n_steps": 1000},
+    "training_loop_params": {"n_steps": 10000},
 }
 
 
 coreEnv_test_2 = {
-    "simulation_id": "coreEnv_test_2",
+    "simulation_id": "coreenv_test_2",
     "agent_class": Weber2018,
     "agent_params": {
         "exc_eta": 2e-4,
@@ -400,11 +400,11 @@ coreEnv_test_2 = {
         "environment_name": "test",
     },
     "training_loop": episode_based_training_loop,
-    "training_loop_params": {"t_episode": 100, "n_episode": 100},
+    "training_loop_params": {"t_episode": 1000, "n_episode": 100},
 }
 
 coreEnv_test_3 = {
-    "simulation_id": "coreEnv_test_3",
+    "simulation_id": "coreenv_test_3",
     "agent_class": Stachenfeld2018,
     "agent_params": {
         "discount": 0.9,
@@ -421,11 +421,11 @@ coreEnv_test_3 = {
         "environment_name": "test",
     },
     "training_loop": episode_based_training_loop,
-    "training_loop_params": {"t_episode": 100, "n_episode": 100},
+    "training_loop_params": {"t_episode": 1000, "n_episode": 100},
 }
 
 coreEnv_test_4 = {
-    "simulation_id": "coreEnv_test_4",
+    "simulation_id": "coreenv_test_4",
     "agent_class": Stachenfeld2018,
     "agent_params": {
         "discount": 0.9,
@@ -442,12 +442,12 @@ coreEnv_test_4 = {
         "environment_name": "test",
     },
     "training_loop": default_training_loop,
-    "training_loop_params": {"n_steps": 1000},
+    "training_loop_params": {"n_steps": 10000},
 }
 
 
 coreAgentEnv_test = {
-    "simulation_id": "coreAgentEnv_test",
+    "simulation_id": "coreagentenv_test",
     "agent_class": AgentCore,
     "agent_params": {
         "model_name": "agent_test",
@@ -458,11 +458,11 @@ coreAgentEnv_test = {
         "environment_name": "test",
     },
     "training_loop": default_training_loop,
-    "training_loop_params": {"n_steps": 1000},
+    "training_loop_params": {"n_steps": 10000},
 }
 
 coreAgentEnv_test_2 = {
-    "simulation_id": "coreAgentEnv_test_2",
+    "simulation_id": "coreagentenv_test_2",
     "agent_class": AgentCore,
     "agent_params": {
         "model_name": "agent_test",
@@ -473,12 +473,12 @@ coreAgentEnv_test_2 = {
         "environment_name": "test",
     },
     "training_loop": episode_based_training_loop,
-    "training_loop_params": {"t_episode": 100, "n_episode": 100},
+    "training_loop_params": {"t_episode": 1000, "n_episode": 100},
 }
 
 
 coreAgent_test_1 = {
-    "simulation_id": "coreAgent_test_1",
+    "simulation_id": "coreagent_test_1",
     "agent_class": AgentCore,
     "agent_params": {
         "model_name": "agent_test",
@@ -492,11 +492,11 @@ coreAgent_test_1 = {
         "agent_step_size": 1,
     },
     "training_loop": default_training_loop,
-    "training_loop_params": {"n_steps": 1000},
+    "training_loop_params": {"n_steps": 10000},
 }
 
 coreAgent_test_2 = {
-    "simulation_id": "coreAgent_test_2",
+    "simulation_id": "coreagent_test_2",
     "agent_class": AgentCore,
     "agent_params": {
         "model_name": "agent_test",
@@ -510,12 +510,12 @@ coreAgent_test_2 = {
         "agent_step_size": 1,
     },
     "training_loop": episode_based_training_loop,
-    "training_loop_params": {"t_episode": 100, "n_episode": 100},
+    "training_loop_params": {"t_episode": 1000, "n_episode": 100},
 }
 
 
 coreAgent_test_3 = {
-    "simulation_id": "coreAgent_test_3",
+    "simulation_id": "coreagent_test_3",
     "agent_class": AgentCore,
     "agent_params": {
         "model_name": "agent_test",
@@ -527,11 +527,11 @@ coreAgent_test_3 = {
         "agent_step_size": None,
     },
     "training_loop": default_training_loop,
-    "training_loop_params": {"n_steps": 1000},
+    "training_loop_params": {"n_steps": 10000},
 }
 
 coreAgent_test_4 = {
-    "simulation_id": "coreAgent_test_4",
+    "simulation_id": "coreagent_test_4",
     "agent_class": AgentCore,
     "agent_params": {
         "model_name": "agent_test",
@@ -539,12 +539,12 @@ coreAgent_test_4 = {
     "env_class": Wernle2018,
     "env_params": {"merge_time": 20, "switch_time": 10, "time_step_size": 0.2, "agent_step_size": 3},
     "training_loop": default_training_loop,
-    "training_loop_params": {"n_steps": 1000},
+    "training_loop_params": {"n_steps": 10000},
 }
 
 
 coreAgent_test_5 = {
-    "simulation_id": "coreAgent_test_5",
+    "simulation_id": "coreagent_test_5",
     "agent_class": AgentCore,
     "agent_params": {
         "model_name": "agent_test",
@@ -559,7 +559,7 @@ coreAgent_test_5 = {
         "switch_time": 270.0,
     },
     "training_loop": default_training_loop,
-    "training_loop_params": {"n_steps": 1000},
+    "training_loop_params": {"n_steps": 10000},
 }
 
 
