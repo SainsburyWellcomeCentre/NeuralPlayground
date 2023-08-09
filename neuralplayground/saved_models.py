@@ -1,4 +1,4 @@
-"""Module for fetching and loading datasets.
+"""Module for fetching and loading saved and pre-trainned models.
 
 This module provides functions for fetching and loading data used in tests,
 examples, and tutorials. The data are stored in a remote repository on GIN
@@ -22,9 +22,9 @@ DATASET_REGISTRY = pooch.create(
     path=LOCAL_DATA_DIR,
     base_url=f"{DATA_URL}/data/",
     registry={
-        "weber_2018_in_simple2D.zip": "85028da0cc7d657933b0041458e9b61149ad86142d370808eabdd3478f8c1cca",
-        "weber_2018_in_Hafting2008.zip": "7bc345632c8cb45b04ed7be738afd3b740259d3d3fb1973d441e920ceeb66e1d",
-        "weber_2018_in_Sargolini2006.zip": "3c3ac58a7ef45a560a8a92b49c31e7724f6d5610c223de6fcf80ed1200a410ab",
+        "Weber_2018_in_simple2D.zip": "85028da0cc7d657933b0041458e9b61149ad86142d370808eabdd3478f8c1cca",
+        "Weber_2018_in_Hafting2008.zip": "7bc345632c8cb45b04ed7be738afd3b740259d3d3fb1973d441e920ceeb66e1d",
+        "Weber_2018_in_Sargolini2006.zip": "3c3ac58a7ef45a560a8a92b49c31e7724f6d5610c223de6fcf80ed1200a410ab",
         "stachenfeld_2018_in_simple2D.zip": "b0d2db8e2b5ee2d7a4f9b8ea1ba1366dafbbe72bb213363a8536fe930649487e",
         "stachenfeld_2018_in_Sargolini2006.zip": "7cadfbe2024d5e3ccbae13f9a2ba492791c3a5f82f740e6289c5eadd3d8d63d3",
         "stachenfeld_2018_in_Hafting2008.zip": "f014be0d6f399b50ebc67e1c4530db24f76ce12fa210aeff2695717598517137",
