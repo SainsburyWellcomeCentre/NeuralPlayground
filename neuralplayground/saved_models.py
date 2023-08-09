@@ -1,7 +1,7 @@
 """Module for fetching and loading saved and pre-trainned models.
 
-This module provides functions for fetching and loading data used in tests,
-examples, and tutorials. The data are stored in a remote repository on GIN
+This module provides functions for fetching and loading pre-trainned model used in test,
+examples, and tutorials. The pre-trainned model are stored in a remote repository on GIN
 and are downloaded to the user's local machine the first time they are used.
 """
 
