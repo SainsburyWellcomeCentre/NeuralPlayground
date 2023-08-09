@@ -31,6 +31,13 @@ jobs:
         python-version: ["3.8", "3.9", "3.10", "3.11"]
         os: [ubuntu-latest]
     steps:
+      - name: Cache Test Data
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.NeuralPlayground/*
+          key: cached-test-data
+          enableCrossOsArchive: true
       - uses: neuroinformatics-unit/actions/test@v2.0.0
         with:
           python-version: ${{ matrix.python-version }}
