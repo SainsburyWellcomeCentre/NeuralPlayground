@@ -39,7 +39,7 @@ class Stachenfeld2018(AgentCore):
             discounting factor
         learning_rate: scalar,
             scaling the magnitude of the TD update
-        threoshold: scalar,
+        threshold: scalar,
             upper bound for the update size
         transmat: (n_state, n_state)
             numpy array, transition matrix
