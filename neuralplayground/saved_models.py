@@ -9,18 +9,19 @@ from pathlib import Path
 
 import pooch
 
-# URL to GIN data repository where the experimental data are hosted
-DATA_URL = "https://gin.g-node.org/SainsburyWellcomeCentre/NeuralPlayground/raw/master"
+
+# URL to GIN model repository where the experimental model are hosted
+Model_URL = "https://gin.g-node.org/SainsburyWellcomeCentre/NeuralPlayground/raw/master"
 
 # Data to be downloaded and cached in ~/.NeuralPlayground/data
-LOCAL_DATA_DIR = Path("~", ".NeuralPlayground", "data").expanduser()
-LOCAL_DATA_DIR.mkdir(parents=True, exist_ok=True)
+LOCAL_MODEL_DIR = Path("~", ".NeuralPlayground", "data").expanduser()
+LOCAL_MODEL_DIR.mkdir(parents=True, exist_ok=True)
 
 # A pooch data registry object
-# Datasets are in the "data" subfolder as zip files - format: {dataset_name}.zip
-DATASET_REGISTRY = pooch.create(
-    path=LOCAL_DATA_DIR,
-    base_url=f"{DATA_URL}/data/",
+# model are in the "data" subfolder as zip files - format: {model_name}.zip
+MODEL_REGISTRY = pooch.create(
+    path=LOCAL_MODEL_DIR,
+    base_url=f"{Model_URL}/data/",
     registry={
         "weber_2018_in_simple2D.zip": "85028da0cc7d657933b0041458e9b61149ad86142d370808eabdd3478f8c1cca",
         "weber_2018_in_hafting2008.zip": "7bc345632c8cb45b04ed7be738afd3b740259d3d3fb1973d441e920ceeb66e1d",
@@ -35,30 +36,30 @@ DATASET_REGISTRY = pooch.create(
 )
 
 
-dataset_names = [n.split(".")[0] for n in DATASET_REGISTRY.registry.keys()]
+model_names = [n.split(".")[0] for n in MODEL_REGISTRY.registry.keys()]
 
 
 def fetch_model_path(
-    dataset_name: str,
+    model_name: str,
     progressbar: bool = True,
 ):
-    """Download and cache a dataset from the GIN repository.
+    """Download and cache a model from the GIN repository.
 
     Parameters
     ----------
-    dataset_name : str
-        The name of one the available datasets, e.g. "hafting_2008".
+    model_name : str
+        The name of one the available model, e.g. "hafting_2008".
     progressbar : bool
-        If True, show a progress bar while downloading the data.
+        If True, show a progress bar while downloading the model.
         Defaults to True.
 
     Returns
     -------
     str
-        Path to the downloaded dataset
+        Path to the downloaded model
     """
-    if dataset_name not in dataset_names:
-        raise ValueError(f"Dataset {dataset_name} not found. Available datasets: {dataset_names}")
-    DATASET_REGISTRY.fetch(f"{dataset_name}.zip", processor=pooch.Unzip(extract_dir=LOCAL_DATA_DIR), progressbar=progressbar)
-    data_path = LOCAL_DATA_DIR / dataset_name
-    return data_path.as_posix() + "/"
+    if model_name not in model_names:
+        raise ValueError(f"Model {model_name} not found. Available models: {model_names}")
+    MODEL_REGISTRY.fetch(f"{model_name}.zip", processor=pooch.Unzip(extract_dir=LOCAL_MODEL_DIR), progressbar=progressbar)
+    model_path = LOCAL_MODEL_DIR / model_name
+    return model_path.as_posix() + "/"
