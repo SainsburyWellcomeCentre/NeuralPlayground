@@ -349,6 +349,13 @@ class Whittington2020(AgentCore):
         pickle.dump(self.tem.state_dict(), open(os.path.join(save_path), "wb"), pickle.HIGHEST_PROTOCOL)
         with open(os.path.join(os.path.dirname(save_path), "agent_hyper"), "wb") as fp:
             pickle.dump(self.tem.hyper, fp, pickle.HIGHEST_PROTOCOL)
+        
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        source_file_path = os.path.join(script_dir, "../../neuralplayground/agents/whittington_2020_extras/whittington_2020_model.py")
+        destination_folder = os.path.join(os.path.dirname(save_path))
+        os.makedirs(destination_folder, exist_ok=True)
+        destination_file_path = os.path.join(destination_folder, "whittington_2020_model.py")
+        shutil.copy(source_file_path, destination_file_path)
 
     def save_files(self):
         """
