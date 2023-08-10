@@ -9,7 +9,6 @@ from pathlib import Path
 
 import pooch
 
-
 # URL to GIN model repository where the experimental model are hosted
 Model_URL = "https://gin.g-node.org/SainsburyWellcomeCentre/NeuralPlayground/raw/master"
 
