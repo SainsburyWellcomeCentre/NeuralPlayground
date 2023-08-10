@@ -18,7 +18,7 @@ class AgentCore(object):
 
     Attributes
     ----------
-    model_name : str
+    agent_name : str
         Name of the specific instantiation of the ExcInhPlasticity class
     mod_kwargs: dict
         Dictionary of specific parameters to be used by children classes
@@ -30,8 +30,8 @@ class AgentCore(object):
         Record of number of updates done on the weights
     """
 
-    def __init__(self, model_name="default_model", **mod_kwargs):
-        self.model_name = model_name
+    def __init__(self, agent_name="default_model", **mod_kwargs):
+        self.agent_name = agent_name
         self.mod_kwargs = mod_kwargs
         if "agent_step_size" in mod_kwargs.keys():
             self.agent_step_size = mod_kwargs["agent_step_size"]
@@ -59,6 +59,12 @@ class AgentCore(object):
         action: float
             action value which in this case is random number draw from a Gaussian
         """
+
+        if not obs.any():
+            action = None
+        else:
+            action = np.random.normal(scale=self.agent_step_size, size=(2,))
+
         self.obs_history.append(obs)
         if len(self.obs_history) >= 1000:  # reset every 1000
             self.obs_history = [
@@ -66,7 +72,7 @@ class AgentCore(object):
             ]
         if policy_func is not None:
             return policy_func(obs)
-        action = np.random.normal(scale=self.agent_step_size, size=(2,))
+
         return action
 
     def update(self):
