@@ -1,5 +1,6 @@
 import os
 import pickle
+
 import pandas as pd
 
 from neuralplayground.agents import AgentCore
@@ -117,8 +118,9 @@ class PlotSim(object):
             param_path = os.path.join(load_path, "params.dict")
         self.__dict__ = pd.read_pickle(param_path)
 
-    def tem_plotting_loop(self, agent: AgentCore, env: Environment, n_walks: int = 1000, 
-    random_state: bool = True, custom_state: list = None):
+    def tem_plotting_loop(
+        self, agent: AgentCore, env: Environment, n_walks: int = 1000, random_state: bool = True, custom_state: list = None
+    ):
         # Run around environment
         observation, state = env.reset(random_state=random_state, custom_state=custom_state)
         while agent.n_walk < n_walks:
@@ -127,5 +129,3 @@ class PlotSim(object):
             action = agent.batch_act(observation)
             observation, state, reward = env.step(action, normalize_step=True)
         return agent, env
-
-    
