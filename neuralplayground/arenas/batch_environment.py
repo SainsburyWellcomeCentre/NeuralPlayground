@@ -149,6 +149,7 @@ class BatchEnvironment(Environment):
         lower_lim, upper_lim = np.amin(env.arena_limits), np.amax(env.arena_limits)
         ax.set_xlim([lower_lim, upper_lim])
         ax.set_ylim([lower_lim, upper_lim])
+        plt.ylim(plt.ylim()[::-1])
 
         # Make plot of positions
         if len(history_data) != 0:

@@ -499,7 +499,9 @@ class Whittington2020(AgentCore):
         axes = []
 
         for i in range(5):
+            max_cells = 30
             n_cells = rate_maps[0][i].shape[1]
+            n_cells = min(n_cells, max_cells)
             num_cols = 6  # Number of subplots per row
             num_rows = np.ceil(n_cells / num_cols).astype(int)
 

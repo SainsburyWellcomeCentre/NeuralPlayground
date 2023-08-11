@@ -75,7 +75,7 @@ agent_params = {
     "use_behavioural_data": False,
 }
 
-training_loop_params = {"n_episode": 3, "params": full_agent_params}
+training_loop_params = {"n_episode": 20000, "params": full_agent_params}
 
 sim = SingleSim(
     simulation_id=simulation_id,
