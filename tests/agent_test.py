@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 from tqdm import tqdm
 
-from neuralplayground.agents import AgentCore, Stachenfeld2018, Weber2018
+from neuralplayground.agents import AgentCore, Stachenfeld2018, Weber2018, Whittington2020
 from neuralplayground.arenas import BasicSargolini2006
 
 
@@ -152,3 +152,40 @@ class TestStachenfeld2018(Testmodelcore):
     def test_plot_sr_sum(self, init_model):
         sr_sum = init_model[0].successor_rep_sum()
         init_model[0].plot_rate_map(sr_sum, eigen_vectors=(0,), save_path=None)
+
+
+class TestWhittington2020(Testmodelcore):
+    @pytest.fixture
+    def init_model(self, get_environment, parameters):
+        mod_name = "Whittington2020_test"
+        params = parameters.copy()
+        env = get_environment[0]
+
+        agent = Whittington2020(
+            model_name=mod_name,
+            params=params,
+            batch_size=env.batch_size,
+            room_widths=env.room_widths,
+            room_depths=env.room_depths,
+            state_densities=env.state_densities,
+            use_behavioural_data=False,
+        )
+        return [
+            agent,
+        ]
+    
+    def test_agent_interaction(self, init_model, get_environment):
+        env = get_environment[0]
+        n_steps = 1
+        obs, state = env.reset()
+        obs = obs[:2]
+        for i in tqdm(range(n_steps)):
+            while init_model.n_walk < init_model.pars["n_rollout"]:
+                actions = init_model.batch_act(observation)
+                observation, state = env.step(actions, normalize_step=True)
+    
+    def test_init_model(self, init_model):
+        assert isinstance(init_model[0], Whittington2020)
+
+    def test_plot_rates(self, init_model):
+        init_model[0].plot_rate_map()
