@@ -1,4 +1,3 @@
-
 """Module for fetching and loading saved and pre-trained models.
 
 This module provides functions for fetching and loading pre-trained models used in tests,
