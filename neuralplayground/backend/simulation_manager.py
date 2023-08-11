@@ -491,6 +491,7 @@ class PlotSim(object):
             pickle.dump(environments, f)
         with open(os.path.join(save_path, "NPG_model_input.pkl"), "wb") as f:
             pickle.dump(model_input, f)
+        return trained_agent, trained_env
 
     def _init_models(self):
         """Initialize the models"""
