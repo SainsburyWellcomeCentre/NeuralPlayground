@@ -3,14 +3,14 @@ import pytest
 
 from neuralplayground.agents import RandomAgent
 from neuralplayground.arenas import (
+    BatchEnvironment,
     ConnectedRooms,
+    DiscreteObjectEnvironment,
     Hafting2008,
     MergingRoom,
     Sargolini2006,
     Simple2D,
     Wernle2018,
-    BatchEnvironment,
-    DiscreteObjectEnvironment,
 )
 from neuralplayground.experiments import Sargolini2006Data
 
@@ -160,6 +160,7 @@ class TestMergingRoom(TestSimple2D):
     def test_init_env(self, init_env):
         assert isinstance(init_env[0], MergingRoom)
 
+
 class TestBatchEnvironment(TestSimple2D):
     def init_env(self):
         env_name = "BatchEnvironment_test"
@@ -167,10 +168,42 @@ class TestBatchEnvironment(TestSimple2D):
         state_density = 1
         n_objects = 45
         agent_step_size = 1
-        arena_x_limits = [[-5, 5],[-4, 4],[-5, 5],[-6, 6],[-4, 4],[-5, 5],[-6, 6],[-5, 5],
-                          [-4, 4],[-5, 5],[-6, 6],[-5, 5],[-4, 4],[-5, 5],[-6, 6],[-5, 5]]
-        arena_y_limits = [[-5, 5],[-4, 4],[-5, 5],[-6, 6],[-4, 4],[-5, 5],[-6, 6],[-5, 5],
-                          [-4, 4],[-5, 5],[-6, 6],[-5, 5],[-4, 4],[-5, 5],[-6, 6],[-5, 5]]
+        arena_x_limits = [
+            [-5, 5],
+            [-4, 4],
+            [-5, 5],
+            [-6, 6],
+            [-4, 4],
+            [-5, 5],
+            [-6, 6],
+            [-5, 5],
+            [-4, 4],
+            [-5, 5],
+            [-6, 6],
+            [-5, 5],
+            [-4, 4],
+            [-5, 5],
+            [-6, 6],
+            [-5, 5],
+        ]
+        arena_y_limits = [
+            [-5, 5],
+            [-4, 4],
+            [-5, 5],
+            [-6, 6],
+            [-4, 4],
+            [-5, 5],
+            [-6, 6],
+            [-5, 5],
+            [-4, 4],
+            [-5, 5],
+            [-6, 6],
+            [-5, 5],
+            [-4, 4],
+            [-5, 5],
+            [-6, 6],
+            [-5, 5],
+        ]
         env = BatchEnvironment(
             environment_name=env_name,
             env_class=DiscreteObjectEnvironment,
@@ -187,7 +220,7 @@ class TestBatchEnvironment(TestSimple2D):
         return [
             env,
         ]
-    
+
     def test_init_env(self, init_env):
         assert isinstance(init_env[0], BatchEnvironment)
 
@@ -200,16 +233,49 @@ class TestBatchEnvironment(TestSimple2D):
             obs, state, reward = init_env[0].step(action)
         init_env[0].plot_trajectory()
 
+
 class TestDiscretizedObjectEnvrionment(TestSimple2D):
     def init_env(self):
         env_name = "DiscretizedObjectEnvironment_test"
         state_density = 1
         n_objects = 45
         agent_step_size = 1
-        arena_x_limits = [[-5, 5],[-4, 4],[-5, 5],[-6, 6],[-4, 4],[-5, 5],[-6, 6],[-5, 5],
-                          [-4, 4],[-5, 5],[-6, 6],[-5, 5],[-4, 4],[-5, 5],[-6, 6],[-5, 5]]
-        arena_y_limits = [[-5, 5],[-4, 4],[-5, 5],[-6, 6],[-4, 4],[-5, 5],[-6, 6],[-5, 5],
-                          [-4, 4],[-5, 5],[-6, 6],[-5, 5],[-4, 4],[-5, 5],[-6, 6],[-5, 5]]
+        arena_x_limits = [
+            [-5, 5],
+            [-4, 4],
+            [-5, 5],
+            [-6, 6],
+            [-4, 4],
+            [-5, 5],
+            [-6, 6],
+            [-5, 5],
+            [-4, 4],
+            [-5, 5],
+            [-6, 6],
+            [-5, 5],
+            [-4, 4],
+            [-5, 5],
+            [-6, 6],
+            [-5, 5],
+        ]
+        arena_y_limits = [
+            [-5, 5],
+            [-4, 4],
+            [-5, 5],
+            [-6, 6],
+            [-4, 4],
+            [-5, 5],
+            [-6, 6],
+            [-5, 5],
+            [-4, 4],
+            [-5, 5],
+            [-6, 6],
+            [-5, 5],
+            [-4, 4],
+            [-5, 5],
+            [-6, 6],
+            [-5, 5],
+        ]
         env = DiscreteObjectEnvironment(
             environment_name=env_name,
             env_class=DiscreteObjectEnvironment,
@@ -225,7 +291,7 @@ class TestDiscretizedObjectEnvrionment(TestSimple2D):
         return [
             env,
         ]
-    
+
     def test_init_env(self, init_env):
         assert isinstance(init_env[0], DiscreteObjectEnvironment)
 

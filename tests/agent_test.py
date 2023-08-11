@@ -173,7 +173,7 @@ class TestWhittington2020(Testmodelcore):
         return [
             agent,
         ]
-    
+
     def test_agent_interaction(self, init_model, get_environment):
         env = get_environment[0]
         n_steps = 1
@@ -183,7 +183,7 @@ class TestWhittington2020(Testmodelcore):
             while init_model.n_walk < init_model.pars["n_rollout"]:
                 actions = init_model.batch_act(observation)
                 observation, state = env.step(actions, normalize_step=True)
-    
+
     def test_init_model(self, init_model):
         assert isinstance(init_model[0], Whittington2020)
 
