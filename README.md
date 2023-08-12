@@ -37,13 +37,13 @@ move in and interact with. We note that each module can also be used separately,
 models and data sets.
 
 We currently rely on visual comparison of a hand-selected number of outputs of the model with neural recordings as 
-shown in [github.com/NeuralPlayground/examples/comparison](https://github.com/ClementineDomine/NeuralPlayground/blob/main/examples/comparison_board_examples/comparison_board.ipynb). In the future, a set of quantitative measures and 
+shown in [github.com/NeuralPlayground/examples/comparison](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/comparisons_examples/Comparision_from_manager.ipynb). In the future, a set of quantitative measures and 
 qualitative measures will be added for systematic comparisons from any Agent, Arena, Experiments. 
 We want to restate that this won’t constitute an objective judgment of the quality of an Agent to replicate the brain 
 mechanism. Instead, this allows an objective and complete comparison to the current evidence in the field, as is 
 typically done in publications.
 
-Altogether, we hope our framework, available at [github.com/NeuralPlayground](https://github.com/ClementineDomine/NeuralPlayground/), offers
+Altogether, we hope our framework, offers
 a foundation that the community will build upon, working toward a shared, standardized, open, and
 reproducible computational understanding of the hippocampus and entorhinal cortex.
 
@@ -86,9 +86,8 @@ pip install -e '.[dev]'
 ## 3. Project
 
 Try our package! We are gathering opinions to focus our efforts on improving aspects of the code or adding new features,
-so if you tell us what you would like to have, we might just implement it 😊.
-Please refer to the [Roadmap](https://github.com/ClementineDomine/NeuralPlayground/blob/main/documents/road_map.md) to understand the state of the project and get an idea of the direction it is going 
-in. This open-source software was built to be collaborative and lasting. We hope that the framework will be simple 
+so if you tell us what you would like to have, we might just implement it 😊. 
+This open-source software was built to be collaborative and lasting. We hope that the framework will be simple 
 enough to be adopted by a great number of neuroscientists, eventually guiding the path to the computational 
 understanding of the HEC mechanisms. We follow reproducible, inclusive, and collaborative project design guidelines. 
 All relevant documents can be found in [Documents](https://github.com/ClementineDomine/NeuralPlayground/blob/main/documents/).
@@ -113,29 +112,38 @@ task.
 
 We have a backend module to run simulations and compare the results with experimental data, you can find it in 
 [simulation_manager](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/comparisons_examples/simulation_manager.ipynb) 
-notebook. To plot these results, go to [comparison_from_manager](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/comparisons_examples/Comparision_from_manadger.ipynb) [Examples_comparison](https://github.com/ClementineDomine/NeuralPlayground/blob/main/examples/comparison_board_examples/comparison_board.ipynb). We show visual 
+notebook. To plot these results, go to [comparison_from_manager](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/comparisons_examples/Comparision_from_manadger.ipynb) and [examples_comparison](https://github.com/ClementineDomine/NeuralPlayground/blob/main/examples/comparison_board_examples/comparison_board.ipynb). We show visual 
 comparisons between results from agents running with experimental behavior and results from the real experiment.
 
 ## 4. I-want-to-Contribute
 
-There are many ways to contribute to the [github.com/NeuralPlayground/examples/comparison](https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground).
+There are many ways to contribute to our project.
 
  1. Implement a hippocampal and entorhinal cortex [Agent](https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground/agents) of your choice.
 
  2. Work on improving the [Arena](https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground/arenas).
 
  3. Add an [Experimental](https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground/experiments) data set.
+4. Implementing metrics to compare the output of the Agent with the experimental data.
+
+ 5. Refactor the code to improve the readability and efficiency.
 
 All contributions should be submitted through a pull request that we will later access.
 Before sending a pull request, make sure you have the following:
 
 1. Checked the Licensing frameworks.
 
-2. Followed the [PEP8](https://www.python.org/dev/peps/pep-0008/) and [numpy docstring](https://numpydoc.readthedocs.io/en/latest/format.html) style convention. More details found in [Style Guide](https://github.com/ClementineDomine/NeuralPlayground/tree/main/documents/style_guide.md).
+2. Use developing tools installing the dev dependencies. Use:
 
-3. Implemented and ran [Test](https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground/tests).
+    ```pre-commit run --all-files``` 
 
-4. Comment your work.
+    to format the code and check for errors.
+
+3. Followed the [PEP8](https://www.python.org/dev/peps/pep-0008/) and [numpy docstring](https://numpydoc.readthedocs.io/en/latest/format.html) style convention. More details found in [Style Guide](https://github.com/ClementineDomine/NeuralPlayground/tree/main/documents/style_guide.md).
+
+4. Implemented and ran [Test](https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground/tests).
+
+5. Comment your work.
 
 All contributions to the repository are acknowledged through the all-contributors bot.
 Refer to the README.md files found in each of the modules for further details on how to contribute to them.

@@ -140,7 +140,7 @@ class Hafting2008Data(Experiment):
         head_direction = head_direction / np.sqrt(np.sum(head_direction**2, axis=1) + tolerance)[..., np.newaxis]
         self.head_direction = head_direction
 
-    def _find_data_path(self, data_path: str):
+    def _find_data_path(self, data_path: str = None):
         """Fetch data from NeuralPlayground data repository 
         if no data path is supplied by the user"""
         if data_path is None:

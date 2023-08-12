@@ -1,3 +1,6 @@
+from neuralplayground.datasets import fetch_data_path
+
+
 class Experiment(object):
     """Main abstract experiment class, created just for consistency purposes"""
 
@@ -16,3 +19,11 @@ class Experiment(object):
         self.experiment_name = experiment_name
         self.data_url = data_url
         self.paper_url = paper_url
+
+    def _find_data_path(self, data_path: str = None):
+        """Fetch data from NeuralPlayground data repository
+        if no data path is supplied by the user"""
+        if data_path is None:
+            self.data_path = fetch_data_path("hafting_2008")
+        else:
+            self.data_path = data_path
