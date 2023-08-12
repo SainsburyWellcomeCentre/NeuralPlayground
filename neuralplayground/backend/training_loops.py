@@ -35,8 +35,8 @@ def default_training_loop(agent: AgentCore, env: Environment, n_steps: int):
         update_output = agent.update()
         training_hist.append(update_output)
         obs = obs[:2]
-    process_training_hist(training_hist)
-    return agent, env, dict
+    dict_training = process_training_hist(training_hist)
+    return agent, env, dict_training
 
 
 def episode_based_training_loop(agent: AgentCore, env: Environment, t_episode: int, n_episode: int):
@@ -97,9 +97,12 @@ def process_training_hist(training_hist):
     """
 
     dict_training = {}
-    for key in training_hist[0].keys():
-        dict_training[key] = []
-    for i in range(len(training_hist)):
-        for key in training_hist[i].keys():
-            dict_training[key].append(training_hist[i][key])
+    if training_hist[0] is None:
+        dict_training = None
+    else:
+        for key in training_hist[0].keys():
+            dict_training[key] = []
+        for i in range(len(training_hist)):
+            for key in training_hist[i].keys():
+                dict_training[key].append(training_hist[i][key])
     return dict_training

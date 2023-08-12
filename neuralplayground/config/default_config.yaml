@@ -25,7 +25,7 @@ plot_config:
     grid: False
 
   agent_comparison_plot:
-    figsize: [12, 16]
+    figsize: [12, 15]
     fontsize: 10
     plot_sac_exp: True
     plot_sac_agt: True
