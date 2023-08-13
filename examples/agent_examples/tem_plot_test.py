@@ -7,7 +7,7 @@ import pandas as pd
 import torch
 
 import neuralplayground.agents.whittington_2020_extras.whittington_2020_analyse as analyse
-from neuralplayground.backend import PlotSim, tem_plotting_loop
+from neuralplayground.plotting import PlotSim
 
 simulation_id = "TEM_custom_plot_sim"
 save_path = "NeuralPlayground/examples/agent_examples/results_sim/"
@@ -28,7 +28,6 @@ sim = PlotSim(
     agent_params=training_dict["agent_params"],
     env_class=training_dict["env_class"],
     env_params=training_dict["env_params"],
-    plotting_loop=tem_plotting_loop,
     plotting_loop_params=plotting_loop_params,
 )
 print(sim)
