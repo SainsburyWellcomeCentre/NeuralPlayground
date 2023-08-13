@@ -193,15 +193,26 @@ def make_agent_comparison(envs, parameters, agents, exps=None, recording_index=N
 
     Parameters
     ----------
-    env : object of class Environment
-    parameters :
-    agents: list of objects of class Agent
-    exp: object of class Experiment
-    ax : matplotlib axis
+    envs:
+        Arena environment where the agent was trained and tested
+    parameters:
+        List of dictionaries with the parameters of the environment and agent
+    agents:
+        List of agents to compare
+    exp:
+        Objects of the class Experiment to compare with the agent
+        If None, the experimental data is will be searched in the environment
+    recording_index: int
+        Index of the recording to plot
+    tetrode_id:
+        Tetrode id to plot, as in Hafting and Sargolini experiment classes
+    GridScorer:
+        Object of the class Gridscore (or custom gridscore routine) to compute the grid scores
 
     Returns
     -------
-    ax: matplotlib axis
+    ax: mpl.axes._subplots.AxesSubplot (matplotlib axis from subplots)
+        Modified axis where the comparison is plotted
     """
     config_vars = PLOT_CONFIG.AGENT_COMPARISON
     exp_data = False

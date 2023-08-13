@@ -84,7 +84,7 @@ class RateMapConfig(NPGConfig):
         self.GRID = kwargs["grid"]
 
 
-class AgentCompatisonConfig(NPGConfig):
+class AgentComparisonConfig(NPGConfig):
     """Config object for ratemap plots
 
     Attributes
@@ -147,7 +147,7 @@ class PlotsConfig(NPGConfig):
         Config object for trajectory plots
     RATEMAP: RateMapConfig
         Config object for ratemap plots
-    AGENT_COMPARISON: AgentCompatisonConfig
+    AGENT_COMPARISON: AgentComparisonConfig
         Config object for agent comparison plots
     TABLE: TableConfig
         Config object for table plots
@@ -156,5 +156,5 @@ class PlotsConfig(NPGConfig):
     def __init__(self, plot_config: dict):
         self.TRAJECTORY = TrajectoryConfig(**plot_config["trajectory_plot"])
         self.RATEMAP = RateMapConfig(**plot_config["ratemap_plot"])
-        self.AGENT_COMPARISON = AgentCompatisonConfig(**plot_config["agent_comparison_plot"])
+        self.AGENT_COMPARISON = AgentComparisonConfig(**plot_config["agent_comparison_plot"])
         self.TABLE = TableConfig(**plot_config["table_plot"])
