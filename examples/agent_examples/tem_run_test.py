@@ -52,18 +52,21 @@ arena_y_limits = [
 room_widths = [10, 8, 10, 12, 8, 10, 12, 10, 8, 10, 12, 10, 8, 10, 12, 10]
 room_depths = [10, 8, 10, 12, 8, 10, 12, 10, 8, 10, 12, 10, 8, 10, 12, 10]
 
+discrete_env_params = {"environment_name": "DiscreteObject",
+                       "state_density": 1, 
+                       "n_objects": params["n_x"],
+                       "agent_step_size": 1,
+                       "use_behavioural_data": False,
+                       "data_path": None,
+                       "experiment_class": Sargolini2006Data}
+                       
 env_params = {
     "environment_name": "BatchEnvironment",
-    "env_class": DiscreteObjectEnvironment,
     "batch_size": 16,
     "arena_x_limits": arena_x_limits,
     "arena_y_limits": arena_y_limits,
-    "state_density": 1,
-    "n_objects": params["n_x"],
-    "agent_step_size": 1,
-    "use_behavioural_data": False,
-    "data_path": None,
-    "experiment_class": Sargolini2006Data,
+    "env_class": DiscreteObjectEnvironment,
+    "arg_env_params": discrete_env_params,
 }
 agent_params = {
     "model_name": "SimpleTEM",
@@ -75,7 +78,7 @@ agent_params = {
     "use_behavioural_data": False,
 }
 
-training_loop_params = {"n_episode": 20000, "params": full_agent_params}
+training_loop_params = {"n_episode": 3, "params": full_agent_params}
 
 sim = SingleSim(
     simulation_id=simulation_id,

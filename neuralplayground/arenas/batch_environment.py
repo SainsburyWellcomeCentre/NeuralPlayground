@@ -23,19 +23,20 @@ class BatchEnvironment(Environment):
         """
         super().__init__(environment_name, **env_kwargs)
         self.env_kwargs = env_kwargs.copy()
+        arg_env_params = env_kwargs["arg_env_params"]
         self.batch_size = batch_size
         self.batch_x_limits = env_kwargs["arena_x_limits"]
         self.batch_y_limits = env_kwargs["arena_y_limits"]
-        self.use_behavioural_data = env_kwargs["use_behavioural_data"]
+        self.use_behavioural_data = arg_env_params["use_behavioural_data"]
         self.environments = []
         for i in range(self.batch_size):
-            env_kwargs["arena_x_limits"] = self.batch_x_limits[i]
-            env_kwargs["arena_y_limits"] = self.batch_y_limits[i]
-            self.environments.append(env_class(**env_kwargs))
+            arg_env_params["arena_x_limits"] = self.batch_x_limits[i]
+            arg_env_params["arena_y_limits"] = self.batch_y_limits[i]
+            self.environments.append(env_class(**arg_env_params))
 
         self.room_widths = [np.diff(self.environments[i].arena_x_limits)[0] for i in range(self.batch_size)]
         self.room_depths = [np.diff(self.environments[i].arena_y_limits)[0] for i in range(self.batch_size)]
-        self.state_densities = [env_kwargs["state_density"] for i in range(self.batch_size)]
+        self.state_densities = [arg_env_params["state_density"] for i in range(self.batch_size)]
 
     def reset(self, random_state: bool = True, custom_state: np.ndarray = None):
         """
