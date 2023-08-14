@@ -13,7 +13,7 @@ import setuptools_scm
 
 # Used when building API docs, put the dependencies
 # of any class you are documenting here
-autodoc_mock_imports = ["numpy", "scipy", "pandas", "deepdiff"]
+autodoc_mock_imports = []
 
 # Add the module path to sys.path here.
 # If the directory is relative to the documentation root,
@@ -72,7 +72,16 @@ templates_path = ["_templates"]
 
 # Automatically generate stub pages for API
 autosummary_generate = True
-autodoc_default_flags = ["members", "inherited-members"]
+numpydoc_class_members_toctree = False  # stops stubs warning
+autodoc_default_options = {
+    "members": True,
+    "member-order": "bysource",
+    "special-members": False,
+    "private-members": False,
+    "inherited-members": False,
+    "undoc-members": True,
+    "exclude-members": "",
+}
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.

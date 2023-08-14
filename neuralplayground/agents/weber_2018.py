@@ -50,33 +50,6 @@ class Weber2018(AgentCore):
         List of parameters of Gaussian functions in tuning curves for each inhibitory neuron
     exc_rates_functions: list
         List of parameters of Gaussian functions in tuning curves for each excitatory neuron
-
-    Methods
-    -------
-    reset(self)
-        Initialize weights, tuning curves and global counter for weights updates done
-    generate_tuning_curves(self, n_curves, cov_scale, Nf, alpha)
-        Generate tuning curves as a combination of Gaussians
-        for a given number of neurons, covariance, number of Gaussian per tuning curve and height
-    get_output_rates(self, pos)
-        Compute firing rate of the output neuron for the specific position, equation 1
-    get_rates(self, cell_list, pos)
-        Get firing rate if input neurons at the given position by finding the pixel that is closest
-        to the position given
-    get_full_output_rate(self)
-        It computes equation 1 (or 4) for all available pixels at the same time taking
-        advantage of broadcasting
-    update(self)
-        Update weights using hebbian plasticity according to equation 2 for excitatory weights
-        and equation 3 for inhibitory weights for a given position
-    full_average_update(self, exc_normalization=True)
-        Update weights using hebbian plasticity according to equation 2 for excitatory weights
-        and equation 3 for inhibitory weights for all available positions in the grid
-    full_update(self, exc_normalization=True)
-        Update weights using hebbian plasticity according to equation 2 for excitatory weights
-        and equation 3, but using self.update function as a sub routine
-    plot_rate_map(self, save_path=None)
-        Plot current rates and an example of inhibitory and excitatory neuron
     """
 
     def __init__(self, model_name: str = "ExcitInhibitoryplastic", **mod_kwargs):
@@ -90,6 +63,7 @@ class Weber2018(AgentCore):
         mod_kwargs : dict
             Dictionary with parameters of the model from Weber and Sprekeler 2018
             https://doi.org/10.7554/eLife.34560.001
+            
             agent_step_size: float
                 Size of movement by the agent within the environment
             exc_eta: float

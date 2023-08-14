@@ -26,11 +26,12 @@ class Whittington2020(AgentCore):
     Implementation of TEM 2020 by James C.R. Whittington, Timothy H. Muller, Shirley Mark, Guifen Chen, Caswell Barry,
     Neil Burgess, Timothy E.J. Behrens. The Tolman-Eichenbaum Machine: Unifying Space and Relational Memory through
     Generalization in the Hippocampal Formation https://doi.org/10.1016/j.cell.2020.10.024.
-    ----
+    
     Attributes
-    ---------
+    ----------
     mod_kwargs : dict
         Model parameters
+        
         params: dict
             contains the majority of parameters used by the model and environment
         room_width: float
@@ -41,28 +42,6 @@ class Whittington2020(AgentCore):
             density of agent states (should be proportional to the step-size)
         tem: class
             TEM model
-
-    Methods
-    ---------
-    reset(self):
-        initialise model and associated variables for training
-    def initialise(self):
-        generate random distribution of objects and intialise optimiser, logger and relevant variables
-    act(self, positions, policy_func):
-        generates batch of random actions to be passed into the environment. If the returned positions are allowed,
-        they are saved along with corresponding actions
-    update(self):
-        Perform forward pass of model and calculate losses and accuracies
-    action_policy(self):
-        random action policy that picks from [up, down, left right]
-    discretise(self, step):
-        convert (x,y) position into discrete location
-    walk(self, positions):
-        convert continuous positions into sequence of discrete locations
-    make_observations(self, locations):
-        observe what randomly distributed object is located at each position of a walk
-    step_to_actions(self, actions):
-        convert (x,y) action information into an integer value
     """
 
     def __init__(self, model_name: str = "TEM", **mod_kwargs):
@@ -154,11 +133,13 @@ class Whittington2020(AgentCore):
         The base model executes one of four action (up-down-right-left) with equal probability.
         This is used to move on the rectangular environment states space (transmat).
         This is done for a batch of 16 environments.
+
         Parameters
         ----------
         observations: array (16,3/4)
             Observation from the environment class needed to choose the right action
             (here the state ID and position). If behavioural data is used, the observation includes head direction.
+        
         Returns
         -------
         new_actions : array (16,2)
@@ -385,13 +366,13 @@ class Whittington2020(AgentCore):
         """
         Convert trajectory of (x,y) actions into integer values (i.e. from [[0,0],[0,-1],[1,0],[0,1],[-1,0]] to [0,1,2,3,4])
 
-        Parameters:
-        ------
+        Parameters
+        ----------
             actions: (16,20,2)
                 batch of 16 actions for each step in a walk of length 20
 
-        Returns:
-        ------
+        Returns
+        -------
             action_values: (16,20,1)
                 batch of 16 action values for each step in walk of length 20
         """

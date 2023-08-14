@@ -24,61 +24,33 @@ sys.path.append("../")
 
 class Stachenfeld2018(AgentCore):
     """
-    Implementation for SR 2017 by Kimberly L. Stachenfeld1,2,*, Matthew M. Botvinick1,3, and Samuel J. Gershman4
+    Implementation for SR 2017 by Kimberly L. Stachenfeld, Matthew M. Botvinick, and Samuel J. Gershman
     The hippocampus as a predictive map
     https://doi.org/10.1101/097170;
 
     This implementation can interact with environments from the package as shown in the examples jupyter notebook.
     Check examples/SRexample.ipynb
-    ----
+    
     Attributes
-    ---------
-     mod_kwargs : dict
+    ----------
+    mod_kwargs : dict
         Model parameters
-        gamma: scalar,
-            discounting factor
-        learning_rate: scalar,
-            scaling the magnitude of the TD update
-        threshold: scalar,
-            upper bound for the update size
-        transmat: (n_state, n_state)
-            numpy array, transition matrix
-        room_width: float
-                    room width specified by the environment (see examples/examples/SRexample.ipynb)
-        room_depth: float
-                    room depth specified by the environment (see examples/examples/SRexample.ipynb)
-        state_density: float
-            density of SR-agent states (should be proportional to the step-size)
-        twoD: bool
-                When true creates a (n_state, n_state) transition array for a rectangular 2D state space.
-
-
-    Methods
-    ---------
-    reset(self):
-        Initialize the successor matrices, normalized transition matrix and observation variables ( history and initialisation)
-    obs_to_state(self, pos):
-        Converts the agent's position in the environment to the agent's position in the SR-agent state space.
-    act: float
-        The base model executes one of four action (up-down-right-left) with equal probability.
-        This is used to move on the rectangular environment states space (transmat).
-    get_T_from_M(self, M):
-        Compute the transition matrix from the computationally simulated successor representation matrix M
-    create_transmat(self, state_density, name_env, plotting_varible=True):
-        Creates the normalised transition matrix for a rectangular environment '2D_env'
-    update_successor_rep(self):
-        Compute the successor representation matrix using geometric sums
-    successor_rep_sum(self):
-        Compute the successor representation using successive additive update
-    update_successor_rep_td_full(self):
-        Compute the successor representation matrix using TD learning
-    update(self):
-        Compute the successor representation matrix using TD learning while interacting with the environement
-    plot_transition(self, matrix, save_path=None, ax=None):
-        Plot the input matrix and compare it to the transition matrix from the
-        rectangular environment states space (rectangular- transmat).
-    plot_eigen(self,matrix, save_path, ax=None):
-        Plot the matrix and the 4 largest modes of its eigen-decomposition
+    gamma: scalar,
+        discounting factor
+    learning_rate: scalar,
+        scaling the magnitude of the TD update
+    threshold: scalar,
+        upper bound for the update size
+    transmat: (n_state, n_state)
+        numpy array, transition matrix
+    room_width: float
+                room width specified by the environment (see examples/examples/SRexample.ipynb)
+    room_depth: float
+                room depth specified by the environment (see examples/examples/SRexample.ipynb)
+    state_density: float
+        density of SR-agent states (should be proportional to the step-size)
+    twoD: bool
+            When true creates a (n_state, n_state) transition array for a rectangular 2D state space.
     """
 
     def __init__(self, agent_name: str = "SR", **mod_kwargs):
@@ -172,10 +144,12 @@ class Stachenfeld2018(AgentCore):
         """
         The base model executes one of four action (up-down-right-left) with equal probability.
         This is used to move on the rectangular environment states space (transmat).
+        
         Parameters
         ----------
         obs: array (2,1)
             Observation from the environment class needed to choose the right action (Here the position).
+        
         Returns
         -------
         action : array (2,1)
@@ -204,6 +178,7 @@ class Stachenfeld2018(AgentCore):
     def get_T_from_M(self, M: np.ndarray):
         """
         Compute the transition matrix from the computationally simulated successor matrix M
+        
         Parameters
         ----------
         M: array (n_state,n_state)
@@ -223,17 +198,18 @@ class Stachenfeld2018(AgentCore):
 
         Parameters
         ----------
-            state_density: float
-                density of SR-agent states (should be proportional to the step-size)
-            name_env: string
-                name of the environment to create ( There is only one environment type for now)
-                If a new state space type is added please update the action function accordingly
-            plotting_variable: bool
-                If True: plots the normalised transition matrix
-        Returns:
+        state_density: float
+            density of SR-agent states (should be proportional to the step-size)
+        name_env: string
+            name of the environment to create ( There is only one environment type for now)
+            If a new state space type is added please update the action function accordingly
+        plotting_variable: bool
+            If True: plots the normalised transition matrix
+        
+        Returns
         -------
-            transmat_norm: array (n_state,n_state)
-                Normalised transition matrix
+        transmat_norm: array (n_state,n_state)
+            Normalised transition matrix
 
         """
 
@@ -277,7 +253,7 @@ class Stachenfeld2018(AgentCore):
         """
         Compute closed form solution of successor representation matrix using geometric sums.
 
-        Returns:
+        Returns
         -------
             srmat_ground: (n_state, n_state) numpy array,
                 Successor representation matrix
@@ -291,7 +267,7 @@ class Stachenfeld2018(AgentCore):
         """
         Compute the successor representation using successive additive update
 
-        Returns:
+        Returns
         -------
             srmat_sum: (n_state, n_state) numpy array, successor representation matrix
         """
@@ -311,7 +287,7 @@ class Stachenfeld2018(AgentCore):
         """
         Compute the successor representation matrix using TD learning while interacting with the environment
 
-        Returns:
+        Returns
         -------
             srmat: (n_state, n_state) successor representation matrix
         """
@@ -339,10 +315,10 @@ class Stachenfeld2018(AgentCore):
         """
         Compute the successor representation matrix using TD learning
 
-        Returns:
-        ----------
-            srmat_full: (n_state, n_state)
-                successor representation matrix
+        Returns
+        -------
+        srmat_full: (n_state, n_state)
+            successor representation matrix
 
         """
         random_state = np.random.RandomState(1234)

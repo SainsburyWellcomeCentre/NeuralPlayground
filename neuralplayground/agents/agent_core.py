@@ -28,20 +28,6 @@ class AgentCore(object):
         List of past observations while interacting with the environment in the act method
     global_steps: int
         Record of number of updates done on the weights
-
-    Methods
-    -------
-    reset(self):
-        Erase all memory from the model, initialize all relevant parameters and build from scratch
-    act(self, obs, policy_func=None):
-        Given an observation, return an action following a specific policy, if policy_func is None, then
-        return a random action
-    update(self):
-        Update model parameters, depends on the specific model
-    save_agent(self, save_path: str, raw_object: bool = True):
-        Save current state and information in general to re-instantiate the agent
-    restore_agent(self, save_path: str):
-        Restore saved agent
     """
 
     def __init__(self, agent_name="default_model", **mod_kwargs):
@@ -63,12 +49,14 @@ class AgentCore(object):
     def act(self, obs, policy_func=None):
         """
         The base model executes a random action from a normal distribution
+        
         Parameters
         ----------
         obs
             Observation from the environment class needed to choose the right action
         policy_func
             Arbitrary function that represents a custom policy that receives and observation and gives an action
+        
         Returns
         -------
         action: float
@@ -149,10 +137,12 @@ class RandomAgent(AgentCore):
 
     def act(self, obs):
         """The base model executes a random action from a normal distribution
+        
         Parameters
         ----------
         obs:
             Whatever observation from the environment class needed to choose the right action
+        
         Returns
         -------
         d_pos: nd.array (2,)
@@ -179,10 +169,10 @@ class LevyFlightAgent(RandomAgent):
     ):
         """Initializing levy flight agent
         From original documentation:
-        The probability density above is defined in the “standardized” form. To shift and/or scale the distribution
+        The probability density above is defined in the "standardized" form. To shift and/or scale the distribution
         use the loc and scale parameters. Specifically, levy_stable.pdf(x, alpha, beta, loc, scale) is identically
         equivalent to levy_stable.pdf(y, alpha, beta) / scale with y = (x - loc) / scale. Note that shifting the
-        location of a distribution does not make it a “noncentral” distribution; noncentral generalizations of some
+        location of a distribution does not make it a "noncentral" distribution; noncentral generalizations of some
         distributions are available in separate classes.
 
         Parameters

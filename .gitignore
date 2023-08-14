@@ -65,4 +65,4 @@ dist/
 
 # Documentation build
 docs/build/
-docs/source/api_generated/
+docs/source/apigen*/
