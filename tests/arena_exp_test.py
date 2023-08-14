@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from neuralplayground.agents import RandomAgent
+from neuralplayground.agents import RandomAgent, Whittington2020
 from neuralplayground.arenas import (
     BatchEnvironment,
     ConnectedRooms,
@@ -226,7 +226,7 @@ class TestBatchEnvironment(TestSimple2D):
 
     def test_agent_interaction(self, init_env):
         n_steps = 1
-        agent = RandomBatchAgent()
+        agent = Whittington2020()
         obs, state = init_env[0].reset()
         for i in range(n_steps):
             action = agent.batch_act(obs)

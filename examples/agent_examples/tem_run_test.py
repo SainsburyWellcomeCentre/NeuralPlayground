@@ -14,52 +14,54 @@ params = parameters.parameters()
 full_agent_params = params.copy()
 
 arena_x_limits = [
-    [-5, 5],
-    [-4, 4],
-    [-5, 5],
-    [-6, 6],
-    [-4, 4],
-    [-5, 5],
-    [-6, 6],
-    [-5, 5],
-    [-4, 4],
-    [-5, 5],
-    [-6, 6],
-    [-5, 5],
-    [-4, 4],
-    [-5, 5],
-    [-6, 6],
-    [-5, 5],
+    [-10, 10],
+    [-8, 8],
+    [-10, 10],
+    [-12, 12],
+    [-8, 8],
+    [-10, 10],
+    [-12, 12],
+    [-10, 10],
+    [-8, 8],
+    [-10, 10],
+    [-12, 12],
+    [-10, 10],
+    [-8, 8],
+    [-10, 10],
+    [-12, 12],
+    [-10, 10],
 ]
 arena_y_limits = [
-    [-5, 5],
-    [-4, 4],
-    [-5, 5],
-    [-6, 6],
-    [-4, 4],
-    [-5, 5],
-    [-6, 6],
-    [-5, 5],
-    [-4, 4],
-    [-5, 5],
-    [-6, 6],
-    [-5, 5],
-    [-4, 4],
-    [-5, 5],
-    [-6, 6],
-    [-5, 5],
+    [-10, 10],
+    [-8, 8],
+    [-10, 10],
+    [-12, 12],
+    [-8, 8],
+    [-10, 10],
+    [-12, 12],
+    [-10, 10],
+    [-8, 8],
+    [-10, 10],
+    [-12, 12],
+    [-10, 10],
+    [-8, 8],
+    [-10, 10],
+    [-12, 12],
+    [-10, 10],
 ]
-room_widths = [10, 8, 10, 12, 8, 10, 12, 10, 8, 10, 12, 10, 8, 10, 12, 10]
-room_depths = [10, 8, 10, 12, 8, 10, 12, 10, 8, 10, 12, 10, 8, 10, 12, 10]
+room_widths = [20, 16, 20, 24, 16, 20, 24, 20, 16, 20, 24, 20, 16, 20, 24, 20]
+room_depths = [20, 16, 20, 24, 16, 20, 24, 20, 16, 20, 24, 20, 16, 20, 24, 20]
 
-discrete_env_params = {"environment_name": "DiscreteObject",
-                       "state_density": 1, 
-                       "n_objects": params["n_x"],
-                       "agent_step_size": 1,
-                       "use_behavioural_data": False,
-                       "data_path": None,
-                       "experiment_class": Sargolini2006Data}
-                       
+discrete_env_params = {
+    "environment_name": "DiscreteObject",
+    "state_density": 1,
+    "n_objects": params["n_x"],
+    "agent_step_size": 1,
+    "use_behavioural_data": False,
+    "data_path": None,
+    "experiment_class": Sargolini2006Data,
+}
+
 env_params = {
     "environment_name": "BatchEnvironment",
     "batch_size": 16,
@@ -78,7 +80,7 @@ agent_params = {
     "use_behavioural_data": False,
 }
 
-training_loop_params = {"n_episode": 3, "params": full_agent_params}
+training_loop_params = {"n_episode": 20000, "params": full_agent_params}
 
 sim = SingleSim(
     simulation_id=simulation_id,
