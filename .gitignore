@@ -62,3 +62,7 @@ coverage.xml
 
 # PyPI distribution / packages
 dist/
+
+# Documentation build
+docs/build/
+docs/source/api_generated/

@@ -92,6 +92,7 @@ ignore = [
   ".all-contributorsrc",
   "tox.ini",
   "tests/*",
+  "docs/*",
 ]
 
 [tool.ruff]
