@@ -10,7 +10,7 @@ class BatchEnvironment(Environment):
     def __init__(self, environment_name: str = "BatchEnv", env_class: object = Simple2D, batch_size: int = 1, **env_kwargs):
         """
         Initialise a batch of environments. This is useful for training a single agent on multiple environments simultaneously.
-        
+
         Parameters
         ----------
         environment_name: str
@@ -47,7 +47,7 @@ class BatchEnvironment(Environment):
             If True, the agent will be placed in a random state
         custom_state: np.ndarray
             If not None, the agent will be placed in the state specified by custom_state
-        
+
         Returns
         -------
         all_observations: list of np.ndarray
@@ -71,14 +71,14 @@ class BatchEnvironment(Environment):
     def step(self, actions: np.ndarray, normalize_step: bool = False):
         """
         Step the environment
-        
+
         Parameters
         ----------
         actions: np.ndarray
             Array of actions for each environment in the batch
         normalize_step: bool
             If True, the agent will be placed in the state specified by custom_state
-        
+
         Returns
         -------
         all_observations: list of np.ndarray
@@ -113,7 +113,7 @@ class BatchEnvironment(Environment):
         self, history_data: list = None, ax=None, return_figure: bool = False, save_path: str = None, plot_every: int = 1
     ):
         """Plot the Trajectory of the agent in the environment
-        
+
         Parameters
         ----------
         history_data: list of interactions
@@ -124,7 +124,7 @@ class BatchEnvironment(Environment):
             If true, it will return the figure variable generated to make the plot
         save_path: str, list of str, tuple of str
             saving path of the generated figure, if None, no figure is saved
-        
+
         Returns
         -------
         ax: mpl.axes._subplots.AxesSubplot (matplotlib axis from subplots)
@@ -192,7 +192,7 @@ class BatchEnvironment(Environment):
     def collect_environment_info(self, model_input, history, environments):
         """
         Collect information about the environment for each step of the trajectory.
-        
+
         Parameters
         ----------
         model_input: list of np.ndarray
@@ -201,7 +201,7 @@ class BatchEnvironment(Environment):
             List of histories for each step of the trajectory
         environments: list of dict
             List of environments for each step of the trajectory
-        
+
         Returns
         -------
         environments: list of dict
@@ -234,14 +234,14 @@ class BatchEnvironment(Environment):
     def round_to_nearest_state_center(self, x, y):
         """
         Round the (x, y) coordinates to the center of the nearest state.
-        
+
         Parameters
         ----------
         x: float
             x coordinate
         y: float
             y coordinate
-        
+
         Returns
         -------
         rounded_x: float
@@ -263,14 +263,14 @@ class BatchEnvironment(Environment):
     def normalize_coordinates(self, x, y):
         """
         Normalize the (x, y) coordinates to the range [0, 1].
-        
+
         Parameters
         ----------
         x: float
             x coordinate
         y: float
             y coordinate
-        
+
         Returns
         -------
         normalized_x: float

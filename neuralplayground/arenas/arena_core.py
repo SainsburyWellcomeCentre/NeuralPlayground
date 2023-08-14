@@ -41,7 +41,7 @@ class Environment(Env):
             environment name for the specific instantiation of the object
         env_kwargs: dict
             Define within each subclass for specific environments
-            
+
             time_step_size: float
                Size of the time step in seconds
         """

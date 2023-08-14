@@ -47,7 +47,7 @@ class Simple2D(Environment):
         ----------
         env_kwargs: dict
             Dictionary with parameters of the experiment of the children class
-            
+
             time_step_size: float
                 time_step_size * global_steps will give a measure of the time in the experimental setting
             agent_step_size: float

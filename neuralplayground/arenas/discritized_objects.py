@@ -44,7 +44,7 @@ class DiscreteObjectEnvironment(Environment):
         """
         Initialize the class. env_kwargs arguments are specific for each of the child environments and
         described in their respective class.
-        
+
         Parameters
         ----------
         environment_name: str
@@ -110,7 +110,7 @@ class DiscreteObjectEnvironment(Environment):
     def reset(self, random_state=True, custom_state=None):
         """
         Reset the environment variables and distribution of sensory objects.
-        
+
         Parameters
         ----------
         random_state: bool
@@ -220,7 +220,7 @@ class DiscreteObjectEnvironment(Environment):
     def generate_objects(self):
         """
         Generate objects in the environment. In this case, the objects are one-hot encoded vectors.
-        
+
         Returns
         -------
         objects: ndarray (n_states, n_objects)
@@ -241,12 +241,12 @@ class DiscreteObjectEnvironment(Environment):
     def make_object_observation(self, pos):
         """
         Make an observation of the object in the environment at the current position.
-        
+
         Parameters
         ----------
         pos: ndarray (2,)
             Vector of the x and y coordinate of the position of the animal in the environment
-        
+
         Returns
         -------
         observation: ndarray (n_objects,)
@@ -260,12 +260,12 @@ class DiscreteObjectEnvironment(Environment):
     def pos_to_state(self, pos):
         """
         Convert an (x,y) position to a discretised state index
-        
+
         Parameters
         ----------
         pos: ndarray (2,)
             Vector of the x and y coordinate of the position of the animal in the environment
-        
+
         Returns
         -------
         index: int
@@ -340,7 +340,7 @@ class DiscreteObjectEnvironment(Environment):
             default to access to the saved history of positions in the environment
         ax: None
             default to create ax
-        
+
         Returns
         -------
         Returns a plot of the trajectory of the animal in the environment

@@ -49,14 +49,14 @@ class AgentCore(object):
     def act(self, obs, policy_func=None):
         """
         The base model executes a random action from a normal distribution
-        
+
         Parameters
         ----------
         obs
             Observation from the environment class needed to choose the right action
         policy_func
             Arbitrary function that represents a custom policy that receives and observation and gives an action
-        
+
         Returns
         -------
         action: float
@@ -137,12 +137,12 @@ class RandomAgent(AgentCore):
 
     def act(self, obs):
         """The base model executes a random action from a normal distribution
-        
+
         Parameters
         ----------
         obs:
             Whatever observation from the environment class needed to choose the right action
-        
+
         Returns
         -------
         d_pos: nd.array (2,)

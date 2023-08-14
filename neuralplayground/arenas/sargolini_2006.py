@@ -14,7 +14,7 @@ class Sargolini2006(Hafting2008):
     ----------
     state: array
         Contains the x, y coordinate of the position and head direction of the agent (will be further developed)
-        
+
         head_direction: ndarray
             Contains the x and y Coordinates of the position
         position: ndarray
@@ -29,7 +29,7 @@ class Sargolini2006(Hafting2008):
         Size of the environment in the y direction
     metadata: dict
         Dictionary containing the metadata of the children experiment
-        
+
         doi: str
             Add the reference to the experiemental results
     observation: ndarray

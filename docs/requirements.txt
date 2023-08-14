@@ -1,9 +1,9 @@
 linkify-it-py
 myst-parser
 nbsphinx
+neuralplayground
 pydata-sphinx-theme
 setuptools-scm
 sphinx
 sphinx-autodoc-typehints
 sphinx-design
-neuralplayground

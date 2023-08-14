@@ -63,7 +63,7 @@ class Weber2018(AgentCore):
         mod_kwargs : dict
             Dictionary with parameters of the model from Weber and Sprekeler 2018
             https://doi.org/10.7554/eLife.34560.001
-            
+
             agent_step_size: float
                 Size of movement by the agent within the environment
             exc_eta: float

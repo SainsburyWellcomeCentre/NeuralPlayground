@@ -30,7 +30,7 @@ class Stachenfeld2018(AgentCore):
 
     This implementation can interact with environments from the package as shown in the examples jupyter notebook.
     Check examples/SRexample.ipynb
-    
+
     Attributes
     ----------
     mod_kwargs : dict
@@ -144,12 +144,12 @@ class Stachenfeld2018(AgentCore):
         """
         The base model executes one of four action (up-down-right-left) with equal probability.
         This is used to move on the rectangular environment states space (transmat).
-        
+
         Parameters
         ----------
         obs: array (2,1)
             Observation from the environment class needed to choose the right action (Here the position).
-        
+
         Returns
         -------
         action : array (2,1)
@@ -178,7 +178,7 @@ class Stachenfeld2018(AgentCore):
     def get_T_from_M(self, M: np.ndarray):
         """
         Compute the transition matrix from the computationally simulated successor matrix M
-        
+
         Parameters
         ----------
         M: array (n_state,n_state)
@@ -205,7 +205,7 @@ class Stachenfeld2018(AgentCore):
             If a new state space type is added please update the action function accordingly
         plotting_variable: bool
             If True: plots the normalised transition matrix
-        
+
         Returns
         -------
         transmat_norm: array (n_state,n_state)

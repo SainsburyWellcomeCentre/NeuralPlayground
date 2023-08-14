@@ -26,12 +26,12 @@ class Whittington2020(AgentCore):
     Implementation of TEM 2020 by James C.R. Whittington, Timothy H. Muller, Shirley Mark, Guifen Chen, Caswell Barry,
     Neil Burgess, Timothy E.J. Behrens. The Tolman-Eichenbaum Machine: Unifying Space and Relational Memory through
     Generalization in the Hippocampal Formation https://doi.org/10.1016/j.cell.2020.10.024.
-    
+
     Attributes
     ----------
     mod_kwargs : dict
         Model parameters
-        
+
         params: dict
             contains the majority of parameters used by the model and environment
         room_width: float
@@ -139,7 +139,7 @@ class Whittington2020(AgentCore):
         observations: array (16,3/4)
             Observation from the environment class needed to choose the right action
             (here the state ID and position). If behavioural data is used, the observation includes head direction.
-        
+
         Returns
         -------
         new_actions : array (16,2)
