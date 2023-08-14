@@ -3,29 +3,50 @@ API Reference
 
 Agents
 ------
-
-.. currentmodule:: neuralplayground.agents.agent_core
-..  autosummary::
-    :toctree: apigen_agents
+.. currentmodule:: neuralplayground.agents
+.. autosummary::
+    :toctree: apigen
 
     AgentCore
     RandomAgent
     LevyFlightAgent
-
-.. currentmodule:: neuralplayground.agents.stachenfeld_2018
-..  autosummary::
-    :toctree: apigen_agents
-
     Stachenfeld2018
-
-.. currentmodule:: neuralplayground.agents.weber_2018
-..  autosummary::
-    :toctree: apigen_agents
-
     Weber2018
-
-.. currentmodule:: neuralplayground.agents.whittington_2020
-..  autosummary::
-    :toctree: apigen_agents
-    
     Whittington2020
+
+Arenas
+------
+.. currentmodule:: neuralplayground.arenas
+.. autosummary::
+    :toctree: apigen
+
+    Environment
+    Simple2D
+    ConnectedRooms
+    Hafting2008
+    BasicSargolini2006
+    Sargolini2006
+    Wernle2018
+    MergingRoom
+    BatchEnvironment
+    DiscreteObjectEnvironment
+
+Experiments
+-----------
+.. currentmodule:: neuralplayground.experiments
+.. autosummary::
+    :toctree: apigen
+
+    Experiment
+    Hafting2008Data
+    SargoliniDataTrajectory
+    Sargolini2006Data
+    Wernle2018Data
+
+Comparison
+----------
+.. currentmodule:: neuralplayground.comparison
+.. autosummary::
+    :toctree: apigen
+
+    GridScorer

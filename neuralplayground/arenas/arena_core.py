@@ -9,23 +9,6 @@ from gymnasium import Env, spaces
 
 class Environment(Env):
     """Abstract parent environment class
-    Methods
-    ----------
-    __init__(self, environment_name: str = "Environment", **env_kwargs):
-        Initialize the class. env_kwargs arguments are specific for each of the child environments and
-        described in their respective class
-    make_observation(self):
-        Returns the current state of the environment
-    step(self, action):
-        Runs the environment dynamics. Given some action, return observation, new state and reward.
-    reset(self):
-        Re-initialize state and global counters. Returns observation and re-setted state
-    save_environment(self, save_path: str):
-        Save current variables of the object to re-instantiate the environment later
-    restore_environment(self, save_path: str):
-        Restore environment saved using save_environment method
-    get_trajectory_data(self):
-        Returns interaction history
 
     Attributes
     ----------
@@ -58,6 +41,7 @@ class Environment(Env):
             environment name for the specific instantiation of the object
         env_kwargs: dict
             Define within each subclass for specific environments
+            
             time_step_size: float
                Size of the time step in seconds
         """

@@ -10,27 +10,16 @@ from neuralplayground.experiments import (
 class Sargolini2006(Hafting2008):
     """Arena resembling Sargolini2006 experimental setting
 
-    Methods
-    ----------
-    __init__(self, use_behavioral_data: bool = False, data_path: str = None, recording_index: int = None,
-                 environment_name: str = "Sargolini2006", verbose: bool = False, experiment_class=Sargolini2006Data,
-                 **env_kwargs):
-         Initialise the class
-    reset(self):
-        Reset the environment variables
-    step(self, action):
-        Increment the global step count of the agent in the environment and updates the position of the agent according
-        to the recordings of the specific chosen session
-
     Attributes
     ----------
-    self.state: array
+    state: array
         Contains the x, y coordinate of the position and head direction of the agent (will be further developed)
+        
         head_direction: ndarray
             Contains the x and y Coordinates of the position
         position: ndarray
             Contains the x and y Coordinates of the position
-    self.history: dict
+    history: dict
         Saved history over simulation steps (action, state, new_state, reward, global_steps)
     global_steps: int
         Counter of the number of steps in the environment
@@ -40,8 +29,9 @@ class Sargolini2006(Hafting2008):
         Size of the environment in the y direction
     metadata: dict
         Dictionary containing the metadata of the children experiment
-            doi: str
-                Add the reference to the experiemental results
+        
+        doi: str
+            Add the reference to the experiemental results
     observation: ndarray
         Fully observable environment, make_observation returns the state
         Array of the observation of the agent in the environment (Could be modified as the environments are evolves)

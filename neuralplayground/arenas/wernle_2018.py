@@ -8,14 +8,7 @@ from .simple2d import Simple2D
 class Wernle2018(Hafting2008):
     """Arena resembling Wernle2018 experimental setting
 
-    Methods (In addition to Hafting 2008)
-    ----------
-    set_room(self, room_id: str):
-        Place the agent in the right room configuration depending the amount of exploration time
-    def step(self, action: np.ndarray, normalize_step: bool = False, skip_every: int = 10):
-        Move the agents based on the action and room configuration
-
-    Attributes (In addition to Hafting 2008)
+    Attributes
     ----------
     merge_time: float
         Time in minutes to remove the middle wall in the experiment, merging the two rooms
@@ -133,14 +126,14 @@ class Wernle2018(Hafting2008):
 class MergingRoom(Simple2D):
     """Arena resembling Wernle2018 experimental setting BUT WITH GENERIC ROOM DIMENSIONS
 
-    Methods (In addition to Simple2D)
-    ----------
+    Methods
+    -------
     set_room(self, room_id: str):
         Place the agent in the right room configuration depending the amount of exploration time
     def step(self, action: np.ndarray, normalize_step: bool = False, skip_every: int = 10):
         Move the agents based on the action and room configuration
 
-    Attributes (In addition to Simple2D)
+    Attributes
     ----------
     merge_time: float
         Time in minutes to remove the middle wall in the experiment, merging the two rooms

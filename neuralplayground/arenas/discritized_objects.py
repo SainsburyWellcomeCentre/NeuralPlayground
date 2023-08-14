@@ -11,41 +11,26 @@ class DiscreteObjectEnvironment(Environment):
     """
     Arena class which accounts for discrete sensory objects, inherits from the Simple2D class.
 
-    Methods
-    ------
-        __init__(self, environment_name='DiscreteObject', **env_kwargs):
-            Initialize the class. env_kwargs arguments are specific for each of the child environments and
-            described in their respective class.
-        reset(self):
-            Re-initialize state and global counters. Resets discrete objects at each state.
-        generate_objects(self):
-            Randomly distribute objects (one-hot encoded vectors) at each discrete state within the environment
-        make_observation(self, step):
-            Convert an (x,y) position into an observation of an object
-        pos_to_state(self, step):
-            Convert an (x,y) position to a discretised state index
-        plot_objects(self, history_data=None, ax=None, return_figure=False):
-
     Attributes
-        ----------
-        state: array
-            Empty array for this abstract class
-        history: list
-            Contains transition history
-        env_kwags: dict
-            Arguments given to the init method
-        global_steps: int
-            Number of calls to step method, set to 0 when calling reset
-        global_time: float
-            Time simulating environment through step method, then global_time = time_step_size * global_steps
-        number_object: int
-            The number of possible objects present at any state
-        room_width: int
-            Size of the environment in the x direction
-        room_depth: int
-            Size of the environment in the y direction
-        state_density: int
-            The density of discrete states in the environment
+    ----------
+    state: array
+        Empty array for this abstract class
+    history: list
+        Contains transition history
+    env_kwags: dict
+        Arguments given to the init method
+    global_steps: int
+        Number of calls to step method, set to 0 when calling reset
+    global_time: float
+        Time simulating environment through step method, then global_time = time_step_size * global_steps
+    number_object: int
+        The number of possible objects present at any state
+    room_width: int
+        Size of the environment in the x direction
+    room_depth: int
+        Size of the environment in the y direction
+    state_density: int
+        The density of discrete states in the environment
     """
 
     def __init__(
@@ -59,16 +44,17 @@ class DiscreteObjectEnvironment(Environment):
         """
         Initialize the class. env_kwargs arguments are specific for each of the child environments and
         described in their respective class.
+        
         Parameters
         ----------
-            environment_name: str
-                Name of the environment
-            verbose: bool
-                If True, print information about the environment
-            experiment_class: str
-                Name of the class of the experiment to use
-            **env_kwargs:
-                Arguments specific to each environment
+        environment_name: str
+            Name of the environment
+        verbose: bool
+            If True, print information about the environment
+        experiment_class: str
+            Name of the class of the experiment to use
+        **env_kwargs:
+            Arguments specific to each environment
         """
         super().__init__(environment_name, **env_kwargs)
         self.environment_name = environment_name
@@ -124,21 +110,21 @@ class DiscreteObjectEnvironment(Environment):
     def reset(self, random_state=True, custom_state=None):
         """
         Reset the environment variables and distribution of sensory objects.
-            Parameters
-            ----------
-            random_state: bool
-                If True, sample a new position uniformly within the arena, use default otherwise
-            custom_state: np.ndarray
-                If given, use this array to set the initial state
+        
+        Parameters
+        ----------
+        random_state: bool
+            If True, sample a new position uniformly within the arena, use default otherwise
+        custom_state: np.ndarray
+            If given, use this array to set the initial state
 
-            Returns
-            ----------
-            observation: ndarray
-                Because this is a fully observable environment, make_observation returns the state of the environment
-                Array of the observation of the agent in the environment (Could be modified as the environments are evolves)
-
-            self.state: ndarray (2,)
-                Vector of the x and y coordinate of the position of the animal in the environment
+        Returns
+        ----------
+        observation: ndarray
+            Because this is a fully observable environment, make_observation returns the state of the environment
+            Array of the observation of the agent in the environment (Could be modified as the environments are evolves)
+        self.state: ndarray (2,)
+            Vector of the x and y coordinate of the position of the animal in the environment
         """
 
         self.global_steps = 0
@@ -234,10 +220,11 @@ class DiscreteObjectEnvironment(Environment):
     def generate_objects(self):
         """
         Generate objects in the environment. In this case, the objects are one-hot encoded vectors.
+        
         Returns
         -------
-            objects: ndarray (n_states, n_objects)
-                Array of the objects in the environment, one-hot encoded
+        objects: ndarray (n_states, n_objects)
+            Array of the objects in the environment, one-hot encoded
         """
         poss_objects = np.zeros(shape=(self.n_objects, self.n_objects))
         for i in range(self.n_objects):
@@ -254,14 +241,16 @@ class DiscreteObjectEnvironment(Environment):
     def make_object_observation(self, pos):
         """
         Make an observation of the object in the environment at the current position.
+        
         Parameters
         ----------
-            pos: ndarray (2,)
-                Vector of the x and y coordinate of the position of the animal in the environment
+        pos: ndarray (2,)
+            Vector of the x and y coordinate of the position of the animal in the environment
+        
         Returns
         -------
-            observation: ndarray (n_objects,)
-                Array of the observation of the agent in the environment, in this case the sensory object.
+        observation: ndarray (n_objects,)
+            Array of the observation of the agent in the environment, in this case the sensory object.
         """
         index = self.pos_to_state(np.array(pos))
         object = self.objects[index]
@@ -271,14 +260,16 @@ class DiscreteObjectEnvironment(Environment):
     def pos_to_state(self, pos):
         """
         Convert an (x,y) position to a discretised state index
+        
         Parameters
         ----------
-            pos: ndarray (2,)
-                Vector of the x and y coordinate of the position of the animal in the environment
+        pos: ndarray (2,)
+            Vector of the x and y coordinate of the position of the animal in the environment
+        
         Returns
         -------
-            index: int
-                Index of the state in the discretised state space
+        index: int
+            Index of the state in the discretised state space
         """
         if len(pos) > 2:
             pos = pos[:2]
@@ -349,6 +340,7 @@ class DiscreteObjectEnvironment(Environment):
             default to access to the saved history of positions in the environment
         ax: None
             default to create ax
+        
         Returns
         -------
         Returns a plot of the trajectory of the animal in the environment
