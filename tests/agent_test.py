@@ -183,12 +183,6 @@ class TestWhittington2020(Testmodelcore):
                 actions = init_model.batch_act(obs)
                 obs, state = env.step(actions, normalize_step=True)
 
-    def test_init_model(self, init_model):
-        assert isinstance(init_model[0], Whittington2020)
-
-    def test_plot_rates(self, init_model):
-        init_model[0].plot_rate_map()
-
     def test_agent_update(self, init_model, get_environment):
         env = get_environment[0]
         n_steps = 1
@@ -198,3 +192,9 @@ class TestWhittington2020(Testmodelcore):
                 actions = init_model.batch_act(obs)
                 obs, state = env.step(actions, normalize_step=True)
                 init_model.update()
+
+    def test_init_model(self, init_model):
+        assert isinstance(init_model[0], Whittington2020)
+
+    def test_plot_rates(self, init_model):
+        init_model[0].plot_rate_map()
