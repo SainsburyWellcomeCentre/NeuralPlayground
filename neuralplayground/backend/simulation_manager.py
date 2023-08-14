@@ -36,6 +36,10 @@ class SimulationManager(object):
         Run all the simulations in the simulation manager list, runs_per_sim times
     check_run_status()
         Prints the status of the simulations in the simulation manager
+    show_logs(simulation_index: int = 0, log_type: str = "error")
+        Show the logs of a simulation
+    rerun_simulation(simulation_index: int = 0)
+        Rerun a simulation, deleting the previous results
     """
 
     def __init__(
