@@ -92,7 +92,7 @@ enough to be adopted by a great number of neuroscientists, eventually guiding th
 understanding of the HEC mechanisms. We follow reproducible, inclusive, and collaborative project design guidelines. 
 All relevant documents can be found in [Documents](https://github.com/ClementineDomine/NeuralPlayground/blob/main/documents/).
 
-#### How to run a single module
+### How to run a single module
 
 Each module can be used separately to easily explore and analyze experimental data and better understand any 
 implemented model. Additionally, different Arenas can be initialised with artificial architectures or with data from 
@@ -101,14 +101,14 @@ real-life experiments. We provide examples of module instantiation in the detail
 <strong>Check our Tolman-Eichenbaum Machine Implementation 
 [this branch](https://github.com/ClementineDomine/NeuralPlayground/tree/whittington_2020) (work in progress), you will also need to install [pytorch](https://pytorch.org/).</strong>
 
-#### How to run interactions between modules
+### How to run interactions between modules
 
 As shown in the jupyter notebooks [Examples_agent](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples/agent_examples), the Agent can interact with an Arena in a standard RL 
 framework. The first step is to initialise an Agent and Arena of your choice. The Agent can be thought of as the 
 animal performing the Experiment and the Arena as the experimental setting where the animal navigates and performs a 
 task.
 
-#### How to run comparisons
+### How to run comparisons
 
 We have a backend module to run simulations and compare the results with experimental data, you can find it in 
 [simulation_manager](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/comparisons_examples/simulation_manager.ipynb) 
