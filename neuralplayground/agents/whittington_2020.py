@@ -88,6 +88,7 @@ class Whittington2020(AgentCore):
         self.room_widths = mod_kwargs["room_widths"]
         self.room_depths = mod_kwargs["room_depths"]
         self.state_densities = mod_kwargs["state_densities"]
+
         self.pars = copy.deepcopy(params)
         self.tem = model.Model(self.pars)
         self.batch_size = mod_kwargs["batch_size"]
@@ -478,39 +479,30 @@ class Whittington2020(AgentCore):
 
         return final_model_input, history, environments
 
-    def plot_rate_map(self, rate_maps):
+    def plot_rate_map(self, rate_maps, frequencies = ["Theta", "Delta", "Beta", "Gamma", "High Gamma"],  max_cells = 30,  num_cols = 6 ):
         """
         Plot the TEM rate maps.
 
         Parameters
         ----------
-        rate_maps: ndarray, shape (5, N)
-            The rate maps for TEM, where N is the number of cells in each frequency.
 
         Returns
         -------
-        figs: list
-            A list of matplotlib figures containing the rate map plots for each frequency.
-        axes: list
-            A list of arrays of matplotlib axes containing the individual rate map plots for each frequency.
+
         """
-        frequencies = ["Theta", "Delta", "Beta", "Gamma", "High Gamma"]
+
         figs = []
         axes = []
 
-        for i in range(5):
-            max_cells = 30
+        for i in range(len(frequencies)):
             n_cells = rate_maps[0][i].shape[1]
             n_cells = min(n_cells, max_cells)
-            num_cols = 6  # Number of subplots per row
+            # Number of subplots per row
             num_rows = np.ceil(n_cells / num_cols).astype(int)
 
             # Create the figure for the current frequency
             fig, axs = plt.subplots(nrows=num_rows, ncols=num_cols, figsize=(15, 10))
             fig.suptitle(f"{frequencies[i]} Rate Maps", fontsize=16)
-
-            # Create a single colorbar for the entire figure
-            cbar_ax = fig.add_axes([0.91, 0.15, 0.02, 0.7])
 
             # Create the subplots for the current frequency
             for j in range(n_cells):
@@ -519,15 +511,11 @@ class Whittington2020(AgentCore):
                 ax_row = j // num_cols
                 ax_col = j % num_cols
 
-                # Get the rate map for the current cell and frequency
-                rate_map = np.asarray(rate_maps[0][i]).T[j]
-
                 # Reshape the rate map into a matrix
-                rate_map_mat = np.reshape(rate_map, (self.room_widths[0], self.room_depths[0]))
+                rate_map_mat =   self.get_rate_map_matrix(rate_maps,i,j)
 
                 # Plot the rate map in the corresponding subplot
-                title = f"Cell {j+1}"
-                make_plot_rate_map(rate_map_mat, axs[ax_row, ax_col], title, "", "", "")
+                make_plot_rate_map(rate_map_mat, axs[ax_row, ax_col], f"Cell {j+1}", "", "", "")
 
             # Hide unused subplots for the current frequency
             for j in range(n_cells, num_rows * num_cols):
@@ -535,11 +523,10 @@ class Whittington2020(AgentCore):
                 ax_col = j % num_cols
                 axs[ax_row, ax_col].axis("off")
 
-            # Add a single colorbar to the figure
-            cbar = fig.colorbar(axs[0, 0].get_images()[0], cax=cbar_ax)
-            cbar.set_label("Firing rate", fontsize=14)
-
             figs.append(fig)
             axes.append(axs)
-
         return figs, axes
+
+    def get_rate_map_matrix(self,rate_maps,i,j):
+        rate_map = np.asarray(rate_maps[0][i]).T[j]
+        return np.reshape(rate_map, (self.room_widths[0], self.room_depths[0]))
