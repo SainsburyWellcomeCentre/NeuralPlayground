@@ -281,8 +281,8 @@ class DiscreteObjectEnvironment(Environment):
             index: int
                 Index of the state in the discretised state space
         """
-        if len(pos) > 2:
-            pos = pos[:2]
+        if len(pos[0]) > 1:
+            pos = pos[0]
         diff = (self.xy_combination - pos) ** 2
         dist = np.sum(diff**2, axis=-1)
         index = np.argmin(dist)
