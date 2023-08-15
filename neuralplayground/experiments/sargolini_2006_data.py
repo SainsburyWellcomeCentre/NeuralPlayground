@@ -20,6 +20,8 @@ class SargoliniDataTrajectory(Experiment):
         self,
         experiment_name: str = "Sargolini_2006_Data",
         data_path: str = None,
+        data_url: str = None,
+        paper_url: str = None,
         **kwargs,
     ):
         """SargoliniData Class Init
@@ -32,7 +34,12 @@ class SargoliniDataTrajectory(Experiment):
             if None, fetch the data from the NeuralPlayground data repository,
             else load data from given path
         """
-        self.experiment_name = experiment_name
+        if data_url is None:
+            data_url = "https://archive.norstore.no/pages/public/datasetDetail.jsf?id=8F6BE356-3277-475C-87B1-C7A977632DA7"
+        if paper_url is None:
+            paper_url = "https://www.science.org/doi/10.1126/science.1125572"
+        super().__init__(experiment_name=experiment_name, data_url=data_url, paper_url=paper_url)
+
         self.recording_list = []
         if data_path is None:
             # Set data_path to the data directory within the package
@@ -94,6 +101,8 @@ class Sargolini2006Data(Hafting2008Data):
     """Data class for sargolini et al. 2006. https://www.science.org/doi/10.1126/science.1125572
     The data can be obtained from https://archive.norstore.no/pages/public/datasetDetail.jsf?id=8F6BE356-3277-475C-87B1-C7A977632DA7
     This class only consider animal raw animal trajectories and neural recordings.
+
+    Refer to Hafting2008Data for more information into the available methods and attributes.
     """
 
     def __init__(
@@ -102,6 +111,8 @@ class Sargolini2006Data(Hafting2008Data):
         recording_index: int = None,
         experiment_name: str = "FullSargoliniData",
         verbose: bool = False,
+        data_url: str = None,
+        paper_url: str = None,
     ):
         """Sargolini2006Data init, just initializing parent class Hafting2008Data
 
@@ -116,12 +127,23 @@ class Sargolini2006Data(Hafting2008Data):
             string to identify object in case of multiple instances
         verbose:
             if True, it will print original readme and data structure when initializing this object
+        data_url: str
+            URL to the data used in the experiment, make sure it is publicly available for usage and download
+        paper_url: str
+            URL to the paper describing the experiment
         """
+        if data_url is None:
+            data_url = "https://archive.norstore.no/pages/public/datasetDetail.jsf?id=8F6BE356-3277-475C-87B1-C7A977632DA7"
+        if paper_url is None:
+            paper_url = "https://www.science.org/doi/10.1126/science.1125572"
+
         super().__init__(
             data_path=data_path,
             recording_index=recording_index,
             experiment_name=experiment_name,
             verbose=verbose,
+            data_url=data_url,
+            paper_url=paper_url,
         )
 
     def _find_data_path(self, data_path: str):

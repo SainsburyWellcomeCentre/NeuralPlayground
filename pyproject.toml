@@ -57,6 +57,9 @@ dev = [
   "ruff",
   "setuptools_scm",
 ]
+tem = [
+  "pytorch"
+]
 
 [build-system]
 requires = [

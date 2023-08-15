@@ -114,7 +114,7 @@ class Stachenfeld2018(AgentCore):
         self.room_depth = mod_kwargs["room_depth"]
         self.state_density = mod_kwargs["state_density"]
         twoD = mod_kwargs["twoD"]
-        self.inital_obs_variable = None
+        self.initial_obs_variable = None
 
         self.reset()
         # Variables for the SR-agent state space
@@ -141,7 +141,7 @@ class Stachenfeld2018(AgentCore):
         self.srmat_ground = []
         self.srmat_full_td = []
         self.transmat_norm = []
-        self.inital_obs_variable = None
+        self.initial_obs_variable = None
         self.obs_history = []  # Reset observation history
 
     def obs_to_state(self, pos: np.ndarray):
@@ -309,7 +309,7 @@ class Stachenfeld2018(AgentCore):
 
     def update(self):
         """
-        Compute the successor representation matrix using TD learning while interacting with the environement
+        Compute the successor representation matrix using TD learning while interacting with the environment
 
         Returns:
         -------
