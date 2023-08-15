@@ -3,13 +3,9 @@ import pytest
 from tqdm import tqdm
 
 from neuralplayground.agents import AgentCore, Stachenfeld2018, Weber2018, Whittington2020
-<<<<<<< HEAD
+from neuralplayground.agents.whittington_2020_extras import whittington_2020_parameters as parameters
 from neuralplayground.arenas import BasicSargolini2006, BatchEnvironment, DiscreteObjectEnvironment
 from neuralplayground.experiments import Sargolini2006Data
-=======
->>>>>>> 5b1c2d004e3c8fcbf8ebb08d6929e0b8bcd7c019
-from neuralplayground.agents.whittington_2020_extras import whittington_2020_parameters as parameters
-from neuralplayground.arenas import BasicSargolini2006
 
 
 @pytest.fixture
@@ -194,11 +190,43 @@ class TestWhittington2020(Testmodelcore):
         env = BatchEnvironment(
             environment_name="BatchEnvironment",
             batch_size=16,
-            arena_x_limits = [[-5, 5], [-4, 4], [-5, 5], [-6, 6], [-4, 4], [-5, 5], [-6, 6], [-5, 5],
-                              [-4, 4], [-5, 5], [-6, 6], [-5, 5], [-4, 4], [-5, 5], [-6, 6], [-5, 5]],
-            arena_y_limits = [[-5, 5], [-4, 4], [-5, 5], [-6, 6], [-4, 4], [-5, 5], [-6, 6], [-5, 5],
-                              [-4, 4], [-5, 5], [-6, 6], [-5, 5], [-4, 4], [-5, 5], [-6, 6], [-5, 5]],
-            env_class = DiscreteObjectEnvironment,
+            arena_x_limits=[
+                [-5, 5],
+                [-4, 4],
+                [-5, 5],
+                [-6, 6],
+                [-4, 4],
+                [-5, 5],
+                [-6, 6],
+                [-5, 5],
+                [-4, 4],
+                [-5, 5],
+                [-6, 6],
+                [-5, 5],
+                [-4, 4],
+                [-5, 5],
+                [-6, 6],
+                [-5, 5],
+            ],
+            arena_y_limits=[
+                [-5, 5],
+                [-4, 4],
+                [-5, 5],
+                [-6, 6],
+                [-4, 4],
+                [-5, 5],
+                [-6, 6],
+                [-5, 5],
+                [-4, 4],
+                [-5, 5],
+                [-6, 6],
+                [-5, 5],
+                [-4, 4],
+                [-5, 5],
+                [-6, 6],
+                [-5, 5],
+            ],
+            env_class=DiscreteObjectEnvironment,
             arg_env_params=discrete_env_params,
         )
         agent = init_model[0]
@@ -222,11 +250,43 @@ class TestWhittington2020(Testmodelcore):
         env = BatchEnvironment(
             environment_name="BatchEnvironment",
             batch_size=16,
-            arena_x_limits = [[-5, 5], [-4, 4], [-5, 5], [-6, 6], [-4, 4], [-5, 5], [-6, 6], [-5, 5],
-                              [-4, 4], [-5, 5], [-6, 6], [-5, 5], [-4, 4], [-5, 5], [-6, 6], [-5, 5]],
-            arena_y_limits = [[-5, 5], [-4, 4], [-5, 5], [-6, 6], [-4, 4], [-5, 5], [-6, 6], [-5, 5],
-                              [-4, 4], [-5, 5], [-6, 6], [-5, 5], [-4, 4], [-5, 5], [-6, 6], [-5, 5]],
-            env_class = DiscreteObjectEnvironment,
+            arena_x_limits=[
+                [-5, 5],
+                [-4, 4],
+                [-5, 5],
+                [-6, 6],
+                [-4, 4],
+                [-5, 5],
+                [-6, 6],
+                [-5, 5],
+                [-4, 4],
+                [-5, 5],
+                [-6, 6],
+                [-5, 5],
+                [-4, 4],
+                [-5, 5],
+                [-6, 6],
+                [-5, 5],
+            ],
+            arena_y_limits=[
+                [-5, 5],
+                [-4, 4],
+                [-5, 5],
+                [-6, 6],
+                [-4, 4],
+                [-5, 5],
+                [-6, 6],
+                [-5, 5],
+                [-4, 4],
+                [-5, 5],
+                [-6, 6],
+                [-5, 5],
+                [-4, 4],
+                [-5, 5],
+                [-6, 6],
+                [-5, 5],
+            ],
+            env_class=DiscreteObjectEnvironment,
             arg_env_params=discrete_env_params,
         )
         agent = init_model[0]
