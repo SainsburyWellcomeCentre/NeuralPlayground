@@ -491,7 +491,6 @@ class Whittington2020(AgentCore):
         shiny_envs = [False, False, False, False]
         env_to_plot = 0
         envs_to_avg = shiny_envs if shiny_envs[env_to_plot] else [not shiny_env for shiny_env in shiny_envs]
-
         correct_model, correct_node, correct_edge = analyse.compare_to_agents(
             forward, tem, environments, include_stay_still=include_stay_still
         )
@@ -541,7 +540,7 @@ class Whittington2020(AgentCore):
                 ax_col = j % num_cols
 
                 # Reshape the rate map into a matrix
-                rate_map_mat =   self.get_rate_map_matrix(rate_maps,i,j)
+                rate_map_mat = self.get_rate_map_matrix(rate_maps, i, j)
 
                 # Plot the rate map in the corresponding subplot
                 make_plot_rate_map(rate_map_mat, axs[ax_row, ax_col], f"Cell {j+1}", "", "", "")
@@ -556,6 +555,6 @@ class Whittington2020(AgentCore):
             axes.append(axs)
         return figs, axes
 
-    def get_rate_map_matrix(self,rate_maps,i,j):
+    def get_rate_map_matrix(self, rate_maps, i, j):
         rate_map = np.asarray(rate_maps[0][i]).T[j]
         return np.reshape(rate_map, (self.room_widths[0], self.room_depths[0]))

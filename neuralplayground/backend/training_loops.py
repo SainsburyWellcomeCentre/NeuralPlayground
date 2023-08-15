@@ -108,6 +108,7 @@ def tem_training_loop(agent: AgentCore, env: Environment, n_episode: int, params
         agent.update()
     return agent, env, training_dict
 
+
 def process_training_hist(training_hist):
     """Process the training history from the training loop and update method.
 
