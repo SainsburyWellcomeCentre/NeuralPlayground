@@ -1,3 +1,5 @@
+import os
+
 from neuralplayground.agents import Whittington2020
 from neuralplayground.agents.whittington_2020_extras import whittington_2020_parameters as parameters
 from neuralplayground.arenas import BatchEnvironment, DiscreteObjectEnvironment
@@ -5,7 +7,7 @@ from neuralplayground.backend import SingleSim, tem_training_loop
 from neuralplayground.experiments import Sargolini2006Data
 
 simulation_id = "TEM_custom_sim"
-save_path = "../NeuralPlayground/examples/agent_examples/results_sim"
+save_path = os.getcwd() + "\\examples\\agent_examples\\results_sim"
 agent_class = Whittington2020
 env_class = BatchEnvironment
 training_loop = tem_training_loop
@@ -13,44 +15,13 @@ training_loop = tem_training_loop
 params = parameters.parameters()
 full_agent_params = params.copy()
 
-arena_x_limits = [
-    [-10, 10],
-    [-8, 8],
-    [-10, 10],
-    [-12, 12],
-    [-8, 8],
-    [-10, 10],
-    [-12, 12],
-    [-10, 10],
-    [-8, 8],
-    [-10, 10],
-    [-12, 12],
-    [-10, 10],
-    [-8, 8],
-    [-10, 10],
-    [-12, 12],
-    [-10, 10],
-]
-arena_y_limits = [
-    [-10, 10],
-    [-8, 8],
-    [-10, 10],
-    [-12, 12],
-    [-8, 8],
-    [-10, 10],
-    [-12, 12],
-    [-10, 10],
-    [-8, 8],
-    [-10, 10],
-    [-12, 12],
-    [-10, 10],
-    [-8, 8],
-    [-10, 10],
-    [-12, 12],
-    [-10, 10],
-]
-room_widths = [20, 16, 20, 24, 16, 20, 24, 20, 16, 20, 24, 20, 16, 20, 24, 20]
-room_depths = [20, 16, 20, 24, 16, 20, 24, 20, 16, 20, 24, 20, 16, 20, 24, 20]
+arena_x_limits = [[-5, 5], [-4, 4], [-5, 5], [-6, 6], [-4, 4], [-5, 5], [-6, 6], [-5, 5], 
+                  [-4, 4], [-5, 5], [-6, 6], [-5, 5], [-4, 4], [-5, 5], [-6, 6], [-5, 5]]
+arena_y_limits = [[-5, 5], [-4, 4], [-5, 5], [-6, 6], [-4, 4], [-5, 5], [-6, 6], [-5, 5], 
+                  [-4, 4], [-5, 5], [-6, 6], [-5, 5], [-4, 4], [-5, 5], [-6, 6], [-5, 5]]
+
+room_widths = [10, 8, 10, 12, 8, 10, 12, 10, 8, 10, 12, 10, 8, 10, 12, 10]
+room_depths = [10, 8, 10, 12, 8, 10, 12, 10, 8, 10, 12, 10, 8, 10, 12, 10]
 
 discrete_env_params = {
     "environment_name": "DiscreteObject",
@@ -80,7 +51,7 @@ agent_params = {
     "use_behavioural_data": False,
 }
 
-training_loop_params = {"n_episode": 20000, "params": full_agent_params}
+training_loop_params = {"n_episode": 10, "params": full_agent_params}
 
 sim = SingleSim(
     simulation_id=simulation_id,
