@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from neuralplayground.agents import RandomAgent, Whittington2020
+from neuralplayground.agents import RandomAgent
 from neuralplayground.arenas import (
     BatchEnvironment,
     ConnectedRooms,
@@ -166,9 +166,6 @@ class TestBatchEnvironment(TestSimple2D):
     def init_env(self):
         env_name = "BatchEnvironment_test"
         batch_size = 16
-        state_density = 1
-        n_objects = 45
-        agent_step_size = 1
         arena_x_limits = [
             [-5, 5],
             [-4, 4],
@@ -291,4 +288,3 @@ class TestDiscretizedObjectEnvrionment(TestSimple2D):
 
     def test_init_env(self, init_env):
         assert isinstance(init_env[0], DiscreteObjectEnvironment)
-

@@ -1,11 +1,10 @@
 import numpy as np
 import pytest
 from tqdm import tqdm
-from copy import deepcopy
 
 from neuralplayground.agents import AgentCore, Stachenfeld2018, Weber2018, Whittington2020
-from neuralplayground.arenas import BasicSargolini2006
 from neuralplayground.agents.whittington_2020_extras import whittington_2020_parameters as parameters
+from neuralplayground.arenas import BasicSargolini2006
 
 
 @pytest.fixture
@@ -162,16 +161,16 @@ class TestWhittington2020(Testmodelcore):
         mod_name = "Whittington2020_test"
         pars = parameters.parameters()
         params = pars.copy()
-        env = get_environment[0]
+        get_environment[0]
         batch_size = 16
 
         agent = Whittington2020(
             model_name=mod_name,
             params=params,
             batch_size=batch_size,
-            room_widths=[10]*batch_size,
-            room_depths=[10]*batch_size,
-            state_densities=[1]*batch_size,
+            room_widths=[10] * batch_size,
+            room_depths=[10] * batch_size,
+            state_densities=[1] * batch_size,
             use_behavioural_data=False,
         )
         return [

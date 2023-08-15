@@ -483,7 +483,9 @@ class Whittington2020(AgentCore):
 
         return final_model_input, history, environments
 
-    def plot_rate_map(self, rate_maps, frequencies = ["Theta", "Delta", "Beta", "Gamma", "High Gamma"],  max_cells = 30,  num_cols = 6 ):
+    def plot_rate_map(
+        self, rate_maps, frequencies=["Theta", "Delta", "Beta", "Gamma", "High Gamma"], max_cells=30, num_cols=6
+    ):
         """
         Plot the TEM rate maps.
 
@@ -516,7 +518,7 @@ class Whittington2020(AgentCore):
                 ax_col = j % num_cols
 
                 # Reshape the rate map into a matrix
-                rate_map_mat =   self.get_rate_map_matrix(rate_maps,i,j)
+                rate_map_mat = self.get_rate_map_matrix(rate_maps, i, j)
 
                 # Plot the rate map in the corresponding subplot
                 make_plot_rate_map(rate_map_mat, axs[ax_row, ax_col], f"Cell {j+1}", "", "", "")
@@ -531,6 +533,6 @@ class Whittington2020(AgentCore):
             axes.append(axs)
         return figs, axes
 
-    def get_rate_map_matrix(self,rate_maps,i,j):
+    def get_rate_map_matrix(self, rate_maps, i, j):
         rate_map = np.asarray(rate_maps[0][i]).T[j]
         return np.reshape(rate_map, (self.room_widths[0], self.room_depths[0]))
