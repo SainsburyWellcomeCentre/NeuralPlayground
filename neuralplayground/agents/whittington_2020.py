@@ -10,9 +10,9 @@ import numpy as np
 import torch
 from torch.utils.tensorboard import SummaryWriter
 
+import neuralplayground.agents.whittington_2020_extras.whittington_2020_analyse as analyse
 import neuralplayground.agents.whittington_2020_extras.whittington_2020_model as model
 import neuralplayground.agents.whittington_2020_extras.whittington_2020_parameters as parameters
-import neuralplayground.agents.whittington_2020_extras.whittington_2020_analyse as analyse
 import neuralplayground.agents.whittington_2020_extras.whittington_2020_utils as utils
 
 # Custom modules
@@ -483,24 +483,26 @@ class Whittington2020(AgentCore):
         final_model_input.extend(single_model_input)
 
         return final_model_input, history, environments
-    
+
     def plot_run(self, tem, model_input, environments):
         with torch.no_grad():
             forward = tem(model_input, prev_iter=None)
         include_stay_still = False
         shiny_envs = [False, False, False, False]
         env_to_plot = 0
-        envs_to_avg = shiny_envs if shiny_envs[env_to_plot] else [not shiny_env for shiny_env in shiny_envs]
+        shiny_envs if shiny_envs[env_to_plot] else [not shiny_env for shiny_env in shiny_envs]
         correct_model, correct_node, correct_edge = analyse.compare_to_agents(
             forward, tem, environments, include_stay_still=include_stay_still
         )
-        zero_shot = analyse.zero_shot(forward, tem, environments, include_stay_still=include_stay_still)
-        occupation = analyse.location_occupation(forward, tem, environments)
+        analyse.zero_shot(forward, tem, environments, include_stay_still=include_stay_still)
+        analyse.location_occupation(forward, tem, environments)
         self.g_rates, self.p_rates = analyse.rate_map(forward, tem, environments)
         from_acc, to_acc = analyse.location_accuracy(forward, tem, environments)
         return
 
-    def plot_rate_map(self, rate_map_type = None, frequencies = ["Theta", "Delta", "Beta", "Gamma", "High Gamma"],  max_cells = 30,  num_cols = 6 ):
+    def plot_rate_map(
+        self, rate_map_type=None, frequencies=["Theta", "Delta", "Beta", "Gamma", "High Gamma"], max_cells=30, num_cols=6
+    ):
         """
         Plot the TEM rate maps.
 

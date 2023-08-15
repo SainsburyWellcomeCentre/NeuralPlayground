@@ -194,9 +194,9 @@ class TestWhittington2020(Testmodelcore):
         env = BatchEnvironment(
             environment_name="BatchEnvironment",
             batch_size=16,
-            arena_x_limits = [[-5, 5], [-4, 4], [-5, 5], [-6, 6], [-4, 4], [-5, 5], [-6, 6], [-5, 5], 
+            arena_x_limits = [[-5, 5], [-4, 4], [-5, 5], [-6, 6], [-4, 4], [-5, 5], [-6, 6], [-5, 5],
                               [-4, 4], [-5, 5], [-6, 6], [-5, 5], [-4, 4], [-5, 5], [-6, 6], [-5, 5]],
-            arena_y_limits = [[-5, 5], [-4, 4], [-5, 5], [-6, 6], [-4, 4], [-5, 5], [-6, 6], [-5, 5], 
+            arena_y_limits = [[-5, 5], [-4, 4], [-5, 5], [-6, 6], [-4, 4], [-5, 5], [-6, 6], [-5, 5],
                               [-4, 4], [-5, 5], [-6, 6], [-5, 5], [-4, 4], [-5, 5], [-6, 6], [-5, 5]],
             env_class = DiscreteObjectEnvironment,
             arg_env_params=discrete_env_params,
@@ -222,9 +222,9 @@ class TestWhittington2020(Testmodelcore):
         env = BatchEnvironment(
             environment_name="BatchEnvironment",
             batch_size=16,
-            arena_x_limits = [[-5, 5], [-4, 4], [-5, 5], [-6, 6], [-4, 4], [-5, 5], [-6, 6], [-5, 5], 
+            arena_x_limits = [[-5, 5], [-4, 4], [-5, 5], [-6, 6], [-4, 4], [-5, 5], [-6, 6], [-5, 5],
                               [-4, 4], [-5, 5], [-6, 6], [-5, 5], [-4, 4], [-5, 5], [-6, 6], [-5, 5]],
-            arena_y_limits = [[-5, 5], [-4, 4], [-5, 5], [-6, 6], [-4, 4], [-5, 5], [-6, 6], [-5, 5], 
+            arena_y_limits = [[-5, 5], [-4, 4], [-5, 5], [-6, 6], [-4, 4], [-5, 5], [-6, 6], [-5, 5],
                               [-4, 4], [-5, 5], [-6, 6], [-5, 5], [-4, 4], [-5, 5], [-6, 6], [-5, 5]],
             env_class = DiscreteObjectEnvironment,
             arg_env_params=discrete_env_params,
@@ -237,7 +237,7 @@ class TestWhittington2020(Testmodelcore):
                 actions = agent.batch_act(obs)
                 obs, state, reward = env.step(actions, normalize_step=True)
             agent.update()
-    
+
     def test_plot_rates(self, init_model):
         init_model[0].plot_rate_map(rate_map_type="g")
 
