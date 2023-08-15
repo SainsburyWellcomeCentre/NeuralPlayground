@@ -18,7 +18,7 @@ class AgentCore(object):
 
     Attributes
     ----------
-    model_name : str
+    agent_name : str
         Name of the specific instantiation of the ExcInhPlasticity class
     mod_kwargs: dict
         Dictionary of specific parameters to be used by children classes
@@ -28,10 +28,24 @@ class AgentCore(object):
         List of past observations while interacting with the environment in the act method
     global_steps: int
         Record of number of updates done on the weights
+
+    Methods
+    -------
+    reset(self):
+        Erase all memory from the model, initialize all relevant parameters and build from scratch
+    act(self, obs, policy_func=None):
+        Given an observation, return an action following a specific policy, if policy_func is None, then
+        return a random action
+    update(self):
+        Update model parameters, depends on the specific model
+    save_agent(self, save_path: str, raw_object: bool = True):
+        Save current state and information in general to re-instantiate the agent
+    restore_agent(self, save_path: str):
+        Restore saved agent
     """
 
-    def __init__(self, model_name="default_model", **mod_kwargs):
-        self.model_name = model_name
+    def __init__(self, agent_name="default_model", **mod_kwargs):
+        self.agent_name = agent_name
         self.mod_kwargs = mod_kwargs
         if "agent_step_size" in mod_kwargs.keys():
             self.agent_step_size = mod_kwargs["agent_step_size"]
@@ -43,7 +57,8 @@ class AgentCore(object):
 
     def reset(self):
         """Erase all memory from the model, initialize all relevant parameters and build from scratch"""
-        pass
+        self.obs_history = []
+        self.global_steps = 0
 
     def act(self, obs, policy_func=None):
         """
@@ -59,6 +74,12 @@ class AgentCore(object):
         action: float
             action value which in this case is random number draw from a Gaussian
         """
+
+        if not obs.any():
+            action = None
+        else:
+            action = np.random.normal(scale=self.agent_step_size, size=(2,))
+
         self.obs_history.append(obs)
         if len(self.obs_history) >= 1000:  # reset every 1000
             self.obs_history = [
@@ -66,22 +87,29 @@ class AgentCore(object):
             ]
         if policy_func is not None:
             return policy_func(obs)
-        action = np.random.normal(scale=self.agent_step_size, size=(2,))
+
         return action
 
     def update(self):
-        pass
+        """Update model parameters"""
+        return None
 
-    def save_agent(self, save_path: str):
+    def save_agent(self, save_path: str, raw_object: bool = True):
         """Save current state and information in general to re-instantiate the environment
 
         Parameters
         ----------
         save_path: str
             Path to save the agent
+        raw_object: bool
+            If True, save the raw object, otherwise save the dictionary of attributes
+            If True, you can load the object by using agent = pd.read_pickle(save_path)
+            if False, you can load the object by using agent.restore_environment(save_path)
         """
-        # pickle.dump(self.__dict__, open(os.path.join(save_path), "wb"), pickle.HIGHEST_PROTOCOL)
-        pickle.dump(self, open(os.path.join(save_path), "wb"), pickle.HIGHEST_PROTOCOL)
+        if raw_object:
+            pickle.dump(self, open(os.path.join(save_path), "wb"), pickle.HIGHEST_PROTOCOL)
+        else:
+            pickle.dump(self.__dict__, open(os.path.join(save_path), "wb"), pickle.HIGHEST_PROTOCOL)
 
     def restore_agent(self, save_path: str):
         """Restore saved environment
@@ -89,11 +117,9 @@ class AgentCore(object):
         Parameters
         ----------
         save_path: str
-            Path to retrieve the agent
+            Path to retrieve the environment saved using save_agent method (raw_object=False)
         """
-        # self.__dict__ = pd.read_pickle(save_path)
-        # TODO: for some reason, ruff has a problem with this: self = pd.read_pickle(save_path)
-        pd.read_pickle(save_path)
+        self.__dict__ = pd.read_pickle(save_path)
 
     def __eq__(self, other):
         diff = DeepDiff(self.__dict__, other.__dict__)

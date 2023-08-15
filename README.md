@@ -1,6 +1,5 @@
 
-# NeuralPlayground: The  standardised environment for the hippocampus and entorhinal cortex models. 
-### (Developing visualization and comparison board)
+# NeuralPlayground: The  standardised environment for the hippocampus and entorhinal cortex models.
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-9-orange.svg?style=flat-square)](#contributors-)
@@ -14,24 +13,37 @@
 * [6 Licence](#6-License)
 
 ## 1. Introduction
-The abstract representation of space has been extensively studied in the hippocampus and entorhinal cortex in part due to the easy monitoring of the task and neural recording. A growing variety of theoretical models have been proposed to capture the rich neural and behavioral phenomena
-associated with these circuits. However, objective comparison of these theories against each other and against empirical data is difficult.
+The abstract representation of space has been extensively studied in the hippocampus and entorhinal cortex in part 
+due to the easy monitoring of the task and neural recording. A growing variety of theoretical models have been proposed
+to capture the rich neural and behavioral phenomena associated with these circuits. However, objective comparison 
+of these theories against each other and against empirical data is difficult.
 
-Although the significance of virtuous interaction between experiments and theory is widely recognized, the tools available to facilitate comparison are limited. Some important challenge to standardized coparaison are the
+Although the significance of virtuous interaction between experiments and theory is widely recognized, the tools 
+available to facilitate comparison are limited. Some important challenge we aim to solve are:
 
    1. Lack availability and accessibility of data in a standardized, labeled format.
 
-   2. Lack of standard or easy ways for models to interact with the task.
+   2. Standard or easy ways to compare model output with empirical data.
 
-   3. Lack  of standard or easy ways to compare model output with empirical data.
+   3. A repository of models and data sets that are relevant for the field of hippocampus and entorhinal cortex.
 
-To address this gap, we present an open-source standardised software framework - NeuralPlayground - to enable adjudication between the hippocampus
-and entorhinal cortex models. This Python software package offers a reproducible way to compare models against a centralised library of published experimental results, including neural recordings and animal behavior.
-The framework currently contains implementations of three Agents, as well as three Experiments providing simple interfaces to publicly available neural and behavioral data. It also contains a customizable 2-dimensional Arena (continuous and discrete) able to produce common experimental environments in which the agents can move in and interact with. We note that each module can also be used separately, allowing flexible access to influential models and data sets.
+To address this gap, we present an open-source standardised software framework - NeuralPlayground - to enable 
+comparison between the hippocampus and entorhinal cortex models. This Python software package offers a reproducible 
+way to compare models against a centralised library of published experimental results, including neural recordings 
+and animal behavior. The framework currently contains implementations of three Agents, as well as three Experiments 
+providing simple interfaces to publicly available neural and behavioral data. It also contains a customizable 
+2-dimensional Arena (continuous and discrete) able to produce common experimental environments in which the agents can 
+move in and interact with. We note that each module can also be used separately, allowing flexible access to influential
+models and data sets.
 
-We currently rely on visual comparison of a hand-selected number of outputs of the model with neural recordings as shown in [github.com/NeuralPlayground/examples/comparison](https://github.com/ClementineDomine/NeuralPlayground/blob/main/examples/comparison_board_examples/comparison_board.ipynb). In the future, a set of quantitative measures and qualitative measures will be added for systematic comparisonsk from any Agent, Arena, Experiments.We want to restate that this won’t constitute an objective judgment of the quality of an Agent to replicate the brain mechanism. Instead, this only allows an objective and complete comparison to the current evidence in the field, as is typically done in publications.
+We currently rely on visual comparison of a hand-selected number of outputs of the model with neural recordings as 
+shown in [github.com/NeuralPlayground/examples/comparison](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/comparisons_examples/Comparision_from_manager.ipynb). In the future, a set of quantitative measures and 
+qualitative measures will be added for systematic comparisons from any Agent, Arena, Experiments. 
+We want to restate that this won’t constitute an objective judgment of the quality of an Agent to replicate the brain 
+mechanism. Instead, this allows an objective and complete comparison to the current evidence in the field, as is 
+typically done in publications.
 
-Altogether, we hope our framework, available at [github.com/NeuralPlayground](https://github.com/ClementineDomine/NeuralPlayground/), offers
+Altogether, we hope our framework, offers
 a foundation that the community will build upon, working toward a shared, standardized, open, and
 reproducible computational understanding of the hippocampus and entorhinal cortex.
 
@@ -46,6 +58,7 @@ to avoid conflicts with other packages. For example, using `conda`:
 ```python
 conda create --name NPG-env python=3.10
 conda activate NPG-env
+conda install pip
 ```
 ### Pip install
 
@@ -79,43 +92,65 @@ pip install -e .[dev]
 
 ## 3. Project
 
-Try our package! We are gathering opinions to focus our efforts on improving aspects of the code or adding new features, so if you tell us what you would like to have, we might just implement it 😊.
-Please refer to the [Roadmap](https://github.com/ClementineDomine/NeuralPlayground/blob/main/documents/road_map.md) to understand the state of the project and get an idea of the direction it is going in. This open-source software was built to be collaborative and lasting. We hope that the framework will be simple enough to be adopted by a great number of neuroscientists, eventually guiding the path to the computational understanding of the HEC mechanisms. We follow reproducible, inclusive, and collaborative project design guidelines. All relevant documents can be found in [Documents](https://github.com/ClementineDomine/NeuralPlayground/blob/main/documents/).
+Try our package! We are gathering opinions to focus our efforts on improving aspects of the code or adding new features,
+so if you tell us what you would like to have, we might just implement it 😊. 
+This open-source software was built to be collaborative and lasting. We hope that the framework will be simple 
+enough to be adopted by a great number of neuroscientists, eventually guiding the path to the computational 
+understanding of the HEC mechanisms. We follow reproducible, inclusive, and collaborative project design guidelines. 
+All relevant documents can be found in [Documents](https://github.com/ClementineDomine/NeuralPlayground/blob/main/documents/).
 
 #### How to run a single module
 
-Each module can be used separately to easily explore and analyze experimental data and better understand any implemented model. Additionally, different Arenas can be initialised with artificial architectures or with data from real-life experiments. We provide examples of module instantiation in the detailed jupyter notebooks found in [Examples_experiment](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples/experimental_examples), [Examples_arena](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples/arena_examples) and [Examples_agents](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples/agent_examples).
+Each module can be used separately to easily explore and analyze experimental data and better understand any 
+implemented model. Additionally, different Arenas can be initialised with artificial architectures or with data from 
+real-life experiments. We provide examples of module instantiation in the detailed jupyter notebooks found in 
+[examples_experiment](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples/experimental_examples), [examples_arena](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples/arena_examples) and [examples_agents](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples/agent_examples).
+<strong>Check our Tolman-Eichenbaum Machine Implementation 
+[this branch](https://github.com/ClementineDomine/NeuralPlayground/tree/whittington_2020) (work in progress), you will also need to install [pytorch](https://pytorch.org/).</strong>
 
 #### How to run interactions between modules
 
-As shown in the jupyter notebooks [Examples_agent](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples/agent_examples), the Agent can interact with an Arena in a standard RL framework. The first step is to initialise an Agent and Arena of your choice. The Agent can be thought of as the animal performing the Experiment and the Arena as the experimental setting where the animal navigates and performs a task.
+As shown in the jupyter notebooks [Examples_agent](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples/agent_examples), the Agent can interact with an Arena in a standard RL 
+framework. The first step is to initialise an Agent and Arena of your choice. The Agent can be thought of as the 
+animal performing the Experiment and the Arena as the experimental setting where the animal navigates and performs a 
+task.
 
 #### How to run comparisons
 
-As shown in the jupyter notebooks [Examples_comparison](https://github.com/ClementineDomine/NeuralPlayground/blob/main/examples/comparison_board_examples/comparison_board.ipynb). We show visual comparisons between results from agents running with experimental behavior and results from the real experiment.
-
-### Check our Tolman-Eichenbaum Machine Implementation in [this branch](https://github.com/ClementineDomine/NeuralPlayground/tree/whittington_2020) (work in progress).
+We have a backend module to run simulations and compare the results with experimental data, you can find it in 
+[simulation_manager](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/comparisons_examples/simulation_manager.ipynb) 
+notebook. To plot these results, go to [comparison_from_manager](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/comparisons_examples/Comparision_from_manadger.ipynb) and [examples_comparison](https://github.com/ClementineDomine/NeuralPlayground/blob/main/examples/comparison_board_examples/comparison_board.ipynb). We show visual 
+comparisons between results from agents running with experimental behavior and results from the real experiment.
 
 ## 4. I-want-to-Contribute
 
-There are many ways to contribute to the [github.com/NeuralPlayground/examples/comparison](https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground).
+There are many ways to contribute to our project.
 
  1. Implement a hippocampal and entorhinal cortex [Agent](https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground/agents) of your choice.
 
  2. Work on improving the [Arena](https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground/arenas).
 
  3. Add an [Experimental](https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground/experiments) data set.
+4. Implementing metrics to compare the output of the Agent with the experimental data.
+
+ 5. Refactor the code to improve the readability and efficiency.
 
 All contributions should be submitted through a pull request that we will later access.
 Before sending a pull request, make sure you have the following:
 
 1. Checked the Licensing frameworks.
 
-2. Followed the [PEP8](https://www.python.org/dev/peps/pep-0008/) and [numpy docstring](https://numpydoc.readthedocs.io/en/latest/format.html) style convention. More details found in [Style Guide](https://github.com/ClementineDomine/NeuralPlayground/tree/main/documents/style_guide.md).
+2. Use developing tools installing the dev dependencies. Use:
 
-3. Implemented and ran [Test](https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground/tests).
+    ```pre-commit run --all-files``` 
 
-4. Comment your work.
+    to format the code and check for errors.
+
+3. Followed the [PEP8](https://www.python.org/dev/peps/pep-0008/) and [numpy docstring](https://numpydoc.readthedocs.io/en/latest/format.html) style convention. More details found in [Style Guide](https://github.com/ClementineDomine/NeuralPlayground/tree/main/documents/style_guide.md).
+
+4. Implemented and ran [Test](https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground/tests).
+
+5. Comment your work.
 
 All contributions to the repository are acknowledged through the all-contributors bot.
 Refer to the README.md files found in each of the modules for further details on how to contribute to them.

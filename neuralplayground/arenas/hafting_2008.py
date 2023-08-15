@@ -246,3 +246,8 @@ class Hafting2008(Simple2D):
         observation = self.make_observation()
         self._increase_global_step()
         return observation, new_state, reward
+
+
+if __name__ == "__main__":
+    hafting_data = Hafting2008Data(verbose=False)
+    hafting_data.show_readme()

@@ -39,12 +39,8 @@ class Stachenfeld2018(AgentCore):
             discounting factor
         learning_rate: scalar,
             scaling the magnitude of the TD update
-        t_episode: scalar,
-            maximum number of timesteps in one episode
-        threoshold: scalar,
+        threshold: scalar,
             upper bound for the update size
-        n_episode: scalar,
-            number of episodes
         transmat: (n_state, n_state)
             numpy array, transition matrix
         room_width: float
@@ -85,23 +81,19 @@ class Stachenfeld2018(AgentCore):
         Plot the matrix and the 4 largest modes of its eigen-decomposition
     """
 
-    def __init__(self, model_name: str = "SR", **mod_kwargs):
+    def __init__(self, agent_name: str = "SR", **mod_kwargs):
         """
         Parameters
         ----------
-        model_name : str
+        agent_name : str
             Name of the specific instantiation of the ExcInhPlasticity class
         mod_kwargs : dict
             gamma: scalar,
                  discounting factor
             learning_rate: scalar,
                 scaling the magnitude of the TD update
-            t_episode: scalar,
-                maximum number of timesteps in one episode
             threshold: scalar,
                upper bound for the update size
-            n_episode: scalar,
-                number of episodes
             twoD: bool
                 When true creates a (n_state, n_state) transition array for a rectangular 2D state space.
             room_width: float
@@ -111,7 +103,7 @@ class Stachenfeld2018(AgentCore):
             state_density: float
                 density of SR-agent states (should be proportional to the step-size)
         """
-        super().__init__(model_name, **mod_kwargs)
+        super().__init__(agent_name, **mod_kwargs)
         self.metadata = {"mod_kwargs": mod_kwargs}
         self.obs_history = []  # Initialize observation history to update weights later
         self.grad_history = []
@@ -122,7 +114,7 @@ class Stachenfeld2018(AgentCore):
         self.room_depth = mod_kwargs["room_depth"]
         self.state_density = mod_kwargs["state_density"]
         twoD = mod_kwargs["twoD"]
-        self.inital_obs_variable = None
+        self.initial_obs_variable = None
 
         self.reset()
         # Variables for the SR-agent state space
@@ -149,7 +141,7 @@ class Stachenfeld2018(AgentCore):
         self.srmat_ground = []
         self.srmat_full_td = []
         self.transmat_norm = []
-        self.inital_obs_variable = None
+        self.initial_obs_variable = None
         self.obs_history = []  # Reset observation history
 
     def obs_to_state(self, pos: np.ndarray):
@@ -195,14 +187,18 @@ class Stachenfeld2018(AgentCore):
             self.obs_history = [
                 obs,
             ]
-        arrow = [[0, 1], [0, -1], [1, 0], [-1, 0]]
-        action = np.random.normal(scale=0.1, size=(2,))
-        diff = action - arrow
-        dist = np.sum(diff**2, axis=1)
-        index = np.argmin(dist)
-        action = arrow[index]
-        self.next_state = self.obs_to_state(obs)
-        action = np.array(action)
+        if not obs.any():
+            action = None
+        else:
+            action = np.random.normal(scale=self.agent_step_size, size=(2,))
+            arrow = [[0, 1], [0, -1], [1, 0], [-1, 0]]
+            action = np.random.normal(scale=0.1, size=(2,))
+            diff = action - arrow
+            dist = np.sum(diff**2, axis=1)
+            index = np.argmin(dist)
+            action = arrow[index]
+            self.next_state = self.obs_to_state(obs)
+            action = np.array(action)
         return action
 
     def get_T_from_M(self, M: np.ndarray):
@@ -313,32 +309,31 @@ class Stachenfeld2018(AgentCore):
 
     def update(self):
         """
-        Compute the successor representation matrix using TD learning while interacting with the environement
+        Compute the successor representation matrix using TD learning while interacting with the environment
 
         Returns:
         -------
             srmat: (n_state, n_state) successor representation matrix
         """
 
-        if self.inital_obs_variable is None:
-            self.curr_state = self.next_state
-            self.inital_obs_variable = True
+        if hasattr(self, "next_state"):
+            if self.inital_obs_variable is None:
+                self.curr_state = self.next_state
+                self.inital_obs_variable = True
+            next_state = self.next_state
+            self.n_state = self.transmat_norm.shape[0]
+            a = np.array(self.curr_state)
+            x = a.flatten()
+            b = np.eye(self.n_state)[x, : self.n_state]
+            L = b.reshape(a.shape + (self.n_state,))
+            curr_state_vec = L
 
-        next_state = self.next_state
-        self.n_state = self.transmat_norm.shape[0]
-        a = np.array(self.curr_state)
-        x = a.flatten()
-        b = np.eye(self.n_state)[x, : self.n_state]
-        L = b.reshape(a.shape + (self.n_state,))
-        curr_state_vec = L
+            td_error = curr_state_vec + self.gamma * self.srmat[:, next_state] - self.srmat[:, self.curr_state]
+            self.srmat[:, self.curr_state] = self.srmat[:, self.curr_state] + self.learning_rate * td_error
 
-        td_error = curr_state_vec + self.gamma * self.srmat[:, next_state] - self.srmat[:, self.curr_state]
-        self.srmat[:, self.curr_state] = self.srmat[:, self.curr_state] + self.learning_rate * td_error
-
-        self.grad_history.append(np.sqrt(np.sum(td_error**2)))
-        self.curr_state = next_state
-
-        return {"state_td_error": td_error}
+            self.grad_history.append(np.sqrt(np.sum(td_error**2)))
+            self.curr_state = next_state
+            return {"state_td_error": td_error}
 
     def update_successor_rep_td_full(self, n_episode: int = 100, t_episode: int = 100):
         """
