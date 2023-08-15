@@ -12,9 +12,10 @@ from torch.utils.tensorboard import SummaryWriter
 
 import neuralplayground.agents.whittington_2020_extras.whittington_2020_model as model
 import neuralplayground.agents.whittington_2020_extras.whittington_2020_parameters as parameters
+import neuralplayground.agents.whittington_2020_extras.whittington_2020_analyse as analyse
+import neuralplayground.agents.whittington_2020_extras.whittington_2020_utils as utils
 
 # Custom modules
-import neuralplayground.agents.whittington_2020_extras.whittington_2020_utils as utils
 from neuralplayground.plotting.plot_utils import make_plot_rate_map
 
 from .agent_core import AgentCore
@@ -100,7 +101,7 @@ class Whittington2020(AgentCore):
         self.poss_actions = [[0, 0], [0, -1], [1, 0], [0, 1], [-1, 0]]
         self.n_actions = len(self.poss_actions)
         self.final_model_input = None
-
+        self.g_rates, self.p_rates = None, None
         self.prev_observations = None
         self.reset()
 
@@ -482,8 +483,25 @@ class Whittington2020(AgentCore):
         final_model_input.extend(single_model_input)
 
         return final_model_input, history, environments
+    
+    def plot_run(self, tem, model_input, environments):
+        with torch.no_grad():
+            forward = tem(model_input, prev_iter=None)
+        include_stay_still = False
+        shiny_envs = [False, False, False, False]
+        env_to_plot = 0
+        envs_to_avg = shiny_envs if shiny_envs[env_to_plot] else [not shiny_env for shiny_env in shiny_envs]
 
-    def plot_rate_map(self, rate_maps, frequencies = ["Theta", "Delta", "Beta", "Gamma", "High Gamma"],  max_cells = 30,  num_cols = 6 ):
+        correct_model, correct_node, correct_edge = analyse.compare_to_agents(
+            forward, tem, environments, include_stay_still=include_stay_still
+        )
+        zero_shot = analyse.zero_shot(forward, tem, environments, include_stay_still=include_stay_still)
+        occupation = analyse.location_occupation(forward, tem, environments)
+        self.g_rates, self.p_rates = analyse.rate_map(forward, tem, environments)
+        from_acc, to_acc = analyse.location_accuracy(forward, tem, environments)
+        return
+
+    def plot_rate_map(self, rate_map_type = None, frequencies = ["Theta", "Delta", "Beta", "Gamma", "High Gamma"],  max_cells = 30,  num_cols = 6 ):
         """
         Plot the TEM rate maps.
 
@@ -498,6 +516,13 @@ class Whittington2020(AgentCore):
         figs = []
         axes = []
 
+        if rate_map_type == "g":
+            rate_maps = self.g_rates
+        elif rate_map_type == "p":
+            rate_maps = self.p_rates
+        if self.g_rates is None or self.p_rates is None:
+            print("rate_maps must be of correct type")
+            return
         for i in range(len(frequencies)):
             n_cells = rate_maps[0][i].shape[1]
             n_cells = min(n_cells, max_cells)

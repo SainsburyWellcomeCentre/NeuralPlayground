@@ -166,9 +166,6 @@ class TestBatchEnvironment(TestSimple2D):
     def init_env(self):
         env_name = "BatchEnvironment_test"
         batch_size = 16
-        state_density = 1
-        n_objects = 45
-        agent_step_size = 1
         arena_x_limits = [
             [-5, 5],
             [-4, 4],

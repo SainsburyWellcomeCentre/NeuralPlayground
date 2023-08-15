@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import torch
 
-import neuralplayground.agents.whittington_2020_extras.whittington_2020_analyse as analyse
 from neuralplayground.plotting import PlotSim
 
 simulation_id = "TEM_custom_plot_sim"
@@ -42,21 +41,8 @@ with open(os.path.join(save_path, "NPG_model_input.pkl"), "rb") as f:
 training_dict["params"] = training_dict["agent_params"]
 del training_dict["agent_params"]
 agent = training_dict["agent_class"](**training_dict["params"])
-with torch.no_grad():
-    forward = tem(model_input, prev_iter=None)
-include_stay_still = False
-shiny_envs = [False, False, False, False]
-env_to_plot = 0
-envs_to_avg = shiny_envs if shiny_envs[env_to_plot] else [not shiny_env for shiny_env in shiny_envs]
-
-correct_model, correct_node, correct_edge = analyse.compare_to_agents(
-    forward, tem, environments, include_stay_still=include_stay_still
-)
-zero_shot = analyse.zero_shot(forward, tem, environments, include_stay_still=include_stay_still)
-occupation = analyse.location_occupation(forward, tem, environments)
-g, p = analyse.rate_map(forward, tem, environments)
-from_acc, to_acc = analyse.location_accuracy(forward, tem, environments)
+agent.plot_run(tem, model_input, environments)
 
 # Plot rate maps for grid or place cells
-agent.plot_rate_map(g)
+agent.plot_rate_map(rate_map_type="g")
 plt.show()
