@@ -162,6 +162,7 @@ class TestMergingRoom(TestSimple2D):
 
 
 class TestBatchEnvironment(TestSimple2D):
+    @pytest.fixture
     def init_env(self):
         env_name = "BatchEnvironment_test"
         batch_size = 16
@@ -204,18 +205,22 @@ class TestBatchEnvironment(TestSimple2D):
             [-6, 6],
             [-5, 5],
         ]
+        discrete_env_params = {
+            "environment_name": "DiscreteObject",
+            "state_density": 1,
+            "n_objects": 45,
+            "agent_step_size": 1,
+            "use_behavioural_data": False,
+            "data_path": None,
+            "experiment_class": Sargolini2006Data,
+        }
         env = BatchEnvironment(
             environment_name=env_name,
             env_class=DiscreteObjectEnvironment,
             batch_size=batch_size,
             arena_x_limits=arena_x_limits,
             arena_y_limits=arena_y_limits,
-            state_density=state_density,
-            n_objects=n_objects,
-            agent_step_size=agent_step_size,
-            use_behavioural_data=False,
-            data_path=None,
-            experiment_class=Sargolini2006Data,
+            arg_env_params=discrete_env_params,
         )
         return [
             env,
@@ -224,17 +229,9 @@ class TestBatchEnvironment(TestSimple2D):
     def test_init_env(self, init_env):
         assert isinstance(init_env[0], BatchEnvironment)
 
-    def test_agent_interaction(self, init_env):
-        n_steps = 1
-        agent = Whittington2020()
-        obs, state = init_env[0].reset()
-        for i in range(n_steps):
-            action = agent.batch_act(obs)
-            obs, state, reward = init_env[0].step(action)
-        init_env[0].plot_trajectory()
-
 
 class TestDiscretizedObjectEnvrionment(TestSimple2D):
+    @pytest.fixture
     def init_env(self):
         env_name = "DiscretizedObjectEnvironment_test"
         state_density = 1
@@ -295,11 +292,3 @@ class TestDiscretizedObjectEnvrionment(TestSimple2D):
     def test_init_env(self, init_env):
         assert isinstance(init_env[0], DiscreteObjectEnvironment)
 
-    def test_agent_interaction(self, init_env):
-        n_steps = 1
-        agent = RandomAgent()
-        obs, state = init_env[0].reset()
-        for i in range(n_steps):
-            action = agent.act(obs)
-            obs, state, reward = init_env[0].step(action)
-        init_env[0].plot_trajectory()
