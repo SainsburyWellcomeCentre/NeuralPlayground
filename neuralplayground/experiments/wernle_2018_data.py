@@ -21,11 +21,6 @@ class Wernle2018Data(Hafting2008Data):
 
     Refer to Hafting2008Data for more information into the available methods and attributes.
     Additional methods in this class are the following:
-
-    Methods
-    -------
-    plot_merging_comparison(self, recording_index: int = None, tetrode_id: str = None, ax: mpl.axes = None)
-        Plot the merging (before and after) comparison for a given recording index and tetrode id
     """
 
     def __init__(
@@ -101,7 +96,7 @@ class Wernle2018Data(Hafting2008Data):
         This method loads the recording data of the paper generating the following attributes.
         For further details refer to the readme of the original repo for the paper with the variable description.
 
-        Returns (set the following attributes)
+        Returns
         -------
         self.ratemap : ndarray
             (128 x 2) where each element is a 100x100 ratemap from 10 different rats

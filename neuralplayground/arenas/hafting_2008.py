@@ -11,18 +11,8 @@ from neuralplayground.experiments import Hafting2008Data
 class Hafting2008(Simple2D):
     """Arena resembling Hafting2008 experimental setting
 
-    Methods
+    Attributes
     ----------
-    __init__
-       Initialise the class
-    reset(self):
-      Reset the environment variables
-    step(self, action):
-       Increment the global step count of the agent in the environment and updates the position of the agent according
-       to the recordings of the specific chosen session
-
-    Attribute (In addition to the ones in Simple2D class)
-    ---------
     use_behavioral_data: bool
         If True, then uses the animal trajectories recorded in Hafting 2008
     experiment: neuralplayground.experiments.Hafting2008Data
@@ -101,11 +91,10 @@ class Hafting2008(Simple2D):
             If given, use this array to set the initial state
 
         Returns
-        ----------
+        -------
         observation: ndarray
             Because this is a fully observable environment, make_observation returns the state of the environment
             Array of the observation of the agent in the environment (Could be modified as the environments are evolves)
-
         self.state: ndarray (2,)
             Vector of the x and y coordinate of the position of the animal in the environment
         """

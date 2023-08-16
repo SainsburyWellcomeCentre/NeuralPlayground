@@ -46,43 +46,6 @@ class Hafting2008Data(Experiment):
         array with the x and y position throughout recording of the given session
     head_direction: ndarray (n_samples, 2)
         array with the x and y head direction throughout recording of the given session
-
-    Methods
-    -------
-    set_animal_data(recording_index: int = 0, tolerance: float = 1e-10)
-        Set position and head direction to be used by the Arena Class later
-    show_data(full_dataframe: bool = False)
-        Print of available data recorded in the experiment
-    show_readme()
-        Print original readme of the dataset
-    get_recorded_session(recording_index: int = None)
-        Get identifiers to sort the experimental data
-    get_recording_data(recording_index: int = None)
-        Get experimental data for a given recordin index
-    plot_recording_tetr(recording_index: Union[int, tuple, list] = None,
-                        save_path: Union[str, tuple, list] = None,
-                        ax: Union[mpl.axes.Axes, tuple, list] = None,
-                        tetrode_id: Union[str, tuple, list] = None,
-                        bin_size: float = 2.0)
-        Plot tetrode ratemap from spike data for a given recording index or a list of recording index.
-    plot_trajectory(recording_index: Union[int, tuple, list] = None,
-                    save_path: Union[str, tuple, list] = None,
-                    ax: Union[mpl.axes.Axes, tuple, list] = None,
-                    plot_every: int = 20)
-        Plot animal trajectory from a given recording index, corresponding to a recording session
-    recording_tetr(recording_index: Union[int, tuple, list] = None,
-                   save_path: Union[str, tuple, list] = None,
-                   tetrode_id: Union[str, tuple, list] = None,
-                   bin_size: float = 2.0)
-        tetrode ratemap from spike data for a given recording index or a list of recording index.
-    _find_tetrode(rev_vars: list)
-        Static function to find tetrode id in a multiple tetrode recording session
-    _find_data_path(data_path: str)
-        Fetch data from NeuralPlayground data repository if no data path is supplied by the user
-    _load_data()
-        Parse data according to specific data format if you are a user check the notebook examples
-    _create_dataframe()
-        Generate dataframe for easy display and access of data
     """
 
     def __init__(

@@ -5,6 +5,7 @@ recursive-exclude * __pycache__
 recursive-exclude * *.py[co]
 
 recursive-exclude examples *
+recursive-exclude docs *
 
 recursive-include documents *.cff
 recursive-include documents *.md
