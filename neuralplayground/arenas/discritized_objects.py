@@ -1,7 +1,9 @@
 import random
 
+import cv2
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 
 from neuralplayground.arenas.arena_core import Environment
 from neuralplayground.plotting.plot_utils import make_plot_trajectories
@@ -217,7 +219,7 @@ class DiscreteObjectEnvironment(Environment):
                 new_pos_state = self.state[-1] + self.agent_step_size * action_rev
             else:
                 new_pos_state = self.state[-1] + action_rev
-            new_pos_state, valid_action = self.validate_action(self.state[-1], action_rev, new_pos_state)
+            new_pos_state, valid_action = self.validate_action(self.state[-1], action_rev, new_pos_state[:2])
         reward = self.reward_function(action, self.state[-1])  # If you get reward, it should be coded here
         observation = self.make_object_observation(new_pos_state)
         self.state = observation
@@ -281,8 +283,8 @@ class DiscreteObjectEnvironment(Environment):
             index: int
                 Index of the state in the discretised state space
         """
-        if len(pos) > 2:
-            pos = pos[:2]
+        if np.shape(pos) == (2, 2):
+            pos = pos[0]
         diff = (self.xy_combination - pos) ** 2
         dist = np.sum(diff**2, axis=-1)
         index = np.argmin(dist)
@@ -403,3 +405,16 @@ class DiscreteObjectEnvironment(Environment):
             return ax, f
         else:
             return ax
+
+    def render(self, history_length=30):
+        """Render the environment live through iterations"""
+        f, ax = plt.subplots(1, 1, figsize=(8, 6))
+        canvas = FigureCanvas(f)
+        history = self.history[-history_length:]
+        ax = self.plot_trajectory(history_data=history, ax=ax)
+        canvas.draw()
+        image = np.frombuffer(canvas.tostring_rgb(), dtype="uint8")
+        image = image.reshape(f.canvas.get_width_height()[::-1] + (3,))
+        print(image.shape)
+        cv2.imshow("2D_env", image)
+        cv2.waitKey(10)

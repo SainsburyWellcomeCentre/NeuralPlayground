@@ -3,7 +3,9 @@ import pytest
 from tqdm import tqdm
 
 from neuralplayground.agents import AgentCore, Stachenfeld2018, Weber2018, Whittington2020
-from neuralplayground.arenas import BasicSargolini2006
+from neuralplayground.agents.whittington_2020_extras import whittington_2020_parameters as parameters
+from neuralplayground.arenas import BasicSargolini2006, BatchEnvironment, DiscreteObjectEnvironment
+from neuralplayground.experiments import Sargolini2006Data
 
 
 @pytest.fixture
@@ -156,45 +158,172 @@ class TestStachenfeld2018(Testmodelcore):
 
 class TestWhittington2020(Testmodelcore):
     @pytest.fixture
-    def init_model(self, get_environment, parameters):
+    def init_model(self, get_environment):
         mod_name = "Whittington2020_test"
-        params = parameters.copy()
-        env = get_environment[0]
+        pars = parameters.parameters()
+        params = pars.copy()
+        batch_size = 16
 
         agent = Whittington2020(
             model_name=mod_name,
             params=params,
-            batch_size=env.batch_size,
-            room_widths=env.room_widths,
-            room_depths=env.room_depths,
-            state_densities=env.state_densities,
+            batch_size=batch_size,
+            room_widths=[10] * batch_size,
+            room_depths=[10] * batch_size,
+            state_densities=[1] * batch_size,
             use_behavioural_data=False,
         )
         return [
             agent,
         ]
 
-    def test_agent_interaction(self, init_model, get_environment):
-        env = get_environment[0]
+    def test_agent_interaction(self):
+        agent_params = parameters.parameters()
+        discrete_env_params = {
+            "environment_name": "DiscreteObject",
+            "state_density": 1,
+            "n_objects": 45,
+            "agent_step_size": 1,
+            "use_behavioural_data": False,
+            "data_path": None,
+            "experiment_class": Sargolini2006Data,
+        }
+        env = BatchEnvironment(
+            environment_name="BatchEnvironment",
+            batch_size=16,
+            arena_x_limits=[
+                [-5, 5],
+                [-4, 4],
+                [-5, 5],
+                [-6, 6],
+                [-4, 4],
+                [-5, 5],
+                [-6, 6],
+                [-5, 5],
+                [-4, 4],
+                [-5, 5],
+                [-6, 6],
+                [-5, 5],
+                [-4, 4],
+                [-5, 5],
+                [-6, 6],
+                [-5, 5],
+            ],
+            arena_y_limits=[
+                [-5, 5],
+                [-4, 4],
+                [-5, 5],
+                [-6, 6],
+                [-4, 4],
+                [-5, 5],
+                [-6, 6],
+                [-5, 5],
+                [-4, 4],
+                [-5, 5],
+                [-6, 6],
+                [-5, 5],
+                [-4, 4],
+                [-5, 5],
+                [-6, 6],
+                [-5, 5],
+            ],
+            env_class=DiscreteObjectEnvironment,
+            arg_env_params=discrete_env_params,
+        )
+        room_widths = [10, 8, 10, 12, 8, 10, 12, 10, 8, 10, 12, 10, 8, 10, 12, 10]
+        room_depths = [10, 8, 10, 12, 8, 10, 12, 10, 8, 10, 12, 10, 8, 10, 12, 10]
+        agent = Whittington2020(
+            model_name="Whittington2020_test",
+            params=agent_params.copy(),
+            batch_size=16,
+            room_widths=room_widths,
+            room_depths=room_depths,
+            state_densities=[1] * 16,
+            use_behavioural_data=False,
+        )
         n_steps = 1
         obs, state = env.reset()
         for i in tqdm(range(n_steps)):
-            while init_model.n_walk < init_model.pars["n_rollout"]:
-                actions = init_model.batch_act(obs)
-                obs, state = env.step(actions, normalize_step=True)
+            while agent.n_walk < agent.pars["n_rollout"]:
+                actions = agent.batch_act(obs)
+                obs, state, reward = env.step(actions, normalize_step=True)
 
-    def test_agent_update(self, init_model, get_environment):
-        env = get_environment[0]
+    def test_agent_update(self):
+        agent_params = parameters.parameters()
+        arena_x_limits = [
+            [-5, 5],
+            [-4, 4],
+            [-5, 5],
+            [-6, 6],
+            [-4, 4],
+            [-5, 5],
+            [-6, 6],
+            [-5, 5],
+            [-4, 4],
+            [-5, 5],
+            [-6, 6],
+            [-5, 5],
+            [-4, 4],
+            [-5, 5],
+            [-6, 6],
+            [-5, 5],
+        ]
+        arena_y_limits = [
+            [-5, 5],
+            [-4, 4],
+            [-5, 5],
+            [-6, 6],
+            [-4, 4],
+            [-5, 5],
+            [-6, 6],
+            [-5, 5],
+            [-4, 4],
+            [-5, 5],
+            [-6, 6],
+            [-5, 5],
+            [-4, 4],
+            [-5, 5],
+            [-6, 6],
+            [-5, 5],
+        ]
+        room_widths = [10, 8, 10, 12, 8, 10, 12, 10, 8, 10, 12, 10, 8, 10, 12, 10]
+        room_depths = [10, 8, 10, 12, 8, 10, 12, 10, 8, 10, 12, 10, 8, 10, 12, 10]
+        discrete_env_params = {
+            "environment_name": "DiscreteObject",
+            "state_density": 1,
+            "n_objects": 45,
+            "agent_step_size": 1,
+            "use_behavioural_data": False,
+            "data_path": None,
+            "experiment_class": Sargolini2006Data,
+        }
+        env = BatchEnvironment(
+            environment_name="BatchEnvironment",
+            batch_size=16,
+            arena_x_limits=arena_x_limits,
+            arena_y_limits=arena_y_limits,
+            env_class=DiscreteObjectEnvironment,
+            arg_env_params=discrete_env_params,
+        )
+        agent = Whittington2020(
+            model_name="Whittington2020_test",
+            params=agent_params.copy(),
+            batch_size=16,
+            room_widths=room_widths,
+            room_depths=room_depths,
+            state_densities=[1] * 16,
+            use_behavioural_data=False,
+        )
         n_steps = 1
-        obs, state = env.reset()
+        obs, state = env.reset(random_state=True, custom_state=None)
         for i in tqdm(range(n_steps)):
-            while init_model.n_walk < init_model.pars["n_rollout"]:
-                actions = init_model.batch_act(obs)
-                obs, state = env.step(actions, normalize_step=True)
-                init_model.update()
+            while agent.n_walk < agent.pars["n_rollout"]:
+                actions = agent.batch_act(obs)
+                obs, state, reward = env.step(actions, normalize_step=True)
+            agent.update()
+
+    def test_plot_rates(self, init_model):
+        init_model[0].plot_rate_map(rate_map_type="g")
 
     def test_init_model(self, init_model):
         assert isinstance(init_model[0], Whittington2020)
-
-    def test_plot_rates(self, init_model):
-        init_model[0].plot_rate_map()

@@ -109,17 +109,6 @@ def tem_training_loop(agent: AgentCore, env: Environment, n_episode: int, params
     return agent, env, training_dict
 
 
-def tem_plotting_loop(agent: AgentCore, env: Environment, n_episode: int):
-    # Run around environment
-    observation, state = env.reset(random_state=True, custom_state=None)
-    while agent.n_walk < n_episode:
-        if agent.n_walk % 100 == 0:
-            print(agent.n_walk)
-        action = agent.batch_act(observation)
-        observation, state, reward = env.step(action, normalize_step=True)
-    return agent, env
-
-
 def process_training_hist(training_hist):
     """Process the training history from the training loop and update method.
 

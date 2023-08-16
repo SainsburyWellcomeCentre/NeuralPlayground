@@ -10,11 +10,12 @@ import numpy as np
 import torch
 from torch.utils.tensorboard import SummaryWriter
 
+import neuralplayground.agents.whittington_2020_extras.whittington_2020_analyse as analyse
 import neuralplayground.agents.whittington_2020_extras.whittington_2020_model as model
 import neuralplayground.agents.whittington_2020_extras.whittington_2020_parameters as parameters
+import neuralplayground.agents.whittington_2020_extras.whittington_2020_utils as utils
 
 # Custom modules
-import neuralplayground.agents.whittington_2020_extras.whittington_2020_utils as utils
 from neuralplayground.plotting.plot_utils import make_plot_rate_map
 
 from .agent_core import AgentCore
@@ -100,7 +101,7 @@ class Whittington2020(AgentCore):
         self.poss_actions = [[0, 0], [0, -1], [1, 0], [0, 1], [-1, 0]]
         self.n_actions = len(self.poss_actions)
         self.final_model_input = None
-
+        self.g_rates, self.p_rates = None, None
         self.prev_observations = None
         self.reset()
 
@@ -126,10 +127,14 @@ class Whittington2020(AgentCore):
         The base model executes one of four action (up-down-right-left) with equal probability.
         This is used to move on the rectangular environment states space (transmat).
         This is done for a single environment.
+
         Parameters
         ----------
         positions: array (16,2)
             Observation from the environment class needed to choose the right action (Here the position).
+        policy_func: function
+            Inherited from AgentCore, not used in this model, to change the policy modify action_policy method.
+
         Returns
         -------
         action : array (16,2)
@@ -479,7 +484,25 @@ class Whittington2020(AgentCore):
 
         return final_model_input, history, environments
 
-    def plot_rate_map(self, rate_maps, frequencies = ["Theta", "Delta", "Beta", "Gamma", "High Gamma"],  max_cells = 30,  num_cols = 6 ):
+    def plot_run(self, tem, model_input, environments):
+        with torch.no_grad():
+            forward = tem(model_input, prev_iter=None)
+        include_stay_still = False
+        shiny_envs = [False, False, False, False]
+        env_to_plot = 0
+        shiny_envs if shiny_envs[env_to_plot] else [not shiny_env for shiny_env in shiny_envs]
+        correct_model, correct_node, correct_edge = analyse.compare_to_agents(
+            forward, tem, environments, include_stay_still=include_stay_still
+        )
+        analyse.zero_shot(forward, tem, environments, include_stay_still=include_stay_still)
+        analyse.location_occupation(forward, tem, environments)
+        self.g_rates, self.p_rates = analyse.rate_map(forward, tem, environments)
+        from_acc, to_acc = analyse.location_accuracy(forward, tem, environments)
+        return
+
+    def plot_rate_map(
+        self, rate_map_type=None, frequencies=["Theta", "Delta", "Beta", "Gamma", "High Gamma"], max_cells=30, num_cols=6
+    ):
         """
         Plot the TEM rate maps.
 
@@ -494,6 +517,13 @@ class Whittington2020(AgentCore):
         figs = []
         axes = []
 
+        if rate_map_type == "g":
+            rate_maps = self.g_rates
+        elif rate_map_type == "p":
+            rate_maps = self.p_rates
+        if self.g_rates is None or self.p_rates is None:
+            print("rate_maps must be of correct type")
+            return
         for i in range(len(frequencies)):
             n_cells = rate_maps[0][i].shape[1]
             n_cells = min(n_cells, max_cells)
@@ -512,7 +542,7 @@ class Whittington2020(AgentCore):
                 ax_col = j % num_cols
 
                 # Reshape the rate map into a matrix
-                rate_map_mat =   self.get_rate_map_matrix(rate_maps,i,j)
+                rate_map_mat = self.get_rate_map_matrix(rate_maps, i, j)
 
                 # Plot the rate map in the corresponding subplot
                 make_plot_rate_map(rate_map_mat, axs[ax_row, ax_col], f"Cell {j+1}", "", "", "")
@@ -527,6 +557,6 @@ class Whittington2020(AgentCore):
             axes.append(axs)
         return figs, axes
 
-    def get_rate_map_matrix(self,rate_maps,i,j):
+    def get_rate_map_matrix(self, rate_maps, i, j):
         rate_map = np.asarray(rate_maps[0][i]).T[j]
         return np.reshape(rate_map, (self.room_widths[0], self.room_depths[0]))
