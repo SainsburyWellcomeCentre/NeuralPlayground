@@ -1,7 +1,8 @@
 import random
+
 import cv2
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 
 from neuralplayground.arenas.arena_core import Environment
@@ -282,7 +283,7 @@ class DiscreteObjectEnvironment(Environment):
             index: int
                 Index of the state in the discretised state space
         """
-        if np.shape(pos) == (2,2):
+        if np.shape(pos) == (2, 2):
             pos = pos[0]
         diff = (self.xy_combination - pos) ** 2
         dist = np.sum(diff**2, axis=-1)
