@@ -1,6 +1,7 @@
 import numpy as np
 import pytest
 
+import neuralplayground.agents.whittington_2020_extras.whittington_2020_parameters as parameters
 from neuralplayground.agents import RandomAgent, Whittington2020
 from neuralplayground.arenas import (
     BatchEnvironment,
@@ -13,7 +14,6 @@ from neuralplayground.arenas import (
     Wernle2018,
 )
 from neuralplayground.experiments import Sargolini2006Data
-import neuralplayground.agents.whittington_2020_extras.whittington_2020_parameters as parameters
 
 
 class TestSimple2D(object):
