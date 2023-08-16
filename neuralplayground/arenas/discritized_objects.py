@@ -1,7 +1,8 @@
 import random
-
-import matplotlib.pyplot as plt
+import cv2
 import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 
 from neuralplayground.arenas.arena_core import Environment
 from neuralplayground.plotting.plot_utils import make_plot_trajectories
@@ -281,7 +282,7 @@ class DiscreteObjectEnvironment(Environment):
             index: int
                 Index of the state in the discretised state space
         """
-        if len(pos[0]) > 1:
+        if np.shape(pos) == (2,2):
             pos = pos[0]
         diff = (self.xy_combination - pos) ** 2
         dist = np.sum(diff**2, axis=-1)
@@ -403,3 +404,16 @@ class DiscreteObjectEnvironment(Environment):
             return ax, f
         else:
             return ax
+
+    def render(self, history_length=30):
+        """Render the environment live through iterations"""
+        f, ax = plt.subplots(1, 1, figsize=(8, 6))
+        canvas = FigureCanvas(f)
+        history = self.history[-history_length:]
+        ax = self.plot_trajectory(history_data=history, ax=ax)
+        canvas.draw()
+        image = np.frombuffer(canvas.tostring_rgb(), dtype="uint8")
+        image = image.reshape(f.canvas.get_width_height()[::-1] + (3,))
+        print(image.shape)
+        cv2.imshow("2D_env", image)
+        cv2.waitKey(10)

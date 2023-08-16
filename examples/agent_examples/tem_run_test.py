@@ -74,7 +74,7 @@ env_params = {
     "arg_env_params": discrete_env_params,
 }
 agent_params = {
-    "model_name": "SimpleTEM",
+    "model_name": "Whittington2020",
     "params": full_agent_params,
     "batch_size": 16,
     "room_widths": room_widths,
