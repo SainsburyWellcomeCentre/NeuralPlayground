@@ -12,6 +12,7 @@ on:
       - add-docs
     tags:
       - '*'
+      - add-docs
   pull_request:
   workflow_dispatch:
 
@@ -27,7 +28,6 @@ jobs:
     needs: build_sphinx_docs
     permissions:
       contents: write
-    if: github.event_name == 'push' && github.base_ref == 'add-docs'
     runs-on: ubuntu-latest
     steps:
       - uses: neuroinformatics-unit/actions/deploy_sphinx_docs@v2
