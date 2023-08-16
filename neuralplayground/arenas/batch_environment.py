@@ -1,8 +1,6 @@
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 import numpy as np
-import cv2
 
 from neuralplayground.arenas.arena_core import Environment
 from neuralplayground.arenas.simple2d import Simple2D
