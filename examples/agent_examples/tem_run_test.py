@@ -7,7 +7,8 @@ from neuralplayground.backend import SingleSim, tem_training_loop
 from neuralplayground.experiments import Sargolini2006Data
 
 simulation_id = "TEM_custom_sim"
-save_path = os.getcwd() + "\\examples\\agent_examples\\results_sim"
+save_path = os.path.join(os.getcwd(), "examples", "agent_examples", "results_sim")
+# save_path = os.path.join(os.getcwd(), "examples", "agent_examples", "trained_results")
 agent_class = Whittington2020
 env_class = BatchEnvironment
 training_loop = tem_training_loop

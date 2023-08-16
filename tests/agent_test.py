@@ -178,6 +178,7 @@ class TestWhittington2020(Testmodelcore):
         ]
 
     def test_agent_interaction(self):
+        agent_params = parameters.parameters()
         discrete_env_params = {
             "environment_name": "DiscreteObject",
             "state_density": 1,
@@ -229,12 +230,14 @@ class TestWhittington2020(Testmodelcore):
             env_class=DiscreteObjectEnvironment,
             arg_env_params=discrete_env_params,
         )
+        room_widths = [10, 8, 10, 12, 8, 10, 12, 10, 8, 10, 12, 10, 8, 10, 12, 10]
+        room_depths = [10, 8, 10, 12, 8, 10, 12, 10, 8, 10, 12, 10, 8, 10, 12, 10]
         agent = Whittington2020(
             model_name="Whittington2020_test",
-            params=parameters.parameters(),
+            params=agent_params.copy(),
             batch_size=16,
-            room_widths=[10] * 16,
-            room_depths=[10] * 16,
+            room_widths=room_widths,
+            room_depths=room_depths,
             state_densities=[1] * 16,
             use_behavioural_data=False,
         )

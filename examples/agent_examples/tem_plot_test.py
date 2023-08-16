@@ -8,10 +8,10 @@ import pandas as pd
 from neuralplayground.plotting import PlotSim
 
 simulation_id = "TEM_custom_plot_sim"
-save_path = os.getcwd() + "\\examples\\agent_examples\\results_sim\\"
+save_path = os.path.join(os.getcwd(), "examples", "agent_examples", "results_sim")
 training_dict = pd.read_pickle(os.path.join(save_path, "params.dict"))
 model_weights = pd.read_pickle(os.path.join(save_path, "agent"))
-model_spec = importlib.util.spec_from_file_location("model", save_path + "whittington_2020_model.py")
+model_spec = importlib.util.spec_from_file_location("model", save_path + "/whittington_2020_model.py")
 model = importlib.util.module_from_spec(model_spec)
 model_spec.loader.exec_module(model)
 params = pd.read_pickle(os.path.join(save_path, "agent_hyper"))
