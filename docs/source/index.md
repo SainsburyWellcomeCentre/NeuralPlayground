@@ -12,13 +12,6 @@ NeuralPlayground is a standardised environment for hippocampus and entorhinal co
 Start playing with NeuralPlayground.
 :::
 
-:::{grid-item-card} {fas}`chalkboard-user;sd-text-primary` Examples
-:link: examples/index
-:link-type: doc
-
-See examples of NeuralPlayground in action.
-:::
-
 :::{grid-item-card} {fas}`book;sd-text-primary` API Reference
 :link: api_index
 :link-type: doc
@@ -34,6 +27,5 @@ Detailed documentation of NeuralPlayground's API.
 :hidden:
 
 getting_started
-examples/index
 api_index
 ```
