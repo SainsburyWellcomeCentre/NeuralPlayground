@@ -57,6 +57,7 @@ dev = [
   "ruff",
   "setuptools_scm",
   "torch",
+  "tensorboard",
 ]
 
 [build-system]
