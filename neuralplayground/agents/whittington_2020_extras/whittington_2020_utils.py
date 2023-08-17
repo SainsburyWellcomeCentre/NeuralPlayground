@@ -138,7 +138,7 @@ def make_directories():
     Returns directories for storing data during a model training run.
     """
     # Get current date for saving folder
-    date = datetime.datetime.today().strftime("%Y-%m-%d")
+    datetime.datetime.today().strftime("%Y-%m-%d")
     # Initialise the run and dir_check to create a new run folder within the current date
     run = 0
     dir_check = True
@@ -147,7 +147,7 @@ def make_directories():
     # Find the current run: the first run that doesn't exist yet
     while dir_check:
         # Construct new paths
-        run_path = "../Summaries2/" + date + "/torch_run" + str(run) + "/"
+        run_path = os.path.join(os.getcwd(), "examples", "agent_examples", "results_sim")
         train_path = run_path + "train"
         model_path = run_path + "model"
         save_path = run_path + "save"
@@ -155,13 +155,13 @@ def make_directories():
         envs_path = script_path + "/envs"
         run += 1
         # And once a path doesn't exist yet: create new folders
-        if not os.path.exists(train_path) and not os.path.exists(model_path) and not os.path.exists(save_path):
-            os.makedirs(train_path)
-            os.makedirs(model_path)
-            os.makedirs(save_path)
-            os.makedirs(script_path)
-            os.makedirs(envs_path)
-            dir_check = False
+        # if not os.path.exists(train_path) and not os.path.exists(model_path) and not os.path.exists(save_path):
+        #     os.makedirs(train_path)
+        #     os.makedirs(model_path)
+        #     os.makedirs(save_path)
+        #     os.makedirs(script_path)
+        #     os.makedirs(envs_path)
+        #     dir_check = False
     # Return folders to new path
     return run_path, train_path, model_path, save_path, script_path, envs_path
 
@@ -201,7 +201,8 @@ def make_logger(run_path):
     # Remove anly existing handlers so you don't output to old files, or to new files twice
     logger.handlers = []
     # Create a file handler, but only if the handler does
-    handler = logging.FileHandler(run_path + "report.log")
+    log_file_path = os.path.join(run_path, "run.log")
+    handler = logging.FileHandler(log_file_path)
     handler.setLevel(logging.INFO)
     # Create a logging format
     formatter = logging.Formatter("%(asctime)s: %(message)s")
