@@ -73,14 +73,26 @@ pip install -U NeuralPlayground
 # install a particular release
 pip install NeuralPlayground==0.0.1
 ```
+Note: if you wish to run our implementation of the Tolman-Eichenbaum machine, there are additional dependencies to install. These can be found in the [whittington_2020_README.md](/examples/agent_examples/whittington_2020_README.md) file.
 ### Install for development
 
 If you want to contribute to the project, get the latest development version
 from GitHub, and install it in editable mode, including the "dev" dependencies:
+#### Unix (Linux and macOS)
 ```bash
 git clone https://github.com/SainsburyWellcomeCentre/NeuralPlayground/
 cd NeuralPlayground
+pip install -e .[dev]
+```
+Note: if you are using the `zsh` shell (default on macOS), replace the last command with:
+```bash
 pip install -e '.[dev]'
+```
+#### Windows
+```bash
+git clone https://github.com/SainsburyWellcomeCentre/NeuralPlayground/
+cd NeuralPlayground
+pip install -e .[dev]
 ```
 
 ## 3. Project

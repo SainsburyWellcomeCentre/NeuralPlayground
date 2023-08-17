@@ -77,8 +77,35 @@ def episode_based_training_loop(agent: AgentCore, env: Environment, t_episode: i
     return agent, env, dict_training
 
 
-def tem_training_loop(agent: AgentCore, env: Environment, n_steps: int):
-    pass
+def tem_training_loop(agent: AgentCore, env: Environment, n_episode: int, params: dict):
+    """Training loop for agents and environments that use a TEM-based update.
+
+    Parameters
+    ----------
+    agent : AgentCore
+        Agent to be trained.
+    env : Environment
+        Environment in which the agent is trained.
+    n_steps : int
+        Number of steps to train the agent for.
+
+    Returns
+    -------
+    agent : AgentCore
+        Trained agent.
+    env : Environment
+        Environment in which the agent was trained.
+    dict_training : dict
+        Dictionary containing the training history from the training loop and update method.
+    """
+    training_dict = [agent.mod_kwargs, env.env_kwargs, agent.tem.hyper]
+    obs, state = env.reset(random_state=True, custom_state=None)
+    for i in range(n_episode):
+        while agent.n_walk < params["n_rollout"]:
+            actions = agent.batch_act(obs)
+            obs, state, reward = env.step(actions, normalize_step=True)
+        agent.update()
+    return agent, env, training_dict
 
 
 def process_training_hist(training_hist):

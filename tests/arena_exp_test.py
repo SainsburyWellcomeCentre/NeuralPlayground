@@ -1,15 +1,19 @@
 import numpy as np
 import pytest
 
-from neuralplayground.agents import RandomAgent
+import neuralplayground.agents.whittington_2020_extras.whittington_2020_parameters as parameters
+from neuralplayground.agents import RandomAgent, Whittington2020
 from neuralplayground.arenas import (
+    BatchEnvironment,
     ConnectedRooms,
+    DiscreteObjectEnvironment,
     Hafting2008,
     MergingRoom,
     Sargolini2006,
     Simple2D,
     Wernle2018,
 )
+from neuralplayground.experiments import Sargolini2006Data
 
 
 class TestSimple2D(object):
@@ -156,3 +160,211 @@ class TestMergingRoom(TestSimple2D):
 
     def test_init_env(self, init_env):
         assert isinstance(init_env[0], MergingRoom)
+
+
+class TestBatchEnvironment(object):
+    @pytest.fixture
+    def init_env(self):
+        env_name = "BatchEnvironment_test"
+        batch_size = 16
+        arena_x_limits = [
+            [-5, 5],
+            [-4, 4],
+            [-5, 5],
+            [-6, 6],
+            [-4, 4],
+            [-5, 5],
+            [-6, 6],
+            [-5, 5],
+            [-4, 4],
+            [-5, 5],
+            [-6, 6],
+            [-5, 5],
+            [-4, 4],
+            [-5, 5],
+            [-6, 6],
+            [-5, 5],
+        ]
+        arena_y_limits = [
+            [-5, 5],
+            [-4, 4],
+            [-5, 5],
+            [-6, 6],
+            [-4, 4],
+            [-5, 5],
+            [-6, 6],
+            [-5, 5],
+            [-4, 4],
+            [-5, 5],
+            [-6, 6],
+            [-5, 5],
+            [-4, 4],
+            [-5, 5],
+            [-6, 6],
+            [-5, 5],
+        ]
+        discrete_env_params = {
+            "environment_name": "DiscreteObject",
+            "state_density": 1,
+            "n_objects": 45,
+            "agent_step_size": 1,
+            "use_behavioural_data": False,
+            "data_path": None,
+            "experiment_class": Sargolini2006Data,
+        }
+        env = BatchEnvironment(
+            environment_name=env_name,
+            env_class=DiscreteObjectEnvironment,
+            batch_size=batch_size,
+            arena_x_limits=arena_x_limits,
+            arena_y_limits=arena_y_limits,
+            arg_env_params=discrete_env_params,
+        )
+        return [
+            env,
+        ]
+
+    def test_agent_interaction(self):
+        agent_params = parameters.parameters()
+        room_widths = [10, 8, 10, 12, 8, 10, 12, 10, 8, 10, 12, 10, 8, 10, 12, 10]
+        room_depths = [10, 8, 10, 12, 8, 10, 12, 10, 8, 10, 12, 10, 8, 10, 12, 10]
+        agent = Whittington2020(
+            model_name="Whittington2020_test",
+            params=agent_params.copy(),
+            batch_size=16,
+            room_widths=room_widths,
+            room_depths=room_depths,
+            state_densities=[1] * 16,
+            use_behavioural_data=False,
+        )
+        env_name = "BatchEnvironment_test"
+        batch_size = 16
+        arena_x_limits = [
+            [-5, 5],
+            [-4, 4],
+            [-5, 5],
+            [-6, 6],
+            [-4, 4],
+            [-5, 5],
+            [-6, 6],
+            [-5, 5],
+            [-4, 4],
+            [-5, 5],
+            [-6, 6],
+            [-5, 5],
+            [-4, 4],
+            [-5, 5],
+            [-6, 6],
+            [-5, 5],
+        ]
+        arena_y_limits = [
+            [-5, 5],
+            [-4, 4],
+            [-5, 5],
+            [-6, 6],
+            [-4, 4],
+            [-5, 5],
+            [-6, 6],
+            [-5, 5],
+            [-4, 4],
+            [-5, 5],
+            [-6, 6],
+            [-5, 5],
+            [-4, 4],
+            [-5, 5],
+            [-6, 6],
+            [-5, 5],
+        ]
+        discrete_env_params = {
+            "environment_name": "DiscreteObject",
+            "state_density": 1,
+            "n_objects": 45,
+            "agent_step_size": 1,
+            "use_behavioural_data": False,
+            "data_path": None,
+            "experiment_class": Sargolini2006Data,
+        }
+        env = BatchEnvironment(
+            environment_name=env_name,
+            env_class=DiscreteObjectEnvironment,
+            batch_size=batch_size,
+            arena_x_limits=arena_x_limits,
+            arena_y_limits=arena_y_limits,
+            arg_env_params=discrete_env_params,
+        )
+        n_steps = 1
+        # Initialize environment
+        obs, state = env.reset(random_state=True, custom_state=None)
+        for i in range(n_steps):
+            while agent.n_walk < agent_params["n_rollout"]:
+                # Observe to choose an action
+                action = agent.batch_act(obs)
+                # Run environment for given action
+                obs, state, reward = env.step(action, normalize_step=True)
+        env.plot_trajectory()
+
+    def test_init_env(self, init_env):
+        assert isinstance(init_env[0], BatchEnvironment)
+
+
+class TestDiscretizedObjectEnvrionment(TestSimple2D):
+    @pytest.fixture
+    def init_env(self):
+        env_name = "DiscretizedObjectEnvironment_test"
+        state_density = 1
+        n_objects = 45
+        agent_step_size = 1
+        arena_x_limits = [
+            [-5, 5],
+            [-4, 4],
+            [-5, 5],
+            [-6, 6],
+            [-4, 4],
+            [-5, 5],
+            [-6, 6],
+            [-5, 5],
+            [-4, 4],
+            [-5, 5],
+            [-6, 6],
+            [-5, 5],
+            [-4, 4],
+            [-5, 5],
+            [-6, 6],
+            [-5, 5],
+        ]
+        arena_y_limits = [
+            [-5, 5],
+            [-4, 4],
+            [-5, 5],
+            [-6, 6],
+            [-4, 4],
+            [-5, 5],
+            [-6, 6],
+            [-5, 5],
+            [-4, 4],
+            [-5, 5],
+            [-6, 6],
+            [-5, 5],
+            [-4, 4],
+            [-5, 5],
+            [-6, 6],
+            [-5, 5],
+        ]
+        env = DiscreteObjectEnvironment(
+            environment_name=env_name,
+            env_class=DiscreteObjectEnvironment,
+            arena_x_limits=arena_x_limits,
+            arena_y_limits=arena_y_limits,
+            state_density=state_density,
+            n_objects=n_objects,
+            agent_step_size=agent_step_size,
+            use_behavioural_data=False,
+            data_path=None,
+            experiment_class=Sargolini2006Data,
+        )
+        return [
+            env,
+        ]
+
+    def test_init_env(self, init_env):
+        assert isinstance(init_env[0], DiscreteObjectEnvironment)

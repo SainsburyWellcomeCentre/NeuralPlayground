@@ -1,5 +1,6 @@
 import copy
 import os
+import pickle
 import shutil
 import sys
 import time
@@ -7,13 +8,12 @@ import time
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
-from torch.utils.tensorboard import SummaryWriter
 
+import neuralplayground.agents.whittington_2020_extras.whittington_2020_analyse as analyse
 import neuralplayground.agents.whittington_2020_extras.whittington_2020_model as model
 import neuralplayground.agents.whittington_2020_extras.whittington_2020_parameters as parameters
 
 # Custom modules
-import neuralplayground.agents.whittington_2020_extras.whittington_2020_utils as utils
 from neuralplayground.plotting.plot_utils import make_plot_rate_map
 
 from .agent_core import AgentCore
@@ -82,10 +82,12 @@ class Whittington2020(AgentCore):
                 density of agent states (should be proportional to the step-size)
         """
         super().__init__()
+        self.mod_kwargs = mod_kwargs.copy()
         params = mod_kwargs["params"]
         self.room_widths = mod_kwargs["room_widths"]
         self.room_depths = mod_kwargs["room_depths"]
         self.state_densities = mod_kwargs["state_densities"]
+
         self.pars = copy.deepcopy(params)
         self.tem = model.Model(self.pars)
         self.batch_size = mod_kwargs["batch_size"]
@@ -97,7 +99,7 @@ class Whittington2020(AgentCore):
         self.poss_actions = [[0, 0], [0, -1], [1, 0], [0, 1], [-1, 0]]
         self.n_actions = len(self.poss_actions)
         self.final_model_input = None
-
+        self.g_rates, self.p_rates = None, None
         self.prev_observations = None
         self.reset()
 
@@ -218,7 +220,7 @@ class Whittington2020(AgentCore):
         action_values = self.step_to_actions(actions)
         self.walk_action_values.append(action_values)
         # Get start time for function timing
-        start_time = time.time()
+        time.time()
         # Get updated parameters for this backprop iteration
         (
             self.eta_new,
@@ -282,63 +284,90 @@ class Whittington2020(AgentCore):
         # Compute model accuracies
         acc_p, acc_g, acc_gt = np.mean([[np.mean(a) for a in step.correct()] for step in forward], axis=0)
         acc_p, acc_g, acc_gt = [a * 100 for a in (acc_p, acc_g, acc_gt)]
-        # Log progress
-        if self.iter % 10 == 0:
-            # Write series of messages to logger from this backprop iteration
-            self.logger.info("Finished backprop iter {:d} in {:.2f} seconds.".format(self.iter, time.time() - start_time))
-            self.logger.info(
-                "Loss: {:.2f}. <p_g> {:.2f} <p_x> {:.2f} <x_gen> {:.2f} <x_g> {:.2f} <x_p> {:.2f} <g> {:.2f} \
-                    <reg_g> {:.2f} <reg_p> {:.2f}".format(
-                    loss.detach().numpy(), *plot_loss
-                )
-            )
-            self.logger.info("Accuracy: <p> {:.2f}% <g> {:.2f}% <gt> {:.2f}%".format(acc_p, acc_g, acc_gt))
-            self.logger.info(
-                "Parameters: <max_hebb> {:.2f} <eta> {:.2f} <lambda> {:.2f} <p2g_scale_offset> {:.2f}".format(
-                    np.max(np.abs(self.prev_iter[0].M[0].numpy())),
-                    self.tem.hyper["eta"],
-                    self.tem.hyper["lambda"],
-                    self.tem.hyper["p2g_scale_offset"],
-                )
-            )
-            self.logger.info("Weights:" + str([w for w in loss_weights.numpy()]))
-            self.logger.info(" ")
-        # Also store the internal state (all learnable parameters) and the hyperparameters periodically
-        if self.iter % self.pars["save_interval"] == 0:
-            torch.save(self.tem.state_dict(), self.model_path + "/tem_" + str(self.iter) + ".pt")
-            torch.save(self.tem.hyper, self.model_path + "/params_" + str(self.iter) + ".pt")
+        # # Log progress
+        # if self.iter % 10 == 0:
+        #     # Write series of messages to logger from this backprop iteration
+        #     self.logger.info("Finished backprop iter {:d} in {:.2f} seconds.".format(self.iter, time.time() - start_time))
+        #     self.logger.info(
+        #         "Loss: {:.2f}. <p_g> {:.2f} <p_x> {:.2f} <x_gen> {:.2f} <x_g> {:.2f} <x_p> {:.2f} <g> {:.2f} \
+        #             <reg_g> {:.2f} <reg_p> {:.2f}".format(
+        #             loss.detach().numpy(), *plot_loss
+        #         )
+        #     )
+        #     self.logger.info("Accuracy: <p> {:.2f}% <g> {:.2f}% <gt> {:.2f}%".format(acc_p, acc_g, acc_gt))
+        #     self.logger.info(
+        #         "Parameters: <max_hebb> {:.2f} <eta> {:.2f} <lambda> {:.2f} <p2g_scale_offset> {:.2f}".format(
+        #             np.max(np.abs(self.prev_iter[0].M[0].numpy())),
+        #             self.tem.hyper["eta"],
+        #             self.tem.hyper["lambda"],
+        #             self.tem.hyper["p2g_scale_offset"],
+        #         )
+        #     )
+        #     self.logger.info("Weights:" + str([w for w in loss_weights.numpy()]))
+        #     self.logger.info(" ")
+        # # Also store the internal state (all learnable parameters) and the hyperparameters periodically
+        # if self.iter % self.pars["save_interval"] == 0:
+        #     torch.save(self.tem.state_dict(), self.model_path + "/tem_" + str(self.iter) + ".pt")
+        #     torch.save(self.tem.hyper, self.model_path + "/params_" + str(self.iter) + ".pt")
 
-        # Save the final state of the model after training has finished
-        if self.iter == self.pars["train_it"] - 1:
-            torch.save(self.tem.state_dict(), self.model_path + "/tem_" + str(self.iter) + ".pt")
-            torch.save(self.tem.hyper, self.model_path + "/params_" + str(self.iter) + ".pt")
+        # # Save the final state of the model after training has finished
+        # if self.iter == self.pars["train_it"] - 1:
+        #     torch.save(self.tem.state_dict(), self.model_path + "/tem_" + str(self.iter) + ".pt")
+        #     torch.save(self.tem.hyper, self.model_path + "/params_" + str(self.iter) + ".pt")
 
     def initialise(self):
         """
         Generate random distribution of objects and intialise optimiser, logger and relevant variables
         """
         # Create directories for storing all information about the current run
-        (
-            self.run_path,
-            self.train_path,
-            self.model_path,
-            self.save_path,
-            self.script_path,
-            self.envs_path,
-        ) = utils.make_directories()
-        # Save all python files in current directory to script directory
-        self.save_files()
-        # Save parameters
-        np.save(os.path.join(self.save_path, "params"), self.pars)
-        # Create a tensor board to stay updated on training progress. Start tensorboard with tensorboard --logdir=runs
-        self.writer = SummaryWriter(self.train_path)
+        # (
+        #     self.run_path,
+        #     self.train_path,
+        #     self.model_path,
+        #     self.save_path,
+        #     self.script_path,
+        #     self.envs_path,
+        # ) = utils.make_directories()
+        # # Save all python files in current directory to script directory
+        # self.save_files()
+        # # Save parameters
+        # np.save(os.path.join(self.save_path, "params"), self.pars)
+        # # Create a tensor board to stay updated on training progress. Start tensorboard with tensorboard --logdir=runs
+        # self.writer = SummaryWriter(self.train_path)
         # Create a logger to write log output to file
-        self.logger = utils.make_logger(self.run_path)
+        # current_dir = os.path.dirname(os.getcwd())
+        # while os.path.basename(current_dir) != "examples":
+        #     current_dir = os.path.dirname(current_dir)
+        # relative_path = "agent_examples/results_sim"
+        # run_path = os.path.join(current_dir, relative_path)
+        # run_path = os.path.normpath(run_path)
+        # self.logger = utils.make_logger(run_path)
         # Make an ADAM optimizer for TEM
         self.adam = torch.optim.Adam(self.tem.parameters(), lr=self.pars["lr_max"])
         # Initialise whether a state has been visited for each world
         self.visited = [[False for _ in range(self.n_states[env])] for env in range(self.pars["batch_size"])]
         self.prev_iter = None
+
+    def save_agent(self, save_path: str):
+        """Save current state and information in general to re-instantiate the agent
+
+        Parameters
+        ----------
+        save_path: str
+            Path to save the agent
+        """
+        pickle.dump(self.tem.state_dict(), open(os.path.join(save_path), "wb"), pickle.HIGHEST_PROTOCOL)
+        with open(os.path.join(os.path.dirname(save_path), "agent_hyper"), "wb") as fp:
+            pickle.dump(self.tem.hyper, fp, pickle.HIGHEST_PROTOCOL)
+
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        source_file_path = os.path.join(
+            script_dir, "../../neuralplayground/agents/whittington_2020_extras/whittington_2020_model.py"
+        )
+        destination_folder = os.path.join(os.path.dirname(save_path))
+        os.makedirs(destination_folder, exist_ok=True)
+        destination_file_path = os.path.join(destination_folder, "whittington_2020_model.py")
+        shutil.copy(source_file_path, destination_file_path)
 
     def save_files(self):
         """
@@ -359,11 +388,6 @@ class Whittington2020(AgentCore):
             os.path.abspath(os.path.join(os.getcwd(), os.path.abspath(os.path.join(curr_path, os.pardir))))
             + "/agents/whittington_2020_extras/whittington_2020_analyse.py",
             os.path.join(self.script_path, "whittington_2020_analyse.py"),
-        )
-        shutil.copy2(
-            os.path.abspath(os.path.join(os.getcwd(), os.path.abspath(os.path.join(curr_path, os.pardir))))
-            + "/agents/whittington_2020_extras/whittington_2020_plot.py",
-            os.path.join(self.script_path, "whittington_2020_plot.py"),
         )
         shutil.copy2(
             os.path.abspath(os.path.join(os.getcwd(), os.path.abspath(os.path.join(curr_path, os.pardir))))
@@ -464,37 +488,55 @@ class Whittington2020(AgentCore):
 
         return final_model_input, history, environments
 
-    def plot_rate_map(self, rate_maps):
+    def plot_run(self, tem, model_input, environments):
+        with torch.no_grad():
+            forward = tem(model_input, prev_iter=None)
+        include_stay_still = False
+        shiny_envs = [False, False, False, False]
+        env_to_plot = 0
+        shiny_envs if shiny_envs[env_to_plot] else [not shiny_env for shiny_env in shiny_envs]
+        correct_model, correct_node, correct_edge = analyse.compare_to_agents(
+            forward, tem, environments, include_stay_still=include_stay_still
+        )
+        analyse.zero_shot(forward, tem, environments, include_stay_still=include_stay_still)
+        analyse.location_occupation(forward, tem, environments)
+        self.g_rates, self.p_rates = analyse.rate_map(forward, tem, environments)
+        from_acc, to_acc = analyse.location_accuracy(forward, tem, environments)
+        return
+
+    def plot_rate_map(
+        self, rate_map_type=None, frequencies=["Theta", "Delta", "Beta", "Gamma", "High Gamma"], max_cells=30, num_cols=6
+    ):
         """
         Plot the TEM rate maps.
 
         Parameters
         ----------
-        rate_maps: ndarray, shape (5, N)
-            The rate maps for TEM, where N is the number of cells in each frequency.
 
         Returns
         -------
-        figs: list
-            A list of matplotlib figures containing the rate map plots for each frequency.
-        axes: list
-            A list of arrays of matplotlib axes containing the individual rate map plots for each frequency.
+
         """
-        frequencies = ["Theta", "Delta", "Beta", "Gamma", "High Gamma"]
+
         figs = []
         axes = []
 
-        for i in range(5):
+        if rate_map_type == "g":
+            rate_maps = self.g_rates
+        elif rate_map_type == "p":
+            rate_maps = self.p_rates
+        if self.g_rates is None or self.p_rates is None:
+            print("rate_maps must be of correct type")
+            return
+        for i in range(len(frequencies)):
             n_cells = rate_maps[0][i].shape[1]
-            num_cols = 6  # Number of subplots per row
+            n_cells = min(n_cells, max_cells)
+            # Number of subplots per row
             num_rows = np.ceil(n_cells / num_cols).astype(int)
 
             # Create the figure for the current frequency
             fig, axs = plt.subplots(nrows=num_rows, ncols=num_cols, figsize=(15, 10))
             fig.suptitle(f"{frequencies[i]} Rate Maps", fontsize=16)
-
-            # Create a single colorbar for the entire figure
-            cbar_ax = fig.add_axes([0.91, 0.15, 0.02, 0.7])
 
             # Create the subplots for the current frequency
             for j in range(n_cells):
@@ -503,15 +545,11 @@ class Whittington2020(AgentCore):
                 ax_row = j // num_cols
                 ax_col = j % num_cols
 
-                # Get the rate map for the current cell and frequency
-                rate_map = np.asarray(rate_maps[0][i]).T[j]
-
                 # Reshape the rate map into a matrix
-                rate_map_mat = np.reshape(rate_map, (self.room_widths[0], self.room_depths[0]))
+                rate_map_mat = self.get_rate_map_matrix(rate_maps, i, j)
 
                 # Plot the rate map in the corresponding subplot
-                title = f"Cell {j+1}"
-                make_plot_rate_map(rate_map_mat, axs[ax_row, ax_col], title, "", "", "")
+                make_plot_rate_map(rate_map_mat, axs[ax_row, ax_col], f"Cell {j+1}", "", "", "")
 
             # Hide unused subplots for the current frequency
             for j in range(n_cells, num_rows * num_cols):
@@ -519,11 +557,10 @@ class Whittington2020(AgentCore):
                 ax_col = j % num_cols
                 axs[ax_row, ax_col].axis("off")
 
-            # Add a single colorbar to the figure
-            cbar = fig.colorbar(axs[0, 0].get_images()[0], cax=cbar_ax)
-            cbar.set_label("Firing rate", fontsize=14)
-
             figs.append(fig)
             axes.append(axs)
-
         return figs, axes
+
+    def get_rate_map_matrix(self, rate_maps, i, j):
+        rate_map = np.asarray(rate_maps[0][i]).T[j]
+        return np.reshape(rate_map, (self.room_widths[0], self.room_depths[0]))

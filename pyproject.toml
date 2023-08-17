@@ -56,9 +56,8 @@ dev = [
   "pre-commit",
   "ruff",
   "setuptools_scm",
-]
-tem = [
-  "pytorch"
+  "torch",
+  "tensorboard",
 ]
 
 [build-system]
