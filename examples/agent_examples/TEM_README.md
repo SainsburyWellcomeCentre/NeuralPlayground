@@ -20,7 +20,12 @@ To run the TEM model, follow the steps below:
 **Important Notes:**
 
 - Running the full TEM model may require significant computational resources and time.
-- Pretrained models are provided for convenience, allowing you to explore the results without training the model from scratch.
+- Pretrained models are provided for convenience, allowing you to explore the results without training the model from scratch. 
+Pre-trained version of the model are hosted on a separate data repository on GIN. GIN offers an interface almost identical to GitHub. 
+To contribute a new trainned model, you need to fork the repository and open a pull request, just like on GitHub.
+Place your model trained in a selected arena folder named as "author_date_in_arena", zip the folder, 
+and place "author_date_in_arena.zip" under the "data" directory of the Forked repository, for example,"data/smith_2023_in_Simple2D.zip". 
+If you encounter any problems with this procedure, do not hesitate to contact us.
 
 ### Modifying Parameters
 
