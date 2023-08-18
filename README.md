@@ -5,11 +5,13 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/python/black)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-9-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-9-orange.svg?style=flat-square)](#contributors)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
-# NeuralPlayground
-The  standardised environment for the hippocampus and entorhinal cortex models. <a href="https://githubtocolab.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/colab_example.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
+# NeuralPlayground 
+**The  standardised environment for the hippocampus and entorhinal cortex models.** <a href="https://githubtocolab.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/colab_example.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
+
+<img src="images/NPG_GH-social-preview_white-bg.jpg" alt="NeuralPlayground Logo" width="500"/>
 
 <!-- TOC -->
 
@@ -28,7 +30,7 @@ The  standardised environment for the hippocampus and entorhinal cortex models. 
   - [I want to contribute](#i-want-to-contribute)
   - [Cite](#cite)
   - [License](#license)
-  - [Contributors ✨](#contributors-)
+  - [Contributors](#contributors)
 
 <!-- /TOC -->
 
@@ -193,7 +195,7 @@ See [Citation](https://github.com/ClementineDomine/NeuralPlayground/blob/main/do
 More details about the license can be found at [Licence](https://github.com/ClementineDomine/NeuralPlayground/blob/main/documents/lisence.md).
 
 
-## Contributors ✨
+## Contributors
 
 Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
 
