@@ -19,7 +19,7 @@ class AgentCore(object):
     Attributes
     ----------
     agent_name : str
-        Name of the specific instantiation of the ExcInhPlasticity class
+        Name of the specific instantiation of the agent class
     mod_kwargs: dict
         Dictionary of specific parameters to be used by children classes
     metadata
