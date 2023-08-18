@@ -68,11 +68,11 @@ class AgentCore(object):
         obs
             Observation from the environment class needed to choose the right action
         policy_func
-            Arbitrary function that represents a custom policy that receives and observation and gives an action
+            Arbitrary function that represents a custom policy that receives an observation and gives an action
         Returns
         -------
-        action: float
-            action value which in this case is random number draw from a Gaussian
+        action: np.array(dtype=float)
+            action value which in this case is random number draw from a 2D-Gaussian
         """
 
         if not obs.any():
@@ -95,7 +95,7 @@ class AgentCore(object):
         return None
 
     def save_agent(self, save_path: str, raw_object: bool = True):
-        """Save current state and information in general to re-instantiate the environment
+        """Save current state and information in general to re-instantiate the agent
 
         Parameters
         ----------
@@ -111,15 +111,15 @@ class AgentCore(object):
         else:
             pickle.dump(self.__dict__, open(os.path.join(save_path), "wb"), pickle.HIGHEST_PROTOCOL)
 
-    def restore_agent(self, save_path: str):
+    def restore_agent(self, restore_path: str):
         """Restore saved environment
 
         Parameters
         ----------
-        save_path: str
-            Path to retrieve the environment saved using save_agent method (raw_object=False)
+        restore_path: str
+            Path to retrieve the agent saved using save_agent method (raw_object=False)
         """
-        self.__dict__ = pd.read_pickle(save_path)
+        self.__dict__ = pd.read_pickle(restore_path)
 
     def __eq__(self, other):
         diff = DeepDiff(self.__dict__, other.__dict__)
