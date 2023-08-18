@@ -21,9 +21,9 @@ In what follows we describe the general format for each of the three main compon
 
 ## Agents
 
-To add an agent to the library begin by creating a file with the naming convention of "author_date.py" where "author" is the name of the lead author who from the work which introduced the agent/model and "date" is the year the work was published. In this file implement the new class for the agent with class naming format "AuthorDate". Ensure that this class inherits the "AgentCore" class found in "agent_core.py". Consequently your new class will inherit the minimal set of attributes and methods necessary to function flexibly within the other pipelines implemented by NeuralPlayground. These core attributes are as follows:
+To add an agent to the library begin by creating a file with the naming convention of "author_date.py" where "author" is the name of the lead author from the work which introduced the agent/model and "date" is the year the work was published. In this file implement the new class for the agent with class naming format "AuthorDate". Ensure that this class inherits the "AgentCore" class found in "agent_core.py". Consequently your new class will inherit the minimal set of attributes and methods necessary to function flexibly within the other pipelines implemented by NeuralPlayground. These core attributes are as follows:
 
-> * `model_name` : *str* 
+> * `agent_name` : *str* 
 >     - The name of the new agent class you are implementing. Can be any valid string and will usually be used for labelling plots or printing to terminal.
 > * `mod_kwargs`: *dict*
 >     - Dictionary of keyword arguments passed to the `__init__()` function during instantiation of the object.
@@ -45,7 +45,7 @@ Additionally the class will also inherit the necessary methods that the rest of 
 >     - Returns: None
 >     - Description: Function which initialises an object of the class. Naming the object is the only required input. All other inputs are passed as keyword 	arguments that are used to create metadata or custom attributes or provide further functionality to custom methods.
 >
-> * `reset()` <!-- in the code the act function populates obs_history but this doesn't reset it -->
+> * `reset()`
 >     - Accepts: None
 >     - Returns: None
 >     - Description: Erases all memory from the model, re-initialises all relevant parameters and builds the original object from scratch.
@@ -61,12 +61,12 @@ Additionally the class will also inherit the necessary methods that the rest of 
 >             - Default: None 
 >             - Description: Observation from the environment class needed to choose the right action
 >         - `policy_func`: *function* 
->             - Default: None
->             - Description: Arbitrary function that represents a custom policy that receives and observation and gives an action
+>             - Default: `None`
+>             - Description: Arbitrary function that represents a custom policy that receives an observation and gives an action
 >     - Returns:
 >         - `action`: *np.array(dtype=float)*
 >         - Description: The action value indicating the direction the agent moves in 2d space (np array will have shape of (2,))
->     - Description: Chooses and executes and action for the agent. Typically depends on the agent's observations of the environment. 
+>     - Description: Chooses and executes an action for the agent. Typically depends on the agent's observations of the environment. 
 >
 > * `update()`
 >     - Accepts: None
@@ -78,22 +78,25 @@ Additionally the class will also inherit the necessary methods that the rest of 
 >         - `save_path`: *str*
 >             - Default: None 
 >             - Description: Path to the file where the objects state and information will be saved
+>         - `raw_object`: *bool*
+>             - Default: `True`
+>             - Description: If `True` the saves the raw object, otherwise it save the dictionary of attributes. If you save the raw object you can load it by using `agent = pd.read_pickle(save_path)`. Otherwise you can load the object by using `agent.restore_environment(save_path)`.  
 >     - Returns: None
->     - Description: Saves the current state and object information to be able to re-instantiate the environment from scratch. 
+>     - Description: Saves the current state and object information to be able to re-instantiate the agent from scratch. 
 >
 > * `restore_agent()`
 >     - Accepts: 
->         - `save_path`: *str* <!-- bad variable name --> 
+>         - `restore_path`: *str*
 >             - Default: None  
 >             - Description: Path to the file where the objects state and information will be restored from. 
 >     - Returns: None 
->     - Description: Restores and re-instantiate the environment from scratch using the state and object information stored in the file at `save_path`. 
+>     - Description: Restores and re-instantiate the agent from scratch using the state and object information stored in the file at `restore_path`. 
 >
-> * `__eq__()` <!-- check what this does -->
+> * `__eq__()`
 >     - Accepts:
 >         - `other`: *dict*
 >             - Default: None
->             - Description: <!-- todo -->
+>             - Description: A dictionary of agent attributes to be compared to the current agent's (this agent's) attributes.
 >     - Returns: *bool*
 >         - Description: True if dictionaries are the same, False if they are different.
 >     - Description: Determines whether two dictionaries are the same or equal.
