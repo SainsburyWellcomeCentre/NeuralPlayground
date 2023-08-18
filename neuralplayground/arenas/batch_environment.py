@@ -3,11 +3,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from neuralplayground.arenas.arena_core import Environment
-from neuralplayground.arenas.simple2d import Simple2D
+from neuralplayground.arenas.discritized_objects import DiscreteObjectEnvironment
 
 
 class BatchEnvironment(Environment):
-    def __init__(self, environment_name: str = "BatchEnv", env_class: object = Simple2D, batch_size: int = 1, **env_kwargs):
+    def __init__(self, environment_name: str = "BatchEnv", env_class: object = DiscreteObjectEnvironment, batch_size: int = 1, **env_kwargs):
         """
         Initialise a batch of environments. This is useful for training a single agent on multiple environments simultaneously.
         Parameters
