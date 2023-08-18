@@ -3,8 +3,6 @@ import pickle
 
 import pandas as pd
 
-from neuralplayground.agents import AgentCore
-from neuralplayground.arenas import Environment
 
 
 class PlotSim(object):
@@ -119,7 +117,7 @@ class PlotSim(object):
         self.__dict__ = pd.read_pickle(param_path)
 
     def tem_plotting_loop(
-        self, agent: AgentCore, env: Environment, n_walks: int = 1000, random_state: bool = True, custom_state: list = None
+        self, agent, env, n_walks: int = 1000, random_state: bool = True, custom_state: list = None
     ):
         # Run around environment
         observation, state = env.reset(random_state=random_state, custom_state=custom_state)
