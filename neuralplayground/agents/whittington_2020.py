@@ -219,6 +219,8 @@ class Whittington2020(AgentCore):
         # Convert action vectors to action values
         action_values = self.step_to_actions(actions)
         self.walk_action_values.append(action_values)
+        if self.iter == 1:
+            print("halt")
         # Get start time for function timing
         time.time()
         # Get updated parameters for this backprop iteration
@@ -563,4 +565,10 @@ class Whittington2020(AgentCore):
 
     def get_rate_map_matrix(self, rate_maps, i, j):
         rate_map = np.asarray(rate_maps[0][i]).T[j]
-        return np.reshape(rate_map, (self.room_widths[0], self.room_depths[0]))
+        return np.reshape(
+            rate_map,
+            (
+                int(self.room_widths[0] * np.sqrt(self.state_densities[0])),
+                int(self.room_depths[0] * np.sqrt(self.state_densities[0])),
+            ),
+        )

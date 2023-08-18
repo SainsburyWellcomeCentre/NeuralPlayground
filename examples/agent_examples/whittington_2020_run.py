@@ -60,15 +60,12 @@ arena_y_limits = [
     [-5, 5],
 ]
 
-room_widths = [int(np.diff(arena_x_limits)[i]) for i in range(len(arena_x_limits))]
-room_depths = [int(np.diff(arena_y_limits)[i]) for i in range(len(arena_y_limits))]
-
 discrete_env_params = {
     "environment_name": "DiscreteObject",
     "state_density": 1,
     "n_objects": params["n_x"],
     "agent_step_size": 1,
-    "use_behavioural_data": False,
+    "use_behavioural_data": True,
     "data_path": None,
     "experiment_class": Sargolini2006Data,
 }
@@ -81,14 +78,23 @@ env_params = {
     "env_class": DiscreteObjectEnvironment,
     "arg_env_params": discrete_env_params,
 }
+
+if discrete_env_params["use_behavioural_data"]:
+    arena_x_limits = [[-50, 50] for _ in range(env_params["batch_size"])]
+    arena_y_limits = [[-50, 50] for _ in range(env_params["batch_size"])]
+    state_densities = [0.25] * env_params["batch_size"]
+
+room_widths = [int(np.diff(arena_x_limits)[i]) for i in range(env_params["batch_size"])]
+room_depths = [int(np.diff(arena_y_limits)[i]) for i in range(env_params["batch_size"])]
+
 agent_params = {
     "model_name": "Whittington2020",
     "params": full_agent_params,
     "batch_size": env_params["batch_size"],
     "room_widths": room_widths,
     "room_depths": room_depths,
-    "state_densities": [discrete_env_params["state_density"]] * env_params["batch_size"],
-    "use_behavioural_data": False,
+    "state_densities": state_densities,
+    "use_behavioural_data": discrete_env_params["use_behavioural_data"],
 }
 
 # Full model training consists of 20000 episodes

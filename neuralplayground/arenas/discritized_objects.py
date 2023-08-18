@@ -87,13 +87,14 @@ class DiscreteObjectEnvironment(Environment):
             self.arena_limits = self.experiment.arena_limits
             self.arena_x_limits = self.arena_limits[0].astype(int)
             self.arena_y_limits = self.arena_limits[1].astype(int)
+            self.state_density = 0.25
         else:
             self.state_dims_labels = ["x_pos", "y_pos"]
             self.arena_x_limits = env_kwargs["arena_x_limits"]
             self.arena_y_limits = env_kwargs["arena_y_limits"]
+            self.state_density = env_kwargs["state_density"]
 
         self.n_objects = env_kwargs["n_objects"]
-        self.state_density = env_kwargs["state_density"]
         self.arena_limits = np.array(
             [[self.arena_x_limits[0], self.arena_x_limits[1]], [self.arena_y_limits[0], self.arena_y_limits[1]]]
         )
@@ -283,8 +284,10 @@ class DiscreteObjectEnvironment(Environment):
             index: int
                 Index of the state in the discretised state space
         """
-        if np.shape(pos) == (2, 2):
+        if not self.use_behavioral_data and np.shape(pos) == (2, 2):
             pos = pos[0]
+        elif self.use_behavioral_data and len(pos) > 2:
+            pos = pos[:2]
         diff = (self.xy_combination - pos) ** 2
         dist = np.sum(diff**2, axis=-1)
         index = np.argmin(dist)

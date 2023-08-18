@@ -101,6 +101,7 @@ def tem_training_loop(agent: AgentCore, env: Environment, n_episode: int, params
     training_dict = [agent.mod_kwargs, env.env_kwargs, agent.tem.hyper]
     obs, state = env.reset(random_state=True, custom_state=None)
     for i in range(n_episode):
+        print("Episode: ", i, flush=True)
         while agent.n_walk < params["n_rollout"]:
             actions = agent.batch_act(obs)
             obs, state, reward = env.step(actions, normalize_step=True)
