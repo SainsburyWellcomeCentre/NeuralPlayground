@@ -1,10 +1,15 @@
-
-# NeuralPlayground
-The  standardised environment for the hippocampus and entorhinal cortex models.
-
+[![License](https://img.shields.io/badge/License-MIT-orange.svg)](https://opensource.org/licenses/MIT)
+![CI](https://img.shields.io/github/actions/workflow/status/SainsburyWellcomeCentre/NeuralPlayground/test_and_deploy.yml?label=CI)
+[![codecov](https://codecov.io/gh/SainsburyWellcomeCentre/NeuralPlayground/branch/main/graph/badge.svg?token=P8CCH3TI8K)](https://codecov.io/gh/SainsburyWellcomeCentre/NeuralPlayground)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/charliermarsh/ruff/main/assets/badge/v0.json)](https://github.com/charliermarsh/ruff)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/python/black)
+[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-9-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
+
+# NeuralPlayground
+The  standardised environment for the hippocampus and entorhinal cortex models. <a href="https://githubtocolab.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/colab_example.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
 
 <!-- TOC -->
 
