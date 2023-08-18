@@ -21,8 +21,6 @@
     - [Create a conda environment](#create-a-conda-environment)
     - [Pip install](#pip-install)
     - [Install for development](#install-for-development)
-      - [Unix (Linux and macOS)](#unix-linux-and-macos)
-      - [Windows](#windows)
   - [Usage](#usage)
       - [How to run a single module](#how-to-run-a-single-module)
       - [How to run interactions between modules](#how-to-run-interactions-between-modules)
@@ -94,32 +92,26 @@ pip install NeuralPlayground
 pip install -U NeuralPlayground
 
 # install a particular release
-pip install NeuralPlayground==0.0.1
+pip install NeuralPlayground==0.0.5
 ```
-Note: if you wish to run our implementation of the Tolman-Eichenbaum machine, there are additional dependencies to install. These can be found in the [whittington_2020_README.md](/examples/agent_examples/whittington_2020_README.md) file.
+Note: if you wish to run our implementation of the Tolman-Eichenbaum machine, there are additional dependencies to install. These can be found in the [TEM_README.md](/examples/agent_examples/TEM_README.md) file.
 
 ### Install for development
 
 If you want to contribute to the project, get the latest development version
 from GitHub, and install it in editable mode, including the "dev" dependencies:
 
-#### Unix (Linux and macOS)
 ```bash
-git clone https://github.com/SainsburyWellcomeCentre/NeuralPlayground/
+git clone https://github.com/SainsburyWellcomeCentre/NeuralPlayground/ --single-branch
 cd NeuralPlayground
 pip install -e .[dev]
 ```
-Note: if you are using the `zsh` shell (default on macOS), replace the last command with:
-```bash
-pip install -e '.[dev]'
-```
-
-#### Windows
-```bash
-git clone https://github.com/SainsburyWellcomeCentre/NeuralPlayground/
-cd NeuralPlayground
-pip install -e .[dev]
-```
+> **Note**
+> 
+> if you are using the `zsh` shell (default on macOS), replace the last command with:
+> ```bash
+> pip install -e '.[dev]'
+> ```
 
 ## Usage
 Try our package! We are gathering opinions to focus our efforts on improving aspects of the code or adding new features,
