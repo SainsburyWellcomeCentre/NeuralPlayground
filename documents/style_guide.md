@@ -17,7 +17,7 @@ The General convention is as follows:
 
 > Examples: name_examples
 
-In what follows we describe the general format for each of the three main components of NeuralPlayground. We begin with the Agents component, then proceed to describing Arenas and then finally Experiments.
+In what follows we describe the general format for each of the three main components of NeuralPlayground. We begin with the Agents component, then proceed to describing Arenas and then finally Experiments. 
 
 ## Agents
 
