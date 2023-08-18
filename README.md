@@ -1,18 +1,33 @@
 
-# NeuralPlayground: The  standardised environment for the hippocampus and entorhinal cortex models.
+# NeuralPlayground
+The  standardised environment for the hippocampus and entorhinal cortex models.
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-9-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
-* [1 Introduction](#1-Introduction)
-* [2 Installation ](#2-Installation)
-* [3 The Project](#3-Project)
-* [4 How to Contribute](#4-I-want-to-Contribute)
-* [5 Cite ](#5-Cite)
-* [6 Licence](#6-License)
+<!-- TOC -->
 
-## 1. Introduction
+- [NeuralPlayground](#neuralplayground)
+  - [Introduction](#introduction)
+  - [Installation](#installation)
+    - [Create a conda environment](#create-a-conda-environment)
+    - [Pip install](#pip-install)
+    - [Install for development](#install-for-development)
+      - [Unix (Linux and macOS)](#unix-linux-and-macos)
+      - [Windows](#windows)
+  - [Usage](#usage)
+      - [How to run a single module](#how-to-run-a-single-module)
+      - [How to run interactions between modules](#how-to-run-interactions-between-modules)
+      - [How to run comparisons](#how-to-run-comparisons)
+  - [I want to contribute](#i-want-to-contribute)
+  - [Cite](#cite)
+  - [License](#license)
+  - [Contributors ✨](#contributors-)
+
+<!-- /TOC -->
+
+## Introduction
 The abstract representation of space has been extensively studied in the hippocampus and entorhinal cortex in part 
 due to the easy monitoring of the task and neural recording. A growing variety of theoretical models have been proposed
 to capture the rich neural and behavioral phenomena associated with these circuits. However, objective comparison 
@@ -49,7 +64,7 @@ reproducible computational understanding of the hippocampus and entorhinal corte
 
 Try our short tutorial online in Colab. <a href="https://githubtocolab.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/colab_example.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
 
-## 2. Installation
+## Installation
 
 ### Create a conda environment
 We advise you to install the package in a virtual environment,
@@ -60,6 +75,7 @@ conda create --name NPG-env python=3.10
 conda activate NPG-env
 conda install pip
 ```
+
 ### Pip install
 
 You can use `pip` get the latest release of NeuralPlayground from PyPI.
@@ -74,10 +90,12 @@ pip install -U NeuralPlayground
 pip install NeuralPlayground==0.0.1
 ```
 Note: if you wish to run our implementation of the Tolman-Eichenbaum machine, there are additional dependencies to install. These can be found in the [whittington_2020_README.md](/examples/agent_examples/whittington_2020_README.md) file.
+
 ### Install for development
 
 If you want to contribute to the project, get the latest development version
 from GitHub, and install it in editable mode, including the "dev" dependencies:
+
 #### Unix (Linux and macOS)
 ```bash
 git clone https://github.com/SainsburyWellcomeCentre/NeuralPlayground/
@@ -88,6 +106,7 @@ Note: if you are using the `zsh` shell (default on macOS), replace the last comm
 ```bash
 pip install -e '.[dev]'
 ```
+
 #### Windows
 ```bash
 git clone https://github.com/SainsburyWellcomeCentre/NeuralPlayground/
@@ -95,8 +114,7 @@ cd NeuralPlayground
 pip install -e .[dev]
 ```
 
-## 3. Project
-
+## Usage
 Try our package! We are gathering opinions to focus our efforts on improving aspects of the code or adding new features,
 so if you tell us what you would like to have, we might just implement it 😊. 
 This open-source software was built to be collaborative and lasting. We hope that the framework will be simple 
@@ -127,18 +145,18 @@ We have a backend module to run simulations and compare the results with experim
 notebook. To plot these results, go to [comparison_from_manager](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/comparisons_examples/Comparision_from_manadger.ipynb) and [examples_comparison](https://github.com/ClementineDomine/NeuralPlayground/blob/main/examples/comparison_board_examples/comparison_board.ipynb). We show visual 
 comparisons between results from agents running with experimental behavior and results from the real experiment.
 
-## 4. I-want-to-Contribute
+## I want to contribute
 
 There are many ways to contribute to our project.
 
- 1. Implement a hippocampal and entorhinal cortex [Agent](https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground/agents) of your choice.
+1. Implement a hippocampal and entorhinal cortex [Agent](https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground/agents) of your choice.
 
- 2. Work on improving the [Arena](https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground/arenas).
+2. Work on improving the [Arena](https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground/arenas).
 
- 3. Add an [Experimental](https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground/experiments) data set.
+3. Add an [Experimental](https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground/experiments) data set.
 4. Implementing metrics to compare the output of the Agent with the experimental data.
 
- 5. Refactor the code to improve the readability and efficiency.
+5. Refactor the code to improve the readability and efficiency.
 
 All contributions should be submitted through a pull request that we will later access.
 Before sending a pull request, make sure you have the following:
@@ -161,11 +179,11 @@ All contributions to the repository are acknowledged through the all-contributor
 Refer to the README.md files found in each of the modules for further details on how to contribute to them.
 
 
-## 5. Cite
+## Cite
 
 See [Citation](https://github.com/ClementineDomine/NeuralPlayground/blob/main/documents/citation.cff) for the correct citation of this framework.
 
-## 6. License
+## License
 
 More details about the license can be found at [Licence](https://github.com/ClementineDomine/NeuralPlayground/blob/main/documents/lisence.md).
 
