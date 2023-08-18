@@ -57,9 +57,9 @@ move in and interact with. We note that each module can also be used separately,
 models and data sets.
 
 We currently rely on visual comparison of a hand-selected number of outputs of the model with neural recordings as 
-shown in [github.com/NeuralPlayground/examples/comparison](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/comparisons_examples/comparison_from_manager.ipynb). In the future, a set of quantitative measures and 
-qualitative measures will be added for systematic comparisons from any Agent, Arena, Experiments. 
-We want to restate that this won't constitute an objective judgment of the quality of an Agent to replicate the brain 
+shown in [github.com/NeuralPlayground/examples/comparison](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/comparisons_examples/comparison_from_manager.ipynb). In the future, a set of quantitative and 
+qualitative measures will be added for systematic comparisons across Agents, Arenas, and Experiments. 
+We want to restate that this won't constitute a definitive judgment on the ability of an Agent to replicate the brain 
 mechanism. Instead, this allows an objective and complete comparison to the current evidence in the field, as is 
 typically done in publications.
 
@@ -94,7 +94,9 @@ pip install -U NeuralPlayground
 # install a particular release
 pip install NeuralPlayground==0.0.5
 ```
-Note: if you wish to run our implementation of the Tolman-Eichenbaum machine, there are additional dependencies to install. These can be found in the [TEM_README.md](/examples/agent_examples/TEM_README.md) file.
+> **Note**
+> 
+> If you wish to run our implementation of the Tolman-Eichenbaum machine, there are additional dependencies to install. These can be found in the [TEM_README.md](/examples/agent_examples/TEM_README.md) file.
 
 ### Install for development
 
@@ -141,7 +143,7 @@ task.
 
 We have a backend module to run simulations and compare the results with experimental data, you can find it in 
 [simulation_manager](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/comparisons_examples/simulation_manager.ipynb) 
-notebook. To plot these results, go to [comparison_from_manager](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/comparisons_examples/comparison_from_manager.ipynb) and [examples_comparison](https://github.com/ClementineDomine/NeuralPlayground/blob/main/examples/comparison_board_examples/comparison_board.ipynb). We show visual 
+notebook. To plot these results, go to [comparison_from_manager](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/comparisons_examples/comparison_from_manager.ipynb) and [comparison_board](https://github.com/ClementineDomine/NeuralPlayground/blob/main/examples/comparisons_examples/comparison_board.ipynb). We show visual 
 comparisons between results from agents running with experimental behavior and results from the real experiment.
 
 ## I want to contribute
