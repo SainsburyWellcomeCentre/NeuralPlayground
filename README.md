@@ -57,9 +57,9 @@ move in and interact with. We note that each module can also be used separately,
 models and data sets.
 
 We currently rely on visual comparison of a hand-selected number of outputs of the model with neural recordings as 
-shown in [github.com/NeuralPlayground/examples/comparison](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/comparisons_examples/Comparision_from_manager.ipynb). In the future, a set of quantitative measures and 
+shown in [github.com/NeuralPlayground/examples/comparison](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/comparisons_examples/comparison_from_manager.ipynb). In the future, a set of quantitative measures and 
 qualitative measures will be added for systematic comparisons from any Agent, Arena, Experiments. 
-We want to restate that this won’t constitute an objective judgment of the quality of an Agent to replicate the brain 
+We want to restate that this won't constitute an objective judgment of the quality of an Agent to replicate the brain 
 mechanism. Instead, this allows an objective and complete comparison to the current evidence in the field, as is 
 typically done in publications.
 
@@ -141,7 +141,7 @@ task.
 
 We have a backend module to run simulations and compare the results with experimental data, you can find it in 
 [simulation_manager](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/comparisons_examples/simulation_manager.ipynb) 
-notebook. To plot these results, go to [comparison_from_manager](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/comparisons_examples/Comparision_from_manadger.ipynb) and [examples_comparison](https://github.com/ClementineDomine/NeuralPlayground/blob/main/examples/comparison_board_examples/comparison_board.ipynb). We show visual 
+notebook. To plot these results, go to [comparison_from_manager](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/comparisons_examples/comparison_from_manager.ipynb) and [examples_comparison](https://github.com/ClementineDomine/NeuralPlayground/blob/main/examples/comparison_board_examples/comparison_board.ipynb). We show visual 
 comparisons between results from agents running with experimental behavior and results from the real experiment.
 
 ## I want to contribute
@@ -153,24 +153,21 @@ There are many ways to contribute to our project.
 2. Work on improving the [Arena](https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground/arenas).
 
 3. Add an [Experimental](https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground/experiments) data set.
-4. Implementing metrics to compare the output of the Agent with the experimental data.
+
+4. Implementing [metrics](https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground/comparison/metrics.py) to compare the output of the Agent with the experimental data.
 
 5. Refactor the code to improve the readability and efficiency.
 
-All contributions should be submitted through a pull request that we will later access.
-Before sending a pull request, make sure you have the following:
+All contributions should be submitted through a pull request and will be reviewed by the maintainers.
+Before sending a pull request, make sure you have the done following:
 
 1. Checked the Licensing frameworks.
 
-2. Use developing tools installing the dev dependencies. Use:
-
-    ```pre-commit run --all-files``` 
-
-    to format the code and check for errors.
+2. Used the [right development environment](#install-for-development). Make sure to initialise the pre-commit hooks with ```pre-commit install``` and run ```pre-commit run -a``` to format the code and check for errors.
 
 3. Followed the [PEP8](https://www.python.org/dev/peps/pep-0008/) and [numpy docstring](https://numpydoc.readthedocs.io/en/latest/format.html) style convention. More details found in [Style Guide](https://github.com/ClementineDomine/NeuralPlayground/tree/main/documents/style_guide.md).
 
-4. Implemented and ran [Test](https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground/tests).
+4. Implemented and ran [tests](https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground/tests).
 
 5. Comment your work.
 
@@ -184,12 +181,12 @@ See [Citation](https://github.com/ClementineDomine/NeuralPlayground/blob/main/do
 
 ## License
 
-More details about the license can be found at [Licence](https://github.com/ClementineDomine/NeuralPlayground/blob/main/documents/lisence.md).
+⚖️ [MIT](./LICENSE)
 
 
 ## Contributors
 
-Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
+Thanks go to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->
