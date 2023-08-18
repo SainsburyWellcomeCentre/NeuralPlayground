@@ -107,6 +107,7 @@ class Stachenfeld2018(AgentCore):
         self.metadata = {"mod_kwargs": mod_kwargs}
         self.obs_history = []  # Initialize observation history to update weights later
         self.grad_history = []
+
         self.gamma = mod_kwargs["discount"]
         self.threshold = mod_kwargs["threshold"]
         self.learning_rate = mod_kwargs["lr_td"]
@@ -115,7 +116,6 @@ class Stachenfeld2018(AgentCore):
         self.state_density = mod_kwargs["state_density"]
         twoD = mod_kwargs["twoD"]
         self.initial_obs_variable = None
-
         self.reset()
         # Variables for the SR-agent state space
         self.resolution_depth = int(self.state_density * self.room_depth)
@@ -317,9 +317,9 @@ class Stachenfeld2018(AgentCore):
         """
 
         if hasattr(self, "next_state"):
-            if self.inital_obs_variable is None:
+            if self.initial_obs_variable is None:
                 self.curr_state = self.next_state
-                self.inital_obs_variable = True
+                self.initial_obs_variable = True
             next_state = self.next_state
             self.n_state = self.transmat_norm.shape[0]
             a = np.array(self.curr_state)
