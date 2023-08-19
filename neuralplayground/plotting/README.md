@@ -1,4 +1,4 @@
-# Agent
+# Plotting
 
 * [1 Introduction](#1-Introduction)
 * [2 Model Implemented](#2-Model-Implemented)
@@ -7,36 +7,27 @@
 
 ## 1. Introduction
 
-This class includes a set of functions that control the ways intelligent systems interact
-with their surroundings (i.e., the environment). An agent receives observations from the environment (reward, visual cues, etc.) and uses these to take an action which in turn will update both its state and the state of the environment, generating new observations. More generally, the Agent can be thought of as an animal performing the task in the simulated experiment. All agent types will be given a set of abilities that are summarised in the agent’s main class. Each different model developed can be easily implemented as a subclass of the main one.
+This class provides functionality for displaying the results of experiments and summarizing metrics or collected data. 
 
 
-## 2. Models-Implemented
+## 2. Plotting Functions Implemented
 
-  1. [The hippocampus as a predictive map](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/agents/stachenfeld_2018.py)
-
-  2. [Learning place cells, grid cells and invariances with excitatory and inhibitory plasticity](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/agents/weber_2018.py)
-
-  3. [The Tolman-Eichenbaum Machine: Unifying Space and Relational Memory through Generalization in the Hippocampal Formation](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/agents/whittington_2020.py)
-
-
-Each of the these models are implemented in a jupyter notebook in [Examples](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples) to facilitate the interaction.
-
-Pre-trained version of some of these model are hosted on a separate data repository on GIN. GIN offers an interface almost identical to GitHub. 
-To contribute a new trainned model, you need to fork the repository and open a pull request, just like on GitHub.
-Place your model trained in a selected arena folder named as "author_date_in_arena", zip the folder, and place "author_date_in_arena.zip" under the "data" directory of the Forked repository, for example, "data/smith_2023_in_Simple2D.zip". 
-If you encounter any problems with this procedure, do not hesitate to contact us.
+  1. [make_plot_trajectories](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/style-guide/neuralplayground/plotting/plot_utils.py)
+      * Plots the position of an agent over time. 
+  2. [make_plot_rate_map](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/style-guide/neuralplayground/plotting/plot_utils.py)
+      * Plots the number of spikes falling within each time bin during a recording session. 
+  3. [render_pl_table](https://stackoverflow.com/questions/19726663/how-to-save-the-pandas-dataframe-series-data-as-a-figure)
+      * Renders a Pandas Dataframe table as an image.
+  4. [make_agent_comparison](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/style-guide/neuralplayground/plotting/plot_utils.py)
+      * Compares agents trajectories and firing rates against experimental data.
 
 ## 3. How-to-Contribute
 
-  1. Create a file that indicates the appropriate reference to the model
+  1. Add your desired plotting utility to "plot_utils.py" as a function.
 
-  2. Create a class to run the model following the template shown in the [Agent_core.py](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/agents/agent_core.py) and the [Style Guide](https://github.com/ClementineDomine/NeuralPlayground/tree/main/documents/style_guide.md).
-  When building a new model create a file named author_date.py.
+  2. Document what you have implemented above by describing at a high level the purpose of your plotting function.
 
-  3. Create or add to [Examples](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples/agent_examples/) jupyter notebook for the new model where you can run the model in a chosen environment with selected experimental data
-
-  4. Record your contribution
+  3. Record your contribution
 
 All contributions should be submitted through a pull request that we will later access.
 Before sending a pull request, make sure you have the following:
