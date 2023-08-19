@@ -220,11 +220,11 @@ Additionally the class will also inherit the necessary methods that the rest of 
 ### simple2d.py
 The overloaded attributes which "simple2d.py" makes more specialized are as follows:
 
-> * `state` : *ndarray*
+> * `state` : *ndarray(dtype=float)*
 >     - Contains:
->         - `head_direction` : *ndarray*
->             - Contains the x and y coordinates of the agent's head relative to the body. <!-- check relative to body -->
->         - `position` : *ndarray*
+>         - `head_direction` : *ndarray(dtype=float)*
+>             - Contains the x and y coordinates of the agent's head relative to the body.
+>         - `position` : *ndarray(dtype=float)*
 >             - Contains the x and y coordinates of the agent's position in the environment.
 >     - Description: Contains the x, y coordinate of the position and head direction of the agent (will be further developed).
 > * `history`: *list of dicts*
@@ -235,8 +235,8 @@ In addition some new attributes are added:
 >     - Size of the environment in the x axis (0th axis of an ndarray array; the number of rows).
 > * `room_depth`: *int*
 >     - Size of the environment in the y axis (1st axis of an ndarray array; the number of columns).
-> * `observation`: *ndarray*
->     - This is a  fully observable environment. Array of the current observation of the agent in the environment (Could be modified as the environment evolves) `make_observation()` returns the state. <!-- why do you need the var and the function -->
+> * `observation`: *ndarray(dtype=float)*
+>     - This is a  fully observable environment. Array of the current observation of the agent in the environment (Could be modified as the environment evolves).
 > * `agent_step_size`: *float*
 >     - Size of the step when executing movement, `agent_step_size*global_steps` will give a measure of the total distance traversed by the agent.
 
@@ -246,8 +246,6 @@ Additionally your class will also inherit the necessary methods that the rest of
 >     - Accepts:  
 >         - `environment_name` : *str* 
 >             - Default: "2DEnv"
->         - `time_step_size` : *float*
->             - Default: 1.0
 >         - `env_kwargs`: *dict* 
 >             - Default: {}
 >     - Returns: None
@@ -273,19 +271,19 @@ Additionally your class will also inherit the necessary methods that the rest of
 >         - `random_state`: *bool*
 >             - Default: `False`
 >             - Description: If True, sample a new position uniformly within the arena, use default otherwise.
->         - `custom_state`: *np.ndarray*
->             - Default: None
+>         - `custom_state`: *ndarray(dtype=float)*
+>             - Default: `None`
 >             - Description: If given, use this array to set the initial state.
 >     - Returns:
->         - `observation`: *ndarray*
->             - Description: Array of the observation of the agent in the environment. Because this is a fully observable environment, make_observation returns the state of the environment (Could be modified as the environments are evolves)
->         - `self.state`: *ndarray*
+>         - `observation`: *ndarray(dtype=float)*
+>             - Description: Array of the observation of the agent in the environment. Because this is a fully observable environment this is the same as the state of the environment (Could be modified as the environments are evolves).
+>         - `self.state`: *ndarray(dtype=float)*
 >             - Description: Vector of the x and y coordinate of the position of the animal in the environment (ndarray has shape (2,)).
 >     - Description: Reset the environment variables and history.
 >
 > * `step()`
 >     - Accepts:
->         - `action`: *ndarray (2,)*
+>         - `action`: *ndarray(dtype=float)*
 >             - Default: `False`
 >             - Description: Array containing the action of the agent, in this case the delta_x and detla_y increment to position.
 >         - `normalize_step`: *bool*
@@ -302,12 +300,12 @@ Additionally your class will also inherit the necessary methods that the rest of
 >
 > * `validate_action()`
 >     - Accepts:
->         - `pre_state`: *ndarray (2,)*
+>         - `pre_state`: *ndarray(dtype=float)*
 >             - Description: 2d position of the agent in the environment before the action.
->         - `new_state`: *ndarray (2,)*
+>         - `new_state`: *ndarray(dtype=float)*
 >             - Description: Potential 2d position of the agent in the environment after the action.
 >     - Returns:
->         - `new_state`: *ndarray (2,)*
+>         - `new_state`: *ndarray(dtype=float)*
 >             - Description: The corrected new state. If it is not crossing the wall, then the new_state stays the same, if the state cross the wall, new_state will be corrected to a valid place without crossing the wall.
 >         - `crossed_wall`: *bool*
 >             - Description: True if the change in state crossed a wall and was corrected.
