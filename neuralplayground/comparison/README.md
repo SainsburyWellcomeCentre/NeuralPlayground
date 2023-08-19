@@ -1,4 +1,4 @@
-# Agent
+# Comparison
 
 * [1 Introduction](#1-Introduction)
 * [2 Model Implemented](#2-Model-Implemented)
@@ -7,34 +7,23 @@
 
 ## 1. Introduction
 
-This class includes a set of functions that control the ways intelligent systems interact
-with their surroundings (i.e., the environment). An agent receives observations from the environment (reward, visual cues, etc.) and uses these to take an action which in turn will update both its state and the state of the environment, generating new observations. More generally, the Agent can be thought of as an animal performing the task in the simulated experiment. All agent types will be given a set of abilities that are summarised in the agent’s main class. Each different model developed can be easily implemented as a subclass of the main one.
+This class includes a set of functions that will help when comparing various models against experimental data. More specifically these metrics will compare an agent's neural representations of the environment against other agents or experimental data. For the moment GridScore is the only metric implemented through the `GridScorer` class.
 
 
-## 2. Models-Implemented
+## 2. Metrics-Implemented
 
-  1. [The hippocampus as a predictive map](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/agents/stachenfeld_2018.py)
-
-  2. [Learning place cells, grid cells and invariances with excitatory and inhibitory plasticity](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/agents/weber_2018.py)
-
-  3. [The Tolman-Eichenbaum Machine: Unifying Space and Relational Memory through Generalization in the Hippocampal Formation](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/agents/whittington_2020.py)
+  1. [GridScore](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/style-guide/neuralplayground/comparison/metrics.py)
 
 
-Each of the these models are implemented in a jupyter notebook in [Examples](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples) to facilitate the interaction.
-
-Pre-trained version of some of these model are hosted on a separate data repository on GIN. GIN offers an interface almost identical to GitHub. 
-To contribute a new trainned model, you need to fork the repository and open a pull request, just like on GitHub.
-Place your model trained in a selected arena folder named as "author_date_in_arena", zip the folder, and place "author_date_in_arena.zip" under the "data" directory of the Forked repository, for example, "data/smith_2023_in_Simple2D.zip". 
-If you encounter any problems with this procedure, do not hesitate to contact us.
+For an example of the use of the `GridScorer` class see [the Jupyter Notebook](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/style-guide/examples/comparisons_examples/comparison_examples_score.ipynb).
 
 ## 3. How-to-Contribute
 
-  1. Create a file that indicates the appropriate reference to the model
+  1. Create a file that indicates the appropriate reference to the metric.
 
-  2. Create a class to run the model following the template shown in the [Agent_core.py](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/agents/agent_core.py) and the [Style Guide](https://github.com/ClementineDomine/NeuralPlayground/tree/main/documents/style_guide.md).
-  When building a new model create a file named author_date.py.
+  2. Create a class which implements the metric given neural representations.
 
-  3. Create or add to [Examples](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples/agent_examples/) jupyter notebook for the new model where you can run the model in a chosen environment with selected experimental data
+  3. Create or add to [Examples](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples/agent_examples/) jupyter notebook for the new metric where you can compare models in a chosen environment with selected experimental data.
 
   4. Record your contribution
 
