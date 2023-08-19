@@ -103,12 +103,14 @@ Additionally the class will also inherit the necessary methods that the rest of 
 
 ## Environment/Arena
 
-To add an environment we follow a similar convention to the Agent class. If the environment is based on a publication begin by creating a file with the naming convention of "author_date.py" where "author" is the name of the lead author and "date" is the year the work was published. Otherwise create a file with a descriptive name such as "connected_rooms.py". There are two possible classes which a new class could inherit to obtain the minimal set of attributes and methods necessary to function flexibly within the other pipelines implemented by NeuralPlayground. Firstly "agent_core.py" which provides the most basic interface necessary. Secondly, "simple2d.py" provides a richer interface which can be used to create 2-dimensional navigation based domains and inherits "agent_core.py". We will begin by describing "agent_core.py" and then move on to describe "simple2d.py".
+To add an environment we follow a similar convention to the Agent class. If the environment is based on a publication begin by creating a file with the naming convention of "author_date.py" where "author" is the name of the lead author and "date" is the year the work was published. Otherwise create a file with a descriptive name such as "connected_rooms.py". There are two possible classes which a new class could inherit to obtain the minimal set of attributes and methods necessary to function flexibly within the other pipelines implemented by NeuralPlayground. Firstly "arena_core.py" which provides the most basic interface necessary. Secondly, "simple2d.py" provides a richer interface which can be used to create 2-dimensional navigation based domains and inherits "arena_core.py". We will begin by describing "arena_core.py" and then move on to describe "simple2d.py".
 
 ### arena_core.py
 The core attributes are as follows:
 
-> * `state` : *array* <!-- all these vars say "Define within each subclass for specific environments" when used in functions which kind of defeats the point -->
+> * `environment_name` : *str*
+>     - Name of the specific instantiation of the environment class
+> * `state` : *np.array(dtype=float)*
 >     - Empty array for this abstract class. Designed to contain the present state of the environment.
 > * `history`: *list*
 >     - Contains the transition history of all states in the environment. Differs from the history of an agent which may not fully observe the full state. Here this is the history of the full state of the environment.
@@ -119,9 +121,9 @@ The core attributes are as follows:
 > * `env_kwags`: *dict*
 >     - Arguments given to the init method.
 > * `global_steps` : *int* 
->     - Counts the number of calls to the `step()` method. Set to 0 when calling `reset()`.
+>     - Counts the number of calls to the `step()` method. Set to 0 when calling `reset()`. Resets to `0`.
 > * `global_time`: *float*
->     - Total "in-world" time simulated through calls to the `step()` method since the last reset. Then `global_time = time_step_size * global_steps`.
+>     - Total "in-world" time simulated through calls to the `step()` method since the last reset. Then `global_time = time_step_size * global_steps`. Resets to `0`.
 > * `observation_space`: *gym.spaces*
 >     - Specifies the range of observations which the environment can generate as in OpenAI Gym.
 > * `action_space`: *gym.spaces* 
@@ -149,14 +151,15 @@ Additionally the class will also inherit the necessary methods that the rest of 
 >
 > * `step()`
 >     - Accepts:
->         - `action` : *array*
->             - Description: Type is currently set to match environment but any type can be used as long as the function is able to still return the necessary variables.  
+>         - `action` : *np.array(dtype=float)*
+>             - Default: `None`
+>             - Description: Type is currently set to match environment but any type can be used as long as the function is able to still return the necessary variables. Needs to also interface with the `self.reward_function()`. 
 >     - Returns:
->         - `observation`: *array*
+>         - `observation`: *np.array(dtype=float)*
 >             - Description: Any set of observation that can be encountered by the agent in the environment (position, visual features,...)  
->         - `self.state` : *array*
+>         - `self.state` : *np.array(dtype=float)*
 >             - Description:  Variable containing the state of the environment (eg. position in the environment)
->         - `reward`: int <!-- why int? -->
+>         - `reward`: float
 >     - Description: Runs the environment dynamics resulting from a given action. Increments global counters and returns the resultant observation by the agent, new state of the environment (which is not necessarily the same as the agent's observation of the environment) and the reward.
 > 
 > * `_increase_global_step()`
@@ -167,38 +170,40 @@ Additionally the class will also inherit the necessary methods that the rest of 
 > * `reset()`
 >     - Accepts: None
 >     - Returns:
->         - `observation`: *array*
+>         - `observation`: *np.array(dtype=float)*
 >             - Description: Any set of observation that can be encountered by the agent in the environment (position, visual features,...)
->         - `self.state` : *array*
+>         - `self.state` : *np.array(dtype=float)*
 >             - Description:  Variable containing the state of the environment (eg. position in the environment) 
 >     - Description: Re-initialize state. Returns observation and state after the reset. Also returns time and step counters to 0.
 > 
 > * `save_environment()`
 >     - Accepts:
 >         - `save_path`: *str*
->             - Description: Path to the file that the environment state will be saved to 
+>             - Description: Path to the file that the environment state will be saved to.
+>         - `raw_object`: *bool*
+              - Description: If `True` then the raw object is saved. Otherwise saves the dictionary of attributes. If True, you can load the object by using `env = pd.read_pickle(save_path)`. If `False`, you can load the object by using `env.restore_environment(save_path)`. 
 >     - Returns: None
 >     - Description: Save current variables of the environment to re-instantiate it in the same state later
 >
 > * `restore_environment()`
 >     - Accepts:
->         - `save_path`: *str* <!-- var name -->
->             - Description: Path to the file that the environment state can be retrieved from 
+>         - `restore_path`: *str*
+>             - Description: Path to the file that the environment state can be retrieved from. 
 >     - Returns: None
->     - Description: Restores the variables of the environment based on the stated save in `save_path`
+>     - Description: Restores the variables of the environment based on the stated save in `save_path()`.
 >
 > * `__eq__()`
 >     - Accepts:
 >         - `other`: *Environment*
 >             - Description: Another instantiation of the environment
 >     - Returns: *bool*
->     - Description: Checks if two environments are equal by comparing all of its attributes. True if self and other are the same exact environment
+>     - Description: Checks if two environments are equal by comparing all of its attributes. True if self and other are the same exact environment.
 >
 > * `get_trajectory_data()`
 >     - Accepts: None 
 >     - Returns:
 >         - `self.history`: *list*
->             - Description: Contains the transition history of all states in the environment. Differs from the history of an agent which may not
+>             - Description: Contains the transition history of all states in the environment. Differs from the history of an agent which may not be fully observable or match the ground truth state.
 >     - Description: Returns state history of the environment since last reset.
 >
 > * `reward_function()`
@@ -210,6 +215,7 @@ Additionally the class will also inherit the necessary methods that the rest of 
 >     - Returns:
 >         - `reward`: *float*
 >             - Description: Reward of taking the given action in the given state.
+>     - Description: Reward curriculum which can be a function of the agent's action and/or state attributes of the environment.
 
 ### simple2d.py
 The overloaded attributes which "simple2d.py" makes more specialized are as follows:
