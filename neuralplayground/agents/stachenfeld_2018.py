@@ -379,7 +379,7 @@ class Stachenfeld2018(AgentCore):
         r_out_im = evecs[:, eigen_vector].reshape((self.resolution_width, self.resolution_depth)).real
         return r_out_im
 
-    def plot_transition(self, save_path: str = None, ax: mpl.axes.Axes = None):
+    def plot_transition(self, T=None, save_path: str = None, ax: mpl.axes.Axes = None):
         """
         Plot the input matrix and compare it to the transition matrix from the rectangular
         environment states space (rectangular- transmat).
@@ -391,7 +391,8 @@ class Stachenfeld2018(AgentCore):
         save_path: string
             Path to save the plot
         """
-        T = self.get_T_from_M(self.srmat)
+        if T is None:
+            T = self.get_T_from_M(self.srmat)
         if ax is None:
             f, ax = plt.subplots(1, 2, figsize=(14, 5))
             make_plot_rate_map(self.transmat_norm, ax[0], "Transition matrix", "states", "states", "State occupency")
