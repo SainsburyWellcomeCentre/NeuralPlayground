@@ -351,7 +351,7 @@ This is the minimal set of methodes and attributes necessary for an experimental
 
 > * `experiment_name` : *str*
 >     - Name of the specific instantiation of the experiment class.
-> * `data_rul`: *str*
+> * `data_url`: *str*
 >     - URL to the data used in the experiment - please make sure it is publicly available for usage and download.
 > * `paper_url`: *str*
 >     - URL to the paper describing the experiment
@@ -381,7 +381,29 @@ We now describe the style of "hafting_2008_data.py" which provides a useful exam
 ### hafting_2008_data.py
 The original article of Hafting et al. 2008. can be found at https://www.nature.com/articles/nature06957. The data can be obtained from https://archive.norstore.no/pages/public/datasetDetail.jsf?id=C43035A4-5CC5-44F2-B207-126922523FD9. This class only consider animal raw animal trajectories and neural recordings.
 
-The class does not contain its own attributes and only provides functions which interface with the data. These functions are:
+Hafting2008Data imports from the Experiment clas. This class's additional attributes are:
+> * `data_path` : *str*
+>     - If None, fetch the data from the NeuralPlayground data repository, else load data from the given path.
+> * `best_recording_index`: *int*
+>     - Index of the best recording session to be used as default.
+> * `arena_limits`: *np.array(dtype=float)*
+>     - Limits of the arena in the experiment. Array has shape of (2,2) where first row is the x limits and the second row is the y limits, in cm.
+> * `data_per_animal`: *dict*
+>     - Dictionary with all the data from the experiment, organized by animal, session and recorded variables.
+> * `recording_list`: *Pandas dataframe*
+>     - List of available data, columns with rat_id, recording session and recorded variables.
+> * `rat_id`: *str*
+>     - Rat identifier from the experiment.
+> * `sess`: *str*
+>     - Recording session identifier from the experiment.
+> * `rec_vars`: *list of str*
+>     - List of variables recorded from a given session.
+> * `position`: *np.array(dtype=float)*
+>     - Array of shape (2,) with the x and y position throughout recording of the given session.
+> * `head_direction`: *np.array(dtype=float)*
+>     - Array of shape (2,) with the x and y head direction throughout recording of the given session.
+
+Similarly the additoinal methods are:
 > * `__init__( )`
 >     - Accepts:  
 >         - `data_path` : *str* 
@@ -396,6 +418,12 @@ The class does not contain its own attributes and only provides functions which 
 >         - `verbose`: *bool*
 >             - Default: `False`
 >             - Description: If `True` then it will print original readme and data structure when initializing this object.
+>         - `data_url`: *str*
+>             - Default: `None`
+>             - Description: URL to the data used in the experiment - please make sure it is publicly available for usage and download.
+>         - `paper_url`: *str*
+>             - Default: `None` 
+>             - Description: URL to the paper describing the experiment.
 >     - Returns: None
 >     - Description: Function which initialises an object of the class. Providing no inputs will default the object to reload the dataset from the repositories.
 >
