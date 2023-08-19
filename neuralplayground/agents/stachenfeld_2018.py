@@ -107,6 +107,7 @@ class Stachenfeld2018(AgentCore):
         self.metadata = {"mod_kwargs": mod_kwargs}
         self.obs_history = []  # Initialize observation history to update weights later
         self.grad_history = []
+
         self.gamma = mod_kwargs["discount"]
         self.threshold = mod_kwargs["threshold"]
         self.learning_rate = mod_kwargs["lr_td"]
@@ -115,7 +116,6 @@ class Stachenfeld2018(AgentCore):
         self.state_density = mod_kwargs["state_density"]
         twoD = mod_kwargs["twoD"]
         self.initial_obs_variable = None
-
         self.reset()
         # Variables for the SR-agent state space
         self.resolution_depth = int(self.state_density * self.room_depth)
@@ -317,9 +317,9 @@ class Stachenfeld2018(AgentCore):
         """
 
         if hasattr(self, "next_state"):
-            if self.inital_obs_variable is None:
+            if self.initial_obs_variable is None:
                 self.curr_state = self.next_state
-                self.inital_obs_variable = True
+                self.initial_obs_variable = True
             next_state = self.next_state
             self.n_state = self.transmat_norm.shape[0]
             a = np.array(self.curr_state)
@@ -379,7 +379,7 @@ class Stachenfeld2018(AgentCore):
         r_out_im = evecs[:, eigen_vector].reshape((self.resolution_width, self.resolution_depth)).real
         return r_out_im
 
-    def plot_transition(self, save_path: str = None, ax: mpl.axes.Axes = None):
+    def plot_transition(self, T=None, save_path: str = None, ax: mpl.axes.Axes = None):
         """
         Plot the input matrix and compare it to the transition matrix from the rectangular
         environment states space (rectangular- transmat).
@@ -391,7 +391,8 @@ class Stachenfeld2018(AgentCore):
         save_path: string
             Path to save the plot
         """
-        T = self.get_T_from_M(self.srmat)
+        if T is None:
+            T = self.get_T_from_M(self.srmat)
         if ax is None:
             f, ax = plt.subplots(1, 2, figsize=(14, 5))
             make_plot_rate_map(self.transmat_norm, ax[0], "Transition matrix", "states", "states", "State occupency")
