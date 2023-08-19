@@ -1,7 +1,7 @@
 # Comparison
 
 * [1 Introduction](#1-Introduction)
-* [2 Model Implemented](#2-Model-Implemented)
+* [2 Metrics Implemented](#2-Model-Implemented)
 * [3 How to Contribute](#3-How-to-Contribute)
 
 
@@ -15,7 +15,7 @@ This class includes a set of functions that will help when comparing various mod
   1. [GridScore](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/style-guide/neuralplayground/comparison/metrics.py)
 
 
-For an example of the use of the `GridScorer` class see [the Jupyter Notebook](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/style-guide/examples/comparisons_examples/comparison_examples_score.ipynb).
+For an example of the use of the `GridScorer` class see [the Jupyter Notebook](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/comparisons_examples/comparison_examples_score.ipynb).
 
 ## 3. How-to-Contribute
 
@@ -23,7 +23,7 @@ For an example of the use of the `GridScorer` class see [the Jupyter Notebook](h
 
   2. Create a class which implements the metric given neural representations.
 
-  3. Create or add to [Examples](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples/agent_examples/) jupyter notebook for the new metric where you can compare models in a chosen environment with selected experimental data.
+  3. Create or add to [Examples](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/tree/main/examples/agent_examples) jupyter notebook for the new metric where you can compare models in a chosen environment with selected experimental data.
 
   4. Record your contribution
 
@@ -32,9 +32,9 @@ Before sending a pull request, make sure you have the following:
 
 1. Checked the Licensing frameworks.
 
-2. Followed the [Style Guide](https://github.com/ClementineDomine/NeuralPlayground/tree/main/documents/style_guide.md).
+2. Followed the [Style Guide](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/documents/style_guide.md).
 
-3. Implemented and ran [Test](https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground/tests).
+3. Implemented and ran [Test](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/tree/main/tests).
 
 4. Comment your work
 
