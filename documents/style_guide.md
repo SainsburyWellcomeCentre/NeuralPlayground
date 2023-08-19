@@ -344,7 +344,39 @@ Additionally your class will also inherit the necessary methods that the rest of
 >     - Description: Render the environment live through iterations.
 
 ## Experiment <!-- A bunch of the links below that I copied from the readme go to clem's user and not SWCs -->
-Implementing a style format for experimental classes is more complex due to the wide variety of data formats and experimental setups. For consistency and ease of future development, when creating a new experimental class the `Experiment` class should be inherited from "experiment_core.py". However, for the moment this class remains empty and provides no variables or functionality. It then becomes key that the steps described in [How To Contribute](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/tree/main/neuralplayground/experiments#3-how-to-contribute) are followed. In particular providing a minimal example of the functionality offered by the class in [Examples](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples/experimental_examples/) is very important. This allows for future developers to easily use the class (without having a base class available to extrapolate from) but also to find similarities between experimental classes. For example [Hafting2008Data](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/experiments/hafting_2008_data.py) offers a simple class for 2D Experimental data. Consequently our implementation of [Sargolini2006Data](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/experiments/sargolini_2006_data.py) inherits from [Hafting2008Data](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/experiments/hafting_2008_data.py). This is ideal and aligns well with the motivation of this package - to begin to standardise the presentation and interface with neuroscience research. For the purpose of example we will describe the style of [Hafting2008Data](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/experiments/hafting_2008_data.py).
+Implementing a style format for experimental classes is more complex due to the wide variety of data formats and experimental setups. For consistency and ease of future development, when creating a new experimental class the `Experiment` class should be inherited from "experiment_core.py" which provides a few base methods and attributes. However, it then becomes key that the steps described in [How To Contribute](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/tree/main/neuralplayground/experiments#3-how-to-contribute) are followed. In particular providing a minimal example of the functionality offered by the class in [Examples](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/tree/style-guide/examples) is very important. This allows for future developers to easily use the class (without having a base class available to extrapolate from) but also to find similarities between experimental classes. For example [Hafting2008Data](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/style-guide/neuralplayground/experiments/hafting_2008_data.py) offers a simple class for 2D Experimental data. Consequently our implementation of [Sargolini2006Data](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/style-guide/neuralplayground/experiments/sargolini_2006_data.py) inherits from [Hafting2008Data](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/style-guide/neuralplayground/experiments/hafting_2008_data.py). This is ideal and aligns well with the motivation of this package - to begin to standardise the presentation and interfaces used in neuroscience research. For the purpose of example we will also describe the style of [Hafting2008Data](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/style-guide/neuralplayground/experiments/hafting_2008_data.py).
+
+### experiment_core.py
+This is the minimal set of methodes and attributes necessary for an experimental class to interface with the rest of NeuralPlayground. The attributes of the class are:
+
+> * `experiment_name` : *str*
+>     - Name of the specific instantiation of the experiment class.
+> * `data_rul`: *str*
+>     - URL to the data used in the experiment - please make sure it is publicly available for usage and download.
+> * `paper_url`: *str*
+>     - URL to the paper describing the experiment
+
+Next the base set of methods are:
+> * `__init__( )`
+>     - Accepts:  
+>         - `experiment_name` : *str* 
+>             - Default: "abstract_experiment"
+>         - `data_rul`: *str*
+>             - Default: `None`
+>         - `paper_url`: *str* 
+>             - Default: `None`
+>     - Returns: None
+>     - Description: Function which initialises an object of the class. It is best practice to ensure that URLs for both the data and original data are provided.
+>
+> * `_find_data_path()`
+>     - Accepts: 
+>         - `data_path`: *str*
+>             - Default: `None`
+>             - Description: Path to the experimental to be loaded by the object. If none is provided then the path to "hafting_2008" will be loaded. 
+>     - Returns: None
+>     - Description: Fetch data from NeuralPlayground data repository if no data path is supplied by the user.
+
+We now describe the style of "hafting_2008_data.py" which provides a useful example of a class which is reusable because of it's standardized data format.
 
 ### hafting_2008_data.py
 The original article of Hafting et al. 2008. can be found at https://www.nature.com/articles/nature06957. The data can be obtained from https://archive.norstore.no/pages/public/datasetDetail.jsf?id=C43035A4-5CC5-44F2-B207-126922523FD9. This class only consider animal raw animal trajectories and neural recordings.
