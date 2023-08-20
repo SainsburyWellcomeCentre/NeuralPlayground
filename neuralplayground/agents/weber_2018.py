@@ -79,12 +79,29 @@ class Weber2018(AgentCore):
         Plot current rates and an example of inhibitory and excitatory neuron
     """
 
-    def __init__(self, model_name: str = "ExcitInhibitoryplastic", agent_step_size : float = 0.1,
-                 etaexc: float = 2e-4, etainh: float = 8e-4, Ne: int = 4900, Ni: int = 1225,
-                 Nef: int = 1, Nif : int = 1, alpha_i: float = 1, alpha_e: float = 1, we_init: float = 1.0,
-                 wi_init: float = 1.5, sigma_exc: np.array = np.array([0.05, 0.05]),
-                 sigma_inh: np.array = np.array([0.1, 0.1]), ro: float = 1, room_width: float = 10.0,
-                 room_depth: float = 10.0, resolution: int = 100, disable_tqdm: bool = False, **mod_kwargs):
+    def __init__(
+        self,
+        model_name: str = "ExcitInhibitoryplastic",
+        agent_step_size: float = 0.1,
+        etaexc: float = 2e-4,
+        etainh: float = 8e-4,
+        Ne: int = 4900,
+        Ni: int = 1225,
+        Nef: int = 1,
+        Nif: int = 1,
+        alpha_i: float = 1,
+        alpha_e: float = 1,
+        we_init: float = 1.0,
+        wi_init: float = 1.5,
+        sigma_exc: np.array = np.array([0.05, 0.05]),
+        sigma_inh: np.array = np.array([0.1, 0.1]),
+        ro: float = 1,
+        room_width: float = 10.0,
+        room_depth: float = 10.0,
+        resolution: int = 100,
+        disable_tqdm: bool = False,
+        **mod_kwargs,
+    ):
         """
         Refer to Table 1 and Table 2 from the paper for best parameter selection
 

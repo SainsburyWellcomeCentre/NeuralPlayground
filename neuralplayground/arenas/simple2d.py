@@ -1,3 +1,5 @@
+from typing import Union
+
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
@@ -7,7 +9,6 @@ from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from neuralplayground.arenas.arena_core import Environment
 from neuralplayground.plotting.plot_utils import make_plot_trajectories
 from neuralplayground.utils import check_crossing_wall
-from typing import Union
 
 
 class Simple2D(Environment):
@@ -52,8 +53,14 @@ class Simple2D(Environment):
          a measure of the total distance traversed by the agent
     """
 
-    def __init__(self, environment_name: str = "2DEnv", arena_x_limits: Union[list, tuple] = (-10, 10),
-                 arena_y_limits: Union[list, tuple] = (10, 10), agent_step_size: float = 0.5, **env_kwargs):
+    def __init__(
+        self,
+        environment_name: str = "2DEnv",
+        arena_x_limits: Union[list, tuple] = (-10, 10),
+        arena_y_limits: Union[list, tuple] = (10, 10),
+        agent_step_size: float = 0.5,
+        **env_kwargs,
+    ):
         """Initialise the class
 
         Parameters
