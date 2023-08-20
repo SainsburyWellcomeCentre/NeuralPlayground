@@ -44,13 +44,10 @@ class AgentCore(object):
         Restore saved agent
     """
 
-    def __init__(self, agent_name="default_model", **mod_kwargs):
+    def __init__(self, agent_name: str = "default_model", agent_step_size: float = 1.0, **mod_kwargs):
         self.agent_name = agent_name
         self.mod_kwargs = mod_kwargs
-        if "agent_step_size" in mod_kwargs.keys():
-            self.agent_step_size = mod_kwargs["agent_step_size"]
-        else:
-            self.agent_step_size = 1.0
+        self.agent_step_size = agent_step_size
         self.metadata = {"mod_kwargs": mod_kwargs}
         self.obs_history = []
         self.global_steps = 0
