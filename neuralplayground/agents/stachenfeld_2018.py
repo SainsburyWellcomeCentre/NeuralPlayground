@@ -187,7 +187,8 @@ class Stachenfeld2018(AgentCore):
             self.obs_history = [
                 obs,
             ]
-        if not obs.any():
+
+        if len(obs) == 0:
             action = None
         else:
             action = np.random.normal(scale=self.agent_step_size, size=(2,))
