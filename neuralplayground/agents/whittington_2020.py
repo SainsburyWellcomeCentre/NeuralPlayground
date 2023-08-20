@@ -100,6 +100,7 @@ class Whittington2020(AgentCore):
         self.n_actions = len(self.poss_actions)
         self.final_model_input = None
         self.g_rates, self.p_rates = None, None
+        self.correct_model, self.correct_node, self.correct_edge = 0, 0, 0
         self.prev_observations = None
         self.reset()
 
@@ -340,7 +341,7 @@ class Whittington2020(AgentCore):
         # current_dir = os.path.dirname(os.getcwd())
         # while os.path.basename(current_dir) != "examples":
         #     current_dir = os.path.dirname(current_dir)
-        # relative_path = "agent_examples/results_sim"
+        # relative_path = "results_sim"
         # run_path = os.path.join(current_dir, relative_path)
         # run_path = os.path.normpath(run_path)
         # self.logger = utils.make_logger(run_path)
@@ -493,15 +494,17 @@ class Whittington2020(AgentCore):
     def plot_run(self, tem, model_input, environments):
         with torch.no_grad():
             forward = tem(model_input, prev_iter=None)
-        include_stay_still = False
+        include_stay_still = True
         # shiny_envs = [False, False, False, False]
         # env_to_plot = 0
         # shiny_envs if shiny_envs[env_to_plot] else [not shiny_env for shiny_env in shiny_envs]
-        # correct_model, correct_node, correct_edge = analyse.compare_to_agents(
-        #     forward, tem, environments, include_stay_still=include_stay_still
-        # )
-        analyse.zero_shot(forward, tem, environments, include_stay_still=include_stay_still)
-        analyse.location_occupation(forward, tem, environments)
+        self.correct_model, self.correct_node, self.correct_edge = analyse.compare_to_agents(
+            forward, tem, environments, include_stay_still=include_stay_still
+        )
+        acc_p, acc_g, acc_gt = np.mean([[np.mean(a) for a in step.correct()] for step in forward], axis=0)
+        acc_p, acc_g, acc_gt = [a * 100 for a in (acc_p, acc_g, acc_gt)]
+        # self.zero_shot = analyse.zero_shot(forward, tem, environments, include_stay_still=include_stay_still)
+        # analyse.location_occupation(forward, tem, environments)
         self.g_rates, self.p_rates = analyse.rate_map(forward, tem, environments)
         from_acc, to_acc = analyse.location_accuracy(forward, tem, environments)
         return

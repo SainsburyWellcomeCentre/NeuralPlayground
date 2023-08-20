@@ -217,9 +217,9 @@ class DiscreteObjectEnvironment(Environment):
                 action_rev = action
             if normalize_step and np.linalg.norm(action) > 0:
                 action_rev = action_rev / np.linalg.norm(action_rev)
-                new_pos_state = self.state[-1] + [self.agent_step_size * e for e in action_rev]
+                new_pos_state = np.add(self.state[-1], [self.agent_step_size * e for e in action_rev]).tolist()
             else:
-                new_pos_state = self.state[-1] + action_rev
+                new_pos_state = np.add(self.state[-1], action_rev).tolist()
             new_pos_state, valid_action = self.validate_action(
                 self.state[-1], [self.agent_step_size * e for e in action_rev], new_pos_state[:2]
             )
@@ -343,7 +343,7 @@ class DiscreteObjectEnvironment(Environment):
         """
         crossed_wall = False
         for wall in self.wall_list:
-            new_state, crossed = check_crossing_wall(pre_state=pre_state, new_state=new_state, wall=wall)
+            new_state, crossed = check_crossing_wall(pre_state=pre_state, new_state=np.asarray(new_state), wall=wall)
             crossed_wall = crossed or crossed_wall
         return new_state, crossed_wall
 

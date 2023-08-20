@@ -73,7 +73,7 @@ class BatchEnvironment(Environment):
 
         return all_observations, all_states
 
-    def step(self, actions: np.ndarray, normalize_step: bool = False):
+    def step(self, actions: np.ndarray, normalize_step: bool = True):
         """
         Step the environment
         Parameters
@@ -115,7 +115,13 @@ class BatchEnvironment(Environment):
         return all_observations, all_states, all_rewards
 
     def plot_trajectory(
-        self, history_data: list = None, ax=None, return_figure: bool = False, save_path: str = None, plot_every: int = 1
+        self,
+        env_to_plot: int = 0,
+        history_data: list = None,
+        ax=None,
+        return_figure: bool = False,
+        save_path: str = None,
+        plot_every: int = 1,
     ):
         """Plot the Trajectory of the agent in the environment
         Parameters
@@ -135,10 +141,10 @@ class BatchEnvironment(Environment):
         f: matplotlib.figure
             if return_figure parameters is True
         """
-        env = self.environments[0]
+        env = self.environments[env_to_plot]
         # Use or not saved history
         if history_data is None:
-            history_data = [his[0] for his in self.history]
+            history_data = [his[env_to_plot] for his in self.history]
 
         # Generate Figure
         if ax is None:
