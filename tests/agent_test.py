@@ -2,7 +2,8 @@ import numpy as np
 import pytest
 from tqdm import tqdm
 
-from neuralplayground.agents import AgentCore, Stachenfeld2018, Weber2018, Whittington2020
+from neuralplayground.agents import AgentCore, Stachenfeld2018, Weber2018
+from neuralplayground.agents.whittington_2020 import Whittington2020
 from neuralplayground.agents.whittington_2020_extras import whittington_2020_parameters as parameters
 from neuralplayground.arenas import BasicSargolini2006, BatchEnvironment, DiscreteObjectEnvironment
 from neuralplayground.experiments import Sargolini2006Data

@@ -7,7 +7,7 @@ import os
 
 import numpy as np
 
-from neuralplayground.agents import Whittington2020
+from neuralplayground.agents.whittington_2020 import Whittington2020
 from neuralplayground.agents.whittington_2020_extras import whittington_2020_parameters as parameters
 from neuralplayground.arenas import BatchEnvironment, DiscreteObjectEnvironment
 from neuralplayground.backend import SingleSim, tem_training_loop
