@@ -94,7 +94,7 @@ class Whittington2020(AgentCore):
         self.use_behavioural_data = mod_kwargs["use_behavioural_data"]
         self.n_envs_save = 4
         self.n_states = [
-            int(self.room_widths[i] * self.room_depths[i] * self.state_densities[i]) for i in range(self.batch_size)
+            int(self.room_widths[i] * self.room_depths[i] * (self.state_densities[i] ** 2)) for i in range(self.batch_size)
         ]
         self.poss_actions = [[0, 0], [0, -1], [1, 0], [0, 1], [-1, 0]]
         self.n_actions = len(self.poss_actions)
@@ -494,12 +494,12 @@ class Whittington2020(AgentCore):
         with torch.no_grad():
             forward = tem(model_input, prev_iter=None)
         include_stay_still = False
-        shiny_envs = [False, False, False, False]
-        env_to_plot = 0
-        shiny_envs if shiny_envs[env_to_plot] else [not shiny_env for shiny_env in shiny_envs]
-        correct_model, correct_node, correct_edge = analyse.compare_to_agents(
-            forward, tem, environments, include_stay_still=include_stay_still
-        )
+        # shiny_envs = [False, False, False, False]
+        # env_to_plot = 0
+        # shiny_envs if shiny_envs[env_to_plot] else [not shiny_env for shiny_env in shiny_envs]
+        # correct_model, correct_node, correct_edge = analyse.compare_to_agents(
+        #     forward, tem, environments, include_stay_still=include_stay_still
+        # )
         analyse.zero_shot(forward, tem, environments, include_stay_still=include_stay_still)
         analyse.location_occupation(forward, tem, environments)
         self.g_rates, self.p_rates = analyse.rate_map(forward, tem, environments)
@@ -568,7 +568,7 @@ class Whittington2020(AgentCore):
         return np.reshape(
             rate_map,
             (
-                int(self.room_widths[0] * np.sqrt(self.state_densities[0])),
-                int(self.room_depths[0] * np.sqrt(self.state_densities[0])),
+                int(self.room_widths[0] * self.state_densities[0]),
+                int(self.room_depths[0] * self.state_densities[0]),
             ),
         )

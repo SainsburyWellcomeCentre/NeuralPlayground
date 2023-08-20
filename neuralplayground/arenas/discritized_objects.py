@@ -217,10 +217,12 @@ class DiscreteObjectEnvironment(Environment):
                 action_rev = action
             if normalize_step and np.linalg.norm(action) > 0:
                 action_rev = action_rev / np.linalg.norm(action_rev)
-                new_pos_state = self.state[-1] + self.agent_step_size * action_rev
+                new_pos_state = self.state[-1] + [self.agent_step_size * e for e in action_rev]
             else:
                 new_pos_state = self.state[-1] + action_rev
-            new_pos_state, valid_action = self.validate_action(self.state[-1], action_rev, new_pos_state[:2])
+            new_pos_state, valid_action = self.validate_action(
+                self.state[-1], [self.agent_step_size * e for e in action_rev], new_pos_state[:2]
+            )
         reward = self.reward_function(action, self.state[-1])  # If you get reward, it should be coded here
         observation = self.make_object_observation(new_pos_state)
         self.state = observation

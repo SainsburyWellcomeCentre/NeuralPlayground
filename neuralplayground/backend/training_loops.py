@@ -104,7 +104,7 @@ def tem_training_loop(agent: AgentCore, env: Environment, n_episode: int, params
         print("Episode: ", i, flush=True)
         while agent.n_walk < params["n_rollout"]:
             actions = agent.batch_act(obs)
-            obs, state, reward = env.step(actions, normalize_step=True)
+            obs, state, reward = env.step(actions, normalize_step=False)
         agent.update()
     return agent, env, training_dict
 

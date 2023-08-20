@@ -62,10 +62,10 @@ arena_y_limits = [
 
 discrete_env_params = {
     "environment_name": "DiscreteObject",
-    "state_density": 1,
+    "state_density": 2,
     "n_objects": params["n_x"],
-    "agent_step_size": 1,
-    "use_behavioural_data": True,
+    "agent_step_size": 0.5,
+    "use_behavioural_data": False,
     "data_path": None,
     "experiment_class": Sargolini2006Data,
 }
@@ -79,6 +79,7 @@ env_params = {
     "arg_env_params": discrete_env_params,
 }
 
+state_densities = [discrete_env_params["state_density"] for _ in range(env_params["batch_size"])]
 if discrete_env_params["use_behavioural_data"]:
     arena_x_limits = [[-50, 50] for _ in range(env_params["batch_size"])]
     arena_y_limits = [[-50, 50] for _ in range(env_params["batch_size"])]
