@@ -99,7 +99,7 @@ agent_params = {
 }
 
 # Full model training consists of 20000 episodes
-training_loop_params = {"n_episode": 10, "params": full_agent_params}
+training_loop_params = {"n_episode": 3, "params": full_agent_params}
 
 sim = SingleSim(
     simulation_id=simulation_id,

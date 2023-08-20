@@ -12,6 +12,7 @@ import torch
 import neuralplayground.agents.whittington_2020_extras.whittington_2020_analyse as analyse
 import neuralplayground.agents.whittington_2020_extras.whittington_2020_model as model
 import neuralplayground.agents.whittington_2020_extras.whittington_2020_parameters as parameters
+import neuralplayground.agents.whittington_2020_extras.whittington_2020_utils as utils
 
 # Custom modules
 from neuralplayground.plotting.plot_utils import make_plot_rate_map
@@ -220,10 +221,8 @@ class Whittington2020(AgentCore):
         # Convert action vectors to action values
         action_values = self.step_to_actions(actions)
         self.walk_action_values.append(action_values)
-        if self.iter == 1:
-            print("halt")
         # Get start time for function timing
-        time.time()
+        start_time = time.time()
         # Get updated parameters for this backprop iteration
         (
             self.eta_new,
@@ -287,27 +286,27 @@ class Whittington2020(AgentCore):
         # Compute model accuracies
         acc_p, acc_g, acc_gt = np.mean([[np.mean(a) for a in step.correct()] for step in forward], axis=0)
         acc_p, acc_g, acc_gt = [a * 100 for a in (acc_p, acc_g, acc_gt)]
-        # # Log progress
-        # if self.iter % 10 == 0:
-        #     # Write series of messages to logger from this backprop iteration
-        #     self.logger.info("Finished backprop iter {:d} in {:.2f} seconds.".format(self.iter, time.time() - start_time))
-        #     self.logger.info(
-        #         "Loss: {:.2f}. <p_g> {:.2f} <p_x> {:.2f} <x_gen> {:.2f} <x_g> {:.2f} <x_p> {:.2f} <g> {:.2f} \
-        #             <reg_g> {:.2f} <reg_p> {:.2f}".format(
-        #             loss.detach().numpy(), *plot_loss
-        #         )
-        #     )
-        #     self.logger.info("Accuracy: <p> {:.2f}% <g> {:.2f}% <gt> {:.2f}%".format(acc_p, acc_g, acc_gt))
-        #     self.logger.info(
-        #         "Parameters: <max_hebb> {:.2f} <eta> {:.2f} <lambda> {:.2f} <p2g_scale_offset> {:.2f}".format(
-        #             np.max(np.abs(self.prev_iter[0].M[0].numpy())),
-        #             self.tem.hyper["eta"],
-        #             self.tem.hyper["lambda"],
-        #             self.tem.hyper["p2g_scale_offset"],
-        #         )
-        #     )
-        #     self.logger.info("Weights:" + str([w for w in loss_weights.numpy()]))
-        #     self.logger.info(" ")
+        # Log progress
+        if self.iter % 10 == 0:
+            # Write series of messages to logger from this backprop iteration
+            self.logger.info("Finished backprop iter {:d} in {:.2f} seconds.".format(self.iter, time.time() - start_time))
+            self.logger.info(
+                "Loss: {:.2f}. <p_g> {:.2f} <p_x> {:.2f} <x_gen> {:.2f} <x_g> {:.2f} <x_p> {:.2f} <g> {:.2f} \
+                    <reg_g> {:.2f} <reg_p> {:.2f}".format(
+                    loss.detach().numpy(), *plot_loss
+                )
+            )
+            self.logger.info("Accuracy: <p> {:.2f}% <g> {:.2f}% <gt> {:.2f}%".format(acc_p, acc_g, acc_gt))
+            self.logger.info(
+                "Parameters: <max_hebb> {:.2f} <eta> {:.2f} <lambda> {:.2f} <p2g_scale_offset> {:.2f}".format(
+                    np.max(np.abs(self.prev_iter[0].M[0].numpy())),
+                    self.tem.hyper["eta"],
+                    self.tem.hyper["lambda"],
+                    self.tem.hyper["p2g_scale_offset"],
+                )
+            )
+            self.logger.info("Weights:" + str([w for w in loss_weights.numpy()]))
+            self.logger.info(" ")
         # # Also store the internal state (all learnable parameters) and the hyperparameters periodically
         # if self.iter % self.pars["save_interval"] == 0:
         #     torch.save(self.tem.state_dict(), self.model_path + "/tem_" + str(self.iter) + ".pt")
@@ -338,13 +337,10 @@ class Whittington2020(AgentCore):
         # # Create a tensor board to stay updated on training progress. Start tensorboard with tensorboard --logdir=runs
         # self.writer = SummaryWriter(self.train_path)
         # Create a logger to write log output to file
-        # current_dir = os.path.dirname(os.getcwd())
-        # while os.path.basename(current_dir) != "examples":
-        #     current_dir = os.path.dirname(current_dir)
-        # relative_path = "results_sim"
-        # run_path = os.path.join(current_dir, relative_path)
-        # run_path = os.path.normpath(run_path)
-        # self.logger = utils.make_logger(run_path)
+        current_dir = os.path.dirname(os.getcwd())
+        run_path = os.path.join(current_dir, 'NeuralPlayground', 'examples', 'agent_examples', 'results_sim')
+        run_path = os.path.normpath(run_path)
+        self.logger = utils.make_logger(run_path)
         # Make an ADAM optimizer for TEM
         self.adam = torch.optim.Adam(self.tem.parameters(), lr=self.pars["lr_max"])
         # Initialise whether a state has been visited for each world
