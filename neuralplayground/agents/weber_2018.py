@@ -79,7 +79,12 @@ class Weber2018(AgentCore):
         Plot current rates and an example of inhibitory and excitatory neuron
     """
 
-    def __init__(self, model_name: str = "ExcitInhibitoryplastic", **mod_kwargs):
+    def __init__(self, model_name: str = "ExcitInhibitoryplastic", agent_step_size : float = 0.1,
+                 etaexc: float = 2e-4, etainh: float = 8e-4, Ne: int = 4900, Ni: int = 1225,
+                 Nef: int = 1, Nif : int = 1, alpha_i: float = 1, alpha_e: float = 1, we_init: float = 1.0,
+                 wi_init: float = 1.5, sigma_exc: np.array = np.array([0.05, 0.05]),
+                 sigma_inh: np.array = np.array([0.1, 0.1]), ro: float = 1, room_width: float = 10.0,
+                 room_depth: float = 10.0, resolution: int = 100, disable_tqdm: bool = False, **mod_kwargs):
         """
         Refer to Table 1 and Table 2 from the paper for best parameter selection
 
@@ -87,8 +92,7 @@ class Weber2018(AgentCore):
         ----------
         model_name : str
             Name of the specific instantiation of the ExcInhPlasticity class
-        mod_kwargs : dict
-            Dictionary with parameters of the model from Weber and Sprekeler 2018
+        Parameters of the model from Weber and Sprekeler 2018
             https://doi.org/10.7554/eLife.34560.001
             agent_step_size: float
                 Size of movement by the agent within the environment
@@ -124,40 +128,30 @@ class Weber2018(AgentCore):
                 room depth specified by the environment (see examples/testing_weber_model.ipynb)
 
         """
+        mod_kwargs["agent_step_size"] = agent_step_size
         super().__init__(model_name, **mod_kwargs)
-        self.agent_step_size = mod_kwargs["agent_step_size"]
+        self.agent_step_size = agent_step_size
         self.metadata = {"mod_kwargs": mod_kwargs}
-        self.etaexc = mod_kwargs["exc_eta"]
-        self.etainh = mod_kwargs["inh_eta"]
-        self.Ne = mod_kwargs["Ne"]
-        self.Ni = mod_kwargs["Ni"]
-        self.Nef = mod_kwargs["Nef"]
-        self.Nif = mod_kwargs["Nif"]
-        self.alpha_i = mod_kwargs["alpha_i"]
-        self.alpha_e = mod_kwargs["alpha_e"]
-        self.we_init = mod_kwargs["we_init"]
-        self.wi_init = mod_kwargs["wi_init"]
+        self.etaexc = etaexc
+        self.etainh = etainh
+        self.Ne = Ne
+        self.Ni = Ni
+        self.Nef = Nef
+        self.Nif = Nif
+        self.alpha_i = alpha_i
+        self.alpha_e = alpha_e
+        self.we_init = we_init
+        self.wi_init = wi_init
+        self.sigma_exc = sigma_exc
+        self.sigma_inh = sigma_inh
+        self.resolution = resolution
+        self.disable_tqdm = disable_tqdm
+        self.room_width = room_width
+        self.room_depth = room_depth
+        self.ro = ro
 
-        self.sigma_exc = mod_kwargs["sigma_exc"]
-        self.sigma_inh = mod_kwargs["sigma_inh"]
-        if "resolution" in mod_kwargs.keys():
-            self.resolution = mod_kwargs["resolution"]
-        else:
-            self.resolution = 50
-        if "disable_tqdm" in mod_kwargs.keys():
-            self.disable_tqdm = mod_kwargs["disable_tqdm"]
-        else:
-            self.disable_tqdm = False
-
-        self.room_width, self.room_depth = (
-            mod_kwargs["room_width"],
-            mod_kwargs["room_depth"],
-        )
-        self.ro = mod_kwargs["ro"]
         self.obs_history = []  # Initialize observation history to update weights later
         self.grad_history = []
-
-        self.resolution = 100  # Number of pixels in the grid for the tuning functions
 
         self.resolution_width = self.resolution
         self.resolution_depth = int(self.resolution * (self.room_depth / self.room_width))

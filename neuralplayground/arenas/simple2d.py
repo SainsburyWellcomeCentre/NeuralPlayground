@@ -7,6 +7,7 @@ from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from neuralplayground.arenas.arena_core import Environment
 from neuralplayground.plotting.plot_utils import make_plot_trajectories
 from neuralplayground.utils import check_crossing_wall
+from typing import Union
 
 
 class Simple2D(Environment):
@@ -51,33 +52,29 @@ class Simple2D(Environment):
          a measure of the total distance traversed by the agent
     """
 
-    def __init__(self, environment_name: str = "2DEnv", **env_kwargs):
+    def __init__(self, environment_name: str = "2DEnv", arena_x_limits: Union[list, tuple] = (-10, 10),
+                 arena_y_limits: Union[list, tuple] = (10, 10), agent_step_size: float = 0.5, **env_kwargs):
         """Initialise the class
 
         Parameters
         ----------
-        env_kwargs: dict
-        Dictionary with parameters of the experiment of the children class
-            time_step_size: float
-                time_step_size * global_steps will give a measure of the time in the experimental setting
-            agent_step_size: float
-                Step size used when the action is a direction in x,y coordinate (normalize false in step())
-                Agent_step_size * global_step_number will give a measure of the distance in the experimental setting
-            arena_x_limits: float
-                Size of the environment in the x direction
-            arena_y_limits: float
-                Size of the environment in the y direction
-
         environment_name: str
             Name of the specific instantiation of the Simple2D class
-
+        time_step_size: float
+            time_step_size * global_steps will give a measure of the time in the experimental setting
+        agent_step_size: float
+            Step size used when the action is a direction in x,y coordinate (normalize false in step())
+            Agent_step_size * global_step_number will give a measure of the distance in the experimental setting
+        arena_x_limits: float
+            Size of the environment in the x direction
+        arena_y_limits: float
+            Size of the environment in the y direction
         """
         super().__init__(environment_name, **env_kwargs)
         self.metadata = {"env_kwargs": env_kwargs}
-        self.arena_x_limits, self.arena_y_limits = (
-            env_kwargs["arena_x_limits"],
-            env_kwargs["arena_y_limits"],
-        )
+        self.arena_x_limits = arena_x_limits
+        self.arena_y_limits = arena_y_limits
+        self.agent_step_size = agent_step_size
         self.arena_limits = np.array(
             [
                 [self.arena_x_limits[0], self.arena_x_limits[1]],
@@ -98,7 +95,6 @@ class Simple2D(Environment):
             high=np.array((np.inf, np.inf)),
             dtype=np.float64,
         )
-        self.agent_step_size = env_kwargs["agent_step_size"]
         self.state_dims_labels = ["x_pos", "y_pos"]
 
         self._create_default_walls()

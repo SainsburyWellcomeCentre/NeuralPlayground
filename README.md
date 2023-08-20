@@ -157,7 +157,9 @@ This process is the base of our package. We provide a more detailed example in <
 Also, specific examples of how to use each module can be found in [agent](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples/agent_examples),
 [arena](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/arena_examples/arena_examples.ipynb) 
 and [experiment](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/experimental_examples/experimental_data_examples.ipynb) jupyter notebooks.
-<strong>Check our Tolman-Eichenbaum Machine Implementation in
+> **Note**
+> 
+> Check our Tolman-Eichenbaum Machine Implementation in
 [this branch](https://github.com/ClementineDomine/NeuralPlayground/tree/whittington_2020) (work in progress), you will also need to install [pytorch](https://pytorch.org/) ro run it.</strong>
 
 ### Simulation Manager
