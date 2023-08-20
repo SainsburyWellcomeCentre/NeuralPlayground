@@ -332,7 +332,7 @@ class Weber2018(AgentCore):
 
         if pos is None:
             pos = self.obs_history[-1]
-        if not pos.any():
+        if len(pos) == 0:
             pass
         else:
             r_out = self.get_output_rates(pos)

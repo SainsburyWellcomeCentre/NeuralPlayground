@@ -72,7 +72,7 @@ class AgentCore(object):
             action value which in this case is random number draw from a Gaussian
         """
 
-        if not obs.any():
+        if len(obs) == 0:
             action = None
         else:
             action = np.random.normal(scale=self.agent_step_size, size=(2,))
