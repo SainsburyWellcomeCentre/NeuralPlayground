@@ -201,6 +201,7 @@ def make_logger(run_path):
     # Remove anly existing handlers so you don't output to old files, or to new files twice
     logger.handlers = []
     # Create a file handler, but only if the handler does
+    os.makedirs(run_path, exist_ok=True)
     log_file_path = os.path.join(run_path, "run.log")
     handler = logging.FileHandler(log_file_path)
     handler.setLevel(logging.INFO)
