@@ -225,12 +225,12 @@ class DiscreteObjectEnvironment(Environment):
         self.state = observation
         self.transition = {
             "action": action,
-            "state": self.old_state,
-            "next_state": self.state,
+            "state": self.old_state[-1],
+            "next_state": self.state[-1],
             "reward": reward,
             "step": self.global_steps,
         }
-        # self.history.append(transition)
+        self.history.append(self.transition)
         self._increase_global_step()
         return observation, self.state, reward
 
