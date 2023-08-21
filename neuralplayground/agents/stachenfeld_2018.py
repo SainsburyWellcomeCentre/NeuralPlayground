@@ -81,7 +81,18 @@ class Stachenfeld2018(AgentCore):
         Plot the matrix and the 4 largest modes of its eigen-decomposition
     """
 
-    def __init__(self, agent_name: str = "SR", **mod_kwargs):
+    def __init__(
+        self,
+        agent_name: str = "SR",
+        discount: float = 0.9,
+        threshold: float = 1e-6,
+        lr_td: float = 1e-2,
+        room_width: float = 12,
+        room_depth: float = 12,
+        state_density: float = 1.0,
+        twoD: bool = True,
+        **mod_kwargs,
+    ):
         """
         Parameters
         ----------
@@ -108,13 +119,13 @@ class Stachenfeld2018(AgentCore):
         self.obs_history = []  # Initialize observation history to update weights later
         self.grad_history = []
 
-        self.gamma = mod_kwargs["discount"]
-        self.threshold = mod_kwargs["threshold"]
-        self.learning_rate = mod_kwargs["lr_td"]
-        self.room_width = mod_kwargs["room_width"]
-        self.room_depth = mod_kwargs["room_depth"]
-        self.state_density = mod_kwargs["state_density"]
-        twoD = mod_kwargs["twoD"]
+        self.gamma = discount
+        self.threshold = threshold
+        self.learning_rate = lr_td
+        self.room_width = room_width
+        self.room_depth = room_depth
+        self.state_density = state_density
+        twoD = twoD
         self.initial_obs_variable = None
         self.reset()
         # Variables for the SR-agent state space
