@@ -9,7 +9,7 @@
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 # NeuralPlayground 
-## *The  standardised environment for the hippocampus and entorhinal cortex models.* <a href="https://githubtocolab.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/colab_example.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
+## *A standardised environment for the hippocampus and entorhinal cortex models.* <a href="https://githubtocolab.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/colab_example.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
 
 <img src="images/NPG_GH-social-preview_white-bg.jpg" alt="NeuralPlayground Logo" width="500"/>
 
