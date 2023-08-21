@@ -2,7 +2,8 @@ import numpy as np
 import pytest
 
 import neuralplayground.agents.whittington_2020_extras.whittington_2020_parameters as parameters
-from neuralplayground.agents import RandomAgent, Whittington2020
+from neuralplayground.agents import RandomAgent
+from neuralplayground.agents.whittington_2020 import Whittington2020
 from neuralplayground.arenas import (
     BatchEnvironment,
     ConnectedRooms,
