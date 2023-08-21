@@ -14,22 +14,18 @@
 <img src="images/NPG_GH-social-preview_white-bg.jpg" alt="NeuralPlayground Logo" width="500"/>
 
 <!-- TOC -->
-
-- [NeuralPlayground](#neuralplayground)
-  - [Introduction](#introduction)
-  - [Installation](#installation)
-    - [Create a conda environment](#create-a-conda-environment)
-    - [Pip install](#pip-install)
-    - [Install for development](#install-for-development)
-  - [Usage](#usage)
-      - [How to run a single module](#how-to-run-a-single-module)
-      - [How to run interactions between modules](#how-to-run-interactions-between-modules)
-      - [How to run comparisons](#how-to-run-comparisons)
-  - [I want to contribute](#i-want-to-contribute)
-  - [Cite](#cite)
-  - [License](#license)
-  - [Contributors](#contributors)
-
+- [Introduction](#introduction)
+- [Installation](#installation)
+  - [Create a conda environment](#create-a-conda-environment)
+  - [Pip install](#pip-install)
+  - [Install for development](#install-for-development)
+- [Usage](#usage)
+  - [Agent Arena interaction](#agent-arena-interaction)
+  - [Simulation Manager](#simulation-manager)
+- [I want to contribute](#i-want-to-contribute)
+- [Cite](#cite)
+- [License](#license)
+- [Contributors](#contributors)
 <!-- /TOC -->
 
 ## Introduction
