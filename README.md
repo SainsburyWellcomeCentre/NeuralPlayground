@@ -10,10 +10,13 @@
 
 # NeuralPlayground 
 
+
 ## *A standardised environment for the hippocampus and entorhinal cortex models.* <a href="https://githubtocolab.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/colab_example.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
 
 
+
 <img src="images/NPG_GH-social-preview_white-bg.jpg" alt="NeuralPlayground Logo" width="500"/>
+
 
 <!-- TOC -->
 - [Introduction](#introduction)
@@ -123,7 +126,7 @@ understanding of the HEC mechanisms. We follow reproducible, inclusive, and coll
 All relevant documents can be found in [Documents](https://github.com/ClementineDomine/NeuralPlayground/blob/main/documents/).
 
 ### Agent Arena interaction
-<<<<<<< HEAD
+
 
 You can pick an Agent, an Arena of your choice to run a simulation.
 arenas and simulations have a simple interface to interact with each other as in [OpenAI gymnasium](https://gymnasium.farama.org/).
@@ -184,7 +187,8 @@ folder with the name you provide, keeping track of any errors and logs. You can 
 to run multiple simulations at once, save the results, keep run of each run and possible errors for easy debugging, and other functions.
 
 ```python
-=======
+
+
 
 You can pick an Agent, an Arena of your choice to run a simulation.
 arenas and simulations have a simple interface to interact with each other as in [OpenAI gymnasium](https://gymnasium.farama.org/).
@@ -245,7 +249,7 @@ folder with the name you provide, keeping track of any errors and logs. You can 
 to run multiple simulations at once, save the results, keep run of each run and possible errors for easy debugging, and other functions.
 
 ```python
->>>>>>> main
+
 # Import Simulation Manager
 from neuralplayground.backend import SimulationManager
 
