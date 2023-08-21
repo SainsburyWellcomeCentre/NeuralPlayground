@@ -15,7 +15,7 @@ from neuralplayground.experiments import Sargolini2006Data
 
 # Set the location for saving the results of the simulation
 simulation_id = "TEM_custom_sim"
-save_path = os.path.join(os.getcwd(), "examples", "agent_examples", "results_sim")
+save_path = os.path.join(os.getcwd(), "results_sim")
 # save_path = os.path.join(os.getcwd(), "examples", "agent_examples", "trained_results")
 agent_class = Whittington2020
 env_class = BatchEnvironment
@@ -65,9 +65,9 @@ arena_y_limits = [
 # Set parameters for the environment that generates observations
 discrete_env_params = {
     "environment_name": "DiscreteObject",
-    "state_density": 2,
+    "state_density": 1,
     "n_objects": params["n_x"],
-    "agent_step_size": 0.5,
+    "agent_step_size": 1,
     "use_behavioural_data": False,
     "data_path": None,
     "experiment_class": Sargolini2006Data,
@@ -105,7 +105,7 @@ agent_params = {
 }
 
 # Full model training consists of 20000 episodes
-training_loop_params = {"n_episode": 3, "params": full_agent_params}
+training_loop_params = {"n_episode": 10, "params": full_agent_params}
 
 # Create the training simulation object
 sim = SingleSim(

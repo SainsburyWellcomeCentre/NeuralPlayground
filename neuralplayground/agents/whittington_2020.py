@@ -338,7 +338,7 @@ class Whittington2020(AgentCore):
         # self.writer = SummaryWriter(self.train_path)
         # Create a logger to write log output to file
         current_dir = os.path.dirname(os.getcwd())
-        run_path = os.path.join(current_dir, "NeuralPlayground", "examples", "agent_examples", "results_sim")
+        run_path = os.path.join(current_dir, "agent_examples", "results_sim")
         run_path = os.path.normpath(run_path)
         self.logger = utils.make_logger(run_path)
         # Make an ADAM optimizer for TEM
