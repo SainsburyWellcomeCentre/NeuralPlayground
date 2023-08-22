@@ -29,7 +29,8 @@ load the experimental data automatically and have some extra methods to plot and
 from the corresponding experiments. These classes are [Hafting2008](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/arenas/hafting_2008.py),
 [Sargolini2006](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/arenas/sargolini_2006.py)
 and [Wernle2018](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/arenas/wernle_2018.py) where the arena change throughout the experiment.
-3. Also included are `batch_environment` and the `discretized_objects` environment. These offer the ablity to run multiple agents simultaneously (in a batch) and generate sequences of discrete state transitions instead of continuous trajectories, respectively. This requires an agent that also generates batches of actions, and so these are both currently only used by the [Tolman-Eichenbaum machine](../agents/whittington_2020.py) agent.
+3. Also included is the [discretized_objects](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/arenas/discritized_objects.py) environment. This offers the ablity to generate sequences of discrete state transitions instead of continuous trajectories, returning state indices and one-hot objects from each state in the environment. Additional parameters are required to run this agent, including `n_objects` and `state_density`.
+4. A [batch_environment](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/arenas/batch_environment.py) class is also provided, enabling any 2D environment class to be run as part of a batch and thus to run multiple environments at once. This, however, requires an agent that also generates batches of actions, and so this class is currently only used by the [Tolman-Eichenbaum machine](../agents/whittington_2020.py) agent.
 
 ## 3. How-to-Contribute
 
