@@ -188,7 +188,8 @@ def render_mpl_table(data, ax=None, **kwargs):
     return ax.get_figure(), ax
 
 
-def make_agent_comparison(envs, parameters, agents, exps=None, recording_index=None, tetrode_id=None, GridScorer=None):
+def make_agent_comparison(envs, parameters, agents, exps=None, recording_index=None, tetrode_id=None, GridScorer=None,
+                          figsize=None, horizontal_axis_spacing=None, vertical_axis_spacing=None):
     """Plot function to compare agents in a given environment
 
     Parameters
@@ -214,7 +215,15 @@ def make_agent_comparison(envs, parameters, agents, exps=None, recording_index=N
     ax: mpl.axes._subplots.AxesSubplot (matplotlib axis from subplots)
         Modified axis where the comparison is plotted
     """
+    from neuralplayground.config import PLOT_CONFIG
     config_vars = PLOT_CONFIG.AGENT_COMPARISON
+    if figsize is not None:
+        config_vars.FIGSIZE = figsize
+    if horizontal_axis_spacing is not None:
+        config_vars.HORIZONTAL_AXIS_SPACING = horizontal_axis_spacing
+    if vertical_axis_spacing is not None:
+        config_vars.VERTICAL_AXIS_SPACING = vertical_axis_spacing
+
     exp_data = False
     for j, env in enumerate(envs):
         if hasattr(env, "show_data"):
@@ -236,27 +245,32 @@ def make_agent_comparison(envs, parameters, agents, exps=None, recording_index=N
     else:
         if exp_data:
             f, ax = plt.subplots(
-                5, len(agents) + len(envs), figsize=(config_vars.FIGSIZE[0] * (len(agents) + 1), config_vars.FIGSIZE[1])
+                5, len(agents) + len(envs),
+                figsize=(config_vars.FIGSIZE[0] * (len(agents) + 1), config_vars.FIGSIZE[1])
             )
         else:
             f, ax = plt.subplots(
-                3, len(agents) + len(envs), figsize=(config_vars.FIGSIZE[0] * (len(agents) + 1), config_vars.FIGSIZE[1])
+                3, len(agents) + len(envs),
+                figsize=(config_vars.FIGSIZE[0] * (len(agents) + 1), config_vars.FIGSIZE[1])
             )
+
+    plt.subplots_adjust(wspace=config_vars.HORIZONTAL_AXIS_SPACING)
+    plt.subplots_adjust(hspace=config_vars.VERTICAL_AXIS_SPACING)
 
     for k, env in enumerate(envs):
         # render_mpl_table( pd.DataFrame([parameters[0]["env_params"]]),ax=ax[0, k],)
-        ax[0, k].text(0, 1.1, env.environment_name, fontsize=config_vars.FONTSIZE)
+        ax[0, k].text(0, 1.1, env.environment_name, fontsize=config_vars.TEXT_FONTSIZE)
         ax[0, k].set_axis_off()
         for p, text in enumerate(parameters[k]["env_params"]):
-            ax[0, k].text(0, 1, "Event param", fontsize=10)
+            ax[0, k].text(0, 1, "Env param", fontsize=config_vars.TEXT_FONTSIZE)
             variable = parameters[k]["env_params"][text]
-            ax[0, k].text(0, 0.9 - ((p) * 0.1), text + ": " + str(variable), fontsize=10)
+            ax[0, k].text(0, 0.9 - ((p) * 0.1), text + ": " + str(variable), fontsize=config_vars.TEXT_FONTSIZE)
             ax[0, k].set_axis_off()
 
         if hasattr(env, "plot_trajectory"):
             env.plot_trajectory(ax=ax[1, k])
         else:
-            ax[1, k].text(0, 1, "No Trajectory map", fontsize=10)
+            ax[1, k].text(0, 1, "No Trajectory map", fontsize=config_vars.TEXT_FONTSIZE)
             ax[1, k].set_axis_off()
 
         if hasattr(env, "show_data"):
@@ -282,12 +296,14 @@ def make_agent_comparison(envs, parameters, agents, exps=None, recording_index=N
         for j, text in enumerate(parameters[i]["agent_params"]):
             if j > 9:
                 variable = parameters[i]["agent_params"][text]
-                ax[0, i + k + 1].text(0.7, 1 - ((j - 9) * 0.1), text + ": " + str(variable), fontsize=10)
+                ax[0, i + k + 1].text(0.6, 1 - ((j - 9) * 0.1),
+                                      text + ": " + str(variable), fontsize=config_vars.TEXT_FONTSIZE)
                 ax[0, i + k + 1].set_axis_off()
             else:
-                ax[0, i + k + 1].text(0, 1, "Agent param", fontsize=10)
+                ax[0, i + k + 1].text(0, 1, "Agent param", fontsize=config_vars.TEXT_FONTSIZE)
                 variable = parameters[i]["agent_params"][text]
-                ax[0, i + k + 1].text(0, 0.9 - ((j) * 0.1), text + ": " + str(variable), fontsize=10)
+                ax[0, i + k + 1].text(0, 0.9 - ((j) * 0.1),
+                                      text + ": " + str(variable), fontsize=config_vars.TEXT_FONTSIZE)
                 ax[0, i + k + 1].set_axis_off()
         if hasattr(agent, "plot_rate_map"):
             agent.plot_rate_map(ax=ax[1][1 + i + k])
@@ -296,7 +312,7 @@ def make_agent_comparison(envs, parameters, agents, exps=None, recording_index=N
                 r_out_im=agent.get_rate_map_matrix(), plot=config_vars.PLOT_SAC_AGT, ax=ax[2, 1 + i + k]
             )
         else:
-            ax[1, i + k + 1].text(0, 1, "No Rate map", fontsize=10)
+            ax[1, i + k + 1].text(0, 1, "No Rate map", fontsize=config_vars.TEXT_FONTSIZE)
             ax[1][i + k + 1].set_axis_off()
             ax[2][i + k + 1].set_axis_off()
             # render_mpl_table(data=pd.DataFrame([parameters[i]["agent_params"]]), ax=ax[0, 1 + i + k])

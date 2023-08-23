@@ -9,6 +9,28 @@ from gymnasium import Env, spaces
 
 class Environment(Env):
     """Abstract parent environment class
+
+    Attributes
+    ----------
+    history: list
+        list containing transition history
+    time_step_size: float
+        time step in second traverse when calling step method
+    metadata: dict
+        dictionary with extra metadata that might be available in other classes
+    state: array
+        Empty array for this abstract class
+    env_kwags: dict
+        Arguments given to the init method
+    global_steps: int
+        number of calls to step method, set to 0 when calling reset
+    global_time: float
+        time simulating environment through step method, then global_time = time_step_size * global_steps
+    observation_space: gym.spaces
+        specify the range of observations as in openai gym
+    action_space: gym.spaces
+        specify the range of actions as in openai gym
+
     Methods
     ----------
     __init__(self, environment_name: str = "Environment", **env_kwargs):
@@ -26,27 +48,9 @@ class Environment(Env):
         Restore environment saved using save_environment method
     get_trajectory_data(self):
         Returns interaction history
-
-    Attributes
-    ----------
-    state: array
-        Empty array for this abstract class
-    history: list
-        list containing transition history
-    time_step_size: float
-        time step in second traverse when calling step method
-    metadata: dict
-        dictionary with extra metadata that might be available in other classes
-    env_kwags: dict
-        Arguments given to the init method
-    global_steps: int
-        number of calls to step method, set to 0 when calling reset
-    global_time: float
-        time simulating environment through step method, then global_time = time_step_size * global_steps
-    observation_space: gym.spaces
-        specify the range of observations as in openai gym
-    action_space: gym.spaces
-        specify the range of actions as in openai gym
+    reward_function(self, action, state):
+        Reward curriculum as a function of action, state
+        and attributes of the environment
     """
 
     def __init__(self, environment_name: str = "Environment", time_step_size: float = 1.0, **env_kwargs):
@@ -190,8 +194,8 @@ class Environment(Env):
         return self.history
 
     def reward_function(self, action, state):
-        """Code reward curriculum here as a function of action and state
-        and attributes of the environment if you want
+        """Reward curriculum as a function of action, state
+        and attributes of the environment
 
         Parameters
         ----------
