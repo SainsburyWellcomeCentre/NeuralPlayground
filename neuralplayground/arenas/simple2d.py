@@ -13,20 +13,6 @@ from neuralplayground.utils import check_crossing_wall
 
 class Simple2D(Environment):
     """
-    Methods (Some in addition to Environment class)
-    ----------
-    __init__(self, environment_name="2DEnv", **env_kwargs):
-        Initialise the class
-    reset(self):
-        Reset the environment variables
-    step(self, action):
-        Increment the global step count of the agent in the environment and moves
-        the agent in a random direction with a fixed step size
-    plot_trajectory(self, history_data=None, ax=None):
-        Plot the Trajectory of the agent in the environment. In addition to environment class.
-    _create_default_walls(self):
-        Generates outer border of the 2D environment based on the arena limits
-
     Attributes (Some in addition to the Environment class)
     ----------
     state: ndarray
@@ -51,6 +37,20 @@ class Simple2D(Environment):
     agent_step_size: float
          Size of the step when executing movement, agent_step_size*global_steps will give
          a measure of the total distance traversed by the agent
+
+    Methods (Some in addition to Environment class)
+    ----------
+    __init__(self, environment_name="2DEnv", **env_kwargs):
+        Initialise the class
+    reset(self):
+        Reset the environment variables
+    step(self, action):
+        Increment the global step count of the agent in the environment and moves
+        the agent in a random direction with a fixed step size
+    plot_trajectory(self, history_data=None, ax=None):
+        Plot the Trajectory of the agent in the environment. In addition to environment class.
+    _create_default_walls(self):
+        Generates outer border of the 2D environment based on the arena limits
     """
 
     def __init__(

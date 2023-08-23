@@ -9,26 +9,10 @@ from gymnasium import Env, spaces
 
 class Environment(Env):
     """Abstract parent environment class
-    Methods
-    ----------
-    __init__(self, environment_name: str = "Environment", **env_kwargs):
-        Initialize the class. env_kwargs arguments are specific for each of the child environments and
-        described in their respective class
-    make_observation(self):
-        Returns the current state of the environment
-    step(self, action):
-        Runs the environment dynamics. Given some action, return observation, new state and reward.
-    reset(self):
-        Re-initialize state and global counters. Returns observation and re-setted state
-    save_environment(self, save_path: str):
-        Save current variables of the object to re-instantiate the environment later
-    restore_environment(self, save_path: str):
-        Restore environment saved using save_environment method
-    get_trajectory_data(self):
-        Returns interaction history
-
     Attributes
     ----------
+    environment_name : str
+        Name of the specific instantiation of the environment class
     state: array
         Empty array for this abstract class
     history: list
@@ -47,6 +31,24 @@ class Environment(Env):
         specify the range of observations as in openai gym
     action_space: gym.spaces
         specify the range of actions as in openai gym
+
+    Methods
+    ----------
+    __init__(self, environment_name: str = "Environment", **env_kwargs):
+        Initialize the class. env_kwargs arguments are specific for each of the child environments and
+        described in their respective class
+    make_observation(self):
+        Returns the current state of the environment
+    step(self, action):
+        Runs the environment dynamics. Given some action, return observation, new state and reward.
+    reset(self):
+        Re-initialize state and global counters. Returns observation and re-setted state
+    save_environment(self, save_path: str):
+        Save current variables of the object to re-instantiate the environment later
+    restore_environment(self, save_path: str):
+        Restore environment saved using save_environment method
+    get_trajectory_data(self):
+        Returns interaction history
     """
 
     def __init__(self, environment_name: str = "Environment", time_step_size: float = 1.0, **env_kwargs):
@@ -102,7 +104,7 @@ class Environment(Env):
         self.state:
             Define within each subclass for specific environments
             Variable containing the state of the environment (eg.position in the environment)
-        reward: int
+        reward: float
             The reward that the animal receives in this state transition
         """
         observation = self.make_observation()  # Build sensory info from current state
@@ -159,15 +161,15 @@ class Environment(Env):
         else:
             pickle.dump(self.__dict__, open(os.path.join(save_path), "wb"), pickle.HIGHEST_PROTOCOL)
 
-    def restore_environment(self, save_path: str):
+    def restore_environment(self, restore_path: str):
         """Restore environment saved using save_environment method
 
         Parameters
         ----------
-        save_path: str
+        restore_path: str
             Path to retrieve the environment saved using save_environment method (raw_object=False)
         """
-        self.__dict__ = pd.read_pickle(save_path)
+        self.__dict__ = pd.read_pickle(restore_path)
 
     def __eq__(self, other):
         """Check if two environments are equal by comparing all of its attributes
