@@ -26,7 +26,7 @@ model_manager = pooch.create(
         "stachenfeld_2018_in_hafting2008.zip": "960cdc8d4fa9ef86ed1d5ef144fe6949d227c081b837ae24e49335bdaf971899",  # noqa: E501
         "weber_2018_in_wernle.zip": "51f701966229ba8a70aab7b7ce79f4965e80904661eb6cdad85d03b0ddb7f8ff",  # noqa: E501
         "weber_2018_in_merging_room.zip": "10c537bc1d410de1bba18fe36624501bc4caddc0a032f3889a39435256a0205c",  # noqa: E501
-        "whittington_2020_in_discritized_objects.zip": "e63c7a0f047c789d422e97921171b6e9cee36a392b24f1d66e29b18248a925cb",  # noqa: E501
+        "whittington_2020_in_discritized_objects.zip": "3b527b03cd011b5e71ff66304f25d2406acddcbd3f770139ca8d8edc71cf1703",  # noqa: E501
     },
 )
 
