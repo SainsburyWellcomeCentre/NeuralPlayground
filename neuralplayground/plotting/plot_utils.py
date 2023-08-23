@@ -188,8 +188,18 @@ def render_mpl_table(data, ax=None, **kwargs):
     return ax.get_figure(), ax
 
 
-def make_agent_comparison(envs, parameters, agents, exps=None, recording_index=None, tetrode_id=None, GridScorer=None,
-                          figsize=None, horizontal_axis_spacing=None, vertical_axis_spacing=None):
+def make_agent_comparison(
+    envs,
+    parameters,
+    agents,
+    exps=None,
+    recording_index=None,
+    tetrode_id=None,
+    GridScorer=None,
+    figsize=None,
+    horizontal_axis_spacing=None,
+    vertical_axis_spacing=None,
+):
     """Plot function to compare agents in a given environment
 
     Parameters
@@ -216,6 +226,7 @@ def make_agent_comparison(envs, parameters, agents, exps=None, recording_index=N
         Modified axis where the comparison is plotted
     """
     from neuralplayground.config import PLOT_CONFIG
+
     config_vars = PLOT_CONFIG.AGENT_COMPARISON
     if figsize is not None:
         config_vars.FIGSIZE = figsize
@@ -245,13 +256,11 @@ def make_agent_comparison(envs, parameters, agents, exps=None, recording_index=N
     else:
         if exp_data:
             f, ax = plt.subplots(
-                5, len(agents) + len(envs),
-                figsize=(config_vars.FIGSIZE[0] * (len(agents) + 1), config_vars.FIGSIZE[1])
+                5, len(agents) + len(envs), figsize=(config_vars.FIGSIZE[0] * (len(agents) + 1), config_vars.FIGSIZE[1])
             )
         else:
             f, ax = plt.subplots(
-                3, len(agents) + len(envs),
-                figsize=(config_vars.FIGSIZE[0] * (len(agents) + 1), config_vars.FIGSIZE[1])
+                3, len(agents) + len(envs), figsize=(config_vars.FIGSIZE[0] * (len(agents) + 1), config_vars.FIGSIZE[1])
             )
 
     plt.subplots_adjust(wspace=config_vars.HORIZONTAL_AXIS_SPACING)
@@ -296,14 +305,14 @@ def make_agent_comparison(envs, parameters, agents, exps=None, recording_index=N
         for j, text in enumerate(parameters[i]["agent_params"]):
             if j > 9:
                 variable = parameters[i]["agent_params"][text]
-                ax[0, i + k + 1].text(0.6, 1 - ((j - 9) * 0.1),
-                                      text + ": " + str(variable), fontsize=config_vars.TEXT_FONTSIZE)
+                ax[0, i + k + 1].text(
+                    0.6, 1 - ((j - 9) * 0.1), text + ": " + str(variable), fontsize=config_vars.TEXT_FONTSIZE
+                )
                 ax[0, i + k + 1].set_axis_off()
             else:
                 ax[0, i + k + 1].text(0, 1, "Agent param", fontsize=config_vars.TEXT_FONTSIZE)
                 variable = parameters[i]["agent_params"][text]
-                ax[0, i + k + 1].text(0, 0.9 - ((j) * 0.1),
-                                      text + ": " + str(variable), fontsize=config_vars.TEXT_FONTSIZE)
+                ax[0, i + k + 1].text(0, 0.9 - ((j) * 0.1), text + ": " + str(variable), fontsize=config_vars.TEXT_FONTSIZE)
                 ax[0, i + k + 1].set_axis_off()
         if hasattr(agent, "plot_rate_map"):
             agent.plot_rate_map(ax=ax[1][1 + i + k])
