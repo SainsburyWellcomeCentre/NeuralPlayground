@@ -51,7 +51,7 @@ class Environment(Env):
         Returns interaction history
     """
 
-    def __init__(self, environment_name: str = "Environment", **env_kwargs):
+    def __init__(self, environment_name: str = "Environment", time_step_size: float = 1.0, **env_kwargs):
         """Initialisation of Environment class
 
         Parameters
@@ -64,10 +64,7 @@ class Environment(Env):
                Size of the time step in seconds
         """
         self.environment_name = environment_name
-        if "time_step_size" in env_kwargs.keys():
-            self.time_step_size = env_kwargs["time_step_size"]  # All environments should have this (second units)
-        else:
-            self.time_step_size = 1.0
+        self.time_step_size = time_step_size
         self.env_kwargs = env_kwargs  # Parameters of the environment
         self.metadata = {"env_kwargs": env_kwargs}  # Define within each subclass for specific environments
         self.state = np.array([])

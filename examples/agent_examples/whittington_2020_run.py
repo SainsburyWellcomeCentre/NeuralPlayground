@@ -7,14 +7,14 @@ import os
 
 import numpy as np
 
-from neuralplayground.agents import Whittington2020
+from neuralplayground.agents.whittington_2020 import Whittington2020
 from neuralplayground.agents.whittington_2020_extras import whittington_2020_parameters as parameters
 from neuralplayground.arenas import BatchEnvironment, DiscreteObjectEnvironment
 from neuralplayground.backend import SingleSim, tem_training_loop
 from neuralplayground.experiments import Sargolini2006Data
 
 simulation_id = "TEM_custom_sim"
-save_path = os.path.join(os.getcwd(), "examples", "agent_examples", "results_sim")
+save_path = os.path.join(os.getcwd(), "results_sim")
 # save_path = os.path.join(os.getcwd(), "examples", "agent_examples", "trained_results")
 agent_class = Whittington2020
 env_class = BatchEnvironment

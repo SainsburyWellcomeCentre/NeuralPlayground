@@ -23,13 +23,13 @@ Check the [arena examples notebook](https://github.com/SainsburyWellcomeCentre/N
 1. For now, all arenas are [2D environments](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/neuralplayground/arenas/simple2d.py) where
 agents can navigate. These arenas can have arbitrary shaped walls as explained in the [jupyter notebook](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/arena_examples/arena_examples.ipynb) with
 examples.
-2. Some of the arenas are based on a real experimental settings, setting the parameters of the arena
+2. Some of the arenas are based on a real experimental settings by setting the parameters of the arena
 to resemble the physical dimensions of the arena used in the real experiment. These arenas also
-load the experimental data automatically and have some extra methods to plot and use the experimental data
-from the corresponding experiments. These classes are [Hafting2008](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/neuralplayground/arenas/hafting_2008.py),
-[Sargolini2006](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/neuralplayground/arenas/sargolini_2006.py)
-and [Wernle2018](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/neuralplayground/arenas/wernle_2018.py) where the arena change throughout the experiment.
-3. Also included are `batch_environment` and the `discretized_objects` environment. These offer the ablity to run multiple agents simultaneously (in a batch) and generate sequences of discrete state transitions instead of continuous trajectories, respectively. This requires an agent that also generates batches of actions, and so these are both currently only used by the [Tolman-Eichenbaum machine](../agents/whittington_2020.py) agent.
+load the experimental data automatically and have some extra methods to plot and use the experimental data from the corresponding experiments. These classes are [Hafting2008](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/arenas/hafting_2008.py),
+[Sargolini2006](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/arenas/sargolini_2006.py)
+and [Wernle2018](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/arenas/wernle_2018.py) where the arena change throughout the experiment.
+3. A [discretized_objects](../arenas/discritized_objects.py) arena is also included. This allows agents to instead run in a discretised environment and generate a sequence of discrete state transitions, as opposed to a continuous trajectory. The resulting 2D arena is split into states which each have a one-hot encoded object associated with them; observations in this environment are of the form `[state_id, object, position]`. Therefore, additional parameters are required to initialise this arena, including `n_objects` and `environment_name="DiscreteObject"`. This is the arena type that the [Tolman-Eichenbaum machine](../../examples/agent_examples/TEM_README.md) runs in.
+3. Also included is the [batch_environment](../arenas/batch_environment.py) class, which offers the ablity to run multiple agents simultaneously (in a batch). Note that this will only generate different trajectories when run with an artificial agent; if used with experimental data, each element of the batch will use that same data. This requires an agent that also generates batches of actions, and so is currently only used by the [Tolman-Eichenbaum machine](../agents/whittington_2020.py) agent.
 
 ## 3. How-to-Contribute
 

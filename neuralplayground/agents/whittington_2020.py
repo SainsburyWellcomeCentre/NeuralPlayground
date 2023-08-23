@@ -12,6 +12,7 @@ import torch
 import neuralplayground.agents.whittington_2020_extras.whittington_2020_analyse as analyse
 import neuralplayground.agents.whittington_2020_extras.whittington_2020_model as model
 import neuralplayground.agents.whittington_2020_extras.whittington_2020_parameters as parameters
+import neuralplayground.agents.whittington_2020_extras.whittington_2020_utils as utils
 
 # Custom modules
 from neuralplayground.plotting.plot_utils import make_plot_rate_map
@@ -335,13 +336,10 @@ class Whittington2020(AgentCore):
         # # Create a tensor board to stay updated on training progress. Start tensorboard with tensorboard --logdir=runs
         # self.writer = SummaryWriter(self.train_path)
         # Create a logger to write log output to file
-        # current_dir = os.path.dirname(os.getcwd())
-        # while os.path.basename(current_dir) != "examples":
-        #     current_dir = os.path.dirname(current_dir)
-        # relative_path = "agent_examples/results_sim"
-        # run_path = os.path.join(current_dir, relative_path)
-        # run_path = os.path.normpath(run_path)
-        # self.logger = utils.make_logger(run_path)
+        current_dir = os.path.dirname(os.getcwd())
+        run_path = os.path.join(current_dir, "agent_examples", "results_sim")
+        run_path = os.path.normpath(run_path)
+        self.logger = utils.make_logger(run_path)
         # Make an ADAM optimizer for TEM
         self.adam = torch.optim.Adam(self.tem.parameters(), lr=self.pars["lr_max"])
         # Initialise whether a state has been visited for each world
