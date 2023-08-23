@@ -37,7 +37,7 @@ class Simple2D(Environment):
     agent_step_size: float
          Size of the step when executing movement, agent_step_size*global_steps will give
          a measure of the total distance traversed by the agent
-         
+
     Methods (Some in addition to Environment class)
     ----------
     __init__(self, environment_name="2DEnv", **env_kwargs):

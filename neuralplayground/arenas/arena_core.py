@@ -31,7 +31,7 @@ class Environment(Env):
         specify the range of observations as in openai gym
     action_space: gym.spaces
         specify the range of actions as in openai gym
-        
+
     Methods
     ----------
     __init__(self, environment_name: str = "Environment", **env_kwargs):
