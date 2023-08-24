@@ -9,6 +9,7 @@ from gymnasium import Env, spaces
 
 class Environment(Env):
     """Abstract parent environment class
+
     Attributes
     ----------
     environment_name : str
@@ -49,6 +50,9 @@ class Environment(Env):
         Restore environment saved using save_environment method
     get_trajectory_data(self):
         Returns interaction history
+    reward_function(self, action, state):
+        Reward curriculum as a function of action, state
+        and attributes of the environment
     """
 
     def __init__(self, environment_name: str = "Environment", time_step_size: float = 1.0, **env_kwargs):
@@ -192,8 +196,8 @@ class Environment(Env):
         return self.history
 
     def reward_function(self, action, state):
-        """Code reward curriculum here as a function of action and state
-        and attributes of the environment if you want
+        """Reward curriculum as a function of action, state
+        and attributes of the environment
 
         Parameters
         ----------

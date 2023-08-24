@@ -13,6 +13,27 @@ from neuralplayground.utils import check_crossing_wall
 
 class Simple2D(Environment):
     """
+    Methods (Some in addition to Environment class)
+    ----------
+    __init__(self, environment_name="2DEnv", **env_kwargs):
+        Initialise the class
+    reset(self):
+        Reset the environment variables
+    step(self, action):
+        Increment the global step count of the agent in the environment and moves
+        the agent in a random direction with a fixed step size
+    plot_trajectory(self, history_data=None, ax=None):
+        Plot the Trajectory of the agent in the environment. In addition to environment class.
+    validate_action(self, pre_state, action, new_state):
+        Check if the new state is crossing any walls in the arena.
+    render(self, history_length=30):
+        Render the environment live through iterations as in OpenAI gym.
+    _create_default_walls(self):
+        Generates outer border of the 2D environment based on the arena limits
+    _create_custom_walls(self):
+        Custom walls method. In this case is empty since the environment is a simple square room.
+        Override this method to generate more walls, see jupyter notebook with examples.
+
     Attributes (Some in addition to the Environment class)
     ----------
     state: ndarray
@@ -25,32 +46,30 @@ class Simple2D(Environment):
         Saved history over simulation steps (action, state, new_state, reward, global_steps)
     global_steps: int
         Counter of the number of steps in the environment
+    arena_x_limits: float
+        Size of the environment in the x direction (width)
+    arena_y_limits: float
+        Size of the environment in the y direction (depth)
     room_width: int
         Size of the environment in the x direction
     room_depth: int
         Size of the environment in the y direction
     metadata: dict
         Dictionary containing the metadata
+    state_dims_labels: list
+        List of the labels of the dimensions of the state
+    observation_space: gym.spaces
+        specify the range of observations as in openai gym
+    action_space: gym.spaces
+        specify the range of actions as in openai gym
+    wall_list: list
+        List of the walls in the environment
     observation: ndarray
         Fully observable environment, make_observation returns the state
         Array of the observation of the agent in the environment (Could be modified as the environments are evolves)
     agent_step_size: float
          Size of the step when executing movement, agent_step_size*global_steps will give
          a measure of the total distance traversed by the agent
-
-    Methods (Some in addition to Environment class)
-    ----------
-    __init__(self, environment_name="2DEnv", **env_kwargs):
-        Initialise the class
-    reset(self):
-        Reset the environment variables
-    step(self, action):
-        Increment the global step count of the agent in the environment and moves
-        the agent in a random direction with a fixed step size
-    plot_trajectory(self, history_data=None, ax=None):
-        Plot the Trajectory of the agent in the environment. In addition to environment class.
-    _create_default_walls(self):
-        Generates outer border of the 2D environment based on the arena limits
     """
 
     def __init__(
@@ -103,11 +122,9 @@ class Simple2D(Environment):
             dtype=np.float64,
         )
         self.state_dims_labels = ["x_pos", "y_pos"]
-
         self._create_default_walls()
         self._create_custom_walls()
         self.wall_list = self.default_walls + self.custom_walls
-        self.state_dims_labels = ["x_pos", "y_pos"]
         self.reset()
 
     def _create_default_walls(self):
@@ -331,7 +348,7 @@ class Simple2D(Environment):
             return ax
 
     def render(self, history_length=30):
-        """Render the environment live through iterations"""
+        """Render the environment live through iterations as in OpenAI gym"""
         f, ax = plt.subplots(1, 1, figsize=(8, 6))
         canvas = FigureCanvas(f)
         history = self.history[-history_length:]
