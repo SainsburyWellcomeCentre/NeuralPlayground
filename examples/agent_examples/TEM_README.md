@@ -19,6 +19,7 @@ To run the TEM model, follow the steps below:
 
 **Important Notes:**
 
+- In order to generate the correct path for the saving of a trained TEM model, be sure to run the [whittington_2020_run.py](../agent_examples/whittington_2020_run.py) file from its location at `NeuralPlayground/examples/agent_examples/`.
 - Running the full TEM model may require significant computational resources and time.
 - Pretrained models are provided for convenience, allowing you to explore the results without training the model from scratch. 
 Pre-trained version of the model are hosted on a separate data repository on GIN. GIN offers an interface almost identical to GitHub. 

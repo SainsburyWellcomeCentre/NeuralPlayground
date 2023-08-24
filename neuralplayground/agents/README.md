@@ -1,7 +1,7 @@
 # Agent
 
 * [1 Introduction](#1-Introduction)
-* [2 Model Implemented](#2-Model-Implemented)
+* [2 Models Implemented](#2-Model-Implemented)
 * [3 How to Contribute](#3-How-to-Contribute)
 
 
@@ -13,14 +13,14 @@ with their surroundings (i.e., the environment). An agent receives observations 
 
 ## 2. Models-Implemented
 
-  1. [The hippocampus as a predictive map](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/agents/stachenfeld_2018.py)
+  1. [The hippocampus as a predictive map](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/neuralplayground/agents/stachenfeld_2018.py)
 
-  2. [Learning place cells, grid cells and invariances with excitatory and inhibitory plasticity](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/agents/weber_2018.py)
+  2. [Learning place cells, grid cells and invariances with excitatory and inhibitory plasticity](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/neuralplayground/agents/weber_2018.py)
 
-  3. [The Tolman-Eichenbaum Machine: Unifying Space and Relational Memory through Generalization in the Hippocampal Formation](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/agents/whittington_2020.py)
+  3. [The Tolman-Eichenbaum Machine: Unifying Space and Relational Memory through Generalization in the Hippocampal Formation](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/neuralplayground/agents/whittington_2020.py)
 
 
-Each of the these models are implemented in a jupyter notebook in [Examples](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples) to facilitate the interaction.
+Each of the these models are implemented in a jupyter notebook in [Examples](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/tree/main/examples) to facilitate the interaction.
 
 Pre-trained version of some of these model are hosted on a separate data repository on GIN. GIN offers an interface almost identical to GitHub. 
 To contribute a new trainned model, you need to fork the repository and open a pull request, just like on GitHub.
@@ -31,10 +31,10 @@ If you encounter any problems with this procedure, do not hesitate to contact us
 
   1. Create a file that indicates the appropriate reference to the model
 
-  2. Create a class to run the model following the template shown in the [Agent_core.py](https://github.com/ClementineDomine/NeuralPlayground/blob/main/neuralplayground/agents/agent_core.py) and the [Style Guide](https://github.com/ClementineDomine/NeuralPlayground/tree/main/documents/style_guide.md).
+  2. Create a class to run the model following the template shown in the [Agent_core.py](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/neuralplayground/agents/agent_core.py) and the [Style Guide](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/documents/style_guide.md).
   When building a new model create a file named author_date.py.
 
-  3. Create or add to [Examples](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples/agent_examples/) jupyter notebook for the new model where you can run the model in a chosen environment with selected experimental data
+  3. Create or add to [Examples](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/tree/main/examples/agent_examples) jupyter notebook for the new model where you can run the model in a chosen environment with selected experimental data
 
   4. Record your contribution
 
@@ -43,9 +43,9 @@ Before sending a pull request, make sure you have the following:
 
 1. Checked the Licensing frameworks.
 
-2. Followed the [Style Guide](https://github.com/ClementineDomine/NeuralPlayground/tree/main/documents/style_guide.md).
+2. Followed the [Style Guide](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/documents/style_guide.md).
 
-3. Implemented and ran [Test](https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground/tests).
+3. Implemented and ran [Test](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/tree/main/tests).
 
 4. Comment your work
 

@@ -12,14 +12,16 @@ class Environment(Env):
 
     Attributes
     ----------
+    environment_name : str
+        Name of the specific instantiation of the environment class
+    state: array
+        Empty array for this abstract class
     history: list
         list containing transition history
     time_step_size: float
         time step in second traverse when calling step method
     metadata: dict
         dictionary with extra metadata that might be available in other classes
-    state: array
-        Empty array for this abstract class
     env_kwags: dict
         Arguments given to the init method
     global_steps: int
@@ -106,7 +108,7 @@ class Environment(Env):
         self.state:
             Define within each subclass for specific environments
             Variable containing the state of the environment (eg.position in the environment)
-        reward: int
+        reward: float
             The reward that the animal receives in this state transition
         """
         observation = self.make_observation()  # Build sensory info from current state
@@ -163,15 +165,15 @@ class Environment(Env):
         else:
             pickle.dump(self.__dict__, open(os.path.join(save_path), "wb"), pickle.HIGHEST_PROTOCOL)
 
-    def restore_environment(self, save_path: str):
+    def restore_environment(self, restore_path: str):
         """Restore environment saved using save_environment method
 
         Parameters
         ----------
-        save_path: str
+        restore_path: str
             Path to retrieve the environment saved using save_environment method (raw_object=False)
         """
-        self.__dict__ = pd.read_pickle(save_path)
+        self.__dict__ = pd.read_pickle(restore_path)
 
     def __eq__(self, other):
         """Check if two environments are equal by comparing all of its attributes

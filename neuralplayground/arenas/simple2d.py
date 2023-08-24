@@ -34,7 +34,6 @@ class Simple2D(Environment):
         Custom walls method. In this case is empty since the environment is a simple square room.
         Override this method to generate more walls, see jupyter notebook with examples.
 
-
     Attributes (Some in addition to the Environment class)
     ----------
     state: ndarray
