@@ -75,7 +75,7 @@ def squared_error(value, target):
             Tensor of mean squared errors
     """
     # Return torch MSE loss
-    if type(value) is list:
+    if isinstance(value, list):
         loss = [0.5 * torch.sum(torch.nn.MSELoss(reduction="none")(value[i], target[i]), dim=-1) for i in range(len(value))]
     else:
         loss = 0.5 * torch.sum(torch.nn.MSELoss(reduction="none")(value, target), dim=-1)
@@ -97,7 +97,7 @@ def cross_entropy(value, target):
             Tensor of binary cross entropies
     """
     # Return torch BCE loss
-    if type(value) is list:
+    if isinstance(value, list):
         loss = [torch.nn.CrossEntropyLoss(reduction="none")(val, targ) for val, targ in zip(value, target)]
     else:
         loss = torch.nn.CrossEntropyLoss(reduction="none")(value, target)
