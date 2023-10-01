@@ -19,12 +19,11 @@ from class_models import get_forward_function
 from class_plotting_utils import (
     plot_graph_grid_activations,
     plot_input_target_output,
-    plot_xy,
     plot_message_passing_layers,
-
+    plot_xy,
 )
-from sklearn.metrics import matthews_corrcoef, roc_auc_score
 from class_utils import rng_sequence_from_rng, set_device
+from sklearn.metrics import matthews_corrcoef, roc_auc_score
 
 # @title Graph net functions
 parser = argparse.ArgumentParser()
@@ -35,29 +34,29 @@ parser.add_argument(
     help="path to base configuration file.",
 )
 
-class Stachenfel2023(AgentCore):
 
+class Stachenfel2023(AgentCore):
     def __init__(self, config_path, config, **mod_kwargs):
         self.train_on_shortest_path = config.train_on_shortest_path
         # @param
         super().__init__()
-        self.experiment_name =config.experiment_name
-        self.train_on_shortest_path =config.train_on_shortest_path
-        self.resample  = config.resample # @param
-        self.wandb_on =config.wandb_on
-        self.seed =config.seed
+        self.experiment_name = config.experiment_name
+        self.train_on_shortest_path = config.train_on_shortest_path
+        self.resample = config.resample  # @param
+        self.wandb_on = config.wandb_on
+        self.seed = config.seed
 
         self.feature_position = config.feature_position
         self.weighted = config.weighted
 
-        self.num_hidden  = config.num_hidden# @param
-        self.num_layers = config.num_layers# @param
-        self.num_message_passing_steps = config.num_training_steps # @param
-        self.learning_rate = config.learning_rate # @param
-        self.num_training_steps = config.num_training_steps # @param
+        self.num_hidden = config.num_hidden  # @param
+        self.num_layers = config.num_layers  # @param
+        self.num_message_passing_steps = config.num_training_steps  # @param
+        self.learning_rate = config.learning_rate  # @param
+        self.num_training_steps = config.num_training_steps  # @param
 
         self.batch_size = config.batch_size
-        self.nx_min= config.nx_min
+        self.nx_min = config.nx_min
         self.nx_max = config.nx_max
         self.arena_x_limits = mod_kwargs["arena_x_limits"]
         self.arena_y_limits = mod_kwargs["arena_y_limits"]
@@ -66,29 +65,29 @@ class Stachenfel2023(AgentCore):
 
         # This can be tought of the brain making different rep of different  granularity
         # Could be explained during sleep
-        self.batch_size_test= config.batch_size_test
-        self.nx_min_test = config.nx_min_test #This is thought of the state density
-        self.nx_max_test = config.nx_max_test #This is thought of the state density
+        self.batch_size_test = config.batch_size_test
+        self.nx_min_test = config.nx_min_test  # This is thought of the state density
+        self.nx_max_test = config.nx_max_test  # This is thought of the state density
         self.batch_size = config.batch_size
-        self.nx_min = config.nx_min #This is thought of the state density
-        self.nx_max = config.nx_max #This is thought of the state density
+        self.nx_min = config.nx_min  # This is thought of the state density
+        self.nx_max = config.nx_max  # This is thought of the state density
 
-        #TODO: Make sure that for different graph this changes with the environement
-        #self.ny_min_test = config.ny_min_test  # This is thought of the state density
-        #self.ny_max_test = config.ny_max_test  # This is thought of the state density
-        #self.ny_min = con
+        # TODO: Make sure that for different graph this changes with the environement
+        # self.ny_min_test = config.ny_min_test  # This is thought of the state density
+        # self.ny_max_test = config.ny_max_test  # This is thought of the state density
+        # self.ny_min = con
         # fig.ny_min  # This is thought of the state density
-        #self.ny_max = config.ny_max  # This is thought of the state density
+        # self.ny_max = config.ny_max  # This is thought of the state density
 
-        #self.resolution_x_min_test = int(self.nx_min * self.room_width)
-        #self.resolution_x_max_test = int(self.nx_max * self.room_depth)
-        #self.resolution_x_min = int(self.nx_min_test * self.room_width)
-        #self.resolution_x_max = int(self.nx_max_test * self.room_depth)
+        # self.resolution_x_min_test = int(self.nx_min * self.room_width)
+        # self.resolution_x_max_test = int(self.nx_max * self.room_depth)
+        # self.resolution_x_min = int(self.nx_min_test * self.room_width)
+        # self.resolution_x_max = int(self.nx_max_test * self.room_depth)
 
-        #self.resolution_y_min_test = int(self.nx_min * self.room_width)
-        #self.resolution_y_max_test = int(self.nx_max * self.room_depth)
-        #self.resolution_y_min = int(self.nx_min_test * self.room_width)
-        #self.resolution_y_max = int(self.nx_max_test * self.room_depth)
+        # self.resolution_y_min_test = int(self.nx_min * self.room_width)
+        # self.resolution_y_max_test = int(self.nx_max * self.room_depth)
+        # self.resolution_y_min = int(self.nx_min_test * self.room_width)
+        # self.resolution_y_max = int(self.nx_max_test * self.room_depth)
 
         self.log_every = config.num_training_steps // 10
 
@@ -98,8 +97,9 @@ class Stachenfel2023(AgentCore):
             self.edege_lables = False
         if self.wandb_on:
             dateTimeObj = datetime.now()
-            wandb.init(project="graph-brain", entity="graph-brain",
-                       name="Grid_shortest_path" + dateTimeObj.strftime("%d%b_%H_%M"))
+            wandb.init(
+                project="graph-brain", entity="graph-brain", name="Grid_shortest_path" + dateTimeObj.strftime("%d%b_%H_%M")
+            )
             self.wandb_logs = {}
             save_path = wandb.run.dir
             os.mkdir(os.path.join(save_path, "results"))
@@ -145,7 +145,6 @@ class Stachenfel2023(AgentCore):
             graph, targets = sample_padded_grid_batch_shortest_path(
                 self.rng, self.batch_size, self.feature_position, self.weighted, self.nx_min, self.nx_max
             )
-            targets = graph.nodes
         self.params = self.net_hk.init(self.rng, graph)
         self.optimizer = optax.adam(self.learning_rate)
         self.opt_state = self.optimizer.init(self.params)
@@ -153,8 +152,8 @@ class Stachenfel2023(AgentCore):
         self.reset()
 
     def reset(self):
-        #TODO: Actually reset the network
-        self.global_test=0
+        # TODO: Actually reset the network
+        self.global_test = 0
         self.losses = []
         self.losses_test = []
         self.roc_aucs_train = []
@@ -167,13 +166,12 @@ class Stachenfel2023(AgentCore):
         outputs = model.apply(params, inputs)
         return jnp.mean((outputs[0].nodes - targets) ** 2)  # using MSE
 
-
-    def update_step(self,grads, opt_state, params):
+    def update_step(self, grads, opt_state, params):
         updates, opt_state = self.optimizer.update(grads, opt_state, params)
         params = optax.apply_updates(params, updates)
         return params
 
-    def evaluate(self,model, params, inputs, target):
+    def evaluate(self, model, params, inputs, target):
         outputs = model.apply(params, inputs)
         roc_auc = roc_auc_score(np.squeeze(target), np.squeeze(outputs[0].nodes))
         MCC = matthews_corrcoef(np.squeeze(target), round(np.squeeze(outputs[0].nodes)))
@@ -198,7 +196,9 @@ class Stachenfel2023(AgentCore):
                 )
                 targets = graph.nodes
         # Train
-        loss, grads = jax.value_and_grad(self.compute_loss)(self.params, self.net_hk, graph, targets)  # jits inside of value_and_grad
+        loss, grads = jax.value_and_grad(self.compute_loss)(
+            self.params, self.net_hk, graph, targets
+        )  # jits inside of value_and_grad
         self.params = self.update_step(grads, self.opt_state, self.params)
         self.losses.append(loss)
         outputs_train, roc_auc_train, MCC_train = self.evaluate(self.net_hk, self.params, graph, targets)
@@ -215,7 +215,7 @@ class Stachenfel2023(AgentCore):
         wandb_logs = {"loss": loss, "losses_test": loss_test, "roc_auc_test": roc_auc_test, "roc_auc": roc_auc_train}
         if self.wandb_on:
             wandb.log(wandb_logs)
-        self.global_steps = self.global_steps+1
+        self.global_steps = self.global_steps + 1
         if self.global_steps % self.log_every == 0:
             print(f"Training step {n}: loss = {loss}")
         return
@@ -224,8 +224,7 @@ class Stachenfel2023(AgentCore):
         # EVALUATE
         rng = next(self.rng_seq)
         graph_test, target_test = sample_padded_grid_batch_shortest_path(
-            rng, self.batch_size_test, self.feature_position, self.weighted, self.nx_min_test,
-            self.nx_max_test
+            rng, self.batch_size_test, self.feature_position, self.weighted, self.nx_min_test, self.nx_max_test
         )
         outputs, roc_auc, MCC = self.evaluate(self.net_hk, self.params, graph_test, target_test)
         print("roc_auc_score")
@@ -290,7 +289,9 @@ class Stachenfel2023(AgentCore):
             "Inputs node assigments",
             self.edege_lables,
         )
-        plot_graph_grid_activations(target_test.sum(-1), graph_test, os.path.join(self.save_path, "Target.pdf"), "Target", self.edege_lables)
+        plot_graph_grid_activations(
+            target_test.sum(-1), graph_test, os.path.join(self.save_path, "Target.pdf"), "Target", self.edege_lables
+        )
 
         plot_graph_grid_activations(
             outputs[0].nodes.tolist(),
@@ -315,7 +316,7 @@ class Stachenfel2023(AgentCore):
 
 
 if __name__ == "__main__":
-    from neuralplayground.arenas import BatchEnvironment, Simple2D, DiscreteObjectEnvironment
+    from neuralplayground.arenas import Simple2D
 
     args = parser.parse_args()
     set_device()
@@ -327,21 +328,22 @@ if __name__ == "__main__":
     # Init environment
     arena_x_limits = [-100, 100]
     arena_y_limits = [-100, 100]
-    env = Simple2D(time_step_size=time_step_size,
-                   agent_step_size=agent_step_size,
-                   arena_x_limits= arena_x_limits,
-                   arena_y_limits=arena_y_limits)
+    env = Simple2D(
+        time_step_size=time_step_size,
+        agent_step_size=agent_step_size,
+        arena_x_limits=arena_x_limits,
+        arena_y_limits=arena_y_limits,
+    )
 
-    agent= Stachenfel2023(config_path=args.config_path, config=config,arena_y_limits=arena_y_limits,arena_x_limits=arena_x_limits)
+    agent = Stachenfel2023(
+        config_path=args.config_path, config=config, arena_y_limits=arena_y_limits, arena_x_limits=arena_x_limits
+    )
     for n in range(config.num_training_steps):
         agent.update()
 
     agent.print_and_plot()
 
 
-#TODO: Make it work with the config Run manadger
-#TODO: Make juste an env type
-#TODO: Make The plotting in the general plotting utilse
-
-
-
+# TODO: Make it work with the config Run manadger
+# TODO: Make juste an env type
+# TODO: Make The plotting in the general plotting utilse

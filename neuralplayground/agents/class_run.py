@@ -21,8 +21,8 @@ from class_plotting_utils import (
     plot_message_passing_layers,
     plot_xy,
 )
-from sklearn.metrics import matthews_corrcoef, roc_auc_score
 from class_utils import rng_sequence_from_rng, set_device
+from sklearn.metrics import matthews_corrcoef, roc_auc_score
 
 # @title Graph net functions
 parser = argparse.ArgumentParser()

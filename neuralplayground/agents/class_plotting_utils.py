@@ -1,7 +1,7 @@
 # @title Make rng sequence generator
 import matplotlib.pyplot as plt
 import networkx as nx
-from class_utils import convert_jraph_to_networkx_graph,get_activations_graph_n,get_node_pad
+from class_utils import convert_jraph_to_networkx_graph, get_activations_graph_n, get_node_pad
 
 
 def plot_input_target_output(inputs, targets, outputs, graph, n, edege_lables, save_path):
@@ -138,7 +138,6 @@ def plot_message_passing_layers_units(
             if edege_lables:
                 nx.draw_networkx_edge_labels(nx_graph, pos=pos, edge_labels=labels, ax=axes[i, j])
     plt.savefig(save_path)
-
 
 
 def plot_xy(auc_roc, path, title):

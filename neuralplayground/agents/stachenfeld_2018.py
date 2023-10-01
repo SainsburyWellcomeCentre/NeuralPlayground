@@ -10,6 +10,7 @@ Check examples/Stachenfeld_2018_example.ipynb
 import random
 import sys
 from typing import Union
+
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np

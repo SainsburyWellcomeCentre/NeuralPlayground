@@ -23,8 +23,8 @@ from class_plotting_utils import (
     plot_message_passing_layers,
     plot_roc,
 )
-from sklearn.metrics import matthews_corrcoef, roc_auc_score
 from class_utils import rng_sequence_from_rng, set_device
+from sklearn.metrics import matthews_corrcoef, roc_auc_score
 
 # @title Graph net functions
 parser = argparse.ArgumentParser()
@@ -35,8 +35,8 @@ parser.add_argument(
     help="path to base configuration file.",
 )
 
-class Stachenfel2023(AgentCore):
 
+class Stachenfel2023(AgentCore):
     def __init__(self, config_path, config):
         self.train_on_shortest_path = config.train_on_shortest_path
         # @param
@@ -48,8 +48,9 @@ class Stachenfel2023(AgentCore):
             self.edege_lables = False
         if config.wandb_on:
             dateTimeObj = datetime.now()
-            wandb.init(project="graph-brain", entity="graph-brain",
-                       name="Grid_shortest_path" + dateTimeObj.strftime("%d%b_%H_%M"))
+            wandb.init(
+                project="graph-brain", entity="graph-brain", name="Grid_shortest_path" + dateTimeObj.strftime("%d%b_%H_%M")
+            )
             self.wandb_logs = {}
             save_path = wandb.run.dir
             os.mkdir(os.path.join(save_path, "results"))
@@ -95,14 +96,13 @@ class Stachenfel2023(AgentCore):
             graph, targets = sample_padded_grid_batch_shortest_path(
                 rng, config.batch_size, config.feature_position, config.weighted, config.nx_min, config.nx_max
             )
-            targets = graph.nodes
         self.params = self.net_hk.init(rng, graph)
         self.optimizer = optax.adam(config.learning_rate)
         self.opt_state = self.optimizer.init(self.params)
         self.reset()
 
     def reset(self):
-        self.global_test=0
+        self.global_test = 0
         self.losses = []
         self.losses_test = []
         self.roc_aucs_train = []
@@ -115,13 +115,12 @@ class Stachenfel2023(AgentCore):
         outputs = model.apply(params, inputs)
         return jnp.mean((outputs[0].nodes - targets) ** 2)  # using MSE
 
-
-    def update_step(self,grads, opt_state, params):
+    def update_step(self, grads, opt_state, params):
         updates, opt_state = self.optimizer.update(grads, opt_state, params)
         params = optax.apply_updates(params, updates)
         return params
 
-    def evaluate(self,model, params, inputs, target):
+    def evaluate(self, model, params, inputs, target):
         outputs = model.apply(params, inputs)
         roc_auc = roc_auc_score(np.squeeze(target), np.squeeze(outputs[0].nodes))
         MCC = matthews_corrcoef(np.squeeze(target), round(np.squeeze(outputs[0].nodes)))
@@ -129,7 +128,6 @@ class Stachenfel2023(AgentCore):
         return outputs, roc_auc, MCC
 
     def run(self):
-
         rng = next(self.rng_seq)
         graph_test, target_test = sample_padded_grid_batch_shortest_path(
             rng, config.batch_size_test, config.feature_position, config.weighted, config.nx_min_test, config.nx_max_test
@@ -148,7 +146,9 @@ class Stachenfel2023(AgentCore):
                 )
                 targets = graph.nodes
         # Train
-        loss, grads = jax.value_and_grad(self.compute_loss)(self.params, self.net_hk, graph, targets)  # jits inside of value_and_grad
+        loss, grads = jax.value_and_grad(self.compute_loss)(
+            self.params, self.net_hk, graph, targets
+        )  # jits inside of value_and_grad
         self.params = self.update_step(grads, self.opt_state, self.params)
 
         self.losses.append(loss)
@@ -166,7 +166,7 @@ class Stachenfel2023(AgentCore):
         wandb_logs = {"loss": loss, "losses_test": loss_test, "roc_auc_test": roc_auc_test, "roc_auc": roc_auc_train}
         if config.wandb_on:
             wandb.log(wandb_logs)
-        self.global_steps = self.global_steps+1
+        self.global_steps = self.global_steps + 1
         if self.global_steps % self.log_every == 0:
             print(f"Training step {n}: loss = {loss}")
         return
@@ -175,8 +175,7 @@ class Stachenfel2023(AgentCore):
         # EVALUATE
         rng = next(self.rng_seq)
         graph_test, target_test = sample_padded_grid_batch_shortest_path(
-            rng, config.batch_size_test, config.feature_position, config.weighted, config.nx_min_test,
-            config.nx_max_test
+            rng, config.batch_size_test, config.feature_position, config.weighted, config.nx_min_test, config.nx_max_test
         )
         outputs, roc_auc, MCC = self.evaluate(self.net_hk, self.params, graph_test, target_test)
         print("roc_auc_score")
@@ -241,7 +240,9 @@ class Stachenfel2023(AgentCore):
             "Inputs node assigments",
             self.edege_lables,
         )
-        plot_graph_grid_activations(target_test.sum(-1), graph_test, os.path.join(self.save_path, "Target.pdf"), "Target", self.edege_lables)
+        plot_graph_grid_activations(
+            target_test.sum(-1), graph_test, os.path.join(self.save_path, "Target.pdf"), "Target", self.edege_lables
+        )
 
         plot_graph_grid_activations(
             outputs[0].nodes.tolist(),
@@ -270,7 +271,7 @@ if __name__ == "__main__":
     set_device()
     config_class = GridConfig
     config = config_class(args.config_path)
-    agent= Stachenfel2023(config_path=args.config_path, config=config)
+    agent = Stachenfel2023(config_path=args.config_path, config=config)
     for n in range(config.num_training_steps):
         agent.run()
     agent.print_and_plot()

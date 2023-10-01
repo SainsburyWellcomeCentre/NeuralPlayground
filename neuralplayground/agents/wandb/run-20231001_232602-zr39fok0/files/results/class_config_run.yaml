@@ -23,4 +23,3 @@ nx_max: 7
 batch_size_test: 4
 nx_min_test: 4
 nx_max_test: 7
-

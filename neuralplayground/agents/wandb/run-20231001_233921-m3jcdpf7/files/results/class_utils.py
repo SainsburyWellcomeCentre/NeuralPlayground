@@ -56,6 +56,7 @@ def set_device():
     else:
         print("GPU is enabled in this notebook.")
 
+
 def get_activations_graph_n(
     node_colour,
     graph,
@@ -65,7 +66,9 @@ def get_activations_graph_n(
     output = node_colour[node_padd : node_padd + graph.n_node[number_graph_batch]]
     return output
 
+
 # maybe actually change the node pad to a node padd function
+
 
 def get_node_pad(graph, i):
     node_padd = 0

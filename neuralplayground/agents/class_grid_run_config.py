@@ -1,7 +1,7 @@
 from typing import Dict, Union
 
-from config_manager import base_configuration
 from class_config_template import ConfigTemplate
+from config_manager import base_configuration
 
 
 class GridConfig(base_configuration.BaseConfiguration):

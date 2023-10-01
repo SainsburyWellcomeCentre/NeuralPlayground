@@ -17,7 +17,7 @@ config: {}
 2023-10-01 17:21:56,685 INFO    MainThread:8041 [wandb_init.py:init():720] updated telemetry
 2023-10-01 17:21:56,750 INFO    MainThread:8041 [wandb_init.py:init():753] communicating run to backend with 90.0 second timeout
 2023-10-01 17:21:57,191 INFO    MainThread:8041 [wandb_run.py:_on_init():2220] communicating current version
-2023-10-01 17:21:57,264 INFO    MainThread:8041 [wandb_run.py:_on_init():2229] got version response 
+2023-10-01 17:21:57,264 INFO    MainThread:8041 [wandb_run.py:_on_init():2229] got version response
 2023-10-01 17:21:57,264 INFO    MainThread:8041 [wandb_init.py:init():804] starting run threads in backend
 2023-10-01 17:21:58,902 INFO    MainThread:8041 [wandb_run.py:_console_start():2199] atexit reg
 2023-10-01 17:21:58,903 INFO    MainThread:8041 [wandb_run.py:_redirect():2054] redirect: wrap_raw
