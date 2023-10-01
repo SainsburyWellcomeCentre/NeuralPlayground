@@ -1,20 +1,18 @@
 # This will be a test weather the way I am adding the edges changes th epath
 # Demo for creating a randomly-weighted grid graph (and using the weights for shortest-path computation)
-import networkx as nx
-import numpy as np
-import matplotlib.pyplot as plt
 # deepmind (i think) package for optimization
 import jax
 import jax.numpy as jnp
 import jraph
 import networkx as nx
+import numpy as np
 from utils import rng_sequence_from_rng
 
 
 def shortest_path():
-  rng=jax.random.PRNGKey(46)
-  rng_seq = rng_sequence_from_rng(rng)
-  """Sample a batch of grid graphs with variable sizes.
+    rng = jax.random.PRNGKey(46)
+    rng_seq = rng_sequence_from_rng(rng)
+    """Sample a batch of grid graphs with variable sizes.
   Args:
     rng: jax.random.PRNGKey(integer_seed) object, random number generator
     batch_size: int, number of graphs to sample
@@ -25,59 +23,75 @@ def shortest_path():
   Returns:
     padded graph batch that can be fed into a jraph GNN.
   """
-  batch_size=1
-  feature_position=True
-  weighted=True
-  ny_min = None,
-  ny_max = None
-  nx_min=3
-  nx_max=4
-  ny_min = nx_min
-  ny_max = ny_max or nx_max
-  max_n = ny_max * nx_max * batch_size
-  max_e = max_n * 4
-  # Sample grid dimensions
-  x_rng = next(rng_seq)
-  y_rng = next(rng_seq)  # need to "split" to advance the random number generator -- otherwise rng will be the same for all things sampled from it
-  n_xs = jax.random.randint(x_rng, shape=(batch_size,), minval=nx_min, maxval=nx_max)
-  n_ys = jax.random.randint(y_rng, shape=(batch_size,), minval=ny_min, maxval=ny_max)
-  # Construct graphs with sampled dimensions.
+    batch_size = 1
+    feature_position = True
+    ny_min = (None,)
+    ny_max = None
+    nx_min = 3
+    nx_max = 4
+    ny_min = nx_min
+    ny_max = ny_max or nx_max
+    max_n = ny_max * nx_max * batch_size
+    max_n * 4
+    # Sample grid dimensions
+    x_rng = next(rng_seq)
+    y_rng = next(
+        rng_seq
+    )  # need to "split" to advance the random number generator -- otherwise rng will be the same for all things sampled from it
+    n_xs = jax.random.randint(x_rng, shape=(batch_size,), minval=nx_min, maxval=nx_max)
+    n_ys = jax.random.randint(y_rng, shape=(batch_size,), minval=ny_min, maxval=ny_max)
+    # Construct graphs with sampled dimensions.
 
-  for n_x, n_y in zip(n_xs, n_ys):
-    nx_graph = get_grid_adjacency(n_x, n_y)
-    senders, receivers, node_positions, edge_displacements, n_node, n_edge, global_context = grid_networkx_to_graphstuple(
-      nx_graph)
-    i_end = jax.random.randint(next(rng_seq), shape=(1,), minval=0, maxval=n_node)
-    i_start = jax.random.randint(next(rng_seq), shape=(1,), minval=0, maxval=n_node)
-    # make it a node feature of the input graph if a node is a start/end node
-    input_node_features = jnp.zeros((n_node, 1))
-    input_node_features = input_node_features.at[i_start, 0].set(1)  # set start node feature
-    input_node_features = input_node_features.at[i_end, 0].set(1)  # set end node feature
+    for n_x, n_y in zip(n_xs, n_ys):
+        nx_graph = get_grid_adjacency(n_x, n_y)
+        senders, receivers, node_positions, edge_displacements, n_node, n_edge, global_context = grid_networkx_to_graphstuple(
+            nx_graph
+        )
+        i_end = jax.random.randint(next(rng_seq), shape=(1,), minval=0, maxval=n_node)
+        i_start = jax.random.randint(next(rng_seq), shape=(1,), minval=0, maxval=n_node)
+        # make it a node feature of the input graph if a node is a start/end node
+        input_node_features = jnp.zeros((n_node, 1))
+        input_node_features = input_node_features.at[i_start, 0].set(1)  # set start node feature
+        input_node_features = input_node_features.at[i_end, 0].set(1)  # set end node feature
 
-    if feature_position:
-      input_node_features = jnp.concatenate((input_node_features, node_positions),axis=1)
-      # edge_displacement=  add_weighted_edge(edge_displacements,n_edge,10)
-    edge_displacement =edge_displacements
-    graph_weighted = jraph.GraphsTuple(nodes=input_node_features, senders=senders, receivers=receivers,
-                              edges=edge_displacement, n_node=jnp.array([n_node], dtype=int),
-                              n_edge=jnp.array([n_edge], dtype=int), globals=global_context)
-    graph = jraph.GraphsTuple(nodes=input_node_features, senders=senders, receivers=receivers,
-                                       edges=edge_displacements, n_node=jnp.array([n_node], dtype=int),
-                                       n_edge=jnp.array([n_edge], dtype=int), globals=global_context)
-    nx_graph_weighted = convert_jraph_to_networkx_graph(graph_weighted, 0)
-    min_edge_weight=0.5
-    for i, j in nx_graph_weighted.edges():
-        nx_graph_weighted[i][j]['weight'] = np.max([0.5 * np.random.rand() + 1., min_edge_weight])
-    nodes_on_shortest_path_indexes_weighted = nx.shortest_path(nx_graph_weighted, int(i_start[0]),
-                                                      int(i_end[0]),weight='weight')
-    nodes_on_shortest_path_indexes = nx.shortest_path(convert_jraph_to_networkx_graph(graph,0), int(i_start[0]),
-                                                      int(i_end[0]))
-  print(nodes_on_shortest_path_indexes)
-  print(nodes_on_shortest_path_indexes_weighted)
-  return nodes_on_shortest_path_indexes, nodes_on_shortest_path_indexes_weighted
+        if feature_position:
+            input_node_features = jnp.concatenate((input_node_features, node_positions), axis=1)
+            # edge_displacement=  add_weighted_edge(edge_displacements,n_edge,10)
+        edge_displacement = edge_displacements
+        graph_weighted = jraph.GraphsTuple(
+            nodes=input_node_features,
+            senders=senders,
+            receivers=receivers,
+            edges=edge_displacement,
+            n_node=jnp.array([n_node], dtype=int),
+            n_edge=jnp.array([n_edge], dtype=int),
+            globals=global_context,
+        )
+        graph = jraph.GraphsTuple(
+            nodes=input_node_features,
+            senders=senders,
+            receivers=receivers,
+            edges=edge_displacements,
+            n_node=jnp.array([n_node], dtype=int),
+            n_edge=jnp.array([n_edge], dtype=int),
+            globals=global_context,
+        )
+        nx_graph_weighted = convert_jraph_to_networkx_graph(graph_weighted, 0)
+        min_edge_weight = 0.5
+        for i, j in nx_graph_weighted.edges():
+            nx_graph_weighted[i][j]["weight"] = np.max([0.5 * np.random.rand() + 1.0, min_edge_weight])
+        nodes_on_shortest_path_indexes_weighted = nx.shortest_path(
+            nx_graph_weighted, int(i_start[0]), int(i_end[0]), weight="weight"
+        )
+        nodes_on_shortest_path_indexes = nx.shortest_path(
+            convert_jraph_to_networkx_graph(graph, 0), int(i_start[0]), int(i_end[0])
+        )
+    print(nodes_on_shortest_path_indexes)
+    print(nodes_on_shortest_path_indexes_weighted)
+    return nodes_on_shortest_path_indexes, nodes_on_shortest_path_indexes_weighted
+
 
 def grid_networkx_to_graphstuple(nx_graph):
-
     """Get edges for a grid graph."""
     nx_graph = nx.DiGraph(nx_graph)
     node_positions = jnp.array(nx_graph.nodes)
@@ -89,59 +103,66 @@ def grid_networkx_to_graphstuple(nx_graph):
     n_node = node_positions.shape[0]
     n_edge = edge_displacements.shape[0]
     return (
-      jnp.array(senders, dtype=int),
-      jnp.array(receivers, dtype=int),
-      jnp.array(node_positions, dtype=float),
-      jnp.array(edge_displacements, dtype=float),
-      n_node,
-      n_edge,
-      jnp.zeros((1, 0), dtype=float))
+        jnp.array(senders, dtype=int),
+        jnp.array(receivers, dtype=int),
+        jnp.array(node_positions, dtype=float),
+        jnp.array(edge_displacements, dtype=float),
+        n_node,
+        n_edge,
+        jnp.zeros((1, 0), dtype=float),
+    )
 
-def add_weighted_edge(edge_displacement,n_edge,sigma_on_edge_weight_noise):
-  for k in range(n_edge):
-    for l in range(2):
-      if not edge_displacement[k][l] == 0:
-        edge_displacement = edge_displacement.at[k,l].set( edge_displacement[k][l]+sigma_on_edge_weight_noise * np.random.rand())
-  return edge_displacement
+
+def add_weighted_edge(edge_displacement, n_edge, sigma_on_edge_weight_noise):
+    for k in range(n_edge):
+        for l in range(2):
+            if not edge_displacement[k][l] == 0:
+                edge_displacement = edge_displacement.at[k, l].set(
+                    edge_displacement[k][l] + sigma_on_edge_weight_noise * np.random.rand()
+                )
+    return edge_displacement
+
 
 def get_grid_adjacency(n_x, n_y, atol=1e-1):
-  return nx.grid_2d_graph(n_x, n_y)  # Get directed grid graph
+    return nx.grid_2d_graph(n_x, n_y)  # Get directed grid graph
+
 
 def convert_jraph_to_networkx_graph(jraph_graph: jraph.GraphsTuple, number_graph_batch) -> nx.Graph:
-  nodes, edges, receivers, senders, _, _, _ = jraph_graph
-  node_padd = 0
-  edges_padd = 0
-  for i in range(number_graph_batch):
-    node_padd = node_padd + jraph_graph.n_node[i]
-    edges_padd = edges_padd + jraph_graph.n_edge[i]
-  nx_graph = nx.DiGraph()
-  if nodes is None:
-    for n in range(jraph_graph.n_node[number_graph_batch]):
-      nx_graph.add_node(n)
-  else:
-    for n in range(jraph_graph.n_node[number_graph_batch]):
-      nx_graph.add_node(n, node_feature=nodes[node_padd + n])
-    for e in range(jraph_graph.n_edge[number_graph_batch]):
-      nx_graph.add_edge(
-        int(senders[edges_padd + e]) - node_padd, int(receivers[edges_padd + e] - node_padd),
-        edge_feature=edges[edges_padd + e])
-  return nx_graph
+    nodes, edges, receivers, senders, _, _, _ = jraph_graph
+    node_padd = 0
+    edges_padd = 0
+    for i in range(number_graph_batch):
+        node_padd = node_padd + jraph_graph.n_node[i]
+        edges_padd = edges_padd + jraph_graph.n_edge[i]
+    nx_graph = nx.DiGraph()
+    if nodes is None:
+        for n in range(jraph_graph.n_node[number_graph_batch]):
+            nx_graph.add_node(n)
+    else:
+        for n in range(jraph_graph.n_node[number_graph_batch]):
+            nx_graph.add_node(n, node_feature=nodes[node_padd + n])
+        for e in range(jraph_graph.n_edge[number_graph_batch]):
+            nx_graph.add_edge(
+                int(senders[edges_padd + e]) - node_padd,
+                int(receivers[edges_padd + e] - node_padd),
+                edge_feature=edges[edges_padd + e],
+            )
+    return nx_graph
 
 
 if __name__ == "__main__":
-  #n, m = 4, 6
-  # g = nx.grid_2d_graph(n, m)
-  # pos = np.array(g.nodes)
-  # path_uw = nx.shortest_path(g, list(g.nodes)[0], list(g.nodes)[-1])
-  # sigma_on_edge_weight_noise = 0.3
-  # min_edge_weight = 0.5
-  # for i, j in g.edges():
-  #   g[i][j]['weight'] = np.max([sigma_on_edge_weight_noise * np.random.rand() + 1., min_edge_weight])
-  # print(g['weight'] )
-  # path_w = nx.shortest_path(g, list(g.nodes)[0], list(g.nodes)[-1], weight='weight')
+    # n, m = 4, 6
+    # g = nx.grid_2d_graph(n, m)
+    # pos = np.array(g.nodes)
+    # path_uw = nx.shortest_path(g, list(g.nodes)[0], list(g.nodes)[-1])
+    # sigma_on_edge_weight_noise = 0.3
+    # min_edge_weight = 0.5
+    # for i, j in g.edges():
+    #   g[i][j]['weight'] = np.max([sigma_on_edge_weight_noise * np.random.rand() + 1., min_edge_weight])
+    # print(g['weight'] )
+    # path_w = nx.shortest_path(g, list(g.nodes)[0], list(g.nodes)[-1], weight='weight')
 
-  shortest_path()
+    shortest_path()
 
-  # ok it seems to go in the adj matrix, but the quesiton why when it is on the weigths it does not make a difference really
-  # then I juste neeed to check if the shortest path is computed ok :)
-
+    # ok it seems to go in the adj matrix, but the quesiton why when it is on the weigths it does not make a difference really
+    # then I juste neeed to check if the shortest path is computed ok :)

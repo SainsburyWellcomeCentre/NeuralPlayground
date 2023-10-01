@@ -1,73 +1,73 @@
-from config_manager import config_field
-from config_manager  import config_template
+from config_manager import config_field, config_template
+
 
 class ConfigTemplate:
     _grid_template = config_template.Template(
         fields=[
             config_field.Field(
-                name='resample',
+                name="resample",
                 types=[bool],
             ),
-    config_field.Field(
-        name='train_on_shortest_path',
-        types=[bool],
-    ),
-    config_field.Field(
-        name='wandb_on',
-        types=[bool],
-    ),
-    config_field.Field(
-                name='weighted',
+            config_field.Field(
+                name="train_on_shortest_path",
                 types=[bool],
             ),
-    config_field.Field(
-                name='seed',
+            config_field.Field(
+                name="wandb_on",
+                types=[bool],
+            ),
+            config_field.Field(
+                name="weighted",
+                types=[bool],
+            ),
+            config_field.Field(
+                name="seed",
                 types=[int],
             ),
-    config_field.Field(
-        name='batch_size',
-        types=[int],
-    ),
-    config_field.Field(
-        name='nx_min',
-        types=[int],
-    ),
-    config_field.Field(
-        name='nx_max',
-        types=[int],
-    ),
-    config_field.Field(
-        name='batch_size_test',
-        types=[int],
-    ),
-    config_field.Field(
-        name='nx_min_test',
-        types=[int],
-    ),
-    config_field.Field(
-        name='nx_max_test',
-        types=[int],
-    ),
-    config_field.Field(
-        name='num_hidden',
-        types=[int],
-    ),
-    config_field.Field(
-        name='num_layers',
-        types=[int],
-    ),
-    # @param
-    config_field.Field(
-        name='num_message_passing_steps',
-        types=[int],
-    ),
-    # @param
-    config_field.Field(
-        name='learning_rate',
-        types=[float],
-    ),
             config_field.Field(
-                name='num_training_steps',
+                name="batch_size",
+                types=[int],
+            ),
+            config_field.Field(
+                name="nx_min",
+                types=[int],
+            ),
+            config_field.Field(
+                name="nx_max",
+                types=[int],
+            ),
+            config_field.Field(
+                name="batch_size_test",
+                types=[int],
+            ),
+            config_field.Field(
+                name="nx_min_test",
+                types=[int],
+            ),
+            config_field.Field(
+                name="nx_max_test",
+                types=[int],
+            ),
+            config_field.Field(
+                name="num_hidden",
+                types=[int],
+            ),
+            config_field.Field(
+                name="num_layers",
+                types=[int],
+            ),
+            # @param
+            config_field.Field(
+                name="num_message_passing_steps",
+                types=[int],
+            ),
+            # @param
+            config_field.Field(
+                name="learning_rate",
+                types=[float],
+            ),
+            config_field.Field(
+                name="num_training_steps",
                 types=[float, int],
             ),
         ],
@@ -75,77 +75,77 @@ class ConfigTemplate:
     base_config_template = config_template.Template(
         fields=[
             config_field.Field(
-                name='experiment_name',
+                name="experiment_name",
                 types=[str, type(None)],
             ),
             config_field.Field(
-                name='resample',
+                name="resample",
                 types=[bool],
             ),
             config_field.Field(
-                name='train_on_shortest_path',
+                name="train_on_shortest_path",
                 types=[bool],
             ),
             config_field.Field(
-                name='wandb_on',
+                name="wandb_on",
                 types=[bool],
             ),
             config_field.Field(
-                name='batch_size',
+                name="batch_size",
                 types=[int],
             ),
             config_field.Field(
-                name='nx_min',
+                name="nx_min",
                 types=[int],
             ),
             config_field.Field(
-                name='nx_max',
+                name="nx_max",
                 types=[int],
             ),
             config_field.Field(
-                name='batch_size_test',
+                name="batch_size_test",
                 types=[int],
             ),
             config_field.Field(
-                name='nx_min_test',
+                name="nx_min_test",
                 types=[int],
             ),
             config_field.Field(
-                name='nx_max_test',
+                name="nx_max_test",
                 types=[int],
             ),
             config_field.Field(
-                name='num_hidden',
+                name="num_hidden",
                 types=[int],
             ),
             config_field.Field(
-                name='num_layers',
+                name="num_layers",
                 types=[int],
             ),
             # @param
             config_field.Field(
-                name='num_message_passing_steps',
+                name="num_message_passing_steps",
                 types=[int],
             ),
             config_field.Field(
-                name='seed',
+                name="seed",
                 types=[int],
             ),
             # @param
             config_field.Field(
-                name='learning_rate',
+                name="learning_rate",
                 types=[float],
             ),
             config_field.Field(
-                name='feature_position',
+                name="feature_position",
                 types=[bool],
             ),
             config_field.Field(
-                name='weighted',
+                name="weighted",
                 types=[bool],
             ),
             config_field.Field(
-                name='num_training_steps',
+                name="num_training_steps",
                 types=[float, int],
             ),
         ],

@@ -21,5 +21,3 @@ num_message_passing_steps: 3  # @param
 learning_rate: 0.001 # @param
 num_training_steps: 10 # @param
 # for loop
-
-

@@ -1,11 +1,14 @@
-from typing import Dict
-from typing import Union
-from config_template import ConfigTemplate
+from typing import Dict, Union
+
 from config_manager import base_configuration
+from config_template import ConfigTemplate
 
 
 class GridConfig(base_configuration.BaseConfiguration):
-    def __init__(self, config: Union[str, Dict],) -> None:
+    def __init__(
+        self,
+        config: Union[str, Dict],
+    ) -> None:
         super().__init__(
             configuration=config,
             template=ConfigTemplate.base_config_template,
