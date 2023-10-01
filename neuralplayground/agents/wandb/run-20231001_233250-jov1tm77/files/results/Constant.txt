@@ -1,0 +1,3 @@
+num_message_passing_steps10
+Learning_rate:0.001
+num_training_steps:10roc_auc0.8596048759983186MCC0.25969677128314994

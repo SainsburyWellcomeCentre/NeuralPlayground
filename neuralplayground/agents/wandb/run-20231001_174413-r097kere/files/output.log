@@ -1,0 +1,16 @@
+
+Training step 0: loss = 0.06412222981452942
+Training step 1: loss = 4010978.0
+Training step 2: loss = 191664.796875
+Training step 3: loss = 280827.125
+Training step 4: loss = 504177.8125
+Training step 5: loss = 249996.859375
+Training step 6: loss = 5380.0478515625
+Training step 7: loss = 2102780.5
+Training step 8: loss = 3185.2509765625
+Training step 9: loss = 938320.875
+roc_auc_score
+0.703763440860215
+MCC
+-0.008302258023111965
+Backend MacOSX is interactive backend. Turning interactive mode on.

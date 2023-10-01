@@ -1,0 +1,463 @@
+2023-10-01 16:49:44,580 INFO    StreamThr :5183 [internal.py:wandb_internal():86] W&B internal server running at pid: 5183, started at: 2023-10-01 16:49:44.578999
+2023-10-01 16:49:44,582 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status
+2023-10-01 16:49:44,594 INFO    WriterThread:5183 [datastore.py:open_for_write():85] open: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/run-xmzqzyj8.wandb
+2023-10-01 16:49:44,595 DEBUG   SenderThread:5183 [sender.py:send():380] send: header
+2023-10-01 16:49:44,650 DEBUG   SenderThread:5183 [sender.py:send():380] send: run
+2023-10-01 16:49:45,026 INFO    SenderThread:5183 [dir_watcher.py:__init__():211] watching files in: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files
+2023-10-01 16:49:45,026 INFO    SenderThread:5183 [sender.py:_start_run_threads():1122] run started: xmzqzyj8 with start time 1696175384.580315
+2023-10-01 16:49:45,046 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: check_version
+2023-10-01 16:49:45,047 DEBUG   SenderThread:5183 [sender.py:send_request():407] send_request: check_version
+2023-10-01 16:49:45,113 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: run_start
+2023-10-01 16:49:45,129 DEBUG   HandlerThread:5183 [system_info.py:__init__():32] System info init
+2023-10-01 16:49:45,130 DEBUG   HandlerThread:5183 [system_info.py:__init__():47] System info init done
+2023-10-01 16:49:45,130 INFO    HandlerThread:5183 [system_monitor.py:start():181] Starting system monitor
+2023-10-01 16:49:45,131 INFO    SystemMonitor:5183 [system_monitor.py:_start():145] Starting system asset monitoring threads
+2023-10-01 16:49:45,131 INFO    HandlerThread:5183 [system_monitor.py:probe():201] Collecting system info
+2023-10-01 16:49:45,133 INFO    SystemMonitor:5183 [interfaces.py:start():190] Started cpu monitoring
+2023-10-01 16:49:45,134 DEBUG   HandlerThread:5183 [system_info.py:probe():196] Probing system
+2023-10-01 16:49:45,135 INFO    SystemMonitor:5183 [interfaces.py:start():190] Started disk monitoring
+2023-10-01 16:49:45,137 INFO    SystemMonitor:5183 [interfaces.py:start():190] Started memory monitoring
+2023-10-01 16:49:45,139 INFO    SystemMonitor:5183 [interfaces.py:start():190] Started network monitoring
+2023-10-01 16:49:45,153 DEBUG   HandlerThread:5183 [system_info.py:_probe_git():181] Probing git
+2023-10-01 16:49:45,268 DEBUG   HandlerThread:5183 [system_info.py:_probe_git():189] Probing git done
+2023-10-01 16:49:45,268 DEBUG   HandlerThread:5183 [system_info.py:probe():244] Probing system done
+2023-10-01 16:49:45,269 DEBUG   HandlerThread:5183 [system_monitor.py:probe():210] {'os': 'macOS-12.6.3-x86_64-i386-64bit', 'python': '3.10.12', 'heartbeatAt': '2023-10-01T15:49:45.134768', 'startedAt': '2023-10-01T15:49:44.564039', 'docker': None, 'cuda': None, 'args': (), 'state': 'running', 'program': '/Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/class.py', 'codePathLocal': 'class.py', 'codePath': 'neuralplayground/agents/class.py', 'git': {'remote': 'https://github.com/SainsburyWellcomeCentre/NeuralPlayground', 'commit': 'ce2f8696408c130855be781acabd40bfc7b4fd5b'}, 'email': 'clementine.domine98@gmail.com', 'root': '/Users/clementine/Documents/UCL/NeuralPlayground', 'host': 'eduroam-int-dhcp-97-204-21.ucl.ac.uk', 'username': 'clementine', 'executable': '/Users/clementine/miniconda3/envs/NPG-env/bin/python', 'cpu_count': 8, 'cpu_count_logical': 8, 'cpu_freq': {'current': 2400, 'min': 2400, 'max': 2400}, 'cpu_freq_per_core': [{'current': 2400, 'min': 2400, 'max': 2400}], 'disk': {'/': {'total': 460.4317207336426, 'used': 20.62871551513672}}, 'memory': {'total': 32.0}}
+2023-10-01 16:49:45,269 INFO    HandlerThread:5183 [system_monitor.py:probe():211] Finished collecting system info
+2023-10-01 16:49:45,269 INFO    HandlerThread:5183 [system_monitor.py:probe():214] Publishing system info
+2023-10-01 16:49:45,269 DEBUG   HandlerThread:5183 [system_info.py:_save_pip():52] Saving list of pip packages installed into the current environment
+2023-10-01 16:49:45,271 DEBUG   HandlerThread:5183 [system_info.py:_save_pip():68] Saving pip packages done
+2023-10-01 16:49:45,272 DEBUG   HandlerThread:5183 [system_info.py:_save_conda():75] Saving list of conda packages installed into the current environment
+2023-10-01 16:49:46,037 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/requirements.txt
+2023-10-01 16:49:46,037 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/conda-environment.yaml
+2023-10-01 16:49:46,905 DEBUG   HandlerThread:5183 [system_info.py:_save_conda():87] Saving conda packages done
+2023-10-01 16:49:46,910 INFO    HandlerThread:5183 [system_monitor.py:probe():216] Finished publishing system info
+2023-10-01 16:49:46,924 DEBUG   SenderThread:5183 [sender.py:send():380] send: files
+2023-10-01 16:49:46,924 INFO    SenderThread:5183 [sender.py:_save_file():1378] saving file wandb-metadata.json with policy now
+2023-10-01 16:49:46,934 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 16:49:46,935 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 16:49:46,936 DEBUG   SenderThread:5183 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 16:49:47,037 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/conda-environment.yaml
+2023-10-01 16:49:47,037 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/results/Graph_generation.py
+2023-10-01 16:49:47,038 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/results/utils.py
+2023-10-01 16:49:47,038 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/results/plotting_utils.py
+2023-10-01 16:49:47,038 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/wandb-metadata.json
+2023-10-01 16:49:47,039 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/results/config_run.yaml
+2023-10-01 16:49:47,039 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/results/run.py
+2023-10-01 16:49:47,039 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/results
+2023-10-01 16:49:47,097 DEBUG   SenderThread:5183 [sender.py:send():380] send: telemetry
+2023-10-01 16:49:47,456 INFO    wandb-upload_0:5183 [upload_job.py:push():131] Uploaded file /var/folders/lk/fjxx3prd2h31kn1cfccrk8fc0000gq/T/tmpo3to0t_uwandb/nuhb8nyy-wandb-metadata.json
+2023-10-01 16:49:50,108 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:49:52,052 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/results
+2023-10-01 16:49:55,125 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:50:00,144 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:50:01,094 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/output.log
+2023-10-01 16:50:01,935 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 16:50:01,938 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 16:50:01,938 DEBUG   SenderThread:5183 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 16:50:03,106 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/output.log
+2023-10-01 16:50:05,157 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:50:10,183 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:50:15,228 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:50:16,209 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/config.yaml
+2023-10-01 16:50:16,944 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 16:50:16,945 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 16:50:16,946 DEBUG   SenderThread:5183 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 16:50:21,138 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:50:26,162 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:50:31,188 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:50:31,946 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 16:50:31,947 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 16:50:31,948 DEBUG   SenderThread:5183 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 16:50:37,138 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:50:38,523 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: partial_history
+2023-10-01 16:50:38,525 DEBUG   SenderThread:5183 [sender.py:send():380] send: history
+2023-10-01 16:50:38,525 DEBUG   SenderThread:5183 [sender.py:send_request():407] send_request: summary_record
+2023-10-01 16:50:38,527 INFO    SenderThread:5183 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-10-01 16:50:39,360 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/wandb-summary.json
+2023-10-01 16:50:41,361 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/output.log
+2023-10-01 16:50:42,545 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:50:45,144 DEBUG   SystemMonitor:5183 [system_monitor.py:_start():159] Starting system metrics aggregation loop
+2023-10-01 16:50:45,146 DEBUG   SenderThread:5183 [sender.py:send():380] send: stats
+2023-10-01 16:50:46,944 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 16:50:46,949 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 16:50:46,950 DEBUG   SenderThread:5183 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 16:50:48,121 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:50:49,199 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: partial_history
+2023-10-01 16:50:49,201 DEBUG   SenderThread:5183 [sender.py:send():380] send: history
+2023-10-01 16:50:49,201 DEBUG   SenderThread:5183 [sender.py:send_request():407] send_request: summary_record
+2023-10-01 16:50:49,202 INFO    SenderThread:5183 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-10-01 16:50:49,402 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/wandb-summary.json
+2023-10-01 16:50:51,414 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/output.log
+2023-10-01 16:50:51,471 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: partial_history
+2023-10-01 16:50:51,472 DEBUG   SenderThread:5183 [sender.py:send():380] send: history
+2023-10-01 16:50:51,473 DEBUG   SenderThread:5183 [sender.py:send_request():407] send_request: summary_record
+2023-10-01 16:50:51,473 INFO    SenderThread:5183 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-10-01 16:50:52,419 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/wandb-summary.json
+2023-10-01 16:50:53,421 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/output.log
+2023-10-01 16:50:53,483 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:50:53,876 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: partial_history
+2023-10-01 16:50:53,878 DEBUG   SenderThread:5183 [sender.py:send():380] send: history
+2023-10-01 16:50:53,878 DEBUG   SenderThread:5183 [sender.py:send_request():407] send_request: summary_record
+2023-10-01 16:50:53,878 INFO    SenderThread:5183 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-10-01 16:50:54,426 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/wandb-summary.json
+2023-10-01 16:50:55,428 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/output.log
+2023-10-01 16:50:56,412 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: partial_history
+2023-10-01 16:50:56,413 DEBUG   SenderThread:5183 [sender.py:send():380] send: history
+2023-10-01 16:50:56,413 DEBUG   SenderThread:5183 [sender.py:send_request():407] send_request: summary_record
+2023-10-01 16:50:56,414 INFO    SenderThread:5183 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-10-01 16:50:56,434 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/wandb-summary.json
+2023-10-01 16:50:57,435 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/output.log
+2023-10-01 16:50:58,707 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: partial_history
+2023-10-01 16:50:58,708 DEBUG   SenderThread:5183 [sender.py:send():380] send: history
+2023-10-01 16:50:58,708 DEBUG   SenderThread:5183 [sender.py:send_request():407] send_request: summary_record
+2023-10-01 16:50:58,709 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:50:58,709 INFO    SenderThread:5183 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-10-01 16:50:59,437 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/wandb-summary.json
+2023-10-01 16:51:01,290 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: partial_history
+2023-10-01 16:51:01,291 DEBUG   SenderThread:5183 [sender.py:send():380] send: history
+2023-10-01 16:51:01,291 DEBUG   SenderThread:5183 [sender.py:send_request():407] send_request: summary_record
+2023-10-01 16:51:01,291 INFO    SenderThread:5183 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-10-01 16:51:01,448 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/wandb-summary.json
+2023-10-01 16:51:01,448 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/output.log
+2023-10-01 16:51:01,972 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 16:51:01,972 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 16:51:01,973 DEBUG   SenderThread:5183 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 16:51:03,458 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/output.log
+2023-10-01 16:51:03,657 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: partial_history
+2023-10-01 16:51:03,658 DEBUG   SenderThread:5183 [sender.py:send():380] send: history
+2023-10-01 16:51:03,658 DEBUG   SenderThread:5183 [sender.py:send_request():407] send_request: summary_record
+2023-10-01 16:51:03,659 INFO    SenderThread:5183 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-10-01 16:51:04,464 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/wandb-summary.json
+2023-10-01 16:51:04,663 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:51:05,470 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/output.log
+2023-10-01 16:51:05,867 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: partial_history
+2023-10-01 16:51:05,868 DEBUG   SenderThread:5183 [sender.py:send():380] send: history
+2023-10-01 16:51:05,869 DEBUG   SenderThread:5183 [sender.py:send_request():407] send_request: summary_record
+2023-10-01 16:51:05,869 INFO    SenderThread:5183 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-10-01 16:51:06,475 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/wandb-summary.json
+2023-10-01 16:51:07,481 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/output.log
+2023-10-01 16:51:07,842 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: partial_history
+2023-10-01 16:51:07,843 DEBUG   SenderThread:5183 [sender.py:send():380] send: history
+2023-10-01 16:51:07,844 DEBUG   SenderThread:5183 [sender.py:send_request():407] send_request: summary_record
+2023-10-01 16:51:07,844 INFO    SenderThread:5183 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-10-01 16:51:08,486 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/wandb-summary.json
+2023-10-01 16:51:08,486 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/results/Constant.txt
+2023-10-01 16:51:08,487 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/results/Losses.pdf
+2023-10-01 16:51:08,487 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/results
+2023-10-01 16:51:09,490 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/results/Losses.pdf
+2023-10-01 16:51:09,490 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/output.log
+2023-10-01 16:51:09,490 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/results/Losses_test.pdf
+2023-10-01 16:51:09,491 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/results/auc_roc_test.pdf
+2023-10-01 16:51:09,491 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/results/MCC_test.pdf
+2023-10-01 16:51:09,491 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/results/MCC_train.pdf
+2023-10-01 16:51:09,491 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/results/auc_roc_train.pdf
+2023-10-01 16:51:09,491 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/results
+2023-10-01 16:51:09,954 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:51:13,512 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/results/in_out_targ.pdf
+2023-10-01 16:51:13,513 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/results
+2023-10-01 16:51:14,518 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/results/in_out_targ.pdf
+2023-10-01 16:51:14,974 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:51:15,152 DEBUG   SenderThread:5183 [sender.py:send():380] send: stats
+2023-10-01 16:51:15,524 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/results/in_out_targ.pdf
+2023-10-01 16:51:16,530 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/results/in_out_targ.pdf
+2023-10-01 16:51:16,961 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 16:51:16,961 DEBUG   SenderThread:5183 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 16:51:17,200 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 16:51:17,536 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/results/in_out_targ.pdf
+2023-10-01 16:51:19,542 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/results
+2023-10-01 16:51:20,196 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:51:23,556 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/results/message_passing_graph.pdf
+2023-10-01 16:51:23,557 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/results
+2023-10-01 16:51:24,562 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/results/message_passing_graph.pdf
+2023-10-01 16:51:25,220 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:51:25,568 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/results/message_passing_graph.pdf
+2023-10-01 16:51:26,574 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/results/message_passing_graph.pdf
+2023-10-01 16:51:27,577 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/results/message_passing_graph.pdf
+2023-10-01 16:51:28,582 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/results/message_passing_graph.pdf
+2023-10-01 16:51:29,586 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/results/outputs.pdf
+2023-10-01 16:51:29,587 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/results
+2023-10-01 16:51:30,239 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:51:30,591 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/results/Inputs.pdf
+2023-10-01 16:51:30,592 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/results
+2023-10-01 16:51:31,597 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/results
+2023-10-01 16:51:31,971 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 16:51:31,972 DEBUG   SenderThread:5183 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 16:51:31,981 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 16:51:32,603 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/output.log
+2023-10-01 16:51:33,606 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/results
+2023-10-01 16:51:35,618 INFO    Thread-17 :5183 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_164944-xmzqzyj8/files/results
+2023-10-01 16:51:36,210 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:51:41,234 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:51:45,163 DEBUG   SenderThread:5183 [sender.py:send():380] send: stats
+2023-10-01 16:51:46,984 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 16:51:46,985 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:51:46,986 DEBUG   SenderThread:5183 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 16:51:46,991 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 16:51:52,236 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:51:57,260 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:52:02,000 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 16:52:02,000 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 16:52:02,001 DEBUG   SenderThread:5183 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 16:52:03,212 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:52:08,238 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:52:13,264 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:52:15,171 DEBUG   SenderThread:5183 [sender.py:send():380] send: stats
+2023-10-01 16:52:17,005 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 16:52:17,006 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 16:52:17,007 DEBUG   SenderThread:5183 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 16:52:19,226 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:52:24,260 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:52:29,285 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:52:32,015 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 16:52:32,016 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 16:52:32,017 DEBUG   SenderThread:5183 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 16:52:35,190 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:52:40,206 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:52:45,181 DEBUG   SenderThread:5183 [sender.py:send():380] send: stats
+2023-10-01 16:52:46,189 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:52:47,022 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 16:52:47,023 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 16:52:47,024 DEBUG   SenderThread:5183 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 16:52:51,213 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:52:56,227 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:53:01,248 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:53:02,022 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 16:53:02,024 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 16:53:02,028 DEBUG   SenderThread:5183 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 16:53:07,213 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:53:12,231 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:53:15,190 DEBUG   SenderThread:5183 [sender.py:send():380] send: stats
+2023-10-01 16:53:17,026 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 16:53:17,027 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 16:53:17,028 DEBUG   SenderThread:5183 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 16:53:17,260 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:53:22,282 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:53:27,307 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:53:32,035 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 16:53:32,036 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 16:53:32,037 DEBUG   SenderThread:5183 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 16:53:33,268 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:53:38,290 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:53:43,310 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:53:45,194 DEBUG   SenderThread:5183 [sender.py:send():380] send: stats
+2023-10-01 16:53:47,040 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 16:53:47,041 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 16:53:47,041 DEBUG   SenderThread:5183 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 16:53:49,250 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:53:54,274 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:53:59,291 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:54:02,044 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 16:54:02,045 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 16:54:02,046 DEBUG   SenderThread:5183 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 16:54:05,287 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:54:10,308 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:54:15,199 DEBUG   SenderThread:5183 [sender.py:send():380] send: stats
+2023-10-01 16:54:16,202 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:54:17,046 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 16:54:17,046 DEBUG   SenderThread:5183 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 16:54:17,050 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 16:54:21,216 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:54:26,239 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:54:31,257 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:54:32,054 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 16:54:32,057 DEBUG   SenderThread:5183 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 16:54:32,058 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 16:54:36,307 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:54:41,325 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:54:45,210 DEBUG   SenderThread:5183 [sender.py:send():380] send: stats
+2023-10-01 16:54:47,027 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:54:47,056 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 16:54:47,057 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 16:54:47,057 DEBUG   SenderThread:5183 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 16:54:52,371 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:54:57,394 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:55:02,060 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 16:55:02,061 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 16:55:02,062 DEBUG   SenderThread:5183 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 16:55:03,286 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:55:08,305 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:55:13,323 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:55:15,217 DEBUG   SenderThread:5183 [sender.py:send():380] send: stats
+2023-10-01 16:55:17,062 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 16:55:17,067 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 16:55:17,068 DEBUG   SenderThread:5183 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 16:55:19,242 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:55:24,263 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:55:29,284 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:55:32,065 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 16:55:32,067 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 16:55:32,067 DEBUG   SenderThread:5183 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 16:55:34,288 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:55:39,303 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:55:44,322 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:55:45,221 DEBUG   SenderThread:5183 [sender.py:send():380] send: stats
+2023-10-01 16:55:47,070 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 16:55:47,072 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 16:55:47,072 DEBUG   SenderThread:5183 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 16:55:50,303 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:55:55,319 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:56:00,336 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:56:02,077 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 16:56:02,080 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 16:56:02,081 DEBUG   SenderThread:5183 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 16:56:06,340 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:56:11,361 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:56:15,227 DEBUG   SenderThread:5183 [sender.py:send():380] send: stats
+2023-10-01 16:56:17,051 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:56:17,078 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 16:56:17,079 DEBUG   SenderThread:5183 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 16:56:17,083 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 16:56:22,320 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:56:27,341 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:56:32,082 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 16:56:32,082 DEBUG   SenderThread:5183 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 16:56:32,085 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 16:56:33,253 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:56:38,273 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:56:43,292 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:56:45,233 DEBUG   SenderThread:5183 [sender.py:send():380] send: stats
+2023-10-01 16:56:47,084 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 16:56:47,084 DEBUG   SenderThread:5183 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 16:56:47,090 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 16:56:49,288 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:56:54,304 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:56:59,326 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:57:02,085 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 16:57:02,085 DEBUG   SenderThread:5183 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 16:57:02,093 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 16:57:04,331 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:57:09,346 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:57:14,353 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:57:15,247 DEBUG   SenderThread:5183 [sender.py:send():380] send: stats
+2023-10-01 16:57:17,086 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 16:57:17,086 DEBUG   SenderThread:5183 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 16:57:17,098 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 16:57:20,304 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:57:25,322 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:57:30,346 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:57:32,087 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 16:57:32,088 DEBUG   SenderThread:5183 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 16:57:32,100 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 16:57:36,234 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:57:41,254 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:57:45,250 DEBUG   SenderThread:5183 [sender.py:send():380] send: stats
+2023-10-01 16:57:47,077 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:57:47,092 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 16:57:47,093 DEBUG   SenderThread:5183 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 16:57:47,103 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 16:57:52,330 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:57:57,351 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:58:02,097 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 16:58:02,098 DEBUG   SenderThread:5183 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 16:58:02,104 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 16:58:03,277 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:58:08,299 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:58:13,314 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:58:15,259 DEBUG   SenderThread:5183 [sender.py:send():380] send: stats
+2023-10-01 16:58:17,102 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 16:58:17,103 DEBUG   SenderThread:5183 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 16:58:17,106 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 16:58:19,319 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:58:24,337 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:58:29,361 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:58:32,104 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 16:58:32,104 DEBUG   SenderThread:5183 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 16:58:32,107 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 16:58:35,253 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:58:40,273 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:58:45,267 DEBUG   SenderThread:5183 [sender.py:send():380] send: stats
+2023-10-01 16:58:46,275 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:58:47,112 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 16:58:47,114 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 16:58:47,115 DEBUG   SenderThread:5183 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 16:58:51,319 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:58:56,343 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:59:01,361 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:59:02,115 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 16:59:02,115 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 16:59:02,116 DEBUG   SenderThread:5183 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 16:59:06,454 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:59:11,474 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:59:15,271 DEBUG   SenderThread:5183 [sender.py:send():380] send: stats
+2023-10-01 16:59:17,102 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:59:17,120 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 16:59:17,122 DEBUG   SenderThread:5183 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 16:59:17,122 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 16:59:22,352 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:59:27,366 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:59:32,121 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 16:59:32,122 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 16:59:32,123 DEBUG   SenderThread:5183 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 16:59:33,305 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:59:38,331 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:59:43,350 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:59:45,278 DEBUG   SenderThread:5183 [sender.py:send():380] send: stats
+2023-10-01 16:59:47,126 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 16:59:47,127 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 16:59:47,128 DEBUG   SenderThread:5183 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 16:59:49,343 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:59:54,371 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 16:59:59,390 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 17:00:02,135 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 17:00:02,135 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 17:00:02,136 DEBUG   SenderThread:5183 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 17:00:05,317 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 17:00:10,332 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 17:00:15,290 DEBUG   SenderThread:5183 [sender.py:send():380] send: stats
+2023-10-01 17:00:16,298 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 17:00:17,137 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 17:00:17,137 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 17:00:17,138 DEBUG   SenderThread:5183 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 17:00:21,425 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 17:00:26,435 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 17:00:31,454 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 17:00:32,145 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 17:00:32,146 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 17:00:32,147 DEBUG   SenderThread:5183 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 17:00:37,348 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 17:00:42,366 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 17:00:45,293 DEBUG   SenderThread:5183 [sender.py:send():380] send: stats
+2023-10-01 17:00:47,144 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 17:00:47,145 DEBUG   SenderThread:5183 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 17:00:47,149 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 17:00:48,361 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 17:00:53,380 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 17:00:58,400 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 17:01:02,146 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 17:01:02,149 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 17:01:02,149 DEBUG   SenderThread:5183 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 17:01:04,371 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 17:01:09,390 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 17:01:14,412 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 17:01:15,295 DEBUG   SenderThread:5183 [sender.py:send():380] send: stats
+2023-10-01 17:01:17,152 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 17:01:17,155 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 17:01:17,155 DEBUG   SenderThread:5183 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 17:01:20,343 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 17:01:25,364 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 17:01:30,385 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 17:01:32,159 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 17:01:32,161 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 17:01:32,162 DEBUG   SenderThread:5183 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 17:01:35,428 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 17:01:40,450 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 17:01:45,303 DEBUG   SenderThread:5183 [sender.py:send():380] send: stats
+2023-10-01 17:01:46,309 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 17:01:47,161 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 17:01:47,164 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 17:01:47,165 DEBUG   SenderThread:5183 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 17:01:51,324 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 17:01:56,346 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 17:02:01,362 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 17:02:06,381 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 17:02:11,398 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 17:02:15,306 DEBUG   SenderThread:5183 [sender.py:send():380] send: stats
+2023-10-01 17:02:17,317 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 17:02:22,335 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 17:02:27,354 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 17:02:32,379 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 17:02:37,400 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 17:02:42,423 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 17:02:45,311 DEBUG   SenderThread:5183 [sender.py:send():380] send: stats
+2023-10-01 17:02:48,321 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 17:02:53,334 DEBUG   HandlerThread:5183 [handler.py:handle_request():144] handle_request: status_report

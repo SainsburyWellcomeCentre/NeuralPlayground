@@ -1,0 +1,15 @@
+
+Training step 0: loss = 0.06483390182256699
+Training step 1: loss = 4085514.0
+Training step 2: loss = 474434.03125
+Training step 3: loss = 26492.30859375
+Training step 4: loss = 235368.953125
+Training step 5: loss = 655380.0625
+Training step 6: loss = 38793.484375
+Training step 7: loss = 42818.75390625
+Training step 8: loss = 50575.33203125
+Training step 9: loss = 2172935.25
+roc_auc_score
+0.3774193548387097
+MCC
+-0.008302258023111965

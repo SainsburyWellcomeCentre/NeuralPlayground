@@ -1,0 +1,14 @@
+
+Backend MacOSX is interactive backend. Turning interactive mode on.
+Traceback (most recent call last):
+  File "/Applications/PyCharm CE (Previous).app/Contents/plugins/python-ce/helpers/pydev/pydevd.py", line 1483, in _exec
+    pydev_imports.execfile(file, globals, locals)  # execute the script
+  File "/Applications/PyCharm CE (Previous).app/Contents/plugins/python-ce/helpers/pydev/_pydev_imps/_pydev_execfile.py", line 18, in execfile
+    exec(compile(contents+"\n", file, 'exec'), glob, loc)
+  File "/Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/class.py", line 273, in <module>
+    agent= Stachenfel2023(config_path=args.config_path, config=config)
+  File "/Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/class.py", line 66, in __init__
+    shutil.copyfile(HERE, path)
+  File "/Users/clementine/miniconda3/envs/NPG-env/lib/python3.10/shutil.py", line 254, in copyfile
+    with open(src, 'rb') as fsrc:
+FileNotFoundError: [Errno 2] No such file or directory: '/Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/run.py'

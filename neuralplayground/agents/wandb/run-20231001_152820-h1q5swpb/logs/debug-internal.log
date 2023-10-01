@@ -1,0 +1,105 @@
+2023-10-01 15:28:20,143 INFO    StreamThr :74240 [internal.py:wandb_internal():86] W&B internal server running at pid: 74240, started at: 2023-10-01 15:28:20.141922
+2023-10-01 15:28:20,145 DEBUG   HandlerThread:74240 [handler.py:handle_request():144] handle_request: status
+2023-10-01 15:28:20,160 INFO    WriterThread:74240 [datastore.py:open_for_write():85] open: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_152820-h1q5swpb/run-h1q5swpb.wandb
+2023-10-01 15:28:20,161 DEBUG   SenderThread:74240 [sender.py:send():380] send: header
+2023-10-01 15:28:20,231 DEBUG   SenderThread:74240 [sender.py:send():380] send: run
+2023-10-01 15:28:20,595 INFO    SenderThread:74240 [dir_watcher.py:__init__():211] watching files in: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_152820-h1q5swpb/files
+2023-10-01 15:28:20,595 INFO    SenderThread:74240 [sender.py:_start_run_threads():1122] run started: h1q5swpb with start time 1696170500.141464
+2023-10-01 15:28:20,625 DEBUG   HandlerThread:74240 [handler.py:handle_request():144] handle_request: check_version
+2023-10-01 15:28:20,626 DEBUG   SenderThread:74240 [sender.py:send_request():407] send_request: check_version
+2023-10-01 15:28:20,698 DEBUG   HandlerThread:74240 [handler.py:handle_request():144] handle_request: run_start
+2023-10-01 15:28:20,716 DEBUG   HandlerThread:74240 [system_info.py:__init__():32] System info init
+2023-10-01 15:28:20,716 DEBUG   HandlerThread:74240 [system_info.py:__init__():47] System info init done
+2023-10-01 15:28:20,716 INFO    HandlerThread:74240 [system_monitor.py:start():181] Starting system monitor
+2023-10-01 15:28:20,717 INFO    SystemMonitor:74240 [system_monitor.py:_start():145] Starting system asset monitoring threads
+2023-10-01 15:28:20,717 INFO    HandlerThread:74240 [system_monitor.py:probe():201] Collecting system info
+2023-10-01 15:28:20,718 INFO    SystemMonitor:74240 [interfaces.py:start():190] Started cpu monitoring
+2023-10-01 15:28:20,719 DEBUG   HandlerThread:74240 [system_info.py:probe():196] Probing system
+2023-10-01 15:28:20,721 INFO    SystemMonitor:74240 [interfaces.py:start():190] Started disk monitoring
+2023-10-01 15:28:20,722 INFO    SystemMonitor:74240 [interfaces.py:start():190] Started memory monitoring
+2023-10-01 15:28:20,723 INFO    SystemMonitor:74240 [interfaces.py:start():190] Started network monitoring
+2023-10-01 15:28:20,739 DEBUG   HandlerThread:74240 [system_info.py:_probe_git():181] Probing git
+2023-10-01 15:28:20,810 DEBUG   HandlerThread:74240 [system_info.py:_probe_git():189] Probing git done
+2023-10-01 15:28:20,811 DEBUG   HandlerThread:74240 [system_info.py:probe():244] Probing system done
+2023-10-01 15:28:20,811 DEBUG   HandlerThread:74240 [system_monitor.py:probe():210] {'os': 'macOS-12.6.3-x86_64-i386-64bit', 'python': '3.10.12', 'heartbeatAt': '2023-10-01T14:28:20.719643', 'startedAt': '2023-10-01T14:28:20.119297', 'docker': None, 'cuda': None, 'args': (), 'state': 'running', 'program': '/Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/class.py', 'codePathLocal': 'class.py', 'codePath': 'neuralplayground/agents/class.py', 'git': {'remote': 'https://github.com/SainsburyWellcomeCentre/NeuralPlayground', 'commit': 'ce2f8696408c130855be781acabd40bfc7b4fd5b'}, 'email': 'clementine.domine98@gmail.com', 'root': '/Users/clementine/Documents/UCL/NeuralPlayground', 'host': 'eduroam-int-dhcp-97-204-21.ucl.ac.uk', 'username': 'clementine', 'executable': '/Users/clementine/miniconda3/envs/NPG-env/bin/python', 'cpu_count': 8, 'cpu_count_logical': 8, 'cpu_freq': {'current': 2400, 'min': 2400, 'max': 2400}, 'cpu_freq_per_core': [{'current': 2400, 'min': 2400, 'max': 2400}], 'disk': {'/': {'total': 460.4317207336426, 'used': 20.62871551513672}}, 'memory': {'total': 32.0}}
+2023-10-01 15:28:20,811 INFO    HandlerThread:74240 [system_monitor.py:probe():211] Finished collecting system info
+2023-10-01 15:28:20,811 INFO    HandlerThread:74240 [system_monitor.py:probe():214] Publishing system info
+2023-10-01 15:28:20,811 DEBUG   HandlerThread:74240 [system_info.py:_save_pip():52] Saving list of pip packages installed into the current environment
+2023-10-01 15:28:20,814 DEBUG   HandlerThread:74240 [system_info.py:_save_pip():68] Saving pip packages done
+2023-10-01 15:28:20,814 DEBUG   HandlerThread:74240 [system_info.py:_save_conda():75] Saving list of conda packages installed into the current environment
+2023-10-01 15:28:21,602 INFO    Thread-17 :74240 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_152820-h1q5swpb/files/requirements.txt
+2023-10-01 15:28:21,603 INFO    Thread-17 :74240 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_152820-h1q5swpb/files/conda-environment.yaml
+2023-10-01 15:28:21,909 DEBUG   HandlerThread:74240 [system_info.py:_save_conda():87] Saving conda packages done
+2023-10-01 15:28:21,913 INFO    HandlerThread:74240 [system_monitor.py:probe():216] Finished publishing system info
+2023-10-01 15:28:21,922 DEBUG   SenderThread:74240 [sender.py:send():380] send: files
+2023-10-01 15:28:21,922 INFO    SenderThread:74240 [sender.py:_save_file():1378] saving file wandb-metadata.json with policy now
+2023-10-01 15:28:21,933 DEBUG   HandlerThread:74240 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 15:28:21,934 DEBUG   HandlerThread:74240 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 15:28:21,936 DEBUG   SenderThread:74240 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 15:28:22,198 DEBUG   SenderThread:74240 [sender.py:send():380] send: telemetry
+2023-10-01 15:28:22,430 INFO    wandb-upload_0:74240 [upload_job.py:push():131] Uploaded file /var/folders/lk/fjxx3prd2h31kn1cfccrk8fc0000gq/T/tmp22eeypexwandb/f2eab99o-wandb-metadata.json
+2023-10-01 15:28:22,603 INFO    Thread-17 :74240 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_152820-h1q5swpb/files/conda-environment.yaml
+2023-10-01 15:28:22,603 INFO    Thread-17 :74240 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_152820-h1q5swpb/files/results/Graph_generation.py
+2023-10-01 15:28:22,603 INFO    Thread-17 :74240 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_152820-h1q5swpb/files/results/run.py
+2023-10-01 15:28:22,604 INFO    Thread-17 :74240 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_152820-h1q5swpb/files/wandb-metadata.json
+2023-10-01 15:28:22,604 INFO    Thread-17 :74240 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_152820-h1q5swpb/files/results/utils.py
+2023-10-01 15:28:22,604 INFO    Thread-17 :74240 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_152820-h1q5swpb/files/results/config_run.yaml
+2023-10-01 15:28:22,604 INFO    Thread-17 :74240 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_152820-h1q5swpb/files/results/plotting_utils.py
+2023-10-01 15:28:22,605 INFO    Thread-17 :74240 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_152820-h1q5swpb/files/results
+2023-10-01 15:28:25,207 DEBUG   HandlerThread:74240 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 15:28:28,626 INFO    Thread-17 :74240 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_152820-h1q5swpb/files/results
+2023-10-01 15:28:30,224 DEBUG   HandlerThread:74240 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 15:28:35,239 DEBUG   HandlerThread:74240 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 15:28:36,936 DEBUG   HandlerThread:74240 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 15:28:36,941 DEBUG   HandlerThread:74240 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 15:28:36,952 DEBUG   SenderThread:74240 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 15:28:41,202 DEBUG   HandlerThread:74240 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 15:28:46,218 DEBUG   HandlerThread:74240 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 15:28:51,255 DEBUG   HandlerThread:74240 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 15:28:51,768 INFO    Thread-17 :74240 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_152820-h1q5swpb/files/config.yaml
+2023-10-01 15:28:51,942 DEBUG   HandlerThread:74240 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 15:28:51,947 DEBUG   HandlerThread:74240 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 15:28:51,950 DEBUG   SenderThread:74240 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 15:28:57,203 DEBUG   HandlerThread:74240 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 15:29:02,219 DEBUG   HandlerThread:74240 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 15:29:06,950 DEBUG   HandlerThread:74240 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 15:29:06,952 DEBUG   HandlerThread:74240 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 15:29:06,954 DEBUG   SenderThread:74240 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 15:29:08,112 DEBUG   HandlerThread:74240 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 15:29:13,131 DEBUG   HandlerThread:74240 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 15:29:18,148 DEBUG   HandlerThread:74240 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 15:29:20,726 DEBUG   SystemMonitor:74240 [system_monitor.py:_start():159] Starting system metrics aggregation loop
+2023-10-01 15:29:20,727 DEBUG   SenderThread:74240 [sender.py:send():380] send: stats
+2023-10-01 15:29:21,950 DEBUG   HandlerThread:74240 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 15:29:21,951 DEBUG   HandlerThread:74240 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 15:29:21,954 DEBUG   SenderThread:74240 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 15:29:23,197 DEBUG   HandlerThread:74240 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 15:29:25,974 INFO    Thread-17 :74240 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_152820-h1q5swpb/files/output.log
+2023-10-01 15:29:27,982 INFO    Thread-17 :74240 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_152820-h1q5swpb/files/output.log
+2023-10-01 15:29:28,944 DEBUG   HandlerThread:74240 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 15:29:33,968 DEBUG   HandlerThread:74240 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 15:29:36,959 DEBUG   HandlerThread:74240 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 15:29:36,960 DEBUG   HandlerThread:74240 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 15:29:36,961 DEBUG   SenderThread:74240 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 15:29:39,181 DEBUG   HandlerThread:74240 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 15:29:44,201 DEBUG   HandlerThread:74240 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 15:29:49,219 DEBUG   HandlerThread:74240 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 15:29:50,739 DEBUG   SenderThread:74240 [sender.py:send():380] send: stats
+2023-10-01 15:29:51,960 DEBUG   HandlerThread:74240 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 15:29:51,961 DEBUG   HandlerThread:74240 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 15:29:51,962 DEBUG   SenderThread:74240 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 15:29:55,175 DEBUG   HandlerThread:74240 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 15:30:00,191 DEBUG   HandlerThread:74240 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 15:30:05,203 DEBUG   HandlerThread:74240 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 15:30:06,965 DEBUG   HandlerThread:74240 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 15:30:06,965 DEBUG   HandlerThread:74240 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 15:30:06,966 DEBUG   SenderThread:74240 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 15:30:11,119 DEBUG   HandlerThread:74240 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 15:30:16,148 DEBUG   HandlerThread:74240 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 15:30:20,745 DEBUG   SenderThread:74240 [sender.py:send():380] send: stats
+2023-10-01 15:30:21,750 DEBUG   HandlerThread:74240 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 15:30:21,976 DEBUG   HandlerThread:74240 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 15:30:21,977 DEBUG   HandlerThread:74240 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 15:30:21,979 DEBUG   SenderThread:74240 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 15:30:27,273 DEBUG   HandlerThread:74240 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 15:30:32,297 DEBUG   HandlerThread:74240 [handler.py:handle_request():144] handle_request: status_report

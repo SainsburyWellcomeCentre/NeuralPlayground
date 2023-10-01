@@ -1,0 +1,45 @@
+{
+    "os": "macOS-12.6.3-x86_64-i386-64bit",
+    "python": "3.10.12",
+    "heartbeatAt": "2023-10-01T16:24:18.675370",
+    "startedAt": "2023-10-01T16:24:18.074308",
+    "docker": null,
+    "cuda": null,
+    "args": [],
+    "state": "running",
+    "program": "/Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/class.py",
+    "codePathLocal": "class.py",
+    "codePath": "neuralplayground/agents/class.py",
+    "git": {
+        "remote": "https://github.com/SainsburyWellcomeCentre/NeuralPlayground",
+        "commit": "ce2f8696408c130855be781acabd40bfc7b4fd5b"
+    },
+    "email": "clementine.domine98@gmail.com",
+    "root": "/Users/clementine/Documents/UCL/NeuralPlayground",
+    "host": "eduroam-int-dhcp-97-204-21.ucl.ac.uk",
+    "username": "clementine",
+    "executable": "/Users/clementine/miniconda3/envs/NPG-env/bin/python",
+    "cpu_count": 8,
+    "cpu_count_logical": 8,
+    "cpu_freq": {
+        "current": 2400,
+        "min": 2400,
+        "max": 2400
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 2400,
+            "min": 2400,
+            "max": 2400
+        }
+    ],
+    "disk": {
+        "/": {
+            "total": 460.4317207336426,
+            "used": 20.62871551513672
+        }
+    },
+    "memory": {
+        "total": 32.0
+    }
+}

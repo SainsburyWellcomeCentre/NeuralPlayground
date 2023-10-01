@@ -1,0 +1,42 @@
+
+Training step 0: loss = 0.08615080267190933
+Traceback (most recent call last):
+  File "/Users/clementine/miniconda3/envs/NPG-env/lib/python3.10/site-packages/sklearn/utils/_param_validation.py", line 211, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/clementine/miniconda3/envs/NPG-env/lib/python3.10/site-packages/sklearn/metrics/_ranking.py", line 606, in roc_auc_score
+    y_score = check_array(y_score, ensure_2d=False)
+  File "/Users/clementine/miniconda3/envs/NPG-env/lib/python3.10/site-packages/sklearn/utils/validation.py", line 957, in check_array
+    _assert_all_finite(
+  File "/Users/clementine/miniconda3/envs/NPG-env/lib/python3.10/site-packages/sklearn/utils/validation.py", line 122, in _assert_all_finite
+    _assert_all_finite_element_wise(
+  File "/Users/clementine/miniconda3/envs/NPG-env/lib/python3.10/site-packages/sklearn/utils/validation.py", line 171, in _assert_all_finite_element_wise
+    raise ValueError(msg_err)
+ValueError: Input contains NaN.
+Traceback (most recent call last):
+  File "/Applications/PyCharm CE (Previous).app/Contents/plugins/python-ce/helpers/pydev/pydevd.py", line 2173, in <module>
+    main()
+  File "/Applications/PyCharm CE (Previous).app/Contents/plugins/python-ce/helpers/pydev/pydevd.py", line 2164, in main
+    globals = debugger.run(setup['file'], None, None, is_module)
+  File "/Applications/PyCharm CE (Previous).app/Contents/plugins/python-ce/helpers/pydev/pydevd.py", line 1476, in run
+    return self._exec(is_module, entry_point_fn, module_name, file, globals, locals)
+  File "/Applications/PyCharm CE (Previous).app/Contents/plugins/python-ce/helpers/pydev/pydevd.py", line 1483, in _exec
+    pydev_imports.execfile(file, globals, locals)  # execute the script
+  File "/Applications/PyCharm CE (Previous).app/Contents/plugins/python-ce/helpers/pydev/_pydev_imps/_pydev_execfile.py", line 18, in execfile
+    exec(compile(contents+"\n", file, 'exec'), glob, loc)
+  File "/Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/class.py", line 337, in <module>
+    agent.update()
+  File "/Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/class.py", line 204, in update
+    outputs_train, roc_auc_train, MCC_train = self.evaluate(self.net_hk, self.params, graph, targets)
+  File "/Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/class.py", line 178, in evaluate
+    roc_auc = roc_auc_score(np.squeeze(target), np.squeeze(outputs[0].nodes))
+  File "/Users/clementine/miniconda3/envs/NPG-env/lib/python3.10/site-packages/sklearn/utils/_param_validation.py", line 211, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/clementine/miniconda3/envs/NPG-env/lib/python3.10/site-packages/sklearn/metrics/_ranking.py", line 606, in roc_auc_score
+    y_score = check_array(y_score, ensure_2d=False)
+  File "/Users/clementine/miniconda3/envs/NPG-env/lib/python3.10/site-packages/sklearn/utils/validation.py", line 957, in check_array
+    _assert_all_finite(
+  File "/Users/clementine/miniconda3/envs/NPG-env/lib/python3.10/site-packages/sklearn/utils/validation.py", line 122, in _assert_all_finite
+    _assert_all_finite_element_wise(
+  File "/Users/clementine/miniconda3/envs/NPG-env/lib/python3.10/site-packages/sklearn/utils/validation.py", line 171, in _assert_all_finite_element_wise
+    raise ValueError(msg_err)
+ValueError: Input contains NaN.

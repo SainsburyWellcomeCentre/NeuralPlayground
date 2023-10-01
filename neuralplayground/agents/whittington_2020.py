@@ -88,6 +88,7 @@ class Whittington2020(AgentCore):
         self.room_widths = mod_kwargs["room_widths"]
         self.room_depths = mod_kwargs["room_depths"]
         self.state_densities = mod_kwargs["state_densities"]
+        self.batch_size = mod_kwargs["batch_size"]
 
         self.pars = copy.deepcopy(params)
         self.tem = model.Model(self.pars)

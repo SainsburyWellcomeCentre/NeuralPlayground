@@ -1,0 +1,23 @@
+Training step 0: loss = 0.06615529954433441
+Backend MacOSX is interactive backend. Turning interactive mode on.
+Traceback (most recent call last):
+  File "/Applications/PyCharm CE (Previous).app/Contents/plugins/python-ce/helpers/pydev/pydevd.py", line 1483, in _exec
+    pydev_imports.execfile(file, globals, locals)  # execute the script
+  File "/Applications/PyCharm CE (Previous).app/Contents/plugins/python-ce/helpers/pydev/_pydev_imps/_pydev_execfile.py", line 18, in execfile
+    exec(compile(contents+"\n", file, 'exec'), glob, loc)
+  File "/Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/class.py", line 276, in <module>
+    losses, auroc = test.run()
+TypeError: cannot unpack non-iterable NoneType object
+Traceback (most recent call last):
+  File "/Applications/PyCharm CE (Previous).app/Contents/plugins/python-ce/helpers/pydev/pydevd.py", line 2173, in <module>
+    main()
+  File "/Applications/PyCharm CE (Previous).app/Contents/plugins/python-ce/helpers/pydev/pydevd.py", line 2164, in main
+    globals = debugger.run(setup['file'], None, None, is_module)
+  File "/Applications/PyCharm CE (Previous).app/Contents/plugins/python-ce/helpers/pydev/pydevd.py", line 1476, in run
+    return self._exec(is_module, entry_point_fn, module_name, file, globals, locals)
+  File "/Applications/PyCharm CE (Previous).app/Contents/plugins/python-ce/helpers/pydev/pydevd.py", line 1483, in _exec
+    pydev_imports.execfile(file, globals, locals)  # execute the script
+  File "/Applications/PyCharm CE (Previous).app/Contents/plugins/python-ce/helpers/pydev/_pydev_imps/_pydev_execfile.py", line 18, in execfile
+    exec(compile(contents+"\n", file, 'exec'), glob, loc)
+  File "/Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/class.py", line 276, in <module>
+    for n in range(config.num_training_steps):

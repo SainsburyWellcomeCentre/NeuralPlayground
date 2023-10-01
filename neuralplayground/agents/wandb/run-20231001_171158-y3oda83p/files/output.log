@@ -1,0 +1,42 @@
+
+Training step 0: loss = 0.06794214993715286
+Training step 1: loss = 654068.625
+Training step 2: loss = 1516767.5
+Training step 3: loss = 40542.98046875
+Training step 4: loss = 325386.0625
+Training step 5: loss = 446847.125
+Training step 6: loss = 19771.234375
+Training step 7: loss = 440920.1875
+Training step 8: loss = 71936.6484375
+Training step 9: loss = 96693.3125
+roc_auc_score
+0.7209677419354839
+MCC
+0.6338441950774462
+Backend MacOSX is interactive backend. Turning interactive mode on.
+Traceback (most recent call last):
+  File "/Applications/PyCharm CE (Previous).app/Contents/plugins/python-ce/helpers/pydev/pydevd.py", line 1483, in _exec
+    pydev_imports.execfile(file, globals, locals)  # execute the script
+  File "/Applications/PyCharm CE (Previous).app/Contents/plugins/python-ce/helpers/pydev/_pydev_imps/_pydev_execfile.py", line 18, in execfile
+    exec(compile(contents+"\n", file, 'exec'), glob, loc)
+  File "/Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/class.py", line 278, in <module>
+    agent.print_and_plot()
+  File "/Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/class.py", line 201, in print_and_plot
+    plot_loss(losses, os.path.join(self.save_path, "Losses.pdf"), "Losses")
+NameError: name 'losses' is not defined
+Traceback (most recent call last):
+  File "/Applications/PyCharm CE (Previous).app/Contents/plugins/python-ce/helpers/pydev/pydevd.py", line 2173, in <module>
+    main()
+  File "/Applications/PyCharm CE (Previous).app/Contents/plugins/python-ce/helpers/pydev/pydevd.py", line 2164, in main
+    globals = debugger.run(setup['file'], None, None, is_module)
+  File "/Applications/PyCharm CE (Previous).app/Contents/plugins/python-ce/helpers/pydev/pydevd.py", line 1476, in run
+    return self._exec(is_module, entry_point_fn, module_name, file, globals, locals)
+  File "/Applications/PyCharm CE (Previous).app/Contents/plugins/python-ce/helpers/pydev/pydevd.py", line 1483, in _exec
+    pydev_imports.execfile(file, globals, locals)  # execute the script
+  File "/Applications/PyCharm CE (Previous).app/Contents/plugins/python-ce/helpers/pydev/_pydev_imps/_pydev_execfile.py", line 18, in execfile
+    exec(compile(contents+"\n", file, 'exec'), glob, loc)
+  File "/Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/class.py", line 278, in <module>
+    agent.print_and_plot()
+  File "/Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/class.py", line 201, in print_and_plot
+    plot_loss(self.losses, os.path.join(self.save_path, "Losses.pdf"), "Losses")
+NameError: name 'losses' is not defined

@@ -1,0 +1,210 @@
+2023-10-01 23:32:50,913 INFO    StreamThr :25955 [internal.py:wandb_internal():86] W&B internal server running at pid: 25955, started at: 2023-10-01 23:32:50.912112
+2023-10-01 23:32:50,916 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: status
+2023-10-01 23:32:50,928 INFO    WriterThread:25955 [datastore.py:open_for_write():85] open: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_233250-jov1tm77/run-jov1tm77.wandb
+2023-10-01 23:32:50,929 DEBUG   SenderThread:25955 [sender.py:send():380] send: header
+2023-10-01 23:32:50,982 DEBUG   SenderThread:25955 [sender.py:send():380] send: run
+2023-10-01 23:32:51,518 INFO    SenderThread:25955 [dir_watcher.py:__init__():211] watching files in: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_233250-jov1tm77/files
+2023-10-01 23:32:51,518 INFO    SenderThread:25955 [sender.py:_start_run_threads():1122] run started: jov1tm77 with start time 1696199570.911737
+2023-10-01 23:32:51,544 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: check_version
+2023-10-01 23:32:51,545 DEBUG   SenderThread:25955 [sender.py:send_request():407] send_request: check_version
+2023-10-01 23:32:51,672 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: run_start
+2023-10-01 23:32:51,688 DEBUG   HandlerThread:25955 [system_info.py:__init__():32] System info init
+2023-10-01 23:32:51,688 DEBUG   HandlerThread:25955 [system_info.py:__init__():47] System info init done
+2023-10-01 23:32:51,688 INFO    HandlerThread:25955 [system_monitor.py:start():181] Starting system monitor
+2023-10-01 23:32:51,689 INFO    SystemMonitor:25955 [system_monitor.py:_start():145] Starting system asset monitoring threads
+2023-10-01 23:32:51,690 INFO    HandlerThread:25955 [system_monitor.py:probe():201] Collecting system info
+2023-10-01 23:32:51,691 DEBUG   HandlerThread:25955 [system_info.py:probe():196] Probing system
+2023-10-01 23:32:51,692 INFO    SystemMonitor:25955 [interfaces.py:start():190] Started cpu monitoring
+2023-10-01 23:32:51,693 INFO    SystemMonitor:25955 [interfaces.py:start():190] Started disk monitoring
+2023-10-01 23:32:51,696 INFO    SystemMonitor:25955 [interfaces.py:start():190] Started memory monitoring
+2023-10-01 23:32:51,697 INFO    SystemMonitor:25955 [interfaces.py:start():190] Started network monitoring
+2023-10-01 23:32:51,713 DEBUG   HandlerThread:25955 [system_info.py:_probe_git():181] Probing git
+2023-10-01 23:32:51,780 DEBUG   HandlerThread:25955 [system_info.py:_probe_git():189] Probing git done
+2023-10-01 23:32:51,780 DEBUG   HandlerThread:25955 [system_info.py:probe():244] Probing system done
+2023-10-01 23:32:51,781 DEBUG   HandlerThread:25955 [system_monitor.py:probe():210] {'os': 'macOS-12.6.3-x86_64-i386-64bit', 'python': '3.10.12', 'heartbeatAt': '2023-10-01T22:32:51.691910', 'startedAt': '2023-10-01T22:32:50.889492', 'docker': None, 'cuda': None, 'args': (), 'state': 'running', 'program': '/Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/class.py', 'codePathLocal': 'class.py', 'codePath': 'neuralplayground/agents/class.py', 'git': {'remote': 'https://github.com/SainsburyWellcomeCentre/NeuralPlayground', 'commit': 'ce2f8696408c130855be781acabd40bfc7b4fd5b'}, 'email': 'clementine.domine98@gmail.com', 'root': '/Users/clementine/Documents/UCL/NeuralPlayground', 'host': 'Clementines-MacBook-Pro-7.local', 'username': 'clementine', 'executable': '/Users/clementine/miniconda3/envs/NPG-env/bin/python', 'cpu_count': 8, 'cpu_count_logical': 8, 'cpu_freq': {'current': 2400, 'min': 2400, 'max': 2400}, 'cpu_freq_per_core': [{'current': 2400, 'min': 2400, 'max': 2400}], 'disk': {'/': {'total': 460.4317207336426, 'used': 20.62871551513672}}, 'memory': {'total': 32.0}}
+2023-10-01 23:32:51,781 INFO    HandlerThread:25955 [system_monitor.py:probe():211] Finished collecting system info
+2023-10-01 23:32:51,781 INFO    HandlerThread:25955 [system_monitor.py:probe():214] Publishing system info
+2023-10-01 23:32:51,781 DEBUG   HandlerThread:25955 [system_info.py:_save_pip():52] Saving list of pip packages installed into the current environment
+2023-10-01 23:32:51,783 DEBUG   HandlerThread:25955 [system_info.py:_save_pip():68] Saving pip packages done
+2023-10-01 23:32:51,784 DEBUG   HandlerThread:25955 [system_info.py:_save_conda():75] Saving list of conda packages installed into the current environment
+2023-10-01 23:32:52,528 INFO    Thread-17 :25955 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_233250-jov1tm77/files/conda-environment.yaml
+2023-10-01 23:32:52,529 INFO    Thread-17 :25955 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_233250-jov1tm77/files/requirements.txt
+2023-10-01 23:32:52,906 DEBUG   HandlerThread:25955 [system_info.py:_save_conda():87] Saving conda packages done
+2023-10-01 23:32:52,909 INFO    HandlerThread:25955 [system_monitor.py:probe():216] Finished publishing system info
+2023-10-01 23:32:52,917 DEBUG   SenderThread:25955 [sender.py:send():380] send: files
+2023-10-01 23:32:52,917 INFO    SenderThread:25955 [sender.py:_save_file():1378] saving file wandb-metadata.json with policy now
+2023-10-01 23:32:52,926 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 23:32:52,928 DEBUG   SenderThread:25955 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 23:32:52,931 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 23:32:53,184 DEBUG   SenderThread:25955 [sender.py:send():380] send: telemetry
+2023-10-01 23:32:53,511 INFO    wandb-upload_0:25955 [upload_job.py:push():131] Uploaded file /var/folders/lk/fjxx3prd2h31kn1cfccrk8fc0000gq/T/tmpn5y_zuokwandb/w43e1jm7-wandb-metadata.json
+2023-10-01 23:32:53,529 INFO    Thread-17 :25955 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_233250-jov1tm77/files/conda-environment.yaml
+2023-10-01 23:32:53,529 INFO    Thread-17 :25955 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_233250-jov1tm77/files/results/class_utils.py
+2023-10-01 23:32:53,529 INFO    Thread-17 :25955 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_233250-jov1tm77/files/wandb-metadata.json
+2023-10-01 23:32:53,529 INFO    Thread-17 :25955 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_233250-jov1tm77/files/results/class_plotting_utils.py
+2023-10-01 23:32:53,530 INFO    Thread-17 :25955 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_233250-jov1tm77/files/results/class_config_run.yaml
+2023-10-01 23:32:53,530 INFO    Thread-17 :25955 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_233250-jov1tm77/files/results/run.py
+2023-10-01 23:32:53,530 INFO    Thread-17 :25955 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_233250-jov1tm77/files/results/class_Graph_generation.py
+2023-10-01 23:32:53,530 INFO    Thread-17 :25955 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_233250-jov1tm77/files/results
+2023-10-01 23:32:56,196 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 23:32:58,551 INFO    Thread-17 :25955 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_233250-jov1tm77/files/results
+2023-10-01 23:33:01,221 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 23:33:06,246 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 23:33:07,941 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 23:33:07,941 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 23:33:07,942 DEBUG   SenderThread:25955 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 23:33:12,192 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 23:33:13,092 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: partial_history
+2023-10-01 23:33:13,094 DEBUG   SenderThread:25955 [sender.py:send():380] send: history
+2023-10-01 23:33:13,094 DEBUG   SenderThread:25955 [sender.py:send_request():407] send_request: summary_record
+2023-10-01 23:33:13,096 INFO    SenderThread:25955 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-10-01 23:33:13,619 INFO    Thread-17 :25955 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_233250-jov1tm77/files/wandb-summary.json
+2023-10-01 23:33:13,620 INFO    Thread-17 :25955 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_233250-jov1tm77/files/output.log
+2023-10-01 23:33:15,631 INFO    Thread-17 :25955 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_233250-jov1tm77/files/output.log
+2023-10-01 23:33:18,117 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 23:33:20,545 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: partial_history
+2023-10-01 23:33:20,547 DEBUG   SenderThread:25955 [sender.py:send():380] send: history
+2023-10-01 23:33:20,547 DEBUG   SenderThread:25955 [sender.py:send_request():407] send_request: summary_record
+2023-10-01 23:33:20,549 INFO    SenderThread:25955 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-10-01 23:33:20,655 INFO    Thread-17 :25955 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_233250-jov1tm77/files/wandb-summary.json
+2023-10-01 23:33:21,657 INFO    Thread-17 :25955 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_233250-jov1tm77/files/output.log
+2023-10-01 23:33:22,965 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 23:33:22,977 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 23:33:22,977 DEBUG   SenderThread:25955 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 23:33:23,158 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 23:33:24,674 INFO    Thread-17 :25955 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_233250-jov1tm77/files/config.yaml
+2023-10-01 23:33:28,870 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 23:33:28,899 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: partial_history
+2023-10-01 23:33:28,900 DEBUG   SenderThread:25955 [sender.py:send():380] send: history
+2023-10-01 23:33:28,900 DEBUG   SenderThread:25955 [sender.py:send_request():407] send_request: summary_record
+2023-10-01 23:33:28,902 INFO    SenderThread:25955 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-10-01 23:33:29,693 INFO    Thread-17 :25955 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_233250-jov1tm77/files/wandb-summary.json
+2023-10-01 23:33:31,704 INFO    Thread-17 :25955 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_233250-jov1tm77/files/output.log
+2023-10-01 23:33:33,928 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 23:33:34,081 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: partial_history
+2023-10-01 23:33:34,082 DEBUG   SenderThread:25955 [sender.py:send():380] send: history
+2023-10-01 23:33:34,083 DEBUG   SenderThread:25955 [sender.py:send_request():407] send_request: summary_record
+2023-10-01 23:33:34,083 INFO    SenderThread:25955 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-10-01 23:33:34,718 INFO    Thread-17 :25955 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_233250-jov1tm77/files/wandb-summary.json
+2023-10-01 23:33:35,720 INFO    Thread-17 :25955 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_233250-jov1tm77/files/output.log
+2023-10-01 23:33:37,984 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 23:33:37,984 DEBUG   SenderThread:25955 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 23:33:37,988 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 23:33:39,155 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 23:33:39,555 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: partial_history
+2023-10-01 23:33:39,556 DEBUG   SenderThread:25955 [sender.py:send():380] send: history
+2023-10-01 23:33:39,556 DEBUG   SenderThread:25955 [sender.py:send_request():407] send_request: summary_record
+2023-10-01 23:33:39,558 INFO    SenderThread:25955 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-10-01 23:33:39,741 INFO    Thread-17 :25955 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_233250-jov1tm77/files/wandb-summary.json
+2023-10-01 23:33:41,752 INFO    Thread-17 :25955 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_233250-jov1tm77/files/output.log
+2023-10-01 23:33:44,579 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 23:33:45,253 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: partial_history
+2023-10-01 23:33:45,254 DEBUG   SenderThread:25955 [sender.py:send():380] send: history
+2023-10-01 23:33:45,254 DEBUG   SenderThread:25955 [sender.py:send_request():407] send_request: summary_record
+2023-10-01 23:33:45,256 INFO    SenderThread:25955 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-10-01 23:33:45,768 INFO    Thread-17 :25955 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_233250-jov1tm77/files/wandb-summary.json
+2023-10-01 23:33:47,777 INFO    Thread-17 :25955 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_233250-jov1tm77/files/output.log
+2023-10-01 23:33:50,275 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 23:33:50,820 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: partial_history
+2023-10-01 23:33:50,821 DEBUG   SenderThread:25955 [sender.py:send():380] send: history
+2023-10-01 23:33:50,821 DEBUG   SenderThread:25955 [sender.py:send_request():407] send_request: summary_record
+2023-10-01 23:33:50,822 INFO    SenderThread:25955 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-10-01 23:33:51,703 DEBUG   SystemMonitor:25955 [system_monitor.py:_start():159] Starting system metrics aggregation loop
+2023-10-01 23:33:51,704 DEBUG   SenderThread:25955 [sender.py:send():380] send: stats
+2023-10-01 23:33:51,795 INFO    Thread-17 :25955 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_233250-jov1tm77/files/wandb-summary.json
+2023-10-01 23:33:51,795 INFO    Thread-17 :25955 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_233250-jov1tm77/files/output.log
+2023-10-01 23:33:52,971 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 23:33:52,971 DEBUG   SenderThread:25955 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 23:33:52,974 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 23:33:56,140 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 23:33:56,372 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: partial_history
+2023-10-01 23:33:56,373 DEBUG   SenderThread:25955 [sender.py:send():380] send: history
+2023-10-01 23:33:56,373 DEBUG   SenderThread:25955 [sender.py:send_request():407] send_request: summary_record
+2023-10-01 23:33:56,374 INFO    SenderThread:25955 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-10-01 23:33:56,817 INFO    Thread-17 :25955 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_233250-jov1tm77/files/wandb-summary.json
+2023-10-01 23:33:57,818 INFO    Thread-17 :25955 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_233250-jov1tm77/files/output.log
+2023-10-01 23:34:01,394 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 23:34:01,909 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: partial_history
+2023-10-01 23:34:01,911 DEBUG   SenderThread:25955 [sender.py:send():380] send: history
+2023-10-01 23:34:01,911 DEBUG   SenderThread:25955 [sender.py:send_request():407] send_request: summary_record
+2023-10-01 23:34:01,913 INFO    SenderThread:25955 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-10-01 23:34:02,845 INFO    Thread-17 :25955 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_233250-jov1tm77/files/wandb-summary.json
+2023-10-01 23:34:03,849 INFO    Thread-17 :25955 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_233250-jov1tm77/files/output.log
+2023-10-01 23:34:06,933 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 23:34:06,973 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: partial_history
+2023-10-01 23:34:06,975 DEBUG   SenderThread:25955 [sender.py:send():380] send: history
+2023-10-01 23:34:06,976 DEBUG   SenderThread:25955 [sender.py:send_request():407] send_request: summary_record
+2023-10-01 23:34:06,977 INFO    SenderThread:25955 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-10-01 23:34:07,866 INFO    Thread-17 :25955 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_233250-jov1tm77/files/wandb-summary.json
+2023-10-01 23:34:07,867 INFO    Thread-17 :25955 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_233250-jov1tm77/files/output.log
+2023-10-01 23:34:07,977 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 23:34:07,978 DEBUG   SenderThread:25955 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 23:34:07,981 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 23:34:08,872 INFO    Thread-17 :25955 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_233250-jov1tm77/files/results/Constant.txt
+2023-10-01 23:34:08,872 INFO    Thread-17 :25955 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_233250-jov1tm77/files/results
+2023-10-01 23:34:09,875 INFO    Thread-17 :25955 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_233250-jov1tm77/files/output.log
+2023-10-01 23:34:09,875 INFO    Thread-17 :25955 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_233250-jov1tm77/files/results/Losses.pdf
+2023-10-01 23:34:09,875 INFO    Thread-17 :25955 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_233250-jov1tm77/files/results/Losses_test.pdf
+2023-10-01 23:34:09,876 INFO    Thread-17 :25955 [dir_watcher.py:_on_file_created():271] file/dir created: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_233250-jov1tm77/files/results/auc_roc_test.pdf
+2023-10-01 23:34:09,876 INFO    Thread-17 :25955 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_233250-jov1tm77/files/results
+2023-10-01 23:34:12,740 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 23:34:12,892 INFO    Thread-17 :25955 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_233250-jov1tm77/files/results
+2023-10-01 23:34:16,921 INFO    Thread-17 :25955 [dir_watcher.py:_on_file_modified():288] file/dir modified: /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231001_233250-jov1tm77/files/results
+2023-10-01 23:34:17,763 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 23:34:21,714 DEBUG   SenderThread:25955 [sender.py:send():380] send: stats
+2023-10-01 23:34:22,985 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 23:34:22,986 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 23:34:22,987 DEBUG   SenderThread:25955 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 23:34:23,303 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 23:34:28,323 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 23:34:33,347 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 23:34:37,988 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 23:34:37,988 DEBUG   SenderThread:25955 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 23:34:37,991 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 23:34:39,257 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 23:34:44,281 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 23:34:49,302 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 23:34:51,718 DEBUG   SenderThread:25955 [sender.py:send():380] send: stats
+2023-10-01 23:34:52,993 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 23:34:52,993 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 23:34:52,994 DEBUG   SenderThread:25955 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 23:34:55,139 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 23:35:00,162 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 23:35:05,187 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 23:35:07,998 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 23:35:07,998 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 23:35:07,999 DEBUG   SenderThread:25955 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 23:35:10,238 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 23:35:15,256 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 23:35:20,275 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 23:35:21,724 DEBUG   SenderThread:25955 [sender.py:send():380] send: stats
+2023-10-01 23:35:23,001 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 23:35:23,002 DEBUG   SenderThread:25955 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 23:35:23,007 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 23:35:26,185 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 23:35:31,206 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 23:35:36,228 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 23:35:38,004 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 23:35:38,006 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 23:35:38,006 DEBUG   SenderThread:25955 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 23:35:41,229 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 23:35:46,249 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 23:35:51,268 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 23:35:51,728 DEBUG   SenderThread:25955 [sender.py:send():380] send: stats
+2023-10-01 23:35:53,010 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 23:35:53,011 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 23:35:53,012 DEBUG   SenderThread:25955 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 23:35:57,188 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 23:36:02,212 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 23:36:07,232 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 23:36:08,015 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 23:36:08,016 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 23:36:08,017 DEBUG   SenderThread:25955 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 23:36:13,225 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 23:36:18,244 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 23:36:21,738 DEBUG   SenderThread:25955 [sender.py:send():380] send: stats
+2023-10-01 23:36:23,020 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: stop_status
+2023-10-01 23:36:23,021 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: internal_messages
+2023-10-01 23:36:23,022 DEBUG   SenderThread:25955 [sender.py:send_request():407] send_request: stop_status
+2023-10-01 23:36:24,181 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: status_report
+2023-10-01 23:36:29,204 DEBUG   HandlerThread:25955 [handler.py:handle_request():144] handle_request: status_report

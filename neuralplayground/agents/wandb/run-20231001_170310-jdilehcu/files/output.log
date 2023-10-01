@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "/Applications/PyCharm CE (Previous).app/Contents/plugins/python-ce/helpers/pydev/pydevd.py", line 1483, in _exec
+    pydev_imports.execfile(file, globals, locals)  # execute the script
+  File "/Applications/PyCharm CE (Previous).app/Contents/plugins/python-ce/helpers/pydev/_pydev_imps/_pydev_execfile.py", line 18, in execfile
+    exec(compile(contents+"\n", file, 'exec'), glob, loc)
+  File "/Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/class.py", line 276, in <module>
+    losses, auroc = test.run()
+  File "/Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/class.py", line 157, in run
+    losses.append(loss)
+NameError: name 'losses' is not defined. Did you mean: 'loss'?
+Backend MacOSX is interactive backend. Turning interactive mode on.
