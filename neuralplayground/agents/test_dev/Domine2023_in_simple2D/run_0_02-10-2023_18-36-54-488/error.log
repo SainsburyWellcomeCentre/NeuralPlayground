@@ -1,0 +1,23 @@
+wandb: Currently logged in as: clementinedomine (graph-brain). Use `wandb login --relogin` to force relogin
+wandb: Tracking run with wandb version 0.15.11
+wandb: Run data is saved locally in /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231002_183657-4q2an0ar
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run Grid_shortest_path02Oct_18_36
+wandb: ⭐️ View project at https://wandb.ai/graph-brain/graph-brain
+wandb: 🚀 View run at https://wandb.ai/graph-brain/graph-brain/runs/4q2an0ar
+Traceback (most recent call last):
+  File "/Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/run_back.py", line 76, in <module>
+    main()
+  File "/Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/run_back.py", line 66, in main
+    sim_manager.run_all()
+  File "/Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/backend/simulation_manager.py", line 130, in run_all
+    self._logged_run(sim, sim_path)
+  File "/Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/backend/simulation_manager.py", line 199, in _logged_run
+    sim.run_sim(save_path=sim_path)
+  File "/Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/backend/simulation_manager.py", line 323, in run_sim
+    self._save_models(save_path, trained_agent, trained_env, training_hist)
+  File "/Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/backend/simulation_manager.py", line 342, in _save_models
+    agent.save_agent(os.path.join(save_path, "agent"))
+  File "/Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/agent_core.py", line 107, in save_agent
+    pickle.dump(self, open(os.path.join(save_path), "wb"), pickle.HIGHEST_PROTOCOL)
+KeyboardInterrupt

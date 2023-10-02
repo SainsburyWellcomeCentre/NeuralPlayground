@@ -1,0 +1,7 @@
+wandb: Currently logged in as: clementinedomine (graph-brain). Use `wandb login --relogin` to force relogin
+wandb: Tracking run with wandb version 0.15.11
+wandb: Run data is saved locally in /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231002_190351-14sptn56
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run Grid_shortest_path02Oct_19_03
+wandb: ⭐️ View project at https://wandb.ai/graph-brain/graph-brain
+wandb: 🚀 View run at https://wandb.ai/graph-brain/graph-brain/runs/14sptn56

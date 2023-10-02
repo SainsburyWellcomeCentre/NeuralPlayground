@@ -1,5 +1,0 @@
-name: NPG-env
-channels:
-  - conda-forge
-  - defaults
-prefix: /Users/clementine/anaconda3/envs/NPG-env

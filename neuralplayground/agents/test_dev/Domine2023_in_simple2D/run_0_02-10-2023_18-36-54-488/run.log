@@ -1,0 +1,15 @@
+---> Saving simulation parameters
+---> Initializing models
+Backend MacOSX is interactive backend. Turning interactive mode on.
+---> Training loop
+Training step 1: loss = 0.057218458503484726
+Training step 2: loss = 0.06054728105664253
+Training step 3: loss = 0.05773813650012016
+Training step 4: loss = 0.058576904237270355
+Training step 5: loss = 0.05821312218904495
+Training step 6: loss = 0.056111305952072144
+Training step 7: loss = 0.055503688752651215
+Training step 8: loss = 0.055287282913923264
+Training step 9: loss = 0.058157335966825485
+Training step 10: loss = 0.05693516507744789
+---> Saving models

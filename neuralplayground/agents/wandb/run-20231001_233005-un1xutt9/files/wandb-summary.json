@@ -1,1 +1,0 @@
-{"loss": 0.08698275685310364, "losses_test": Infinity, "roc_auc_test": 0.8920454545454546, "roc_auc": 0.8292759051186017, "_timestamp": 1696199429.327606, "_runtime": 23.573206901550293, "_step": 0, "_wandb": {"runtime": 31}}

@@ -1,0 +1,18 @@
+wandb: Currently logged in as: clementinedomine (graph-brain). Use `wandb login --relogin` to force relogin
+wandb: Tracking run with wandb version 0.15.11
+wandb: Run data is saved locally in /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231002_174456-t499ay91
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run Grid_shortest_path02Oct_17_44
+wandb: ⭐️ View project at https://wandb.ai/graph-brain/graph-brain
+wandb: 🚀 View run at https://wandb.ai/graph-brain/graph-brain/runs/t499ay91
+Traceback (most recent call last):
+  File "/Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/backend/simulation_manager.py", line 199, in _logged_run
+    sim.run_sim(save_path=sim_path)
+  File "/Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/backend/simulation_manager.py", line 319, in run_sim
+    trained_agent, trained_env, training_hist = self.training_loop(agent, env, **self.training_loop_params)
+  File "/Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/backend/training_loops.py", line 32, in default_training_loop
+    action = agent.act(obs)
+  File "/Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/agent_core.py", line 80, in act
+    self.obs_history.append(obs)
+AttributeError: 'Domine2023' object has no attribute 'obs_history'
+

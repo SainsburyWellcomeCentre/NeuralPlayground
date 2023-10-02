@@ -1,0 +1,19 @@
+wandb: Currently logged in as: clementinedomine (graph-brain). Use `wandb login --relogin` to force relogin
+Traceback (most recent call last):
+  File "/Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/run_back.py", line 75, in <module>
+    main()
+  File "/Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/run_back.py", line 65, in main
+    sim_manager.run_all()
+  File "/Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/backend/simulation_manager.py", line 130, in run_all
+    self._logged_run(sim, sim_path)
+  File "/Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/backend/simulation_manager.py", line 199, in _logged_run
+    sim.run_sim(save_path=sim_path)
+  File "/Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/backend/simulation_manager.py", line 315, in run_sim
+    agent, env = self._init_models()
+  File "/Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/backend/simulation_manager.py", line 336, in _init_models
+    agent = self.agent_class(**self.agent_params)
+  File "/Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/domine_2023.py", line 119, in __init__
+    wandb.init(
+  File "/Users/clementine/miniconda3/envs/NPG-env/lib/python3.10/site-packages/wandb/sdk/wandb_init.py", line 1193, in init
+    raise e
+KeyboardInterrupt

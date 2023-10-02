@@ -106,7 +106,7 @@ class AgentCore(object):
         if raw_object:
             pickle.dump(self, open(os.path.join(save_path), "wb"), pickle.HIGHEST_PROTOCOL)
         else:
-            pickle.dump(self.__dict__, open(os.path.join(save_path), "wb"), pickle.HIGHEST_PROTOCOL)
+            pickle.dump(self, open(os.path.join(save_path), "wb"), pickle.HIGHEST_PROTOCOL)
 
     def restore_agent(self, restore_path: str):
         """Restore saved environment

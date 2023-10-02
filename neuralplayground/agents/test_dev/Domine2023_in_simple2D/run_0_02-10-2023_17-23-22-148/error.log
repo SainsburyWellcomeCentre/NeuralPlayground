@@ -1,0 +1,20 @@
+wandb: Currently logged in as: clementinedomine (graph-brain). Use `wandb login --relogin` to force relogin
+wandb: Tracking run with wandb version 0.15.11
+wandb: Run data is saved locally in /Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231002_172324-y7rye4bq
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run Grid_shortest_path02Oct_17_23
+wandb: ⭐️ View project at https://wandb.ai/graph-brain/graph-brain
+wandb: 🚀 View run at https://wandb.ai/graph-brain/graph-brain/runs/y7rye4bq
+Traceback (most recent call last):
+  File "/Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/backend/simulation_manager.py", line 199, in _logged_run
+    sim.run_sim(save_path=sim_path)
+  File "/Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/backend/simulation_manager.py", line 315, in run_sim
+    agent, env = self._init_models()
+  File "/Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/backend/simulation_manager.py", line 336, in _init_models
+    agent = self.agent_class(**self.agent_params)
+  File "/Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/domine_2023.py", line 142, in __init__
+    shutil.copyfile(HERE, path)
+  File "/Users/clementine/miniconda3/envs/NPG-env/lib/python3.10/shutil.py", line 254, in copyfile
+    with open(src, 'rb') as fsrc:
+FileNotFoundError: [Errno 2] No such file or directory: '/Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/class_Graph_generation.py'
+

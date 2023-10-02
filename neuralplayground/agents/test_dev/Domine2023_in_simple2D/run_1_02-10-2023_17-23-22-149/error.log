@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "/Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/backend/simulation_manager.py", line 199, in _logged_run
+    sim.run_sim(save_path=sim_path)
+  File "/Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/backend/simulation_manager.py", line 315, in run_sim
+    agent, env = self._init_models()
+  File "/Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/backend/simulation_manager.py", line 336, in _init_models
+    agent = self.agent_class(**self.agent_params)
+  File "/Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/domine_2023.py", line 125, in __init__
+    os.mkdir(os.path.join(save_path, "results"))
+FileExistsError: [Errno 17] File exists: '/Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/wandb/run-20231002_172324-y7rye4bq/files/results'
+

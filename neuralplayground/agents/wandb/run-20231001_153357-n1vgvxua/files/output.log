@@ -1,7 +1,0 @@
-Traceback (most recent call last):
-  File "/Users/clementine/miniconda3/envs/NPG-env/lib/python3.10/site-packages/jax/_src/api_util.py", line 583, in shaped_abstractify
-    return _shaped_abstractify_handlers[type(x)](x)
-KeyError: <class '__main__.Stachenfel2023'>
-During handling of the above exception, another exception occurred:
-jax.errors.SimplifiedTraceback: For simplicity, JAX has removed its internal frames from the traceback of the following exception. Set JAX_TRACEBACK_FILTERING=off to include these.
-The above exception was the direct cause of the following exception:
