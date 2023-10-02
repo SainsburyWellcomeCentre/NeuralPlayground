@@ -57,7 +57,8 @@ coverage.xml
 #Results
 *.pdf
 *.png
-/neuralplayground/agents/wandb/
+./neuralplayground/agents/wandb/
+≈
 *.egg-info
 
 # PyPI distribution / packages
