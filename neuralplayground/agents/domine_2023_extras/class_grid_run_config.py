@@ -1,6 +1,8 @@
 from typing import Dict, Union
 
-from neuralplayground.agents.domine_2023_extras.class_config_template import ConfigTemplate
+from neuralplayground.agents.domine_2023_extras.class_config_template import (
+    ConfigTemplate,
+)
 from config_manager import base_configuration
 
 

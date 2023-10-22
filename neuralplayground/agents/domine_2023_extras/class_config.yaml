@@ -11,7 +11,7 @@ num_hidden: 500 # @param
 num_layers: 2  # @param
 num_message_passing_steps: 4  # @param
 learning_rate: 0.001 # @param
-num_training_steps: 300 # @param
+num_training_steps: 10 # @param
 
 
 # Env Stuff

@@ -44,7 +44,11 @@ def run(config_path, config):
         edege_lables = False
     if config.wandb_on:
         dateTimeObj = datetime.now()
-        wandb.init(project="graph-brain", entity="graph-brain", name="Grid_shortest_path" + dateTimeObj.strftime("%d%b_%H_%M"))
+        wandb.init(
+            project="graph-brain",
+            entity="graph-brain",
+            name="Grid_shortest_path" + dateTimeObj.strftime("%d%b_%H_%M"),
+        )
         wandb_logs = {}
         save_path = wandb.run.dir
         os.mkdir(os.path.join(save_path, "results"))
@@ -52,8 +56,16 @@ def run(config_path, config):
     else:
         dateTimeObj = datetime.now()
         save_path = os.path.join(Path(os.getcwd()).resolve(), "results")
-        os.mkdir(os.path.join(save_path, "Grid_shortest_path" + dateTimeObj.strftime("%d%b_%H_%M")))
-        save_path = os.path.join(os.path.join(save_path, "Grid_shortest_path" + dateTimeObj.strftime("%d%b_%H_%M")))
+        os.mkdir(
+            os.path.join(
+                save_path, "Grid_shortest_path" + dateTimeObj.strftime("%d%b_%H_%M")
+            )
+        )
+        save_path = os.path.join(
+            os.path.join(
+                save_path, "Grid_shortest_path" + dateTimeObj.strftime("%d%b_%H_%M")
+            )
+        )
     # SAVING Trainning Files
     path = os.path.join(save_path, "run.py")
     HERE = os.path.join(Path(os.getcwd()).resolve(), "run.py")
@@ -76,17 +88,29 @@ def run(config_path, config):
     shutil.copyfile(HERE, path)
 
     # This is the function that does the forward pass of the model
-    forward = get_forward_function(config.num_hidden, config.num_layers, config.num_message_passing_steps)
+    forward = get_forward_function(
+        config.num_hidden, config.num_layers, config.num_message_passing_steps
+    )
     net_hk = hk.without_apply_rng(hk.transform(forward))
     rng = jax.random.PRNGKey(config.seed)
     rng_seq = rng_sequence_from_rng(rng)
     if config.train_on_shortest_path:
         graph, targets = sample_padded_grid_batch_shortest_path(
-            rng, config.batch_size, config.feature_position, config.weighted, config.nx_min, config.nx_max
+            rng,
+            config.batch_size,
+            config.feature_position,
+            config.weighted,
+            config.nx_min,
+            config.nx_max,
         )
     else:
         graph, targets = sample_padded_grid_batch_shortest_path(
-            rng, config.batch_size, config.feature_position, config.weighted, config.nx_min, config.nx_max
+            rng,
+            config.batch_size,
+            config.feature_position,
+            config.weighted,
+            config.nx_min,
+            config.nx_max,
         )
         targets = graph.nodes
     params = net_hk.init(rng, graph)
@@ -121,7 +145,12 @@ def run(config_path, config):
     roc_aucs_test = []
     rng = next(rng_seq)
     graph_test, target_test = sample_padded_grid_batch_shortest_path(
-        rng, config.batch_size_test, config.feature_position, config.weighted, config.nx_min_test, config.nx_max_test
+        rng,
+        config.batch_size_test,
+        config.feature_position,
+        config.weighted,
+        config.nx_min_test,
+        config.nx_max_test,
     )
     for n in range(config.num_training_steps):
         rng = next(rng_seq)
@@ -129,29 +158,50 @@ def run(config_path, config):
         if config.resample:
             if train_on_shortest_path:
                 graph, targets = sample_padded_grid_batch_shortest_path(
-                    rng, config.batch_size, config.feature_position, config.weighted, config.nx_min, config.nx_max
+                    rng,
+                    config.batch_size,
+                    config.feature_position,
+                    config.weighted,
+                    config.nx_min,
+                    config.nx_max,
                 )
             else:
                 graph, targets = sample_padded_grid_batch_shortest_path(
-                    rng, config.batch_size, config.feature_position, config.weighted, config.nx_min, config.nx_max
+                    rng,
+                    config.batch_size,
+                    config.feature_position,
+                    config.weighted,
+                    config.nx_min,
+                    config.nx_max,
                 )
                 targets = graph.nodes
         # Train
-        loss, grads = jax.value_and_grad(compute_loss)(params, net_hk, graph, targets)  # jits inside of value_and_grad
+        loss, grads = jax.value_and_grad(compute_loss)(
+            params, net_hk, graph, targets
+        )  # jits inside of value_and_grad
         params = update_step(grads, opt_state, params)
         losses.append(loss)
-        outputs_train, roc_auc_train, MCC_train = evaluate(net_hk, params, graph, targets)
+        outputs_train, roc_auc_train, MCC_train = evaluate(
+            net_hk, params, graph, targets
+        )
         roc_aucs_train.append(roc_auc_train)
         MCCs_train.append(MCC_train)  # Matthews correlation coefficient
         # Test # model should basically learn to do nothing from this
         loss_test = compute_loss(params, net_hk, graph_test, target_test)
         losses_test.append(loss_test)
-        outputs_test, roc_auc_test, MCC_test = evaluate(net_hk, params, graph_test, target_test)
+        outputs_test, roc_auc_test, MCC_test = evaluate(
+            net_hk, params, graph_test, target_test
+        )
         roc_aucs_test.append(roc_auc_test)
         MCCs_test.append(MCC_test)
 
         # Log
-        wandb_logs = {"loss": loss, "losses_test": loss_test, "roc_auc_test": roc_auc_test, "roc_auc": roc_auc_train}
+        wandb_logs = {
+            "loss": loss,
+            "losses_test": loss_test,
+            "roc_auc_test": roc_auc_test,
+            "roc_auc": roc_auc_train,
+        }
         if config.wandb_on:
             wandb.log(wandb_logs)
         if n % log_every == 0:
@@ -169,7 +219,11 @@ def run(config_path, config):
         with open("readme.txt", "w") as f:
             f.write("readme")
         with open(os.path.join(save_path, "Constant.txt"), "w") as outfile:
-            outfile.write("num_message_passing_steps" + str(config.num_message_passing_steps) + "\n")
+            outfile.write(
+                "num_message_passing_steps"
+                + str(config.num_message_passing_steps)
+                + "\n"
+            )
             outfile.write("Learning_rate:" + str(config.learning_rate) + "\n")
             outfile.write("num_training_steps:" + str(config.num_training_steps))
             outfile.write("roc_auc" + str(roc_auc))
@@ -179,7 +233,9 @@ def run(config_path, config):
     plot_xy(losses, os.path.join(save_path, "Losses.pdf"), "Losses")
     plot_xy(losses_test, os.path.join(save_path, "Losses_test.pdf"), "Losses_test")
     plot_xy(roc_aucs_test, os.path.join(save_path, "auc_roc_test.pdf"), "auc_roc_test")
-    plot_xy(roc_aucs_train, os.path.join(save_path, "auc_roc_train.pdf"), "auc_roc_train")
+    plot_xy(
+        roc_aucs_train, os.path.join(save_path, "auc_roc_train.pdf"), "auc_roc_train"
+    )
     plot_xy(MCCs_train, os.path.join(save_path, "MCC_train.pdf"), "MCC_train")
     plot_xy(MCCs_test, os.path.join(save_path, "MCC_test.pdf"), "MCC_test")
 
@@ -221,7 +277,13 @@ def run(config_path, config):
         "Inputs node assigments",
         edege_lables,
     )
-    plot_graph_grid_activations(target_test.sum(-1), graph_test, os.path.join(save_path, "Target.pdf"), "Target", edege_lables)
+    plot_graph_grid_activations(
+        target_test.sum(-1),
+        graph_test,
+        os.path.join(save_path, "Target.pdf"),
+        "Target",
+        edege_lables,
+    )
 
     plot_graph_grid_activations(
         outputs[0].nodes.tolist(),
@@ -240,7 +302,12 @@ def run(config_path, config):
         2,
     )
     plot_graph_grid_activations(
-        target_test.sum(-1), graph_test, os.path.join(save_path, "Target_2.pdf"), "Target", edege_lables, 2
+        target_test.sum(-1),
+        graph_test,
+        os.path.join(save_path, "Target_2.pdf"),
+        "Target",
+        edege_lables,
+        2,
     )
     return losses, roc_auc
 

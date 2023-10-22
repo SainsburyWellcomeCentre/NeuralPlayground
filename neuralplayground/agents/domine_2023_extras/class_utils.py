@@ -21,7 +21,10 @@ def rng_sequence_from_rng(rng):
         rng, _ = jax.random.split(rng)
         yield rng
 
-def convert_jraph_to_networkx_graph(jraph_graph: jraph.GraphsTuple, number_graph_batch) -> nx.Graph:
+
+def convert_jraph_to_networkx_graph(
+    jraph_graph: jraph.GraphsTuple, number_graph_batch
+) -> nx.Graph:
     nodes, edges, receivers, senders, _, _, _ = jraph_graph
     node_padd = 0
     edges_padd = 0
