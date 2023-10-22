@@ -42,20 +42,38 @@ def sample_padded_grid_batch_shortest_path(
     target = []
     for n_x, n_y in zip(n_xs, n_ys):
         nx_graph = get_grid_adjacency(n_x, n_y)
+
         senders, receivers, node_positions, edge_displacements, n_node, n_edge, global_context = grid_networkx_to_graphstuple(
             nx_graph
         )
-        i_end = jax.random.randint(next(rng_seq), shape=(1,), minval=0, maxval=n_node)
-        i_start = jax.random.randint(next(rng_seq), shape=(1,), minval=0, maxval=n_node)
+
+        weights = add_weighted_edge(edge_displacements, n_edge, 1)
+        for i, j in nx_graph.edges():
+           nx_graph[i][j]['weight'] = weights[i]
+
+        i_start_1 = jax.random.randint(next(rng_seq), shape=(1,), minval=0, maxval= n_x)
+        i_start_2 = jax.random.randint(next(rng_seq), shape=(1,), minval=0, maxval=n_y)
+        i_end_1 = jax.random.randint(next(rng_seq), shape=(1,), minval=0, maxval= n_x)
+        i_end_2 = jax.random.randint(next(rng_seq), shape=(1,), minval=0, maxval=n_y)
+
+        start = tuple(np.concatenate( (i_start_1,i_start_2), axis=0 ))
+        end = tuple(np.concatenate( (i_end_1,i_end_2), axis=0 ))
+
+        nodes_on_shortest_path_indexes_not_weighted = nx.shortest_path(nx_graph, start, end)
+        nodes_on_shortest_path_indexes = nx.shortest_path(nx_graph, start, end, weight='weight')
         # make it a node feature of the input graph if a node is a start/end node
         input_node_features = jnp.zeros((n_node, 1))
-        input_node_features = input_node_features.at[i_start, 0].set(1)  # set start node feature
-        input_node_features = input_node_features.at[i_end, 0].set(1)  # set end node feature
+
+        node_number_start = (i_start_1) * n_y + (i_start_2)
+        node_number_end = (i_end_1) * n_y + (i_end_2)
+
+        input_node_features = input_node_features.at[node_number_start, 0].set(1)  # set start node feature
+        input_node_features = input_node_features.at[node_number_end, 0].set(1)  # set end node feature
         if feature_position:
             input_node_features = jnp.concatenate((input_node_features, node_positions), axis=1)
+
         if weighted:
-            weights = add_weighted_edge(edge_displacements, n_edge, 1)
-            edge_displacement = jnp.concatenate((edge_displacements, weights), axis=1)
+            edge_displacement = jnp.concatenate((edge_displacements,weights), axis=1)
             graph = jraph.GraphsTuple(
                 nodes=input_node_features,
                 senders=senders,
@@ -65,10 +83,7 @@ def sample_padded_grid_batch_shortest_path(
                 n_edge=jnp.array([n_edge], dtype=int),
                 globals=global_context,
             )
-            nx_weighted = convert_jraph_to_networkx_graph(graph, 0)
-            for i, j in nx_weighted.edges():
-                nx_weighted[i][j]["weight"] = weights[i]
-            nodes_on_shortest_path_indexes = nx.shortest_path(nx_weighted, int(i_start[0]), int(i_end[0]), weight="weight")
+
         else:
             graph = jraph.GraphsTuple(
                 nodes=input_node_features,
@@ -79,13 +94,12 @@ def sample_padded_grid_batch_shortest_path(
                 n_edge=jnp.array([n_edge], dtype=int),
                 globals=global_context,
             )
-            nx_weighted = convert_jraph_to_networkx_graph(graph, 0)
-            nodes_on_shortest_path_indexes = nx.shortest_path(nx_weighted, int(i_start[0]), int(i_end[0]))
-        graphs.append(graph)
 
+        graphs.append(graph)
         nodes_on_shortest_labels = jnp.zeros((n_node, 1))
         for i in nodes_on_shortest_path_indexes:
-            nodes_on_shortest_labels = nodes_on_shortest_labels.at[i].set(1)
+            l=np.argwhere(np.all((node_positions - np.asarray(i)) == 0, axis=1))
+            nodes_on_shortest_labels = nodes_on_shortest_labels.at[l[0,0]].set(1)
         target.append(nodes_on_shortest_labels)  # set start node feature
     targets = jnp.concatenate(target)
     target_pad = jnp.zeros(((max_n - len(targets)), 1))
@@ -93,7 +107,7 @@ def sample_padded_grid_batch_shortest_path(
     graph_batch = jraph.batch(graphs)
     padded_graph_batch = jraph.pad_with_graphs(graph_batch, n_node=max_n, n_edge=max_e, n_graph=len(graphs) + 1)
 
-    return padded_graph_batch, jnp.asarray(padded_target)
+    return padded_graph_batch, jnp.asarray(padded_target),
 
 
 def grid_networkx_to_graphstuple(nx_graph):

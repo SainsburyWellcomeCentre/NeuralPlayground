@@ -95,9 +95,9 @@ class Domine2023(AgentCore,):
 
         self.log_every = num_training_steps // 10
         if self.weighted:
-            self.edege_lables = True
+            self.edge_lables = True
         else:
-            self.edege_lables = False
+            self.edge_lables = False
 
         if self.wandb_on:
             dateTimeObj = datetime.now()
@@ -156,14 +156,16 @@ class Domine2023(AgentCore,):
 
         self._update_step = jax.jit(update_step)
 
-        def evaluate(params, inputs, target):
+        def evaluate(params, inputs, target, Target_Value):
             outputs = net_hk.apply(params, inputs)
-            roc_auc = roc_auc_score(np.squeeze(target), np.squeeze(outputs[0].nodes))
+            if Target_Value:
+                roc_auc = roc_auc_score(np.squeeze(target), np.squeeze(outputs[0].nodes))
+            else:
+                roc_auc = False
             MCC = matthews_corrcoef(np.squeeze(target), round(np.squeeze(outputs[0].nodes)))
             return outputs, roc_auc, MCC
 
         self._evaluate = evaluate
-
 
 
     def saving_run_parameters(self):
@@ -188,18 +190,20 @@ class Domine2023(AgentCore,):
         HERE = os.path.join(Path(os.getcwd()).resolve(), "domine_2023_extras/class_config.yaml")
         shutil.copyfile(HERE, path)
 
-
-
     def reset(self,a=1):
         self.obs_history = []  # Initialize observation history to update weights later
         self.grad_history = []
         self.global_steps = 0
         self.losses = []
         self.losses_test = []
+        self.losses_wse = []
+        self.losses_test_wse = []
         self.roc_aucs_train = []
         self.MCCs_train = []
         self.MCCs_test = []
         self.roc_aucs_test = []
+        self.MCCs_train_wse = []
+        self.MCCs_test_wse = []
         return
 
     def update(self):
@@ -209,35 +213,58 @@ class Domine2023(AgentCore,):
                 rng, self.batch_size_test, self.feature_position, self.weighted, self.nx_min_test, self.nx_max_test
                     )
             rng = next(self.rng_seq)
+
             if self.resample:
                 self.graph, self.targets = sample_padded_grid_batch_shortest_path(
                     rng, self.batch_size, self.feature_position, self.weighted, self.nx_min, self.nx_max
                 )
         else:
-            graph_test, target_test = sample_padded_grid_batch_shortest_path(
+            graph_test, target_test= sample_padded_grid_batch_shortest_path(
                 rng, self.batch_size_test, self.feature_position, self.weighted, self.nx_min_test, self.nx_max_test
             )
-            target_test = graph_test.nodes
+            target_test =  np.reshape(graph_test.nodes[:, 0], (graph_test.nodes[:, 0].shape[0], -1))
+
             rng = next(self.rng_seq)
+            #target_test_wse = target_test - graph_test.nodes[:, 0]
             if self.resample:
-                self.graph, self.targets = sample_padded_grid_batch_shortest_path(
+                self.graph, self.targets= sample_padded_grid_batch_shortest_path(
                     rng, self.batch_size, self.feature_position, self.weighted, self.nx_min, self.nx_max
                 )
-                self.targets = self.graph.nodes
-        # Train
+            self.targets = np.reshape(self.graph.nodes[:, 0], (self.graph.nodes[:, 0].shape[0], -1)) #self.graph.nodes[:,0]
+            #target_wse = self.targets - self.graph.nodes[:, 0]
 
+        if self.feature_position:
+            target_test_wse = target_test - np.reshape(graph_test.nodes[:, 0], (graph_test.nodes[:, 0].shape[0], -1))
+            target_wse = self.targets - np.reshape(self.graph.nodes[:, 0], (self.graph.nodes[:, 0].shape[0], -1))
+        else:
+            target_test_wse = target_test - graph_test.nodes[:]
+            target_wse = self.targets - self.graph.nodes[:]
+
+        # Train
         self.params,self.opt_state, loss = self._update_step(self.params,self.opt_state )
         self.losses.append(loss)
-        outputs_train, roc_auc_train, MCC_train = self._evaluate(self.params, self.graph, self.targets)
+        outputs_train, roc_auc_train, MCC_train = self._evaluate(self.params, self.graph, self.targets, True)
         self.roc_aucs_train.append(roc_auc_train)
-        self.MCCs_train.append(MCC_train)  #Matthews correlation coefficient
+        self.MCCs_train.append(MCC_train)
 
-        # Test # model should basically learn to do nothing from this
+        # Train without end start in the target
+        loss_wse = self._compute_loss(self.params, self.graph, target_wse)
+        self.losses_wse.append(loss_wse)
+        outputs_train_wse, roc_auc_train_wse, MCC_train_wse = self._evaluate(self.params, self.graph, target_wse, False)
+        self.MCCs_train_wse.append(MCC_train_wse)
+
+        # Test
         loss_test = self._compute_loss(self.params,graph_test, target_test)
         self.losses_test.append(loss_test)
-        outputs_test, roc_auc_test, MCC_test = self._evaluate(self.params, graph_test, target_test)
+        outputs_test, roc_auc_test, MCC_test = self._evaluate(self.params, graph_test, target_test, True)
         self.roc_aucs_test.append(roc_auc_test)
         self.MCCs_test.append(MCC_test)
+
+        # Test without end start in the target
+        loss_test_wse = self._compute_loss(self.params, graph_test, target_test_wse)
+        self.losses_test_wse.append(loss_test_wse)
+        outputs_test_wse, roc_auc_test_wse, MCC_test_wse = self._evaluate(self.params, graph_test, target_test_wse, False)
+        self.MCCs_test_wse.append(MCC_test_wse)
 
         # Log
         wandb_logs = {"loss": loss, "losses_test": loss_test, "roc_auc_test": roc_auc_test, "roc_auc": roc_auc_train}
@@ -256,25 +283,24 @@ class Domine2023(AgentCore,):
                 rng, self.batch_size_test, self.feature_position, self.weighted, self.nx_min_test, self.nx_max_test
                     )
         else:
+            rng = next(self.rng_seq)
             graph_test, target_test = sample_padded_grid_batch_shortest_path(
                 rng, self.batch_size_test, self.feature_position, self.weighted, self.nx_min_test, self.nx_max_test
             )
-            target_test = graph_test.nodes
-            rng = next(self.rng_seq)
+            target_test = np.reshape(graph_test.nodes[:, 0], (graph_test.nodes[:, 0].shape[0], -1))
+
+        if self.feature_position:
+            target_test_wse = target_test - np.reshape(graph_test.nodes[:, 0], (graph_test.nodes[:, 0].shape[0], -1))
+            target_wse = self.targets - np.reshape(self.graph.nodes[:, 0], (self.graph.nodes[:, 0].shape[0], -1))
+        else:
+            target_test_wse = target_test - graph_test.nodes[:]
+            target_wse = self.targets - self.graph.nodes[:]
 
 
-        #graph_test, target_test = sample_padded_grid_batch_shortest_path(
-        #  rng, self.batch_size_test, self.feature_position, self.weighted, self.nx_min_test, self.nx_max_test
-        #  )
-        # graph_test= self.graph
-        # target_test = self.targets
-
-        outputs, roc_auc, MCC = self._evaluate(self.params, graph_test, target_test)
-
-        print("roc_auc_score")
-        print(roc_auc)
-        print("MCC")
-        print(MCC)
+        outputs_test, roc_auc_test, MCC_test = self._evaluate(self.params, graph_test, target_test, True)
+        outputs_test_wse, roc_auc_test_wse, MCC_test_wse = self._evaluate(self.params, graph_test, target_test_wse, False)
+        outputs, roc_auc, MCC = self._evaluate(self.params, self.graph, self.targets, True)
+        outputs_wse, roc_auc_wse, MCC_wse = self._evaluate(self.params, self.graph,  target_wse , False)
 
         # SAVE PARAMETER (NOT WE SAVE THE FILES SO IT SHOULD BE THERE AS WELL )
         if self.wandb_on:
@@ -284,132 +310,174 @@ class Domine2023(AgentCore,):
                 outfile.write("num_message_passing_steps" + str(self.num_message_passing_steps) + "\n")
                 outfile.write("Learning_rate:" + str(self.learning_rate) + "\n")
                 outfile.write("num_training_steps:" + str(self.num_training_steps))
-                outfile.write("roc_auc" + str(roc_auc))
-                outfile.write("MCC" + str(MCC))
+                outfile.write("roc_auc" + str(roc_auc_test))
+                outfile.write("MCC" + str(MCC_test))
+                outfile.write("roc_auc_wse" + str(roc_auc_test_wse))
+                outfile.write("MCC_wse" + str(MCC_test_wse))
 
         # PLOTTING THE LOSS and AUC ROC
         plot_xy(self.losses, os.path.join(self.save_path, "Losses.pdf"), "Losses")
         plot_xy(self.losses_test, os.path.join(self.save_path, "Losses_test.pdf"), "Losses_test")
+
+        plot_xy(self.losses_wse, os.path.join(self.save_path, "Losses_wse.pdf"), "Losses_wse")
+        plot_xy(self.losses_test_wse, os.path.join(self.save_path, "Losses_test_wse.pdf"), "Losses_test_wse")
+
         plot_xy(self.roc_aucs_test, os.path.join(self.save_path, "auc_roc_test.pdf"), "auc_roc_test")
         plot_xy(self.roc_aucs_train, os.path.join(self.save_path, "auc_roc_train.pdf"), "auc_roc_train")
+
         plot_xy(self.MCCs_train, os.path.join(self.save_path, "MCC_train.pdf"), "MCC_train")
         plot_xy(self.MCCs_test, os.path.join(self.save_path, "MCC_test.pdf"), "MCC_test")
 
-        # PLOTTING ACTIVATION OF THE FIRST 2 GRAPH OF THE BATCH
+        plot_xy(self.MCCs_train_wse, os.path.join(self.save_path, "MCC_train_wse.pdf"), "MCC_train_wse")
+        plot_xy(self.MCCs_test_wse, os.path.join(self.save_path, "MCC_test_wse.pdf"), "MCC_test_wse")
+
+        # PLOTTING ACTIVATION FOR TEST AND THE TARGET OF THE THING ( NOTE THAT IS WAS TRANED ON THE ALL THING)
         plot_input_target_output(
             list(graph_test.nodes.sum(-1)),
             target_test.sum(-1),
-            outputs[0].nodes.tolist(),
+            outputs_test[0].nodes.tolist(),
             graph_test,
             4,
-            self.edege_lables,
-            os.path.join(self.save_path, "in_out_targ.pdf"),
+            self.edge_lables,
+            os.path.join(self.save_path, "in_out_targ_test.pdf"),
         )
         plot_message_passing_layers(
             list(graph_test.nodes.sum(-1)),
-            outputs[1],
+            outputs_test[1],
             target_test.sum(-1),
-            outputs[0].nodes.tolist(),
+            outputs_test[0].nodes.tolist(),
             graph_test,
             3,
             self.num_message_passing_steps,
-            self.edege_lables,
-            os.path.join(self.save_path, "message_passing_graph.pdf"),
+            self.edge_lables,
+            os.path.join(self.save_path, "message_passing_graph_test.pdf"),
         )
+
+        plot_input_target_output(
+            list(graph_test.nodes.sum(-1)),
+            target_test_wse.sum(-1),
+            outputs_test_wse[0].nodes.tolist(),
+            graph_test,
+            4,
+            self.edge_lables,
+            os.path.join(self.save_path, "in_out_targ_test_wse.pdf"),
+        )
+
+        # Train
+        # PLOTTING ACTIVATION OF THE FIRST 2 GRAPH OF THE BATCH
+        plot_input_target_output(
+            list(self.graph.nodes.sum(-1)),
+            self.targets.sum(-1),
+            outputs[0].nodes.tolist(),
+            self.graph,
+            4,
+            self.edge_lables,
+            os.path.join(self.save_path, "in_out_targ_train.pdf"),
+        )
+
+        plot_input_target_output(
+            list(self.graph.nodes.sum(-1)),
+            target_wse.sum(-1),
+            outputs_wse[0].nodes.tolist(),
+            self.graph,
+            4,
+            self.edge_lables,
+            os.path.join(self.save_path, "in_out_targ_train_wse.pdf"),
+        )
+
+
+        # graph_test, target_test = sample_padded_grid_batch_shortest_path(
+        #  rng, self.batch_size_test, self.feature_position, self.weighted, self.nx_min_test, self.nx_max_test
+        #  )
+        # graph_test= self.graph
+        # target_test = self.targets
+
         # plot_message_passing_layers_units(outputs[1], target_test.sum(-1), outputs[0].nodes.tolist(),graph_test,config.num_hidden,config.num_message_passing_steps,edege_lables,os.path.join(save_path, 'message_passing_hidden_unit.pdf'))
 
         # Plot each seperatly
-        plot_graph_grid_activations(
-            outputs[0].nodes.tolist(),
-            graph_test,
-            os.path.join(self.save_path, "outputs.pdf"),
-            "Predicted Node Assignments with GCN",
-            self.edege_lables,
-        )
-        plot_graph_grid_activations(
-            list(graph_test.nodes.sum(-1)),
-            graph_test,
-            os.path.join(self.save_path, "Inputs.pdf"),
-            "Inputs node assigments",
-            self.edege_lables,
-        )
-        plot_graph_grid_activations(
-            target_test.sum(-1), graph_test, os.path.join(self.save_path, "Target.pdf"), "Target", self.edege_lables
-        )
+        # plot_graph_grid_activations(
+        #      outputs[0].nodes.tolist(),
+        #      graph_test,
+        #      os.path.join(self.save_path, "outputs_test.pdf"),
+        #     "Predicted Node Assignments with GCN test",
+        #     self.edge_lables,
+        # )
+        # plot_graph_grid_activations(
+        #    list(graph_test.nodes.sum(-1)),
+        #   graph_test,
+        #     os.path.join(self.save_path, "Inputs_test.pdf"),
+        #    "Inputs node assigments test ",
+        #     self.edge_lables,
+        #  )
+        #  plot_graph_grid_activations(
+        #     target_test.sum(-1), graph_test, os.path.join(self.save_path, "Target_test.pdf"), "Target_test", self.edge_lables
+        #  )
 
-        graph_test= self.graph
-        target_test = self.targets
 
-        outputs, roc_auc, MCC = self._evaluate(self.params, graph_test, target_test)
-        # PLOTTING ACTIVATION OF THE FIRST 2 GRAPH OF THE BATCH
+        # PLOTTING ACTIVATION OF THE FIRST 2 GRAPH OF THE BATCHe
         plot_input_target_output(
-            list(graph_test.nodes.sum(-1)),
-            target_test.sum(-1),
-            outputs[0].nodes.tolist(),
-            graph_test,
+            list( self.graph.nodes.sum(-1)),
+            target_wse.sum(-1),
+            outputs_wse[0].nodes.tolist(),
+            self.graph,
             4,
-            self.edege_lables,
-            os.path.join(self.save_path, "in_out_targ_train.pdf"),
+            self.edge_lables,
+            os.path.join(self.save_path, "in_out_targ_train_wse.pdf"),
         )
+
         plot_message_passing_layers(
-            list(graph_test.nodes.sum(-1)),
-            outputs[1],
-            target_test.sum(-1),
-            outputs[0].nodes.tolist(),
-            graph_test,
+            list( self.graph.nodes.sum(-1)),
+            outputs_wse[1],
+            target_wse.sum(-1),
+            outputs_wse[0].nodes.tolist(),
+            self.graph,
             3,
             self.num_message_passing_steps,
-            self.edege_lables,
+            self.edge_lables,
+            os.path.join(self.save_path, "message_passing_graph_train_wse.pdf"),
+        )
+
+        plot_input_target_output(
+            list( self.graph.nodes.sum(-1)),
+            self.targets.sum(-1),
+            outputs[0].nodes.tolist(),
+            self.graph,
+            4,
+            self.edge_lables,
+            os.path.join(self.save_path, "in_out_targ_train.pdf"),
+        )
+
+        plot_message_passing_layers(
+            list( self.graph.nodes.sum(-1)),
+            outputs[1],
+            self.targets.sum(-1),
+            outputs[0].nodes.tolist(),
+            self.graph,
+            3,
+            self.num_message_passing_steps,
+            self.edge_lables,
             os.path.join(self.save_path, "message_passing_graph_train.pdf"),
         )
         # plot_message_passing_layers_units(outputs[1], target_test.sum(-1), outputs[0].nodes.tolist(),graph_test,config.num_hidden,config.num_message_passing_steps,edege_lables,os.path.join(save_path, 'message_passing_hidden_unit.pdf'))
 
         # Plot each seperatly
-        plot_graph_grid_activations(
-            outputs[0].nodes.tolist(),
-            graph_test,
-            os.path.join(self.save_path, "outputs_train.pdf"),
-            "Predicted Node Assignments with GCN",
-            self.edege_lables,
-        )
-        plot_graph_grid_activations(
-            list(graph_test.nodes.sum(-1)),
-            graph_test,
-            os.path.join(self.save_path, "Inputs_train.pdf"),
-            "Inputs node assigments",
-            self.edege_lables,
-        )
-        plot_graph_grid_activations(
-            target_test.sum(-1), graph_test, os.path.join(self.save_path, "Target_train.pdf"), "Target", self.edege_lables
-        )
-
-
-      #  plot_graph_grid_activations(
-       #     outputs[0].nodes.tolist(),
+        #  plot_graph_grid_activations(
+        #   outputs[0].nodes.tolist(),
         #    graph_test,
-         #   os.path.join(self.save_path, "outputs_2.pdf"),
-          #  "Predicted Node Assignments with GCN",
-           # self.edege_lables,
-            #2,
-        #)
-        #plot_graph_grid_activations(
-         #   list(graph_test.nodes.sum(-1)),
-          #  graph_test,
-           # os.path.join(self.save_path, "Inputs_2.pdf"),
-            #"Inputs node assigments",
-        #self.edege_lables,
-            #2,
-        #)
-        #
-        #
-        print('End')
-
+        #   os.path.join(self.save_path, "outputs_train.pdf"),
+        #   "Predicted Node Assignments with GCN",
+        #   self.edge_lables,
+        #   )
+        #  plot_graph_grid_activations(
+        #    list(graph_test.nodes.sum(-1)),
+        #    graph_test,
+        #    os.path.join(self.save_path, "Inputs_train.pdf"),
+        #      "Inputs node assigments",
+        #   self.edge_lables,
+        #  )
         # plot_graph_grid_activations(
-            #
-            #            target_test.sum(-1), graph_test, os.path.join(self.save_path, "Target_2.pdf"), "Target", self.edege_lables, 2
-            # )
-        #        return
-
+        #  target_test.sum(-1), graph_test, os.path.join(self.save_path, "Target_train.pdf"), "Target", self.edge_lables
+        # )        print('End')
 
 if __name__ == "__main__":
     from neuralplayground.arenas import Simple2D
@@ -427,18 +495,17 @@ if __name__ == "__main__":
     set_device()
     config_class = GridConfig
     config = config_class(args.config_path)
-    time_step_size = 0.1  # seg
-    agent_step_size = 3
+
 
     # Init environment
     arena_x_limits = [-100, 100]
     arena_y_limits = [-100, 100]
-    env = Simple2D(
-        time_step_size=time_step_size,
-        agent_step_size=agent_step_size,
-        arena_x_limits=arena_x_limits,
-        arena_y_limits=arena_y_limits,
-    )
+    #env = Simple2D
+    #   time_step_size=time_step_size,
+    #  agent_step_size=agent_step_size,
+    #  arena_x_limits=arena_x_limits,
+    #   arena_y_limits=arena_y_limits,
+    # )
 
     agent = Domine2023( experiment_name=config.experiment_name,
     train_on_shortest_path= config.train_on_shortest_path,

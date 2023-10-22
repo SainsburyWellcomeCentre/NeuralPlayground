@@ -1,17 +1,17 @@
 experiment_name: 'train_on_shortest_path'
-train_on_shortest_path: True
+train_on_shortest_path: True  # make sure it works when this is the case
 resample: True # @param
-wandb_on: True
-seed: 41
+wandb_on: False
+seed: 42
 
-feature_position: False
+feature_position: False   # make sure it works when this is the case
 weighted: False
 
-num_hidden: 100 # @param
+num_hidden: 500 # @param
 num_layers: 2  # @param
-num_message_passing_steps: 3  # @param
+num_message_passing_steps: 4  # @param
 learning_rate: 0.001 # @param
-num_training_steps: 400 # @param
+num_training_steps: 300 # @param
 
 
 # Env Stuff
