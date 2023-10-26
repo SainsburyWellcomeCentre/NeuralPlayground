@@ -25,7 +25,6 @@ from neuralplayground.agents.domine_2023_extras.class_plotting_utils import (
     plot_graph_grid_activations,
     plot_input_target_output,
     plot_message_passing_layers,
-    plot_xy,
     plot_curves,
 )
 from neuralplayground.agents.domine_2023_extras.class_utils import (
@@ -110,7 +109,7 @@ class Domine2023(
             wandb.init(
                 project="graph-brain",
                 entity="graph-brain",
-                name="Grid_shortest_path" + dateTimeObj.strftime("%d%b_%H_%M"),
+                name="Grid_shortest_path" + dateTimeObj.strftime("%d%b_%H_%M_%S"),
             )
             self.wandb_logs = {}
             save_path = wandb.run.dir
@@ -122,12 +121,12 @@ class Domine2023(
             save_path = os.path.join(Path(os.getcwd()).resolve(), "results")
             os.mkdir(
                 os.path.join(
-                    save_path, "Grid_shortest_path" + dateTimeObj.strftime("%d%b_%H_%M")
+                    save_path, "Grid_shortest_path" + dateTimeObj.strftime("%d%b_%H_%M_%S")
                 )
             )
             self.save_path = os.path.join(
                 os.path.join(
-                    save_path, "Grid_shortest_path" + dateTimeObj.strftime("%d%b_%H_%M")
+                    save_path, "Grid_shortest_path" + dateTimeObj.strftime("%d%b_%H_%M_%S")
                 )
             )
 
@@ -181,17 +180,29 @@ class Domine2023(
 
         self._update_step = jax.jit(update_step)
 
-        def evaluate(params, inputs, target, Target_Value):
+        def evaluate(params, inputs, target,wse_value=True,indices=None):
             outputs = net_hk.apply(params, inputs)
-            if Target_Value:
+            if wse_value:
                 roc_auc = roc_auc_score(
                     np.squeeze(target), np.squeeze(outputs[0].nodes)
                 )
+                MCC = matthews_corrcoef(
+                    np.squeeze(target), round(np.squeeze(outputs[0].nodes))
+                )
             else:
+                output = outputs[0].nodes
+                for ind in indices:
+                    output = output.at[ind].set(0)
+                    #lst = list(outputs)
+                    #lst[0].nodes.at[ind].set(0)
+                    #output = tuple(lst)
+                    #outputs = outputs[0].nodes.replace(0, 0)
+                    #outputs = outputs.replace(0,0)
+                MCC = matthews_corrcoef(
+                        np.squeeze(target), round(np.squeeze(output))
+                    )
                 roc_auc = False
-            MCC = matthews_corrcoef(
-                np.squeeze(target), round(np.squeeze(outputs[0].nodes))
-            )
+
             return outputs, roc_auc, MCC
 
         self._evaluate = evaluate
@@ -229,9 +240,9 @@ class Domine2023(
         self.obs_history = []  # Initialize observation history to update weights later
         self.grad_history = []
         self.global_steps = 0
-        self.losses = []
+        self.losses_train = []
         self.losses_test = []
-        self.losses_wse = []
+        self.losses_train_wse = []
         self.losses_test_wse = []
         self.roc_aucs_train = []
         self.MCCs_train = []
@@ -277,6 +288,7 @@ class Domine2023(
             )
 
             rng = next(self.rng_seq)
+            # Sample
             # target_test_wse = target_test - graph_test.nodes[:, 0]
             if self.resample:
                 self.graph, self.targets = sample_padded_grid_batch_shortest_path(
@@ -289,10 +301,11 @@ class Domine2023(
                 )
             self.targets = np.reshape(
                 self.graph.nodes[:, 0], (self.graph.nodes[:, 0].shape[0], -1)
-            )  # self.graph.nodes[:,0]
-            # target_wse = self.targets - self.graph.nodes[:, 0]
+            )
 
         if self.feature_position:
+            indices_train = np.where(self.graph.nodes[:, 0] == 1)[0]
+            indices_test = np.where(graph_test.nodes[:, 0]  == 1)[0]
             target_test_wse = target_test - np.reshape(
                 graph_test.nodes[:, 0], (graph_test.nodes[:, 0].shape[0], -1)
             )
@@ -300,6 +313,8 @@ class Domine2023(
                 self.graph.nodes[:, 0], (self.graph.nodes[:, 0].shape[0], -1)
             )
         else:
+            indices_train = np.where( self.graph.nodes[:]== 1)[0]
+            indices_test = np.where(graph_test.nodes[:] == 1)[0]
             target_test_wse = target_test - graph_test.nodes[:]
             target_wse = self.targets - self.graph.nodes[:]
 
@@ -307,7 +322,8 @@ class Domine2023(
         self.params, self.opt_state, loss = self._update_step(
             self.params, self.opt_state
         )
-        self.losses.append(loss)
+
+        self.losses_train.append(loss)
         outputs_train, roc_auc_train, MCC_train = self._evaluate(
             self.params, self.graph, self.targets, True
         )
@@ -316,10 +332,12 @@ class Domine2023(
 
         # Train without end start in the target
         loss_wse = self._compute_loss(self.params, self.graph, target_wse)
-        self.losses_wse.append(loss_wse)
+        self.losses_train_wse.append(loss_wse)
         outputs_train_wse, roc_auc_train_wse, MCC_train_wse = self._evaluate(
-            self.params, self.graph, target_wse, False
+            self.params, self.graph, target_wse, False, indices_train
         )
+
+
         self.MCCs_train_wse.append(MCC_train_wse)
 
         # Test
@@ -334,17 +352,34 @@ class Domine2023(
         # Test without end start in the target
         loss_test_wse = self._compute_loss(self.params, graph_test, target_test_wse)
         self.losses_test_wse.append(loss_test_wse)
-        outputs_test_wse, roc_auc_test_wse, MCC_test_wse = self._evaluate(
-            self.params, graph_test, target_test_wse, False
+        outputs_test_wse_list, roc_auc_test_wse, MCC_test_wse = self._evaluate(
+            self.params, graph_test, target_test_wse, False, indices_test
         )
         self.MCCs_test_wse.append(MCC_test_wse)
 
         # Log
         wandb_logs = {
-            "loss": loss,
-            "losses_test": loss_test,
+            "loss_test": loss_test,
+            "loss_test_wse": loss_test_wse,
+            "loss_train": loss,
+            "loss_train_wse": loss_wse,
+
+            "log_loss_test": np.log(loss_test),
+            "log_loss_test_wse": np.log(loss_test_wse),
+            "log_loss": np.log(loss),
+            "log_loss_wse": np.log(loss_wse),
+
             "roc_auc_test": roc_auc_test,
-            "roc_auc": roc_auc_train,
+            "roc_auc_test_wse": roc_auc_test_wse,
+            "roc_auc_train": roc_auc_train,
+            "roc_auc_train_wse": roc_auc_train_wse,
+
+
+            "MCC_test": MCC_test,
+            "MCC_test_wse": MCC_test_wse,
+            "MCC_train": MCC_train,
+            "MCC_train_wse": MCC_train_wse,
+
         }
         if self.wandb_on:
             wandb.log(wandb_logs)
@@ -382,6 +417,8 @@ class Domine2023(
             )
 
         if self.feature_position:
+            indices_train = np.where(self.graph.nodes[:, 0] == 1)[0]
+            indices_test = np.where(graph_test.nodes[:, 0] == 1)[0]
             target_test_wse = target_test - np.reshape(
                 graph_test.nodes[:, 0], (graph_test.nodes[:, 0].shape[0], -1)
             )
@@ -389,6 +426,8 @@ class Domine2023(
                 self.graph.nodes[:, 0], (self.graph.nodes[:, 0].shape[0], -1)
             )
         else:
+            indices_train = np.where(self.graph.nodes[:] == 1)[0]
+            indices_test = np.where(graph_test.nodes[:] == 1)[0]
             target_test_wse = target_test - graph_test.nodes[:]
             target_wse = self.targets - self.graph.nodes[:]
 
@@ -396,14 +435,23 @@ class Domine2023(
             self.params, graph_test, target_test, True
         )
         outputs_test_wse, roc_auc_test_wse, MCC_test_wse = self._evaluate(
-            self.params, graph_test, target_test_wse, False
+            self.params, graph_test, target_test_wse, False,indices_test
         )
+
+        outputs_test_wse_list = outputs_test_wse[0].nodes
+        for ind in indices_test:
+            outputs_test_wse_list = outputs_test_wse_list.at[ind].set(0)
+
         outputs, roc_auc, MCC = self._evaluate(
             self.params, self.graph, self.targets, True
         )
         outputs_wse, roc_auc_wse, MCC_wse = self._evaluate(
-            self.params, self.graph, target_wse, False
+            self.params, self.graph, target_wse, False, indices_train
         )
+
+        outputs_wse_list = outputs_wse[0].nodes
+        for ind in indices_train:
+            outputs_wse_list = outputs_wse_list.at[ind].set(0)
 
         # SAVE PARAMETER (NOT WE SAVE THE FILES SO IT SHOULD BE THERE AS WELL )
         if self.wandb_on:
@@ -424,7 +472,7 @@ class Domine2023(
 
         # PLOTTING THE LOSS and AUC RO
         plot_curves(
-            [self.losses, self.losses_test, self.losses_wse, self.losses_test_wse],
+            [self.losses_train, self.losses_test, self.losses_train_wse, self.losses_test_wse],
             os.path.join(self.save_path, "Losses.pdf"),
             "All_Losses",
             legend_labels=["loss", "loss test", "loss_wse", "loss_test_wse"],
@@ -432,9 +480,9 @@ class Domine2023(
 
         plot_curves(
             [
-                np.log(self.losses),
+                np.log(self.losses_train),
                 np.log(self.losses_test),
-                np.log(self.losses_wse),
+                np.log(self.losses_train_wse),
                 np.log(self.losses_test_wse),
             ],
             os.path.join(self.save_path, "Log_Losses.pdf"),
@@ -447,21 +495,21 @@ class Domine2023(
             ],
         )
 
-        plot_xy(self.losses, os.path.join(self.save_path, "Losses_train.pdf"), "Losses")
-        plot_xy(
-            self.losses_test,
-            os.path.join(self.save_path, "Losses_test.pdf"),
-            "Losses_test",
+        plot_curves([self.losses_train], os.path.join(self.save_path, "Losses_train.pdf"), "Losses")
+        plot_curves(
+            [self.losses_test],
+            os.path.join(self.save_path, "losses_test.pdf"),
+            "losses_test",
         )
-        plot_xy(
-            self.losses_wse,
+        plot_curves(
+            [self.losses_train_wse],
             os.path.join(self.save_path, "Losses_wse.pdf"),
             "Losses_wse",
         )
-        plot_xy(
-            self.losses_test_wse,
-            os.path.join(self.save_path, "Losses_test_wse.pdf"),
-            "Losses_test_wse",
+        plot_curves(
+           [ self.losses_test_wse],
+            os.path.join(self.save_path, "losses_test_wse.pdf"),
+            "losses_test_wse",
         )
 
         plot_curves(
@@ -470,13 +518,13 @@ class Domine2023(
             "All_auc_roc",
             legend_labels=["auc_roc_test", "auc_roc_train"],
         )
-        plot_xy(
-            self.roc_aucs_test,
+        plot_curves(
+            [self.roc_aucs_test],
             os.path.join(self.save_path, "auc_roc_test.pdf"),
             "auc_roc_test",
         )
-        plot_xy(
-            self.roc_aucs_train,
+        plot_curves(
+            [self.roc_aucs_train],
             os.path.join(self.save_path, "auc_roc_train.pdf"),
             "auc_roc_train",
         )
@@ -487,19 +535,19 @@ class Domine2023(
             "All_MCCs",
             legend_labels=["MCC", "MCC test", "MCC_wse", "MCC_test_wse"],
         )
-        plot_xy(
-            self.MCCs_train, os.path.join(self.save_path, "MCC_train.pdf"), "MCC_train"
+        plot_curves(
+            [self.MCCs_train], os.path.join(self.save_path, "MCC_train.pdf"), "MCC_train"
         )
-        plot_xy(
-            self.MCCs_test, os.path.join(self.save_path, "MCC_test.pdf"), "MCC_test"
+        plot_curves(
+            [self.MCCs_test], os.path.join(self.save_path, "MCC_test.pdf"), "MCC_test"
         )
-        plot_xy(
-            self.MCCs_train_wse,
+        plot_curves(
+            [self.MCCs_train_wse],
             os.path.join(self.save_path, "MCC_train_wse.pdf"),
             "MCC_train_wse",
         )
-        plot_xy(
-            self.MCCs_test_wse,
+        plot_curves(
+            [self.MCCs_test_wse],
             os.path.join(self.save_path, "MCC_test_wse.pdf"),
             "MCC_test_wse",
         )
@@ -510,18 +558,31 @@ class Domine2023(
             target_test.sum(-1),
             outputs_test[0].nodes.tolist(),
             graph_test,
-            4,
+            6,
             self.edge_lables,
             os.path.join(self.save_path, "in_out_targ_test.pdf"),
             "in_out_targ_test",
         )
+
+        new_vector = [1 if val > 0.3 else 0 for val in outputs_test[0].nodes]
+        plot_input_target_output(
+            list(graph_test.nodes.sum(-1)),
+            target_test.sum(-1),
+            new_vector,
+            graph_test,
+            6,
+            self.edge_lables,
+            os.path.join(self.save_path, "in_out_targ_test_threshold.pdf"),
+            "in_out_targ_test",
+        )
+
         plot_message_passing_layers(
             list(graph_test.nodes.sum(-1)),
             outputs_test[1],
             target_test.sum(-1),
             outputs_test[0].nodes.tolist(),
             graph_test,
-            3,
+            6,
             self.num_message_passing_steps,
             self.edge_lables,
             os.path.join(
@@ -534,33 +595,35 @@ class Domine2023(
         plot_input_target_output(
             list(graph_test.nodes.sum(-1)),
             target_test_wse.sum(-1),
-            outputs_test_wse[0].nodes.tolist(),
+            outputs_test_wse_list,
             graph_test,
-            4,
+            6,
             self.edge_lables,
             os.path.join(self.save_path, "in_out_targ_test_wse.pdf"),
             "in_out_targ_test_wse",
         )
 
         # Train
+
         # PLOTTING ACTIVATION OF THE FIRST 2 GRAPH OF THE BATCH
+        new_vector = [1 if val > 0.3 else 0 for val in outputs[0].nodes]
         plot_input_target_output(
             list(self.graph.nodes.sum(-1)),
             self.targets.sum(-1),
-            outputs[0].nodes.tolist(),
+            new_vector,
             self.graph,
-            4,
+            6,
             self.edge_lables,
-            os.path.join(self.save_path, "in_out_targ_train.pdf"),
+            os.path.join(self.save_path, "in_out_targ_train_threshol.pdf"),
             "in_out_targ_train",
         )
 
         plot_input_target_output(
             list(self.graph.nodes.sum(-1)),
             target_wse.sum(-1),
-            outputs_wse[0].nodes.tolist(),
+            outputs_wse_list,
             self.graph,
-            4,
+            6,
             self.edge_lables,
             os.path.join(self.save_path, "in_out_targ_train_wse.pdf"),
             "in_out_targ_train_wse",
@@ -594,39 +657,14 @@ class Domine2023(
         #  )
 
         # PLOTTING ACTIVATION OF THE FIRST 2 GRAPH OF THE BATCHe
-        plot_input_target_output(
-            list(self.graph.nodes.sum(-1)),
-            target_wse.sum(-1),
-            outputs_wse[0].nodes.tolist(),
-            self.graph,
-            4,
-            self.edge_lables,
-            os.path.join(self.save_path, "in_out_targ_train_wse.pdf"),
-            "in_out_targ_train_wse",
-        )
 
-        plot_message_passing_layers(
-            list(self.graph.nodes.sum(-1)),
-            outputs_wse[1],
-            target_wse.sum(-1),
-            outputs_wse[0].nodes.tolist(),
-            self.graph,
-            3,
-            self.num_message_passing_steps,
-            self.edge_lables,
-            os.path.join(
-                self.save_path,
-                "message_passing_graph_train_wse.pdf",
-            ),
-            "message_passing_graph_train_wse",
-        )
 
         plot_input_target_output(
             list(self.graph.nodes.sum(-1)),
             self.targets.sum(-1),
             outputs[0].nodes.tolist(),
             self.graph,
-            4,
+            6,
             self.edge_lables,
             os.path.join(self.save_path, "in_out_targ_train.pdf"),
             "in_out_targ_train",
@@ -638,7 +676,7 @@ class Domine2023(
             self.targets.sum(-1),
             outputs[0].nodes.tolist(),
             self.graph,
-            3,
+            6,
             self.num_message_passing_steps,
             self.edge_lables,
             os.path.join(self.save_path, "message_passing_graph_train.pdf"),
@@ -663,7 +701,8 @@ class Domine2023(
         #  )
         # plot_graph_grid_activations(
         #  target_test.sum(-1), graph_test, os.path.join(self.save_path, "Target_train.pdf"), "Target", self.edge_lables
-        # )        print('End')
+
+        print('End')
 
 
 if __name__ == "__main__":

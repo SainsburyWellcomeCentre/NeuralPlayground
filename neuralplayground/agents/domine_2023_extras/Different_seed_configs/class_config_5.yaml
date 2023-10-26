@@ -1,0 +1,24 @@
+experiment_name: 'Learn identity no resample'
+train_on_shortest_path: False  # make sure it works when this is the case
+resample: False # @param
+wandb_on: True
+seed: 46
+
+feature_position: False   # make sure it works when this is the case
+weighted: False
+
+num_hidden: 500 # @param
+num_layers: 2  # @param
+num_message_passing_steps: 3  # @param
+learning_rate: 0.001 # @param
+num_training_steps: 10 # @param
+
+
+# Env Stuff
+batch_size: 6
+nx_min: 2
+nx_max: 5
+
+batch_size_test: 6
+nx_min_test: 2
+nx_max_test: 5

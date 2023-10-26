@@ -1,5 +1,6 @@
 # @title Make rng sequence generator
 import matplotlib.pyplot as plt
+
 import networkx as nx
 from neuralplayground.agents.domine_2023_extras.class_utils import (
     convert_jraph_to_networkx_graph,
@@ -14,7 +15,7 @@ def plot_input_target_output(
     # minim 2 otherwise it breaks
     rows = ["{}".format(row) for row in ["Input", "Target", "Outputs"]]
     fig, axes = plt.subplots(3, n)
-    fig.set_size_inches(8, 8)
+    fig.set_size_inches(15, 15)
     for i in range(n):
         nx_graph = convert_jraph_to_networkx_graph(graph, i)
         pos = nx.spring_layout(nx_graph, iterations=100, seed=39775)
@@ -74,6 +75,7 @@ def plot_input_target_output(
         axes.set_ylabel(row, rotation=0, size="large")
     plt.suptitle(title)
     plt.savefig(save_path)
+    plt.close()
 
 
 def plot_message_passing_layers(
@@ -90,7 +92,7 @@ def plot_message_passing_layers(
 ):
     # minim 2 otherwise it breaks
     fig, axes = plt.subplots(n_message_passing + 3, n)
-    fig.set_size_inches(8, 8)
+    fig.set_size_inches(15, 15)
     for j in range(n):
         nx_graph = convert_jraph_to_networkx_graph(graph, j)
         pos = nx.spring_layout(nx_graph, iterations=100, seed=39775)
@@ -161,6 +163,7 @@ def plot_message_passing_layers(
                 )
     plt.suptitle(title)
     plt.savefig(save_path)
+    plt.close()
 
 
 def plot_graph_grid_activations(
@@ -210,7 +213,7 @@ def plot_message_passing_layers_units(
 ):
     # minim 2 otherwise it breaks
     fig, axes = plt.subplots(n_message_passing, number_hidden)
-    fig.set_size_inches(12, 12)
+    fig.set_size_inches(15, 15)
     nx_graph = convert_jraph_to_networkx_graph(graph, 0)
     pos = nx.spring_layout(nx_graph, iterations=100, seed=39775)
     if edege_lables:
@@ -244,15 +247,6 @@ def plot_message_passing_layers_units(
     plt.savefig(save_path)
 
 
-def plot_xy(auc_roc, path, title):
-    fig = plt.figure(figsize=(5, 3))
-    ax = fig.add_subplot(111)
-    ax.title.set_text(title)
-    ax.plot(auc_roc)
-    plt.savefig(path)
-
-
-import matplotlib.pyplot as plt
 
 
 def plot_curves(curves, path, title, legend_labels=None, x_label=None, y_label=None):
@@ -276,3 +270,4 @@ def plot_curves(curves, path, title, legend_labels=None, x_label=None, y_label=N
 
     plt.savefig(path)
     plt.show()
+    plt.close()
