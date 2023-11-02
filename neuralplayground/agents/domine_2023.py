@@ -95,18 +95,16 @@ class Domine2023(
         self.room_depth = np.diff(self.arena_y_limits)[0]
         self.agent_step_size = 0
 
-
-
         self.log_every = num_training_steps // 10
         if self.weighted:
             self.edge_lables = True
         else:
-            self.edge_lables = False
+            self.edge_lables = True
 
         if self.wandb_on:
             dateTimeObj = datetime.now()
             wandb.init(
-                project="graph-brain",
+                project="graph-test",
                 entity="graph-brain",
                 name="Grid_shortest_path" + dateTimeObj.strftime("%d%b_%H_%M_%S"),
             )
@@ -282,13 +280,13 @@ class Domine2023(
         rng = next(self.rng_seq)
         if self.train_on_shortest_path:
             graph_test, target_test = sample_padded_grid_batch_shortest_path(
-                rng,
-                self.batch_size_test,
-                self.feature_position,
-                self.weighted,
-                self.nx_min_test,
-                self.nx_max_test,
-            )
+                    rng,
+                    self.batch_size,
+                    self.feature_position,
+                    self.weighted,
+                    self.nx_min,
+                    self.nx_max,
+                )
             rng = next(self.rng_seq)
 
             if self.resample:
@@ -362,7 +360,6 @@ class Domine2023(
             self.params, self.graph, target_wse, False, indices_train
         )
 
-
         self.MCCs_train_wse.append(MCC_train_wse)
 
         # Test
@@ -384,10 +381,6 @@ class Domine2023(
 
         # Log
         wandb_logs = {
-            # "loss_test": loss_test,
-            # "loss_test_wse": loss_test_wse,
-            # "loss_train": loss,
-            # "loss_train_wse": loss_wse,
 
             "log_loss_test": np.log(loss_test),
             "log_loss_test_wse": np.log(loss_test_wse),
@@ -653,36 +646,6 @@ class Domine2023(
             "in_out_targ_train_wse",
         )
 
-        # graph_test, target_test = sample_padded_grid_batch_shortest_path(
-        #  rng, self.batch_size_test, self.feature_position, self.weighted, self.nx_min_test, self.nx_max_test
-        #  )
-        # graph_test= self.graph
-        # target_test = self.targets
-
-        # plot_message_passing_layers_units(outputs[1], target_test.sum(-1), outputs[0].nodes.tolist(),graph_test,config.num_hidden,config.num_message_passing_steps,edege_lables,os.path.join(save_path, 'message_passing_hidden_unit.pdf'))
-
-        # Plot each seperatly
-        # plot_graph_grid_activations(
-        #      outputs[0].nodes.tolist(),
-        #      graph_test,
-        #      os.path.join(self.save_path, "outputs_test.pdf"),
-        #     "Predicted Node Assignments with GCN test",
-        #     self.edge_lables,
-        # )
-        # plot_graph_grid_activations(
-        #    list(graph_test.nodes.sum(-1)),
-        #   graph_test,
-        #     os.path.join(self.save_path, "Inputs_test.pdf"),
-        #    "Inputs node assigments test ",
-        #     self.edge_lables,
-        #  )
-        #  plot_graph_grid_activations(
-        #     target_test.sum(-1), graph_test, os.path.join(self.save_path, "Target_test.pdf"), "Target_test", self.edge_lables
-        #  )
-
-        # PLOTTING ACTIVATION OF THE FIRST 2 GRAPH OF THE BATCHe
-
-
         plot_input_target_output(
             list(self.graph.nodes.sum(-1)),
             self.targets.sum(-1),
@@ -708,25 +671,6 @@ class Domine2023(
             os.path.join(self.save_path, "message_passing_graph_train.pdf"),
             "message_passing_graph_train",
         )
-        # plot_message_passing_layers_units(outputs[1], target_test.sum(-1), outputs[0].nodes.tolist(),graph_test,config.num_hidden,config.num_message_passing_steps,edege_lables,os.path.join(save_path, 'message_passing_hidden_unit.pdf'))
-
-        # Plot each seperatly
-        #  plot_graph_grid_activations(
-        #   outputs[0].nodes.tolist(),
-        #    graph_test,
-        #   os.path.join(self.save_path, "outputs_train.pdf"),
-        #   "Predicted Node Assignments with GCN",
-        #   self.edge_lables,
-        #   )
-        #  plot_graph_grid_activations(
-        #    list(graph_test.nodes.sum(-1)),
-        #    graph_test,
-        #    os.path.join(self.save_path, "Inputs_train.pdf"),
-        #      "Inputs node assigments",
-        #   self.edge_lables,
-        #  )
-        # plot_graph_grid_activations(
-        #  target_test.sum(-1), graph_test, os.path.join(self.save_path, "Target_train.pdf"), "Target", self.edge_lables
 
         print('End')
 
@@ -751,12 +695,7 @@ if __name__ == "__main__":
     # Init environment
     arena_x_limits = [-100, 100]
     arena_y_limits = [-100, 100]
-    # env = Simple2D
-    #   time_step_size=time_step_size,
-    #  agent_step_size=agent_step_size,
-    #  arena_x_limits=arena_x_limits,
-    #   arena_y_limits=arena_y_limits,
-    # )
+
 
     agent = Domine2023(
         experiment_name=config.experiment_name,
@@ -783,7 +722,7 @@ if __name__ == "__main__":
 
     for n in range(config.num_training_steps):
         agent.update()
-        agent.print_and_plot()
+    agent.print_and_plot()
 
 # TODO: Run manadger (not possible for now), to get a seperated code we would juste need to change the paths and config this would mean get rid of the comfig
 # The other alternative is to see that we have multiple env that we resample every time

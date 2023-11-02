@@ -50,13 +50,10 @@ def sample_padded_grid_batch_shortest_path(
     for n_x, n_y in zip(n_xs, n_ys):
         nx_graph = get_grid_adjacency(n_x, n_y)
         weights = add_weighted_edge(int(nx_graph.number_of_edges()), 1)
-        l=0
-
+        r=0
         for i, j in nx_graph.edges:
-            l=l+1
-            nx_graph[i][j]["weight"] = weights[l]
-
-        nx_graph = nx.DiGraph(nx_graph)
+            r=r+1
+            nx_graph[i][j]["weight"] = weights[r]
 
         i_start_1 = jax.random.randint(next(rng_seq), shape=(1,), minval=0, maxval=n_x)
         i_start_2 = jax.random.randint(next(rng_seq), shape=(1,), minval=0, maxval=n_y)
@@ -85,43 +82,47 @@ def sample_padded_grid_batch_shortest_path(
         input_node_features = input_node_features.at[node_number_end, 0].set(
             1
         )  # set end node feature
+
+        (
+            senders,
+            receivers,
+            node_positions,
+            edge_displacements,
+            n_node,
+            n_edge,
+            global_context,
+        ) = grid_networkx_to_graphstuple(nx_graph)
+
         if feature_position:
 
             input_node_features = jnp.concatenate(
                 (input_node_features, node_positions), axis=1
             )
 
-        (
-                senders,
-                receivers,
-                node_positions,
-                edge_displacements,
-                n_node,
-                n_edge,
-                global_context,
-            ) = grid_networkx_to_graphstuple(nx_graph)
 
+
+        nx_graph = nx.DiGraph(nx_graph)
         if weighted:
-            edges = jnp.array(
+            edges_features = jnp.array(
                 [nx_graph[s][r]["weight"] for s, r in nx_graph.edges]
             )
-            edge_displacement = jnp.concatenate((edge_displacements, edges), axis=1)
             graph = jraph.GraphsTuple(
                 nodes=input_node_features,
                 senders=senders,
                 receivers=receivers,
-                edges=edge_displacement,
+                edges=edges_features,
                 n_node=jnp.array([n_node], dtype=int),
                 n_edge=jnp.array([n_edge], dtype=int),
                 globals=global_context,
             )
-
         else:
+            #TODO:Clementine: Chamge this line
+            edge_displacement=abs(np.sum(edge_displacements,1)).reshape(-1, 1)
             graph = jraph.GraphsTuple(
                 nodes=input_node_features,
                 senders=senders,
+                edges= edge_displacement,
                 receivers=receivers,
-                edges=edge_displacements,
                 n_node=jnp.array([n_node], dtype=int),
                 n_edge=jnp.array([n_edge], dtype=int),
                 globals=global_context,
@@ -183,7 +184,7 @@ def grid_networkx_to_graphstuple(nx_graph):
 def add_weighted_edge(n_edge, sigma_on_edge_weight_noise):
     weights = jnp.zeros((n_edge, 1))
     for k in range(n_edge):
-        weight = np.max([sigma_on_edge_weight_noise * np.random.rand() + 1.0, 0.5])
+        weight = round(np.max([sigma_on_edge_weight_noise * np.random.rand() + 1.0, 0.5]),2)
         weights = weights.at[k, 0].set(weight)
         # edge_displacement = edge_displacement.at[k,l].set(edge_displacement[k][l] + weight)    # weights=sigma_on_edge_weight_noise * np.random.rand() Because nedd postiove and add as features and need ot be used by the neural networks :)
     return weights

@@ -15,7 +15,7 @@ def plot_input_target_output(
     # minim 2 otherwise it breaks
     rows = ["{}".format(row) for row in ["Input", "Target", "Outputs"]]
     fig, axes = plt.subplots(3, n)
-    fig.set_size_inches(10, 10)
+    fig.set_size_inches(15, 15)
     for i in range(n):
         nx_graph = convert_jraph_to_networkx_graph(graph, i)
         pos = nx.spring_layout(nx_graph, iterations=100, seed=39775)
@@ -30,10 +30,7 @@ def plot_input_target_output(
         if edege_lables:
             node_padd = get_node_pad(graph, i)
             u = 0
-            for l, j in nx_graph.edges():
-                nx_graph[l][j]["weight"] = round(graph.edges[node_padd + u][2], 2)
-                u = u + 1
-            labels = nx.get_edge_attributes(nx_graph, "weight")
+            labels = nx.get_edge_attributes(nx_graph, "edge_feature")
             nx.draw_networkx_edge_labels(
                 nx_graph, pos=pos, edge_labels=labels, ax=axes[0, i]
             )
@@ -43,7 +40,7 @@ def plot_input_target_output(
             nx.draw_networkx_edge_labels(
                 nx_graph, pos=pos, edge_labels=labels, ax=axes[2, i]
             )
-            #            labels = nx.get_edge_attributes(nx_graph, 'weight')
+
         nx.draw(
             nx_graph,
             pos=pos,
@@ -79,11 +76,8 @@ def plot_input_target_output(
             cmap=plt.cm.jet,
             ax=axes[2, i],
         )
-
         plt.colorbar(color_map (output),ax = axes[2, i])
 
-    for axes, row in zip(axes[:, 0], rows):
-        axes.set_ylabel(row, rotation=0, size="large")
     plt.suptitle(title)
     plt.savefig(save_path)
     plt.close()
@@ -109,17 +103,12 @@ def plot_message_passing_layers(
 ):
     # minim 2 otherwise it breaks
     fig, axes = plt.subplots(n_message_passing + 3, n)
-    fig.set_size_inches(10, 10)
+    fig.set_size_inches(15, 15)
     for j in range(n):
         nx_graph = convert_jraph_to_networkx_graph(graph, j)
         pos = nx.spring_layout(nx_graph, iterations=100, seed=39775)
         if edege_lables:
-            node_padd = get_node_pad(graph, j)
-            u = 0
-            for k, m in nx_graph.edges():
-                nx_graph[k][m]["weight"] = round(graph.edges[node_padd + u][2], 2)
-                u = u + 1
-            labels = nx.get_edge_attributes(nx_graph, "weight")
+            labels = nx.get_edge_attributes(nx_graph, "edge_feature")
         for i in range(n_message_passing + 3):
             if edege_lables:
                 nx.draw_networkx_edge_labels(
@@ -135,8 +124,10 @@ def plot_message_passing_layers(
                     node_size=200,
                     node_color=input,
                     font_color="white",
+                    cmap=plt.cm.jet,
                     ax=axes[i, j],
                 )
+                plt.colorbar(color_map(input), ax=axes[i, j])
             elif i == (n_message_passing + 1):
                 axes[i, j].title.set_text("target")
                 target = get_activations_graph_n(targets, graph, j)
@@ -147,8 +138,10 @@ def plot_message_passing_layers(
                     node_size=200,
                     node_color=target,
                     font_color="white",
+                    cmap=plt.cm.jet,
                     ax=axes[i, j],
                 )
+                plt.colorbar(color_map(input), ax=axes[i, j])
             elif i == (n_message_passing):
                 axes[i, j].title.set_text("output")
                 output = get_activations_graph_n(outputs, graph, j)
@@ -159,8 +152,10 @@ def plot_message_passing_layers(
                     node_size=200,
                     node_color=output,
                     font_color="white",
+                    cmap=plt.cm.jet,
                     ax=axes[i, j],
                 )
+                plt.colorbar(color_map(input), ax=axes[i, j])
             else:
                 activation = activations[i]
                 axes[i, j].title.set_text(
@@ -176,8 +171,10 @@ def plot_message_passing_layers(
                     node_size=200,
                     node_color=input,
                     font_color="white",
+                    cmap = plt.cm.jet,
                     ax=axes[i, j],
                 )
+                plt.colorbar(color_map(input), ax=axes[i, j])
     plt.suptitle(title)
     plt.savefig(save_path)
     plt.close()
@@ -198,12 +195,7 @@ def plot_graph_grid_activations(
     pos = nx.spring_layout(nx_graph, iterations=100, seed=39775)
     ax.title.set_text(title)
     if edege_lables:
-        node_padd = get_node_pad(graph, number_graph_batch)
-        u = 0
-        for k, m in nx_graph.edges():
-            nx_graph[k][m]["weight"] = round(graph.edges[node_padd + u][2], 2)
-            u = u + 1
-        labels = nx.get_edge_attributes(nx_graph, "weight")
+        labels = nx.get_edge_attributes(nx_graph, "edge_feature")
         nx.draw_networkx_edge_labels(nx_graph, pos=pos, edge_labels=labels, ax=ax)
     nx.draw(
         nx_graph,
@@ -233,7 +225,7 @@ def plot_message_passing_layers_units(
 ):
     # minim 2 otherwise it breaks
     fig, axes = plt.subplots(n_message_passing, number_hidden)
-    fig.set_size_inches(10, 10)
+    fig.set_size_inches(15, 15)
     nx_graph = convert_jraph_to_networkx_graph(graph, 0)
     pos = nx.spring_layout(nx_graph, iterations=100, seed=39775)
     if edege_lables:
@@ -257,8 +249,10 @@ def plot_message_passing_layers_units(
                 node_size=200,
                 node_color=input,
                 font_color="white",
+                cmap=plt.cm.jet,
                 ax=axes[i, j],
             )
+            plt.colorbar(color_map(input), ax=axes[i, j])
             if edege_lables:
                 nx.draw_networkx_edge_labels(
                     nx_graph, pos=pos, edge_labels=labels, ax=axes[i, j]
@@ -289,34 +283,4 @@ def plot_curves(curves, path, title, legend_labels=None, x_label=None, y_label=N
         ax.legend()
     plt.savefig(path)
     plt.show()
-    plt.close()
-
-
-def plot_graph_grid_activations(
-    node_colour,
-    nx_graph,
-    save_path,
-    title,
-    edege_lables,
-    number_graph_batch=0,
-):
-    fig = plt.figure(figsize=(5, 3))
-    ax = fig.add_subplot(111)
-    pos = nx.spring_layout(nx_graph, iterations=100, seed=39775)
-    ax.title.set_text(title)
-    if edege_lables:
-        u = 0
-        for k, m in nx_graph.edges():
-            nx_graph[k][m]["weight"] = round(graph.edges[node_padd + u][2], 2)
-            u = u + 1
-        labels = nx.get_edge_attributes(nx_graph, "weight")
-
-    nx.draw(
-        nx_graph,
-        pos=pos,
-        font_color="white",
-        cmap=plt.cm.jet,
-    )
-    plt.colorbar(color_map(output))
-    plt.savefig(save_path)
     plt.close()
