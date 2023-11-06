@@ -106,17 +106,54 @@ class Domine2023(
             wandb.init(
                 project="graph-test",
                 entity="graph-brain",
-                name=experiment_name + dateTimeObj.strftime("%d%b_%H_%M_%S"),
+                name="Grid_shortest_path" + dateTimeObj.strftime("%d%b_%H_%M_%S"),
             )
             self.wandb_logs = {}
             save_path = wandb.run.dir
             os.mkdir(os.path.join(save_path, "results"))
             self.save_path = os.path.join(save_path, "results")
 
+        wandb_logs = {
+            "train_on_shortest_path": train_on_shortest_path,
+            "resample": resample,
 
+            "batch_size_test": batch_size_test,
+            "nx_min_test": nx_min_test,  # This is thought of the state density
+            "nx_max_test": nx_max_test,  # This is thought of the state density
+            "batch_size": batch_size,
+            "nx_min": nx_min,  # This is thought of the state density
+            "nx_max": nx_max,
+
+            "seed": seed,
+            "feature_position": feature_position,
+            "weighted": weighted,
+
+            "num_hidden": num_hidden,
+            "num_layers": num_layers,
+            "num_message_passing_steps": num_message_passing_steps,
+            "learning_rate": learning_rate,
+            "num_training_steps": num_training_steps,
+        }
+
+        if self.wandb_on:
+            wandb.log(wandb_logs)
+
+        else:
+            dateTimeObj = datetime.now()
+            save_path = os.path.join(Path(os.getcwd()).resolve(), "results")
+            os.mkdir(
+                os.path.join(
+                    save_path, "Grid_shortest_path" + dateTimeObj.strftime("%d%b_%H_%M_%S")
+                )
+            )
+            self.save_path = os.path.join(
+                os.path.join(
+                    save_path, "Grid_shortest_path" + dateTimeObj.strftime("%d%b_%H_%M_%S")
+                )
+            )
 
         self.reset()
-
+        self.saving_run_parameters()
 
         rng = jax.random.PRNGKey(self.seed)
         self.rng_seq = rng_sequence_from_rng(rng)
@@ -144,13 +181,10 @@ class Domine2023(
         )
         net_hk = hk.without_apply_rng(hk.transform(forward))
         params = net_hk.init(rng, self.graph)
-        param_count = sum(x.size for x in jax.tree_util.tree_leaves(params))
-        print("Total number of parameters: %d" % param_count)
         self.params = params
         optimizer = optax.adam(self.learning_rate)
         opt_state = optimizer.init(self.params)
         self.opt_state = opt_state
-
 
         def compute_loss(params, inputs, targets):
             outputs = net_hk.apply(params, inputs)
@@ -196,47 +230,6 @@ class Domine2023(
             return outputs, roc_auc, MCC
 
         self._evaluate = evaluate
-
-        wandb_logs = {
-            "train_on_shortest_path": train_on_shortest_path,
-            "resample": resample,
-
-            "batch_size_test": batch_size_test,
-            "nx_min_test": nx_min_test,  # This is thought of the state density
-            "nx_max_test": nx_max_test,  # This is thought of the state density
-            "batch_size": batch_size,
-            "nx_min": nx_min,  # This is thought of the state density
-            "nx_max": nx_max,
-
-            "seed": seed,
-            "feature_position": feature_position,
-            "weighted": weighted,
-
-            "num_hidden": num_hidden,
-            "num_layers": num_layers,
-            "num_message_passing_steps": num_message_passing_steps,
-            "learning_rate": learning_rate,
-            "num_training_steps": num_training_steps,
-            "param_count": param_count,
-        }
-
-        if self.wandb_on:
-            wandb.log(wandb_logs)
-
-        else:
-            dateTimeObj = datetime.now()
-            save_path = os.path.join(Path(os.getcwd()).resolve(), "results")
-            os.mkdir(
-                os.path.join(
-                    save_path, "Grid_shortest_path" + dateTimeObj.strftime("%d%b_%H_%M_%S")
-                )
-            )
-            self.save_path = os.path.join(
-                os.path.join(
-                    save_path, "Grid_shortest_path" + dateTimeObj.strftime("%d%b_%H_%M_%S")
-                )
-            )
-            self.saving_run_parameters()
 
     def saving_run_parameters(self):
         path = os.path.join(self.save_path, "run.py")

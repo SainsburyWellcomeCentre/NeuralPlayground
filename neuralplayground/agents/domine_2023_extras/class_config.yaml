@@ -1,17 +1,17 @@
 experiment_name: 'Learn identity no resample with Feature position '
 train_on_shortest_path: True  # make sure it works when this is the case
 resample: True # @param
-wandb_on: True
-seed: 42
+wandb_on: False
+seed: 45
 
 feature_position: False  # make sure it works when this is the case
-weighted: True
+weighted: False
 
-num_hidden: 300 # @param
-num_layers: 2  # @param
-num_message_passing_steps: 3  # @param
-learning_rate: 0.000001 # @param
-num_training_steps: 300 # @param
+num_hidden: 160 # @param
+num_layers: 1  # @param
+num_message_passing_steps: 2  # @param
+learning_rate: 0.0001 # @param
+num_training_steps: 200 # @param
 
 # Env Stuff
 batch_size: 2

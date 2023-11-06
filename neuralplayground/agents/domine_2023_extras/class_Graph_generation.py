@@ -117,7 +117,7 @@ def sample_padded_grid_batch_shortest_path(
             )
         else:
             #TODO:Clementine: Chamge this line
-            edge_displacement=abs(np.sum(edge_displacements,1)).reshape(-1, 1)
+            edge_displacement=np.sum(abs(edge_displacements),1).reshape(-1, 1)
             graph = jraph.GraphsTuple(
                 nodes=input_node_features,
                 senders=senders,
