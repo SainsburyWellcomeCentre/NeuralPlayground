@@ -1,24 +1,25 @@
-experiment_name: 'Learn identity no resample'
-train_on_shortest_path: False  # make sure it works when this is the case
-resample: False # @param
+experiment_name: 'Large_sp_re_ '
+train_on_shortest_path: True  # make sure it works when this is the case
+resample: True # @param
 wandb_on: True
-seed: 42
+seed: 46
 
-feature_position: False   # make sure it works when this is the case
+feature_position: False  # make sure it works when this is the case
 weighted: False
 
-num_hidden: 500 # @param
-num_layers: 2  # @param
+num_hidden: 160 # @param
+num_layers: 1  # @param
 num_message_passing_steps: 3  # @param
-learning_rate: 0.001 # @param
-num_training_steps: 10 # @param
-
+learning_rate: 0.00001 # @param
+num_training_steps: 20 # @param
+residual: False
+layer_norm: False
 
 # Env Stuff
-batch_size: 6
-nx_min: 2
-nx_max: 5
+batch_size: 2
+nx_min: 5
+nx_max: 6
 
-batch_size_test: 6
-nx_min_test: 2
-nx_max_test: 5
+batch_size_test: 2
+nx_min_test: 5
+nx_max_test: 6

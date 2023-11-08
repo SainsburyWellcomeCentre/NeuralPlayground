@@ -1,4 +1,4 @@
-experiment_name: 'Learn identity no resample with Feature position '
+experiment_name: 'Large_sp_re_ '
 train_on_shortest_path: True  # make sure it works when this is the case
 resample: True # @param
 wandb_on: False
@@ -9,9 +9,11 @@ weighted: False
 
 num_hidden: 160 # @param
 num_layers: 1  # @param
-num_message_passing_steps: 2  # @param
-learning_rate: 0.0001 # @param
-num_training_steps: 200 # @param
+num_message_passing_steps: 3  # @param
+learning_rate: 0.00001 # @param
+num_training_steps: 10 # @param
+residual: False
+layer_norm: False
 
 # Env Stuff
 batch_size: 2

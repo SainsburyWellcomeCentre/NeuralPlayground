@@ -282,5 +282,4 @@ def plot_curves(curves, path, title, legend_labels=None, x_label=None, y_label=N
     if legend_labels:
         ax.legend()
     plt.savefig(path)
-    plt.show()
     plt.close()

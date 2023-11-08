@@ -9,6 +9,10 @@ class ConfigTemplate:
                 types=[bool],
             ),
             config_field.Field(
+                name="residual",
+                types=[bool],
+            ),
+            config_field.Field(
                 name="train_on_shortest_path",
                 types=[bool],
             ),
@@ -147,6 +151,14 @@ class ConfigTemplate:
             config_field.Field(
                 name="num_training_steps",
                 types=[float, int],
+            ),
+            config_field.Field(
+                name="residual",
+                types=[bool],
+            ),
+            config_field.Field(
+                name="layer_norm",
+                types=[bool],
             ),
         ],
     )

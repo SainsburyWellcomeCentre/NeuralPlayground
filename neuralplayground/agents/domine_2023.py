@@ -54,14 +54,19 @@ class Domine2023(
         num_message_passing_steps: int = 3,
         learning_rate: float = 0.001,
         num_training_steps: int = 10,
+        residual = True,
+        layer_norm= True,
         batch_size: int = 4,
         nx_min: int = 4,
         nx_max: int = 7,
         batch_size_test: int = 4,
         nx_min_test: int = 4,
         nx_max_test: int = 7,
+
+
         **mod_kwargs,
     ):
+        self.plot=True
         self.obs_history = []
         self.grad_history = []
         self.train_on_shortest_path = train_on_shortest_path
@@ -94,6 +99,8 @@ class Domine2023(
         self.room_width = np.diff(self.arena_x_limits)[0]
         self.room_depth = np.diff(self.arena_y_limits)[0]
         self.agent_step_size = 0
+        self.residuals=residual
+        self.layer_norm = layer_norm
 
         self.log_every = num_training_steps // 10
         if self.weighted:
@@ -112,11 +119,7 @@ class Domine2023(
             save_path = wandb.run.dir
             os.mkdir(os.path.join(save_path, "results"))
             self.save_path = os.path.join(save_path, "results")
-
-
-
         self.reset()
-
 
         rng = jax.random.PRNGKey(self.seed)
         self.rng_seq = rng_sequence_from_rng(rng)
@@ -140,7 +143,7 @@ class Domine2023(
                 self.nx_max,
             )
         forward = get_forward_function(
-            self.num_hidden, self.num_layers, self.num_message_passing_steps
+            self.num_hidden, self.num_layers, self.num_message_passing_steps, self.residuals,self.layer_norm
         )
         net_hk = hk.without_apply_rng(hk.transform(forward))
         params = net_hk.init(rng, self.graph)
@@ -218,6 +221,8 @@ class Domine2023(
             "learning_rate": learning_rate,
             "num_training_steps": num_training_steps,
             "param_count": param_count,
+            "residual": residual,
+            "layer_norm": layer_norm
         }
 
         if self.wandb_on:
@@ -286,7 +291,7 @@ class Domine2023(
     def update(self):
         rng = next(self.rng_seq)
         if self.train_on_shortest_path:
-            graph_test, target_test = sample_padded_grid_batch_shortest_path(
+            self.graph_test, self.target_test = sample_padded_grid_batch_shortest_path(
                     rng,
                     self.batch_size,
                     self.feature_position,
@@ -306,7 +311,7 @@ class Domine2023(
                     self.nx_max,
                 )
         else:
-            graph_test, target_test = sample_padded_grid_batch_shortest_path(
+            self.graph_test, self.target_test = sample_padded_grid_batch_shortest_path(
                 rng,
                 self.batch_size_test,
                 self.feature_position,
@@ -314,8 +319,8 @@ class Domine2023(
                 self.nx_min_test,
                 self.nx_max_test,
             )
-            target_test = np.reshape(
-                graph_test.nodes[:, 0], (graph_test.nodes[:, 0].shape[0], -1)
+            self.target_test = np.reshape(
+                self.graph_test.nodes[:, 0], (self.graph_test.nodes[:, 0].shape[0], -1)
             )
 
             rng = next(self.rng_seq)
@@ -335,60 +340,59 @@ class Domine2023(
 
         if self.feature_position:
             indices_train = np.where(self.graph.nodes[:, 0] == 1)[0]
-            indices_test = np.where(graph_test.nodes[:, 0]  == 1)[0]
-            target_test_wse = target_test - np.reshape(
-                graph_test.nodes[:, 0], (graph_test.nodes[:, 0].shape[0], -1)
+            indices_test = np.where(self.graph_test.nodes[:, 0]  == 1)[0]
+            self.target_test_wse = self.target_test - np.reshape(
+                self.graph_test.nodes[:, 0], (self.graph_test.nodes[:, 0].shape[0], -1)
             )
-            target_wse = self.targets - np.reshape(
+            self.target_wse = self.targets - np.reshape(
                 self.graph.nodes[:, 0], (self.graph.nodes[:, 0].shape[0], -1)
             )
         else:
             indices_train = np.where( self.graph.nodes[:]== 1)[0]
-            indices_test = np.where(graph_test.nodes[:] == 1)[0]
-            target_test_wse = target_test - graph_test.nodes[:]
-            target_wse = self.targets - self.graph.nodes[:]
+            indices_test = np.where(self.graph_test.nodes[:] == 1)[0]
+            self.target_test_wse = self.target_test - self.graph_test.nodes[:]
+            self.target_wse = self.targets - self.graph.nodes[:]
 
         # Train
         self.params, self.opt_state, loss = self._update_step(
             self.params, self.opt_state
         )
-
         self.losses_train.append(loss)
-        outputs_train, roc_auc_train, MCC_train = self._evaluate(
+        self.outputs_train, roc_auc_train, MCC_train = self._evaluate(
             self.params, self.graph, self.targets, True
         )
         self.roc_aucs_train.append(roc_auc_train)
         self.MCCs_train.append(MCC_train)
 
         # Train without end start in the target
-        loss_wse = self._compute_loss(self.params, self.graph, target_wse)
+        loss_wse = self._compute_loss(self.params, self.graph, self.target_wse)
         self.losses_train_wse.append(loss_wse)
-        outputs_train_wse, roc_auc_train_wse, MCC_train_wse = self._evaluate(
-            self.params, self.graph, target_wse, False, indices_train
+        outputs_train_wse_wrong, roc_auc_train_wse, MCC_train_wse = self._evaluate(
+            self.params, self.graph, self.target_wse, False, indices_train
         )
-
+        self.outputs_train_wse = update_outputs_test(outputs_train_wse_wrong, indices_train)
         self.MCCs_train_wse.append(MCC_train_wse)
 
         # Test
-        loss_test = self._compute_loss(self.params, graph_test, target_test)
+        loss_test = self._compute_loss(self.params, self.graph_test, self.target_test)
         self.losses_test.append(loss_test)
-        outputs_test, roc_auc_test, MCC_test = self._evaluate(
-            self.params, graph_test, target_test, True
+        self.outputs_test, roc_auc_test, MCC_test = self._evaluate(
+            self.params, self.graph_test, self.target_test, True
         )
         self.roc_aucs_test.append(roc_auc_test)
         self.MCCs_test.append(MCC_test)
 
         # Test without end start in the target
-        loss_test_wse = self._compute_loss(self.params, graph_test, target_test_wse)
+        loss_test_wse = self._compute_loss(self.params, self.graph_test, self.target_test_wse)
         self.losses_test_wse.append(loss_test_wse)
         outputs_test_wse_wrong, roc_auc_test_wse, MCC_test_wse = self._evaluate(
-            self.params, graph_test, target_test_wse, False, indices_test
+            self.params, self.graph_test, self.target_test_wse, False, indices_test
         )
+        self.outputs_test_wse = update_outputs_test(outputs_test_wse_wrong, indices_test)
         self.MCCs_test_wse.append(MCC_test_wse)
 
         # Log
         wandb_logs = {
-
             "log_loss_test": np.log(loss_test),
             "log_loss_test_wse": np.log(loss_test_wse),
             "log_loss": np.log(loss),
@@ -399,104 +403,52 @@ class Domine2023(
             "roc_auc_train": roc_auc_train,
             "roc_auc_train_wse": roc_auc_train_wse,
 
-
             "MCC_test": MCC_test,
             "MCC_test_wse": MCC_test_wse,
             "MCC_train": MCC_train,
             "MCC_train_wse": MCC_train_wse,
-
         }
         if self.wandb_on:
             wandb.log(wandb_logs)
         self.global_steps = self.global_steps + 1
         if self.global_steps % self.log_every == 0:
+            #if self.plot == True:
+                # Uncomment if one wants to plot the activation at different time points
+                #self.plot_learning_curves(str(self.global_steps))
+                #self.plot_activation(str(self.global_steps))
             print(
                 f"Training step {self.global_steps}: log_loss = {np.log(loss)} , log_loss_test = {np.log(loss_test)}, roc_auc_test = {roc_auc_test}, roc_auc_train = {roc_auc_train}"
             )
+
+
+        if self.global_steps == self.num_training_steps:
+            if self.wandb_on:
+                with open("readme.txt", "w") as f:
+                    f.write("readme")
+                with open(os.path.join(self.save_path, "Constant.txt"), "w") as outfile:
+                    outfile.write(
+                        "num_message_passing_steps"
+                        + str(self.num_message_passing_steps)
+                        + "\n"
+                    )
+                    outfile.write("Learning_rate:" + str(self.learning_rate) + "\n")
+                    outfile.write("num_training_steps:" + str(self.num_training_steps) + "\n")
+                    outfile.write("roc_auc" + str(roc_auc_test) + "\n")
+                    outfile.write("MCC" + str(MCC_test) + "\n")
+                    outfile.write("roc_auc_wse" + str(roc_auc_test_wse) + "\n")
+                    outfile.write("MCC_wse" + str(MCC_test_wse) + "\n")
+                wandb.finish()
+            if self.plot == True:
+                print('Plotting and Saving Figures')
+                self.plot_learning_curves(str(self.global_steps))
+                self.plot_activation(str(self.global_steps))
+
         return
 
-    def print_and_plot(self):
-        # EVALUATE
-        rng = next(self.rng_seq)
-        if self.train_on_shortest_path:
-            graph_test, target_test = sample_padded_grid_batch_shortest_path(
-                rng,
-                self.batch_size_test,
-                self.feature_position,
-                self.weighted,
-                self.nx_min_test,
-                self.nx_max_test,
-            )
-        else:
-            rng = next(self.rng_seq)
-            graph_test, target_test = sample_padded_grid_batch_shortest_path(
-                rng,
-                self.batch_size_test,
-                self.feature_position,
-                self.weighted,
-                self.nx_min_test,
-                self.nx_max_test,
-            )
-            target_test = np.reshape(
-                graph_test.nodes[:, 0], (graph_test.nodes[:, 0].shape[0], -1)
-            )
-
-        if self.feature_position:
-            indices_train = np.where(self.graph.nodes[:, 0] == 1)[0]
-            indices_test = np.where(graph_test.nodes[:, 0] == 1)[0]
-            target_test_wse = target_test - np.reshape(
-                graph_test.nodes[:, 0], (graph_test.nodes[:, 0].shape[0], -1)
-            )
-            target_wse = self.targets - np.reshape(
-                self.graph.nodes[:, 0], (self.graph.nodes[:, 0].shape[0], -1)
-            )
-        else:
-            indices_train = np.where(self.graph.nodes[:] == 1)[0]
-            indices_test = np.where(graph_test.nodes[:] == 1)[0]
-            target_test_wse = target_test - graph_test.nodes[:]
-            target_wse = self.targets - self.graph.nodes[:]
-
-
-
-        outputs_test, roc_auc_test_wse, MCC_test_wse = self._evaluate(
-            self.params, graph_test, target_test_wse, False,indices_test
-        )
-        outputs_test_wse= update_outputs_test(outputs_test, indices_test)
-
-        outputs_test, roc_auc_test, MCC_test = self._evaluate(
-            self.params, graph_test, target_test, True
-        )
-
-        outputs, roc_auc_wse, MCC_wse = self._evaluate(
-            self.params, self.graph, target_wse, False, indices_train
-        )
-        outputs_train_wse = update_outputs_test(outputs, indices_train)
-
-        outputs, roc_auc, MCC = self._evaluate(
-            self.params, self.graph, self.targets, True
-        )
-
-        # SAVE PARAMETER (NOT WE SAVE THE FILES SO IT SHOULD BE THERE AS WELL )
-        if self.wandb_on:
-            with open("readme.txt", "w") as f:
-                f.write("readme")
-            with open(os.path.join(self.save_path, "Constant.txt"), "w") as outfile:
-                outfile.write(
-                    "num_message_passing_steps"
-                    + str(self.num_message_passing_steps)
-                    + "\n"
-                )
-                outfile.write("Learning_rate:" + str(self.learning_rate) + "\n")
-                outfile.write("num_training_steps:" + str(self.num_training_steps))
-                outfile.write("roc_auc" + str(roc_auc_test))
-                outfile.write("MCC" + str(MCC_test))
-                outfile.write("roc_auc_wse" + str(roc_auc_test_wse))
-                outfile.write("MCC_wse" + str(MCC_test_wse))
-
-        # PLOTTING THE LOSS and AUC RO
+    def plot_learning_curves(self,trainning_step):
         plot_curves(
             [self.losses_train, self.losses_test, self.losses_train_wse, self.losses_test_wse],
-            os.path.join(self.save_path, "Losses.pdf"),
+            os.path.join(self.save_path, "Losses_"+trainning_step+".pdf"),
             "All_Losses",
             legend_labels=["loss", "loss test", "loss_wse", "loss_test_wse"],
         )
@@ -508,7 +460,7 @@ class Domine2023(
                 np.log(self.losses_train_wse),
                 np.log(self.losses_test_wse),
             ],
-            os.path.join(self.save_path, "Log_Losses.pdf"),
+            os.path.join(self.save_path, "Log_Losses_"+trainning_step+".pdf"),
             "All_log_Losses",
             legend_labels=[
                 "log_loss",
@@ -518,94 +470,96 @@ class Domine2023(
             ],
         )
 
-        plot_curves([self.losses_train], os.path.join(self.save_path, "Losses_train.pdf"), "Losses")
+        plot_curves([self.losses_train], os.path.join(self.save_path, "Losses_train_"+trainning_step+".pdf"), "Losses")
         plot_curves(
             [self.losses_test],
-            os.path.join(self.save_path, "losses_test.pdf"),
+            os.path.join(self.save_path, "losses_test_"+trainning_step+".pdf"),
             "losses_test",
         )
         plot_curves(
             [self.losses_train_wse],
-            os.path.join(self.save_path, "Losses_wse.pdf"),
+            os.path.join(self.save_path, "Losses_wse_"+trainning_step+".pdf"),
             "Losses_wse",
         )
         plot_curves(
            [ self.losses_test_wse],
-            os.path.join(self.save_path, "losses_test_wse.pdf"),
+            os.path.join(self.save_path, "losses_test_wse_"+trainning_step+".pdf"),
             "losses_test_wse",
         )
 
         plot_curves(
             [self.roc_aucs_test, self.roc_aucs_train],
-            os.path.join(self.save_path, "auc_rocs.pdf"),
+            os.path.join(self.save_path, "auc_rocs_"+trainning_step+".pdf"),
             "All_auc_roc",
-            legend_labels=["auc_roc_test", "auc_roc_train"],
+            legend_labels=["auc_roc_test", "auc_roc_train_"+trainning_step+".pdf"],
         )
         plot_curves(
             [self.roc_aucs_test],
-            os.path.join(self.save_path, "auc_roc_test.pdf"),
+            os.path.join(self.save_path, "auc_roc_test_"+trainning_step+".pdf"),
             "auc_roc_test",
         )
         plot_curves(
             [self.roc_aucs_train],
-            os.path.join(self.save_path, "auc_roc_train.pdf"),
+            os.path.join(self.save_path, "auc_roc_train_"+trainning_step+".pdf"),
             "auc_roc_train",
         )
 
         plot_curves(
             [self.MCCs_train, self.MCCs_test, self.MCCs_train_wse, self.MCCs_test_wse],
-            os.path.join(self.save_path, "MCCs.pdf"),
+            os.path.join(self.save_path, "MCCs_"+trainning_step+".pdf"),
             "All_MCCs",
             legend_labels=["MCC", "MCC test", "MCC_wse", "MCC_test_wse"],
         )
         plot_curves(
-            [self.MCCs_train], os.path.join(self.save_path, "MCC_train.pdf"), "MCC_train"
+            [self.MCCs_train], os.path.join(self.save_path, "MCC_train_"+trainning_step+".pdf"), "MCC_train"
         )
         plot_curves(
-            [self.MCCs_test], os.path.join(self.save_path, "MCC_test.pdf"), "MCC_test"
+            [self.MCCs_test], os.path.join(self.save_path, "MCC_test_"+trainning_step+".pdf"), "MCC_test"
         )
         plot_curves(
             [self.MCCs_train_wse],
-            os.path.join(self.save_path, "MCC_train_wse.pdf"),
+            os.path.join(self.save_path, "MCC_train_wse_"+trainning_step+".pdf"),
             "MCC_train_wse",
         )
         plot_curves(
             [self.MCCs_test_wse],
-            os.path.join(self.save_path, "MCC_test_wse.pdf"),
+            os.path.join(self.save_path, "MCC_test_wse_"+trainning_step+".pdf"),
             "MCC_test_wse",
         )
 
+    def plot_activation(self,trainning_step):
+
         # PLOTTING ACTIVATION FOR TEST AND THE TARGET OF THE THING ( NOTE THAT IS WAS TRANED ON THE ALL THING)
         plot_input_target_output(
-            list(graph_test.nodes.sum(-1)),
-            target_test.sum(-1),
-            np.squeeze(outputs_test[0].nodes).tolist(),
-            graph_test,
+            list(self.graph_test.nodes.sum(-1)),
+            self.target_test.sum(-1),
+            np.squeeze(self.outputs_test[0].nodes).tolist(),
+            self.graph_test,
             2,
             self.edge_lables,
-            os.path.join(self.save_path, "in_out_targ_test.pdf"),
+            os.path.join(self.save_path, "in_out_targ_test_"+trainning_step+".pdf"),
             "in_out_targ_test",
         )
 
-        new_vector = [1 if val > 0.3 else 0 for val in outputs_test[0].nodes]
+        new_vector = [1 if val > 0.3 else 0 for val in self.outputs_test[0].nodes]
         plot_input_target_output(
-            list(graph_test.nodes.sum(-1)),
-            target_test.sum(-1),
+            list(self.graph_test.nodes.sum(-1)),
+            self.target_test.sum(-1),
             new_vector,
-            graph_test,
+            self.graph_test,
             2,
             self.edge_lables,
-            os.path.join(self.save_path, "in_out_targ_test_threshold.pdf"),
+            os.path.join(self.save_path, "in_out_targ_test_threshold_"+trainning_step+".pdf"),
             "in_out_targ_test",
         )
 
         plot_message_passing_layers(
-            list(graph_test.nodes.sum(-1)),
-            outputs_test[1],
-            target_test.sum(-1),
+            list(self.graph_test.nodes.sum(-1)),
+            self.outputs_test[1],
+            self.target_test.sum(-1),
             np.squeeze(
-                outputs_test[0].nodes).tolist(),
-            graph_test,
+                self.outputs_test[0].nodes).tolist(),
+            self.graph_test,
             2,
             self.num_message_passing_steps,
             self.edge_lables,
@@ -617,20 +571,19 @@ class Domine2023(
         )
 
         plot_input_target_output(
-            list(graph_test.nodes.sum(-1)),
-            target_test_wse.sum(-1),
-            np.squeeze(outputs_test_wse).tolist(),
-            graph_test,
+            list(self.graph_test.nodes.sum(-1)),
+            self.target_test_wse.sum(-1),
+            np.squeeze(self.outputs_test_wse).tolist(),
+            self.graph_test,
             2,
             self.edge_lables,
-            os.path.join(self.save_path, "in_out_targ_test_wse.pdf"),
+            os.path.join(self.save_path, "in_out_targ_test_wse_"+trainning_step+".pdf"),
             "in_out_targ_test_wse",
         )
 
         # Train
-
         # PLOTTING ACTIVATION OF THE FIRST 2 GRAPH OF THE BATCH
-        new_vector = [1 if val > 0.3 else 0 for val in outputs[0].nodes]
+        new_vector = [1 if val > 0.3 else 0 for val in self.outputs_train[0].nodes]
         plot_input_target_output(
             list(self.graph.nodes.sum(-1)),
             self.targets.sum(-1),
@@ -638,18 +591,18 @@ class Domine2023(
             self.graph,
             2,
             self.edge_lables,
-            os.path.join(self.save_path, "in_out_targ_train_threshol.pdf"),
+            os.path.join(self.save_path, "in_out_targ_train_threshold_"+trainning_step+".pdf"),
             "in_out_targ_train",
         )
 
         plot_input_target_output(
             list(self.graph.nodes.sum(-1)),
-            target_wse.sum(-1),
-            np.squeeze(outputs_train_wse).tolist(),
+            self.target_wse.sum(-1),
+            np.squeeze(self.outputs_train_wse).tolist(),
             self.graph,
             2,
             self.edge_lables,
-            os.path.join(self.save_path, "in_out_targ_train_wse.pdf"),
+            os.path.join(self.save_path, "in_out_targ_train_wse_"+trainning_step+".pdf"),
             "in_out_targ_train_wse",
         )
 
@@ -657,29 +610,29 @@ class Domine2023(
             list(self.graph.nodes.sum(-1)),
             self.targets.sum(-1),
             np.squeeze(
-                outputs[0].nodes).tolist(),
+                self.outputs_train[0].nodes).tolist(),
             self.graph,
             2,
             self.edge_lables,
-            os.path.join(self.save_path, "in_out_targ_train.pdf"),
+            os.path.join(self.save_path, "in_out_targ_train_"+trainning_step+".pdf"),
             "in_out_targ_train",
         )
 
         plot_message_passing_layers(
             list(self.graph.nodes.sum(-1)),
-            outputs[1],
+            self.outputs_train[1],
             self.targets.sum(-1),
             np.squeeze(
-                outputs[0].nodes).tolist(),
+                self.outputs_train[0].nodes).tolist(),
             self.graph,
             2,
             self.num_message_passing_steps,
             self.edge_lables,
-            os.path.join(self.save_path, "message_passing_graph_train.pdf"),
+            os.path.join(self.save_path, "message_passing_graph_train_"+trainning_step+".pdf"),
             "message_passing_graph_train",
         )
 
-        print('End')
+    print('End')
 
 
 if __name__ == "__main__":
@@ -725,11 +678,12 @@ if __name__ == "__main__":
         nx_max_test=config.nx_max_test,
         arena_y_limits=arena_y_limits,
         arena_x_limits=arena_x_limits,
+        residual=config.residual,
+        layer_norm=config.layer_norm,
     )
 
     for n in range(config.num_training_steps):
         agent.update()
-    agent.print_and_plot()
 
 # TODO: Run manadger (not possible for now), to get a seperated code we would juste need to change the paths and config this would mean get rid of the comfig
 # The other alternative is to see that we have multiple env that we resample every time
