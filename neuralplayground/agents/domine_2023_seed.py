@@ -98,9 +98,7 @@ for n in range(config.num_training_steps):
 
 
 
-import statistics
-print(statistics.mean([agent_1.roc_aucs_train,agent_2.roc_aucs_train]))
-print(statistics.stdev([agent_1.roc_aucs_train,agent_2.roc_aucs_train]))
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
@@ -214,7 +212,9 @@ for n in range(config.num_training_steps):
     agent_5.update()
 
 
-
+import statistics
+print(statistics.mean([agent_1.roc_aucs_train[-1],agent_2.roc_aucs_train[-1]]))
+print(statistics.stdev([agent_1.roc_aucs_train[-1],agent_2.roc_aucs_train[-1]]))
 import statistics
 print(statistics.mean([agent_1.roc_aucs_train,agent_2.roc_aucs_train,agent_3.roc_aucs_train,agent_4.roc_aucs_train,agent_5.roc_aucs_train]))
 print(statistics.stdev([agent_1.roc_aucs_train,agent_2.roc_aucs_train,agent_3.roc_aucs_train,agent_4.roc_aucs_train,agent_5.roc_aucs_train]))
