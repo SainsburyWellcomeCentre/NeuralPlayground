@@ -1,10 +1,10 @@
-experiment_name: 'shortp_p'
-train_on_shortest_path: True  # make sure it works when this is the case
+experiment_name: 'Identity_l'
+train_on_shortest_path: False  # make sure it works when this is the case
 resample: False # @param
 wandb_on: True
 seed: 45
 
-feature_position: True  # make sure it works when this is the case
+feature_position: False  # make sure it works when this is the case
 weighted: False
 
 num_hidden: 160 # @param
@@ -13,7 +13,7 @@ num_message_passing_steps: 2  # @param
 learning_rate: 0.00001 # @param
 num_training_steps: 300 # @param
 residual: False
-layer_norm: False
+layer_norm: True
 
 # Env Stuff
 batch_size: 2

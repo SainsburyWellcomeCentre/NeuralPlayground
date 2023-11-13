@@ -1,6 +1,6 @@
-experiment_name: 'shortp_p'
-train_on_shortest_path: True  # make sure it works when this is the case
-resample: False # @param
+experiment_name: 'Identity_resample_p'
+train_on_shortest_path: False  # make sure it works when this is the case
+resample: True # @param
 wandb_on: True
 seed: 45
 
