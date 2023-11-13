@@ -547,14 +547,14 @@ class Domine2023(
             "losses_test",
         )
 
-        plot_curves([self.losses_per_node_test[0]], os.path.join(self.save_path, "losses_per_node_test_" + trainning_step + ".pdf"),
-                    "Losses")
-        plot_curves([self.losses_per_graph_test[0]],
-                    os.path.join(self.save_path, "Losses_per_graph_test_" + trainning_step + ".pdf"),
-                    "Losses",[self.losses_per_graph_test[1]])
-        plot_curves([self.losses_per_shortest_path_test[0]],
-                    os.path.join(self.save_path, "Losses_per_shortest_path_test_" + trainning_step + ".pdf"),
-                    "Losses")
+       # plot_curves([self.losses_per_node_test[0]], os.path.join(self.save_path, "losses_per_node_test_" + trainning_step + ".pdf"),
+        #            "Losses")
+        #  plot_curves([self.losses_per_graph_test[0]],
+                    #  os.path.join(self.save_path, "Losses_per_graph_test_" + trainning_step + ".pdf"),
+        #          "Losses",[self.losses_per_graph_test[1]])
+        #          plot_curves([self.losses_per_shortest_path_test[0]],
+        #          os.path.join(self.save_path, "sacct" + trainning_step + ".pdf"),
+        #          "Losses")
 
         plot_curves(
             [self.losses_train_wse],
