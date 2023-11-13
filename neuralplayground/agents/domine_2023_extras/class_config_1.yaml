@@ -1,4 +1,4 @@
-experiment_name: 'Identity_resample'
+experiment_name: 'Identity_test'
 train_on_shortest_path: False  # make sure it works when this is the case
 resample: True # @param
 wandb_on: True
@@ -11,7 +11,7 @@ num_hidden: 160 # @param
 num_layers: 1  # @param
 num_message_passing_steps: 2  # @param
 learning_rate: 0.00001 # @param
-num_training_steps: 100 # @param
+num_training_steps: 300 # @param
 residual: False
 layer_norm: False
 

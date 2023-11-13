@@ -14,6 +14,7 @@ def submit_it_function(path):
 
     set_device()
     config_class = GridConfig
+    path= os.getcwd() +path
     config = config_class(path)
 
     # Init environment
@@ -57,7 +58,8 @@ executor = submitit.AutoExecutor(folder="log_test")
 
 # set timeout in min, and partition for running the job
 executor.update_parameters(timeout_min=50)
-path =["/Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/domine_2023_extras/class_config.yaml","/Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/domine_2023_extras/class_config.yaml"]
+path =["/domine_2023_extras/class_config.yaml","/domine_2023_extras/class_config_1.yaml"]
+
 job = executor.map_array(submit_it_function,path )  # will compute add(5, 7)
 print(job[0].job_id)  # ID of your job
 print(job[1].job_id)
