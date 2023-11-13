@@ -56,7 +56,7 @@ executor = submitit.AutoExecutor(folder="log_test")
 # at most 2 jobs at once. By default, this is several hundreds
 
 # set timeout in min, and partition for running the job
-executor.update_parameters(timeout_min=50, slurm_partition="dev")
+executor.update_parameters(timeout_min=50)
 path =["/Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/domine_2023_extras/class_config.yaml","/Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents/domine_2023_extras/class_config.yaml"]
 job = executor.map_array(submit_it_function,path )  # will compute add(5, 7)
 print(job[0].job_id)  # ID of your job
