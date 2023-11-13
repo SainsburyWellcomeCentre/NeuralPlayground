@@ -61,7 +61,7 @@ path =["/Users/clementine/Documents/UCL/NeuralPlayground/neuralplayground/agents
 job = executor.map_array(submit_it_function,path )  # will compute add(5, 7)
 print(job[0].job_id)  # ID of your job
 print(job[1].job_id)
-output = job[0].result()  # waits for completion and returns output
+# output = job[0].result()  # waits for completion and returns output
 
 
 # waits for completion and returns output
