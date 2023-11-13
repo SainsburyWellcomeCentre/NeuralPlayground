@@ -15,7 +15,7 @@ def plot_input_target_output(
     # minim 2 otherwise it breaks
     rows = ["{}".format(row) for row in ["Input", "Target", "Outputs"]]
     fig, axes = plt.subplots(3, n)
-    fig.set_size_inches(15, 15)
+    fig.set_size_inches(20, 20)
     for i in range(n):
         nx_graph = convert_jraph_to_networkx_graph(graph, i)
         pos = nx.spring_layout(nx_graph, iterations=100, seed=39775)
@@ -103,7 +103,7 @@ def plot_message_passing_layers(
 ):
     # minim 2 otherwise it breaks
     fig, axes = plt.subplots(n_message_passing + 3, n)
-    fig.set_size_inches(15, 15)
+    fig.set_size_inches(20, 20)
     for j in range(n):
         nx_graph = convert_jraph_to_networkx_graph(graph, j)
         pos = nx.spring_layout(nx_graph, iterations=100, seed=39775)
@@ -225,7 +225,7 @@ def plot_message_passing_layers_units(
 ):
     # minim 2 otherwise it breaks
     fig, axes = plt.subplots(n_message_passing, number_hidden)
-    fig.set_size_inches(15, 15)
+    fig.set_size_inches(20, 20)
     nx_graph = convert_jraph_to_networkx_graph(graph, 0)
     pos = nx.spring_layout(nx_graph, iterations=100, seed=39775)
     if edege_lables:
