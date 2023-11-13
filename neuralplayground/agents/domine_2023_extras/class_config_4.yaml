@@ -1,4 +1,4 @@
-experiment_name: 'shortp_'
+experiment_name: 'shortp_l_r'
 train_on_shortest_path: True  # make sure it works when this is the case
 resample: False # @param
 wandb_on: True

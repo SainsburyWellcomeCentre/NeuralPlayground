@@ -1,4 +1,4 @@
-experiment_name: 'shortp_p'
+experiment_name: 'shortp_p_l_r'
 train_on_shortest_path: True  # make sure it works when this is the case
 resample: False # @param
 wandb_on: True
@@ -13,8 +13,8 @@ num_layers: 2  # @param
 num_message_passing_steps: 3  # @param
 learning_rate: 0.00001 # @param
 num_training_steps: 1000 # @param
-residual: False
-layer_norm: False
+residual: True
+layer_norm: True
 
 # Env Stuff
 batch_size: 2
