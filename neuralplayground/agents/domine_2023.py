@@ -9,6 +9,7 @@ from typing import Union
 from pathlib import Path
 import haiku as hk
 import jax
+import jax.ops as jop
 import jax.numpy as jnp
 import numpy as np
 import optax
@@ -95,8 +96,6 @@ class Domine2023(
 
         self.arena_x_limits = mod_kwargs["arena_y_limits"]
         self.arena_y_limits = mod_kwargs["arena_y_limits"]
-        self.room_width = np.diff(self.arena_x_limits)[0]
-        self.room_depth = np.diff(self.arena_y_limits)[0]
         self.agent_step_size = 0
         self.residuals=residual
         self.layer_norm = layer_norm
@@ -151,7 +150,7 @@ class Domine2023(
                 self.nx_min_test,
                 self.nx_max_test,
             )
-            self.target_test = np.reshape(
+            self.target_test = jnp.reshape(
                 self.graph_test.nodes[:, 0], (self.graph_test.nodes[:, 0].shape[0], -1)
             )
             rng = next(self.rng_seq)
@@ -163,18 +162,23 @@ class Domine2023(
                 self.nx_min,
                 self.nx_max,
             )
+            self.targets = jnp.reshape(
+                self.graph.nodes[:, 0], (self.graph.nodes[:, 0].shape[0], -1)
+            )
 
         if self.feature_position:
-            self.indices_test = np.where(self.graph_test.nodes[:, 0] == 1)[0]
-            self.target_test_wse = self.target_test - np.reshape(
+            self.indices_train = jnp.where(self.graph.nodes[:] == 1)[0]
+            self.indices_test = jnp.where(self.graph_test.nodes[:, 0] == 1)[0]
+
+            self.target_test_wse = self.target_test - jnp.reshape(
                 self.graph_test.nodes[:, 0], (self.graph_test.nodes[:, 0].shape[0], -1)
             )
-            self.target_wse = self.targets - np.reshape(
+            self.target_wse = self.targets - jnp.reshape(
                 self.graph.nodes[:, 0], (self.graph.nodes[:, 0].shape[0], -1)
             )
         else:
-            self.indices_train = np.where(self.graph.nodes[:] == 1)[0]
-            self.indices_test = np.where(self.graph_test.nodes[:] == 1)[0]
+            self.indices_train = jnp.where(self.graph.nodes[:] == 1)[0]
+            self.indices_test = jnp.where(self.graph_test.nodes[:] == 1)[0]
             self.target_test_wse = self.target_test - self.graph_test.nodes[:]
             self.target_wse = self.targets - self.graph.nodes[:]
 
@@ -203,35 +207,56 @@ class Domine2023(
             return (outputs[0].nodes - targets) ** 2
         self._compute_loss_per_node = jax.jit(compute_loss_per_node)
 
-        def compute_loss_per_graph(params, graph, targets):
-            outputs = net_hk.apply(params, graph)
-            loss_per_graph=[]
-            for i in range(self.batch_size):
-                graph_outputs= get_activations_graph_n(np.squeeze(outputs[0].nodes), graph, i)
-                graph_target = get_activations_graph_n((targets.sum(-1)), graph,i)
-                loss_per_graph.append(jnp.mean((graph_outputs - graph_target) ** 2))
-
-            return [np.squeeze(loss_per_graph).tolist() , graph.n_node[0:self.batch_size].tolist()]
-
-        self._compute_loss_per_graph = compute_loss_per_graph
 
         def compute_loss_nodes_shortest_path(params, graph, targets):
             outputs = net_hk.apply(params, graph)
-            loss_per_graph=[]
-            len_shortest_path=[]
-            for i in range(self.batch_size):
-                graph_outputs= get_activations_graph_n(np.squeeze(outputs[0].nodes), graph, i)
-                graph_target = get_activations_graph_n((targets.sum(-1)), graph,i)
-                indices_train = np.where(graph_target == 1)[0]
-                len_shortest_path.append(len(indices_train))
-                loss_per_graph.append(jnp.mean((graph_outputs[indices_train] - graph_target[indices_train]) ** 2)/len(indices_train))
-            return np.concatenate((np.squeeze(loss_per_graph),np.asarray(len_shortest_path)),axis=0)
+            node_features = jnp.squeeze(graph.nodes)  # n_node_total x n_feat
+            # graph id for each node
+            i=int(0)
+            for n in graph.n_node:
+                if i== 0:
+                    graph_ids = jnp.zeros(n) + i
+                else:
+                    graph_id = jnp.zeros(n) + i
+                    graph_ids = jnp.concatenate([graph_ids,graph_id], axis=0)
+                i = i + 1
+            graph_ids = jnp.concatenate([jnp.zeros(n) + i for i, n in enumerate(graph.n_node)], axis=0)
+            assert graph_ids.shape[0] == node_features.shape[0]
+            summed_outputs = jop.segment_sum(outputs[0].nodes, graph_ids.astype(int))
+            summed_node_features = jop.segment_sum(node_features, graph_ids.astype(int))
+            assert summed_node_features.shape[0] == graph.n_node.shape[0]
+            denom = graph.n_node
+            denom = jnp.where(denom == 0, 1, denom)
+            mean_node_features = summed_node_features / denom
+            mean_outputs = summed_outputs / denom
+            return (mean_node_features-mean_outputs)**2 #[np.squeeze(loss_per_graph).tolist() , graph.n_node[0:self.batch_size].tolist()]
 
         self._compute_loss_nodes_shortest_path = compute_loss_nodes_shortest_path
 
-        # def compute_loss_per_node(params, inputs, targets):
-        #       outputs = net_hk.apply(params, inputs)
-        #      return (outputs[0].nodes - targets) ** 2
+
+        def compute_loss_per_graph(params, graph, targets):
+            outputs = net_hk.apply(params, graph)
+            node_features = jnp.squeeze(graph.nodes)  # n_node_total x n_feat
+            # graph id for each node
+            i = int(0)
+            for n in graph.n_node:
+                if i == 0:
+                    graph_ids = jnp.zeros(n)+i
+                else:
+                    graph_id = jnp.zeros(n)+i
+                    graph_ids = jnp.concatenate([graph_ids, graph_id], axis=0)
+                i = i + 1
+
+            graph_ids =  graph_ids + (jnp.squeeze(targets*i))
+
+            assert graph_ids.shape[0] == node_features.shape[0]
+            summed_outputs = jop.segment_sum(outputs[0].nodes, graph_ids.astype(int))
+            summed_node_features = jop.segment_sum(node_features, graph_ids.astype(int))
+
+            return (summed_outputs-summed_node_features)**2 #np.concatenate((np.squeeze(loss_per_graph),np.asarray(len_shortest_path)),axis=0)
+
+        self._compute_loss_per_graph = compute_loss_per_graph
+
 
         def update_step(params, opt_state):
             loss, grads = jax.value_and_grad(compute_loss)(
@@ -247,10 +272,10 @@ class Domine2023(
             outputs = net_hk.apply(params, inputs)
             if wse_value:
                 roc_auc = roc_auc_score(
-                    np.squeeze(target), np.squeeze(outputs[0].nodes)
+                    jnp.squeeze(target), jnp.squeeze(outputs[0].nodes)
                 )
                 MCC = matthews_corrcoef(
-                    np.squeeze(target), round(np.squeeze(outputs[0].nodes))
+                    jnp.squeeze(target), round(jnp.squeeze(outputs[0].nodes))
                 )
             else:
                 output = outputs[0].nodes
@@ -258,7 +283,7 @@ class Domine2023(
                     output = output.at[ind].set(0)
 
                 MCC = matthews_corrcoef(
-                        np.squeeze(target), round(np.squeeze(output))
+                        jnp.squeeze(target), round(jnp.squeeze(output))
                     )
                 roc_auc = False
 
@@ -298,12 +323,12 @@ class Domine2023(
             save_path = os.path.join(Path(os.getcwd()).resolve(), "results")
             os.mkdir(
                 os.path.join(
-                    save_path, "Grid_shortest_path" + dateTimeObj.strftime("%d%b_%H_%M_%S")
+                    save_path, self.experiment_name + dateTimeObj.strftime("%d%b_%H_%M_%S")
                 )
             )
             self.save_path = os.path.join(
                 os.path.join(
-                    save_path, "Grid_shortest_path" + dateTimeObj.strftime("%d%b_%H_%M_%S")
+                    save_path, self.experiment_name + dateTimeObj.strftime("%d%b_%H_%M_%S")
                 )
             )
             self.saving_run_parameters()
@@ -371,7 +396,6 @@ class Domine2023(
             else:
                 rng = next(self.rng_seq)
                 # Sample
-
                 self.graph, self.targets = sample_padded_grid_batch_shortest_path(
                         rng,
                         self.batch_size,
@@ -380,16 +404,17 @@ class Domine2023(
                         self.nx_min,
                         self.nx_max,
                     )
-                self.targets = np.reshape(
+                self.targets = jnp.reshape(
                     self.graph.nodes[:, 0], (self.graph.nodes[:, 0].shape[0], -1)
                 )
 
             if self.feature_position:
-                self.target_wse = self.targets - np.reshape(
-                self.graph.nodes[:, 0], (self.graph.nodes[:, 0].shape[0], -1)
+                self.indices_train = jnp.where(self.graph.nodes[:] == 1)[0]
+                self.target_wse = self.targets - jnp.reshape(
+                    self.graph.nodes[:, 0], (self.graph.nodes[:, 0].shape[0], -1)
                 )
             else:
-                self.indices_train = np.where( self.graph.nodes[:]== 1)[0]
+                self.indices_train = jnp.where(self.graph.nodes[:] == 1)[0]
                 self.target_wse = self.targets - self.graph.nodes[:]
 
         # Train
@@ -416,7 +441,7 @@ class Domine2023(
         loss_test_per_node = self._compute_loss_per_node(self.params, self.graph_test, self.target_test)
         loss_test_per_graph = self._compute_loss_per_graph(self.params, self.graph_test, self.target_test)
         loss_nodes_shortest_path = self._compute_loss_nodes_shortest_path(self.params, self.graph_test, self.target_test)
-        self.losses_per_node_test.append(np.squeeze(loss_test_per_node))
+        self.losses_per_node_test.append(jnp.squeeze(loss_test_per_node))
         self.losses_per_graph_test.append((loss_test_per_graph))
         self.losses_per_shortest_path_test.append(loss_nodes_shortest_path)
 
@@ -439,10 +464,10 @@ class Domine2023(
 
         # Log
         wandb_logs = {
-            "log_loss_test": np.log(loss_test),
-            "log_loss_test_wse": np.log(loss_test_wse),
-            "log_loss": np.log(loss),
-            "log_loss_wse": np.log(loss_wse),
+            "log_loss_test": jnp.log(loss_test),
+            "log_loss_test_wse": jnp.log(loss_test_wse),
+            "log_loss": jnp.log(loss),
+            "log_loss_wse": jnp.log(loss_wse),
 
             "roc_auc_test": roc_auc_test,
             "roc_auc_test_wse": roc_auc_test_wse,
@@ -463,7 +488,7 @@ class Domine2023(
                 #self.plot_learning_curves(str(self.global_steps))
                 #self.plot_activation(str(self.global_steps))
             print(
-                f"Training step {self.global_steps}: log_loss = {np.log(loss)} , log_loss_test = {np.log(loss_test)}, roc_auc_test = {roc_auc_test}, roc_auc_train = {roc_auc_train}"
+                f"Training step {self.global_steps}: log_loss = {jnp.log(loss)} , log_loss_test = {jnp.log(loss_test)}, roc_auc_test = {roc_auc_test}, roc_auc_train = {roc_auc_train}"
             )
 
         if self.global_steps == self.num_training_steps:
@@ -500,10 +525,10 @@ class Domine2023(
 
         plot_curves(
             [
-                np.log(self.losses_train),
-                np.log(self.losses_test),
-                np.log(self.losses_train_wse),
-                np.log(self.losses_test_wse),
+                jnp.log(jnp.asarray(self.losses_train)),
+                jnp.log(jnp.asarray(self.losses_test)),
+                jnp.log(jnp.asarray(self.losses_train_wse)),
+                jnp.log(jnp.asarray(self.losses_test_wse)),
             ],
             os.path.join(self.save_path, "Log_Losses_"+trainning_step+".pdf"),
             "All_log_Losses",
@@ -588,7 +613,7 @@ class Domine2023(
         plot_input_target_output(
             list(self.graph_test.nodes.sum(-1)),
             self.target_test.sum(-1),
-            np.squeeze(self.outputs_test[0].nodes).tolist(),
+            jnp.squeeze(self.outputs_test[0].nodes).tolist(),
             self.graph_test,
             2,
             self.edge_lables,
@@ -612,7 +637,7 @@ class Domine2023(
             list(self.graph_test.nodes.sum(-1)),
             self.outputs_test[1],
             self.target_test.sum(-1),
-            np.squeeze(
+            jnp.squeeze(
                 self.outputs_test[0].nodes).tolist(),
             self.graph_test,
             2,
@@ -628,7 +653,7 @@ class Domine2023(
         plot_input_target_output(
             list(self.graph_test.nodes.sum(-1)),
             self.target_test_wse.sum(-1),
-            np.squeeze(self.outputs_test_wse).tolist(),
+            jnp.squeeze(self.outputs_test_wse).tolist(),
             self.graph_test,
             2,
             self.edge_lables,
@@ -653,7 +678,7 @@ class Domine2023(
         plot_input_target_output(
             list(self.graph.nodes.sum(-1)),
             self.target_wse.sum(-1),
-            np.squeeze(self.outputs_train_wse).tolist(),
+            jnp.squeeze(self.outputs_train_wse).tolist(),
             self.graph,
             2,
             self.edge_lables,
@@ -664,7 +689,7 @@ class Domine2023(
         plot_input_target_output(
             list(self.graph.nodes.sum(-1)),
             self.targets.sum(-1),
-            np.squeeze(
+            jnp.squeeze(
                 self.outputs_train[0].nodes).tolist(),
             self.graph,
             2,
@@ -677,7 +702,7 @@ class Domine2023(
             list(self.graph.nodes.sum(-1)),
             self.outputs_train[1],
             self.targets.sum(-1),
-            np.squeeze(
+            jnp.squeeze(
                 self.outputs_train[0].nodes).tolist(),
             self.graph,
             2,
