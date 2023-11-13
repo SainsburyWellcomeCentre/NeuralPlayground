@@ -58,7 +58,7 @@ executor = submitit.AutoExecutor(folder="log_test")
 
 # set timeout in min, and partition for running the job
 executor.update_parameters(timeout_min=50)
-path =["/domine_2023_extras/class_config.yaml","/domine_2023_extras/class_config_1.yaml"]
+path =["/domine_2023_extras/class_config.yaml","/domine_2023_extras/class_config_1.yaml","/domine_2023_extras/class_config_2.yaml","/domine_2023_extras/class_config_3.yaml","/domine_2023_extras/class_config_4.yaml","/domine_2023_extras/class_config_5.yaml","/domine_2023_extras/class_config_6.yaml","/domine_2023_extras/class_config_7.yaml","/domine_2023_extras/class_config_8.yaml","/domine_2023_extras/class_config_9.yaml","/domine_2023_extras/class_config_10.yaml","/domine_2023_extras/class_config_11.yaml"]
 
 job = executor.map_array(submit_it_function,path )  # will compute add(5, 7)
 print(job[0].job_id)  # ID of your job

@@ -115,18 +115,21 @@ def sample_padded_grid_batch_shortest_path(
                 n_edge=jnp.array([n_edge], dtype=int),
                 globals=global_context,
             )
+
         else:
             #TODO:Clementine: Chamge this line
-            edge_displacement=np.sum(abs(edge_displacements),1).reshape(-1, 1)
+            #edge_displacement=np.sum(abs(edge_displacements),1).reshape(-1, 1)
+            distance = jnp.sqrt(jnp.sum((edge_displacements)**2, 1)).reshape(-1, 1)
             graph = jraph.GraphsTuple(
                 nodes=input_node_features,
                 senders=senders,
-                edges= edge_displacement,
+                edges= distance,
                 receivers=receivers,
                 n_node=jnp.array([n_node], dtype=int),
                 n_edge=jnp.array([n_edge], dtype=int),
                 globals=global_context,
             )
+
         graphs.append(graph)
         nodes_on_shortest_labels = jnp.zeros((n_node, 1))
         if weighted:

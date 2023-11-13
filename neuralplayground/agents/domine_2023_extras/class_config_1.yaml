@@ -1,11 +1,11 @@
-experiment_name: 'Identity_test'
+experiment_name: 'Identity_w_p'
 train_on_shortest_path: False  # make sure it works when this is the case
-resample: True # @param
+resample: False # @param
 wandb_on: True
 seed: 45
 
-feature_position: False  # make sure it works when this is the case
-weighted: False
+feature_position: True  # make sure it works when this is the case
+weighted: True
 
 num_hidden: 160 # @param
 num_layers: 1  # @param
