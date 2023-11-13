@@ -438,12 +438,12 @@ class Domine2023(
         self.MCCs_train_wse.append(MCC_train_wse)
 
         # Test
-        loss_test_per_node = self._compute_loss_per_node(self.params, self.graph_test, self.target_test)
-        loss_test_per_graph = self._compute_loss_per_graph(self.params, self.graph_test, self.target_test)
-        loss_nodes_shortest_path = self._compute_loss_nodes_shortest_path(self.params, self.graph_test, self.target_test)
-        self.losses_per_node_test.append(jnp.squeeze(loss_test_per_node))
-        self.losses_per_graph_test.append((loss_test_per_graph))
-        self.losses_per_shortest_path_test.append(loss_nodes_shortest_path)
+        #loss_test_per_node = self._compute_loss_per_node(self.params, self.graph_test, self.target_test)
+        #loss_test_per_graph = self._compute_loss_per_graph(self.params, self.graph_test, self.target_test)
+        #loss_nodes_shortest_path = self._compute_loss_nodes_shortest_path(self.params, self.graph_test, self.target_test)
+        #self.losses_per_node_test.append(jnp.squeeze(loss_test_per_node))
+        #self.losses_per_graph_test.append((loss_test_per_graph))
+        #self.losses_per_shortest_path_test.append(loss_nodes_shortest_path)
 
         loss_test = self._compute_loss(self.params, self.graph_test, self.target_test)
         self.losses_test.append(loss_test)
