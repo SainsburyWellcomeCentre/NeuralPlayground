@@ -16,6 +16,7 @@ def submit_it_function(path):
     set_device()
     config_class = GridConfig
     path = os.getcwd() + path
+    print(path)
     config = config_class(path)
 
     # Init environment

@@ -212,7 +212,7 @@ class Domine2023(
 
         def compute_loss_per_graph(params, graph, targets):
             outputs = net_hk.apply(params, graph)
-            node_features = jnp.squeeze(graph.nodes)  # n_node_total x n_feat
+            node_features = jnp.squeeze(targets)  # n_node_total x n_feat
             # graph id for each node
             i = int(0)
             for n in graph.n_node:
@@ -239,7 +239,7 @@ class Domine2023(
 
         def compute_loss_nodes_shortest_path(params, graph, targets):
             outputs = net_hk.apply(params, graph)
-            node_features = jnp.squeeze(graph.nodes)  # n_node_total x n_feat
+            node_features = jnp.squeeze(targets)  # n_node_total x n_feat
             # graph id for each node
             i = int(0)
             for n in graph.n_node:
