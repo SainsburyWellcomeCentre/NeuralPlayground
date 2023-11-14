@@ -27,13 +27,12 @@ from neuralplayground.agents.domine_2023_extras.class_plotting_utils import (
     plot_input_target_output,
     plot_message_passing_layers,
     plot_curves,
-
 )
 from neuralplayground.agents.domine_2023_extras.class_utils import (
     rng_sequence_from_rng,
     set_device,
     update_outputs_test,
-    get_activations_graph_n
+    get_activations_graph_n,
 )
 from sklearn.metrics import matthews_corrcoef, roc_auc_score
 
@@ -56,8 +55,8 @@ class Domine2023(
         num_message_passing_steps: int = 3,
         learning_rate: float = 0.001,
         num_training_steps: int = 10,
-        residual = True,
-        layer_norm= True,
+        residual=True,
+        layer_norm=True,
         batch_size: int = 4,
         nx_min: int = 4,
         nx_max: int = 7,
@@ -66,7 +65,7 @@ class Domine2023(
         nx_max_test: int = 7,
         **mod_kwargs,
     ):
-        self.plot=True
+        self.plot = True
         self.obs_history = []
         self.grad_history = []
         self.train_on_shortest_path = train_on_shortest_path
@@ -97,7 +96,7 @@ class Domine2023(
         self.arena_x_limits = mod_kwargs["arena_y_limits"]
         self.arena_y_limits = mod_kwargs["arena_y_limits"]
         self.agent_step_size = 0
-        self.residuals=residual
+        self.residuals = residual
         self.layer_norm = layer_norm
 
         self.log_every = num_training_steps // 10
@@ -134,11 +133,11 @@ class Domine2023(
             rng = next(self.rng_seq)
             self.graph_test, self.target_test = sample_padded_grid_batch_shortest_path(
                 rng,
-                self.batch_size,
+                self.batch_size_test,
                 self.feature_position,
                 self.weighted,
-                self.nx_min,
-                self.nx_max,
+                self.nx_min_test,
+                self.nx_max_test,
             )
 
         else:
@@ -182,9 +181,12 @@ class Domine2023(
             self.target_test_wse = self.target_test - self.graph_test.nodes[:]
             self.target_wse = self.targets - self.graph.nodes[:]
 
-
         forward = get_forward_function(
-            self.num_hidden, self.num_layers, self.num_message_passing_steps, self.residuals,self.layer_norm
+            self.num_hidden,
+            self.num_layers,
+            self.num_message_passing_steps,
+            self.residuals,
+            self.layer_norm,
         )
 
         net_hk = hk.without_apply_rng(hk.transform(forward))
@@ -205,34 +207,8 @@ class Domine2023(
         def compute_loss_per_node(params, graph, targets):
             outputs = net_hk.apply(params, graph)
             return (outputs[0].nodes - targets) ** 2
+
         self._compute_loss_per_node = jax.jit(compute_loss_per_node)
-
-
-        def compute_loss_nodes_shortest_path(params, graph, targets):
-            outputs = net_hk.apply(params, graph)
-            node_features = jnp.squeeze(graph.nodes)  # n_node_total x n_feat
-            # graph id for each node
-            i=int(0)
-            for n in graph.n_node:
-                if i== 0:
-                    graph_ids = jnp.zeros(n) + i
-                else:
-                    graph_id = jnp.zeros(n) + i
-                    graph_ids = jnp.concatenate([graph_ids,graph_id], axis=0)
-                i = i + 1
-            graph_ids = jnp.concatenate([jnp.zeros(n) + i for i, n in enumerate(graph.n_node)], axis=0)
-            assert graph_ids.shape[0] == node_features.shape[0]
-            summed_outputs = jop.segment_sum(outputs[0].nodes, graph_ids.astype(int))
-            summed_node_features = jop.segment_sum(node_features, graph_ids.astype(int))
-            assert summed_node_features.shape[0] == graph.n_node.shape[0]
-            denom = graph.n_node
-            denom = jnp.where(denom == 0, 1, denom)
-            mean_node_features = summed_node_features / denom
-            mean_outputs = summed_outputs / denom
-            return (mean_node_features-mean_outputs)**2 #[np.squeeze(loss_per_graph).tolist() , graph.n_node[0:self.batch_size].tolist()]
-
-        self._compute_loss_nodes_shortest_path = compute_loss_nodes_shortest_path
-
 
         def compute_loss_per_graph(params, graph, targets):
             outputs = net_hk.apply(params, graph)
@@ -241,22 +217,50 @@ class Domine2023(
             i = int(0)
             for n in graph.n_node:
                 if i == 0:
-                    graph_ids = jnp.zeros(n)+i
+                    graph_ids = jnp.zeros(n) + i
                 else:
-                    graph_id = jnp.zeros(n)+i
+                    graph_id = jnp.zeros(n) + i
                     graph_ids = jnp.concatenate([graph_ids, graph_id], axis=0)
                 i = i + 1
-
-            graph_ids =  graph_ids + (jnp.squeeze(targets*i))
-
+            graph_ids = jnp.concatenate(
+                [jnp.zeros(n) + i for i, n in enumerate(graph.n_node)], axis=0
+            )
             assert graph_ids.shape[0] == node_features.shape[0]
             summed_outputs = jop.segment_sum(outputs[0].nodes, graph_ids.astype(int))
             summed_node_features = jop.segment_sum(node_features, graph_ids.astype(int))
-
-            return (summed_outputs-summed_node_features)**2 #np.concatenate((np.squeeze(loss_per_graph),np.asarray(len_shortest_path)),axis=0)
+            assert summed_node_features.shape[0] == graph.n_node.shape[0]
+            denom = graph.n_node
+            denom = jnp.where(denom == 0, 1, denom)
+            mean_node_features = summed_node_features / denom
+            mean_outputs = jnp.squeeze(summed_outputs) / denom
+            return (mean_node_features - mean_outputs) ** 2
 
         self._compute_loss_per_graph = compute_loss_per_graph
 
+        def compute_loss_nodes_shortest_path(params, graph, targets):
+            outputs = net_hk.apply(params, graph)
+            node_features = jnp.squeeze(graph.nodes)  # n_node_total x n_feat
+            # graph id for each node
+            i = int(0)
+            for n in graph.n_node:
+                if i == 0:
+                    graph_ids = jnp.zeros(n) + i
+                else:
+                    graph_id = jnp.zeros(n) + i
+                    graph_ids = jnp.concatenate([graph_ids, graph_id], axis=0)
+                i = i + 1
+
+            graph_ids = graph_ids + (jnp.squeeze(targets * i))
+            assert graph_ids.shape[0] == node_features.shape[0]
+            summed_outputs = jnp.squeeze(
+                jop.segment_sum(outputs[0].nodes, graph_ids.astype(int))
+            )
+            summed_node_features = jop.segment_sum(node_features, graph_ids.astype(int))
+            return (
+                summed_outputs - summed_node_features
+            ) ** 2  # np.concatenate((np.squeeze(loss_per_graph),np.asarray(len_shortest_path)),axis=0)
+
+        self._compute_loss_nodes_shortest_path = compute_loss_nodes_shortest_path
 
         def update_step(params, opt_state):
             loss, grads = jax.value_and_grad(compute_loss)(
@@ -268,7 +272,7 @@ class Domine2023(
 
         self._update_step = jax.jit(update_step)
 
-        def evaluate(params, inputs, target,wse_value=True,indices=None):
+        def evaluate(params, inputs, target, wse_value=True, indices=None):
             outputs = net_hk.apply(params, inputs)
             if wse_value:
                 roc_auc = roc_auc_score(
@@ -282,9 +286,7 @@ class Domine2023(
                 for ind in indices:
                     output = output.at[ind].set(0)
 
-                MCC = matthews_corrcoef(
-                        jnp.squeeze(target), round(jnp.squeeze(output))
-                    )
+                MCC = matthews_corrcoef(jnp.squeeze(target), round(jnp.squeeze(output)))
                 roc_auc = False
 
             return outputs, roc_auc, MCC
@@ -300,11 +302,9 @@ class Domine2023(
             "batch_size": batch_size,
             "nx_min": nx_min,  # This is thought of the state density
             "nx_max": nx_max,
-
             "seed": seed,
             "feature_position": feature_position,
             "weighted": weighted,
-
             "num_hidden": num_hidden,
             "num_layers": num_layers,
             "num_message_passing_steps": num_message_passing_steps,
@@ -312,7 +312,7 @@ class Domine2023(
             "num_training_steps": num_training_steps,
             "param_count": param_count,
             "residual": residual,
-            "layer_norm": layer_norm
+            "layer_norm": layer_norm,
         }
 
         if self.wandb_on:
@@ -323,12 +323,14 @@ class Domine2023(
             save_path = os.path.join(Path(os.getcwd()).resolve(), "results")
             os.mkdir(
                 os.path.join(
-                    save_path, self.experiment_name + dateTimeObj.strftime("%d%b_%H_%M_%S")
+                    save_path,
+                    self.experiment_name + dateTimeObj.strftime("%d%b_%H_%M_%S"),
                 )
             )
             self.save_path = os.path.join(
                 os.path.join(
-                    save_path, self.experiment_name + dateTimeObj.strftime("%d%b_%H_%M_%S")
+                    save_path,
+                    self.experiment_name + dateTimeObj.strftime("%d%b_%H_%M_%S"),
                 )
             )
             self.saving_run_parameters()
@@ -368,9 +370,9 @@ class Domine2023(
         self.global_steps = 0
         self.losses_train = []
         self.losses_test = []
-        self.losses_per_node_test = []
-        self.losses_per_graph_test = []
-        self.losses_per_shortest_path_test=[]
+        self.log_losses_per_node_test = []
+        self.log_losses_per_graph_test = []
+        self.log_losses_per_shortest_path_test = []
         self.losses_train_wse = []
         self.losses_test_wse = []
         self.roc_aucs_train = []
@@ -397,13 +399,13 @@ class Domine2023(
                 rng = next(self.rng_seq)
                 # Sample
                 self.graph, self.targets = sample_padded_grid_batch_shortest_path(
-                        rng,
-                        self.batch_size,
-                        self.feature_position,
-                        self.weighted,
-                        self.nx_min,
-                        self.nx_max,
-                    )
+                    rng,
+                    self.batch_size,
+                    self.feature_position,
+                    self.weighted,
+                    self.nx_min,
+                    self.nx_max,
+                )
                 self.targets = jnp.reshape(
                     self.graph.nodes[:, 0], (self.graph.nodes[:, 0].shape[0], -1)
                 )
@@ -434,16 +436,24 @@ class Domine2023(
         outputs_train_wse_wrong, roc_auc_train_wse, MCC_train_wse = self._evaluate(
             self.params, self.graph, self.target_wse, False, self.indices_train
         )
-        self.outputs_train_wse = update_outputs_test(outputs_train_wse_wrong, self.indices_train)
+        self.outputs_train_wse = update_outputs_test(
+            outputs_train_wse_wrong, self.indices_train
+        )
         self.MCCs_train_wse.append(MCC_train_wse)
 
         # Test
-        #loss_test_per_node = self._compute_loss_per_node(self.params, self.graph_test, self.target_test)
-        #loss_test_per_graph = self._compute_loss_per_graph(self.params, self.graph_test, self.target_test)
-        #loss_nodes_shortest_path = self._compute_loss_nodes_shortest_path(self.params, self.graph_test, self.target_test)
-        #self.losses_per_node_test.append(jnp.squeeze(loss_test_per_node))
-        #self.losses_per_graph_test.append((loss_test_per_graph))
-        #self.losses_per_shortest_path_test.append(loss_nodes_shortest_path)
+        loss_test_per_node = self._compute_loss_per_node(
+            self.params, self.graph_test, self.target_test
+        )
+        loss_test_per_graph = self._compute_loss_per_graph(
+            self.params, self.graph_test, self.target_test
+        )
+        loss_nodes_shortest_path = self._compute_loss_nodes_shortest_path(
+            self.params, self.graph_test, self.target_test
+        )
+        self.log_losses_per_node_test.append(jnp.log(jnp.squeeze(loss_test_per_node)))
+        self.log_losses_per_graph_test.append(jnp.log(loss_test_per_graph))
+        self.log_losses_per_shortest_path_test.append(jnp.log(loss_nodes_shortest_path))
 
         loss_test = self._compute_loss(self.params, self.graph_test, self.target_test)
         self.losses_test.append(loss_test)
@@ -454,12 +464,16 @@ class Domine2023(
         self.MCCs_test.append(MCC_test)
 
         # Test without end start in the target
-        loss_test_wse = self._compute_loss(self.params, self.graph_test, self.target_test_wse)
+        loss_test_wse = self._compute_loss(
+            self.params, self.graph_test, self.target_test_wse
+        )
         self.losses_test_wse.append(loss_test_wse)
         outputs_test_wse_wrong, roc_auc_test_wse, MCC_test_wse = self._evaluate(
             self.params, self.graph_test, self.target_test_wse, False, self.indices_test
         )
-        self.outputs_test_wse = update_outputs_test(outputs_test_wse_wrong, self.indices_test)
+        self.outputs_test_wse = update_outputs_test(
+            outputs_test_wse_wrong, self.indices_test
+        )
         self.MCCs_test_wse.append(MCC_test_wse)
 
         # Log
@@ -468,12 +482,10 @@ class Domine2023(
             "log_loss_test_wse": jnp.log(loss_test_wse),
             "log_loss": jnp.log(loss),
             "log_loss_wse": jnp.log(loss_wse),
-
             "roc_auc_test": roc_auc_test,
             "roc_auc_test_wse": roc_auc_test_wse,
             "roc_auc_train": roc_auc_train,
             "roc_auc_train_wse": roc_auc_train_wse,
-
             "MCC_test": MCC_test,
             "MCC_test_wse": MCC_test_wse,
             "MCC_train": MCC_train,
@@ -483,10 +495,10 @@ class Domine2023(
             wandb.log(wandb_logs)
         self.global_steps = self.global_steps + 1
         if self.global_steps % self.log_every == 0:
-            #if self.plot == True:
-                # Uncomment if one wants to plot the activation at different time points
-                #self.plot_learning_curves(str(self.global_steps))
-                #self.plot_activation(str(self.global_steps))
+            # if self.plot == True:
+            # Uncomment if one wants to plot the activation at different time points
+            # self.plot_learning_curves(str(self.global_steps))
+            # self.plot_activation(str(self.global_steps))
             print(
                 f"Training step {self.global_steps}: log_loss = {jnp.log(loss)} , log_loss_test = {jnp.log(loss_test)}, roc_auc_test = {roc_auc_test}, roc_auc_train = {roc_auc_train}"
             )
@@ -502,23 +514,30 @@ class Domine2023(
                         + "\n"
                     )
                     outfile.write("Learning_rate:" + str(self.learning_rate) + "\n")
-                    outfile.write("num_training_steps:" + str(self.num_training_steps) + "\n")
+                    outfile.write(
+                        "num_training_steps:" + str(self.num_training_steps) + "\n"
+                    )
                     outfile.write("roc_auc" + str(roc_auc_test) + "\n")
                     outfile.write("MCC" + str(MCC_test) + "\n")
                     outfile.write("roc_auc_wse" + str(roc_auc_test_wse) + "\n")
                     outfile.write("MCC_wse" + str(MCC_test_wse) + "\n")
                 wandb.finish()
             if self.plot == True:
-                print('Plotting and Saving Figures')
+                print("Plotting and Saving Figures")
                 self.plot_learning_curves(str(self.global_steps))
                 self.plot_activation(str(self.global_steps))
 
         return
 
-    def plot_learning_curves(self,trainning_step):
+    def plot_learning_curves(self, trainning_step):
         plot_curves(
-            [self.losses_train, self.losses_test, self.losses_train_wse, self.losses_test_wse],
-            os.path.join(self.save_path, "Losses_"+trainning_step+".pdf"),
+            [
+                self.losses_train,
+                self.losses_test,
+                self.losses_train_wse,
+                self.losses_test_wse,
+            ],
+            os.path.join(self.save_path, "Losses_" + trainning_step + ".pdf"),
             "All_Losses",
             legend_labels=["loss", "loss test", "loss_wse", "loss_test_wse"],
         )
@@ -530,7 +549,7 @@ class Domine2023(
                 jnp.log(jnp.asarray(self.losses_train_wse)),
                 jnp.log(jnp.asarray(self.losses_test_wse)),
             ],
-            os.path.join(self.save_path, "Log_Losses_"+trainning_step+".pdf"),
+            os.path.join(self.save_path, "Log_Losses_" + trainning_step + ".pdf"),
             "All_log_Losses",
             legend_labels=[
                 "log_loss",
@@ -540,75 +559,104 @@ class Domine2023(
             ],
         )
 
-        plot_curves([self.losses_train], os.path.join(self.save_path, "Losses_train_"+trainning_step+".pdf"), "Losses")
+        plot_curves(
+            [self.losses_train],
+            os.path.join(self.save_path, "Losses_train_" + trainning_step + ".pdf"),
+            "Losses",
+        )
         plot_curves(
             [self.losses_test],
-            os.path.join(self.save_path, "losses_test_"+trainning_step+".pdf"),
+            os.path.join(self.save_path, "losses_test_" + trainning_step + ".pdf"),
             "losses_test",
         )
 
-       # plot_curves([self.losses_per_node_test[0]], os.path.join(self.save_path, "losses_per_node_test_" + trainning_step + ".pdf"),
-        #            "Losses")
-        #  plot_curves([self.losses_per_graph_test[0]],
-                    #  os.path.join(self.save_path, "Losses_per_graph_test_" + trainning_step + ".pdf"),
-        #          "Losses",[self.losses_per_graph_test[1]])
-        #          plot_curves([self.losses_per_shortest_path_test[0]],
-        #          os.path.join(self.save_path, "sacct" + trainning_step + ".pdf"),
-        #          "Losses")
+        transposed_list = [list(item) for item in zip(*self.log_losses_per_node_test)]
+        plot_curves(
+            transposed_list,
+            os.path.join(
+                self.save_path, "Log_Losses_per_node_test_" + trainning_step + ".pdf"
+            ),
+            "Log_Losse_per_node",
+        )
+        transposed_list = [list(item) for item in zip(*self.log_losses_per_graph_test)]
+        plot_curves(
+            transposed_list,
+            os.path.join(
+                self.save_path, "Log_Losses_per_graph_test_" + trainning_step + ".pdf"
+            ),
+            "Log_Loss_per_graph",
+            ["GRAPH" + str(n) for n in range(self.batch_size_test + 1)],
+        )
+
+        transposed_list = [
+            list(item) for item in zip(*self.log_losses_per_shortest_path_test)
+        ]
+        plot_curves(
+            transposed_list,
+            os.path.join(
+                self.save_path, "Log_Loss_on_shortest_path" + trainning_step + ".pdf"
+            ),
+            "Log_Loss_on shortest_path",
+            ["Other_node graph" + str(n) for n in range(self.batch_size_test + 1)]
+            + ["SHORTEEST_PATH graph" + str(n) for n in range(self.batch_size_test)],
+        )
 
         plot_curves(
             [self.losses_train_wse],
-            os.path.join(self.save_path, "Losses_wse_"+trainning_step+".pdf"),
+            os.path.join(self.save_path, "Losses_wse_" + trainning_step + ".pdf"),
             "Losses_wse",
         )
         plot_curves(
-           [ self.losses_test_wse],
-            os.path.join(self.save_path, "losses_test_wse_"+trainning_step+".pdf"),
+            [self.losses_test_wse],
+            os.path.join(self.save_path, "losses_test_wse_" + trainning_step + ".pdf"),
             "losses_test_wse",
         )
 
         plot_curves(
             [self.roc_aucs_test, self.roc_aucs_train],
-            os.path.join(self.save_path, "auc_rocs_"+trainning_step+".pdf"),
+            os.path.join(self.save_path, "auc_rocs_" + trainning_step + ".pdf"),
             "All_auc_roc",
-            legend_labels=["auc_roc_test", "auc_roc_train_"+trainning_step+".pdf"],
+            legend_labels=["auc_roc_test", "auc_roc_train_" + trainning_step + ".pdf"],
         )
         plot_curves(
             [self.roc_aucs_test],
-            os.path.join(self.save_path, "auc_roc_test_"+trainning_step+".pdf"),
+            os.path.join(self.save_path, "auc_roc_test_" + trainning_step + ".pdf"),
             "auc_roc_test",
         )
         plot_curves(
             [self.roc_aucs_train],
-            os.path.join(self.save_path, "auc_roc_train_"+trainning_step+".pdf"),
+            os.path.join(self.save_path, "auc_roc_train_" + trainning_step + ".pdf"),
             "auc_roc_train",
         )
 
         plot_curves(
             [self.MCCs_train, self.MCCs_test, self.MCCs_train_wse, self.MCCs_test_wse],
-            os.path.join(self.save_path, "MCCs_"+trainning_step+".pdf"),
+            os.path.join(self.save_path, "MCCs_" + trainning_step + ".pdf"),
             "All_MCCs",
             legend_labels=["MCC", "MCC test", "MCC_wse", "MCC_test_wse"],
         )
         plot_curves(
-            [self.MCCs_train], os.path.join(self.save_path, "MCC_train_"+trainning_step+".pdf"), "MCC_train"
+            [self.MCCs_train],
+            os.path.join(self.save_path, "MCC_train_" + trainning_step + ".pdf"),
+            "MCC_train",
         )
         plot_curves(
-            [self.MCCs_test], os.path.join(self.save_path, "MCC_test_"+trainning_step+".pdf"), "MCC_test"
+            [self.MCCs_test],
+            os.path.join(self.save_path, "MCC_test_" + trainning_step + ".pdf"),
+            "MCC_test",
         )
         plot_curves(
             [self.MCCs_train_wse],
-            os.path.join(self.save_path, "MCC_train_wse_"+trainning_step+".pdf"),
+            os.path.join(self.save_path, "MCC_train_wse_" + trainning_step + ".pdf"),
             "MCC_train_wse",
         )
         plot_curves(
             [self.MCCs_test_wse],
-            os.path.join(self.save_path, "MCC_test_wse_"+trainning_step+".pdf"),
+            os.path.join(self.save_path, "MCC_test_wse_" + trainning_step + ".pdf"),
             "MCC_test_wse",
         )
 
-    def plot_activation(self,trainning_step):
-
+    def plot_activation(self, trainning_step):
         # PLOTTING ACTIVATION FOR TEST AND THE TARGET OF THE THING ( NOTE THAT IS WAS TRANED ON THE ALL THING)
         plot_input_target_output(
             list(self.graph_test.nodes.sum(-1)),
@@ -617,7 +665,7 @@ class Domine2023(
             self.graph_test,
             2,
             self.edge_lables,
-            os.path.join(self.save_path, "in_out_targ_test_"+trainning_step+".pdf"),
+            os.path.join(self.save_path, "in_out_targ_test_" + trainning_step + ".pdf"),
             "in_out_targ_test",
         )
 
@@ -629,7 +677,9 @@ class Domine2023(
             self.graph_test,
             2,
             self.edge_lables,
-            os.path.join(self.save_path, "in_out_targ_test_threshold_"+trainning_step+".pdf"),
+            os.path.join(
+                self.save_path, "in_out_targ_test_threshold_" + trainning_step + ".pdf"
+            ),
             "in_out_targ_test",
         )
 
@@ -637,8 +687,7 @@ class Domine2023(
             list(self.graph_test.nodes.sum(-1)),
             self.outputs_test[1],
             self.target_test.sum(-1),
-            jnp.squeeze(
-                self.outputs_test[0].nodes).tolist(),
+            jnp.squeeze(self.outputs_test[0].nodes).tolist(),
             self.graph_test,
             2,
             self.num_message_passing_steps,
@@ -657,7 +706,9 @@ class Domine2023(
             self.graph_test,
             2,
             self.edge_lables,
-            os.path.join(self.save_path, "in_out_targ_test_wse_"+trainning_step+".pdf"),
+            os.path.join(
+                self.save_path, "in_out_targ_test_wse_" + trainning_step + ".pdf"
+            ),
             "in_out_targ_test_wse",
         )
 
@@ -671,7 +722,9 @@ class Domine2023(
             self.graph,
             2,
             self.edge_lables,
-            os.path.join(self.save_path, "in_out_targ_train_threshold_"+trainning_step+".pdf"),
+            os.path.join(
+                self.save_path, "in_out_targ_train_threshold_" + trainning_step + ".pdf"
+            ),
             "in_out_targ_train",
         )
 
@@ -682,19 +735,22 @@ class Domine2023(
             self.graph,
             2,
             self.edge_lables,
-            os.path.join(self.save_path, "in_out_targ_train_wse_"+trainning_step+".pdf"),
+            os.path.join(
+                self.save_path, "in_out_targ_train_wse_" + trainning_step + ".pdf"
+            ),
             "in_out_targ_train_wse",
         )
 
         plot_input_target_output(
             list(self.graph.nodes.sum(-1)),
             self.targets.sum(-1),
-            jnp.squeeze(
-                self.outputs_train[0].nodes).tolist(),
+            jnp.squeeze(self.outputs_train[0].nodes).tolist(),
             self.graph,
             2,
             self.edge_lables,
-            os.path.join(self.save_path, "in_out_targ_train_"+trainning_step+".pdf"),
+            os.path.join(
+                self.save_path, "in_out_targ_train_" + trainning_step + ".pdf"
+            ),
             "in_out_targ_train",
         )
 
@@ -702,17 +758,18 @@ class Domine2023(
             list(self.graph.nodes.sum(-1)),
             self.outputs_train[1],
             self.targets.sum(-1),
-            jnp.squeeze(
-                self.outputs_train[0].nodes).tolist(),
+            jnp.squeeze(self.outputs_train[0].nodes).tolist(),
             self.graph,
             2,
             self.num_message_passing_steps,
             self.edge_lables,
-            os.path.join(self.save_path, "message_passing_graph_train_"+trainning_step+".pdf"),
+            os.path.join(
+                self.save_path, "message_passing_graph_train_" + trainning_step + ".pdf"
+            ),
             "message_passing_graph_train",
         )
 
-    print('End')
+    print("End")
 
 
 if __name__ == "__main__":
@@ -735,7 +792,6 @@ if __name__ == "__main__":
     # Init environment
     arena_x_limits = [-100, 100]
     arena_y_limits = [-100, 100]
-
 
     agent = Domine2023(
         experiment_name=config.experiment_name,

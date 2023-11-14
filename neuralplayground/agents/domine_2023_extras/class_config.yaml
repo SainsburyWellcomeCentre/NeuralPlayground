@@ -1,17 +1,17 @@
 experiment_name: 'shortp_w_l_r'
 train_on_shortest_path: True  # make sure it works when this is the case
 resample: False # @param
-wandb_on: True
+wandb_on: False
 seed: 46
 
 feature_position: False  # make sure it works when this is the case
-weighted: True
+weighted: False
 
 num_hidden: 160 # @param
 num_layers: 2  # @param
 num_message_passing_steps: 3  # @param
 learning_rate: 0.00001 # @param
-num_training_steps: 1000 # @param
+num_training_steps: 100 # @param
 residual: True
 layer_norm: True
 

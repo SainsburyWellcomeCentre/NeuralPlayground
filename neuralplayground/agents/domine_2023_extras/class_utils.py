@@ -78,8 +78,9 @@ def get_node_pad(graph, i):
         node_padd = node_padd + graph.n_node[j]
     return node_padd
 
+
 def update_outputs_test(outputs, indices):
     outputs_wse = outputs[0].nodes
     for ind in indices:
-            outputs_wse = outputs_wse.at[ind].set(0)
+        outputs_wse = outputs_wse.at[ind].set(0)
     return outputs_wse

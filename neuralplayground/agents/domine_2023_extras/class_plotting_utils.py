@@ -1,5 +1,6 @@
 # @title Make rng sequence generator
 import matplotlib.pyplot as plt
+import jax.numpy as jnp
 
 import networkx as nx
 from neuralplayground.agents.domine_2023_extras.class_utils import (
@@ -51,7 +52,7 @@ def plot_input_target_output(
             cmap=plt.cm.jet,
             ax=axes[0, i],
         )
-        plt.colorbar(color_map(input), ax = axes[0, i])
+        plt.colorbar(color_map(input), ax=axes[0, i])
 
         nx.draw(
             nx_graph,
@@ -63,8 +64,7 @@ def plot_input_target_output(
             cmap=plt.cm.jet,
             ax=axes[1, i],
         )
-        plt.colorbar(color_map(target),ax = axes[1, i])
-
+        plt.colorbar(color_map(target), ax=axes[1, i])
 
         nx.draw(
             nx_graph,
@@ -76,18 +76,22 @@ def plot_input_target_output(
             cmap=plt.cm.jet,
             ax=axes[2, i],
         )
-        plt.colorbar(color_map (output),ax = axes[2, i])
+        plt.colorbar(color_map(output), ax=axes[2, i])
 
     plt.suptitle(title)
     plt.savefig(save_path)
     plt.close()
 
-def color_map (output):
+
+def color_map(output):
     vmin = min(output)
     vmax = max(output)
-    sm = plt.cm.ScalarMappable(cmap=plt.cm.jet, norm=plt.Normalize(vmin=vmin, vmax=vmax))
+    sm = plt.cm.ScalarMappable(
+        cmap=plt.cm.jet, norm=plt.Normalize(vmin=vmin, vmax=vmax)
+    )
     sm._A = []
     return sm
+
 
 def plot_message_passing_layers(
     inputs,
@@ -171,7 +175,7 @@ def plot_message_passing_layers(
                     node_size=200,
                     node_color=input,
                     font_color="white",
-                    cmap = plt.cm.jet,
+                    cmap=plt.cm.jet,
                     ax=axes[i, j],
                 )
                 plt.colorbar(color_map(input), ax=axes[i, j])
@@ -262,7 +266,6 @@ def plot_message_passing_layers_units(
     plt.close()
 
 
-
 def plot_curves(curves, path, title, legend_labels=None, x_label=None, y_label=None):
     fig, ax = plt.subplots(figsize=(8, 6))
     ax.set_title(title)
@@ -271,8 +274,15 @@ def plot_curves(curves, path, title, legend_labels=None, x_label=None, y_label=N
         ax.set_xlabel(x_label)
     if y_label:
         ax.set_ylabel(y_label)
+    colormap = plt.get_cmap("viridis")
 
-    colors = ["b", "g", "r", "c", "m", "y", "k"]
+    num_colors_needed = 15  # Change this to the number of colors you need
+
+    # Create a list of equally spaced values from 0 to 1
+    values = jnp.linspace(0, 1, len(curves))
+
+    # Map the values to colors using the chosen colormap
+    colors = [colormap(value) for value in values]
 
     for i, curve in enumerate(curves):
         label = legend_labels[i] if legend_labels else None

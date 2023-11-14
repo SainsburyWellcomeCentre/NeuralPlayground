@@ -49,10 +49,10 @@ def sample_padded_grid_batch_shortest_path(
     for n_x, n_y in zip(n_xs, n_ys):
         nx_graph = get_grid_adjacency(n_x, n_y)
 
-        weights = add_weighted_edge(int(nx_graph.number_of_edges()), 1,rng_seq)
-        r=0
+        weights = add_weighted_edge(int(nx_graph.number_of_edges()), 1, rng_seq)
+        r = 0
         for i, j in nx_graph.edges:
-            r=r+1
+            r = r + 1
             nx_graph[i][j]["weight"] = weights[r]
 
         i_start_1 = jax.random.randint(next(rng_seq), shape=(1,), minval=0, maxval=n_x)
@@ -60,7 +60,7 @@ def sample_padded_grid_batch_shortest_path(
         i_end_1 = jax.random.randint(next(rng_seq), shape=(1,), minval=0, maxval=n_x)
         i_end_2 = jax.random.randint(next(rng_seq), shape=(1,), minval=0, maxval=n_y)
 
-        start =tuple([i_start_1.tolist()[0], i_start_2.tolist()[0]])
+        start = tuple([i_start_1.tolist()[0], i_start_2.tolist()[0]])
         end = tuple([i_end_1.tolist()[0], i_end_2.tolist()[0]])
 
         nodes_on_shortest_path_indexes_not_weighted = nx.shortest_path(
@@ -94,12 +94,9 @@ def sample_padded_grid_batch_shortest_path(
         ) = grid_networkx_to_graphstuple(nx_graph)
 
         if feature_position:
-
             input_node_features = jnp.concatenate(
                 (input_node_features, node_positions), axis=1
             )
-
-
 
         nx_graph = nx.DiGraph(nx_graph)
         if weighted:
@@ -117,13 +114,13 @@ def sample_padded_grid_batch_shortest_path(
             )
 
         else:
-            #TODO:Clementine: Chamge this line
-            #edge_displacement=np.sum(abs(edge_displacements),1).reshape(-1, 1)
-            distance = jnp.sqrt(jnp.sum((edge_displacements)**2, 1)).reshape(-1, 1)
+            # TODO:Clementine: Chamge this line
+            # edge_displacement=np.sum(abs(edge_displacements),1).reshape(-1, 1)
+            distance = jnp.sqrt(jnp.sum((edge_displacements) ** 2, 1)).reshape(-1, 1)
             graph = jraph.GraphsTuple(
                 nodes=input_node_features,
                 senders=senders,
-                edges= distance,
+                edges=distance,
                 receivers=receivers,
                 n_node=jnp.array([n_node], dtype=int),
                 n_edge=jnp.array([n_edge], dtype=int),
@@ -134,12 +131,16 @@ def sample_padded_grid_batch_shortest_path(
         nodes_on_shortest_labels = jnp.zeros((n_node, 1))
         if weighted:
             for i in nodes_on_shortest_path_indexes:
-                l = jnp.argwhere(jnp.all((node_positions - jnp.asarray(i)) == 0, axis=1))
+                l = jnp.argwhere(
+                    jnp.all((node_positions - jnp.asarray(i)) == 0, axis=1)
+                )
                 nodes_on_shortest_labels = nodes_on_shortest_labels.at[l[0, 0]].set(1)
             target.append(nodes_on_shortest_labels)  # set start node feature
         else:
             for i in nodes_on_shortest_path_indexes_not_weighted:
-                l = jnp.argwhere(jnp.all((node_positions - jnp.asarray(i)) == 0, axis=1))
+                l = jnp.argwhere(
+                    jnp.all((node_positions - jnp.asarray(i)) == 0, axis=1)
+                )
                 nodes_on_shortest_labels = nodes_on_shortest_labels.at[l[0, 0]].set(1)
             target.append(nodes_on_shortest_labels)
 
@@ -184,12 +185,12 @@ def grid_networkx_to_graphstuple(nx_graph):
 "Here I have a problem again because for one of them i have to have positive weights " "I think I will add it as a feature of the edges "
 
 
-def add_weighted_edge(n_edge, sigma_on_edge_weight_noise,rng_seq):
+def add_weighted_edge(n_edge, sigma_on_edge_weight_noise, rng_seq):
     weights = jnp.zeros((n_edge, 1))
     for k in range(n_edge):
         rng = next(rng_seq)
-        r=jax.random.uniform(rng, shape=(1,))
-        weight = jnp.asarray( jax.lax.round(10*r[0])*0.1 + int(1))
+        r = jax.random.uniform(rng, shape=(1,))
+        weight = jnp.asarray(jax.lax.round(10 * r[0]) * 0.1 + int(1))
         weights = weights.at[k, 0].set(weight)
         # edge_displacement = edge_displacement.at[k,l].set(edge_displacement[k][l] + weight)    # weights=sigma_on_edge_weight_noise * np.random.rand() Because nedd postiove and add as features and need ot be used by the neural networks :)
     return weights
