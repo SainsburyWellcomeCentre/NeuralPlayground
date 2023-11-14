@@ -7,7 +7,7 @@ seed: 45
 feature_position: True  # make sure it works when this is the case
 weighted: True
 
-nnum_hidden: 160 # @param
+num_hidden: 160 # @param
 num_layers: 2  # @param
 num_message_passing_steps: 3  # @param
 learning_rate: 0.00001 # @param

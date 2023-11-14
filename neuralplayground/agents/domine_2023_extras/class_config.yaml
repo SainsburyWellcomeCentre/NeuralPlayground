@@ -4,7 +4,7 @@ resample: False # @param
 wandb_on: False
 seed: 46
 
-feature_position: False  # make sure it works when this is the case
+feature_position: True # make sure it works when this is the case
 weighted: False
 
 num_hidden: 160 # @param
