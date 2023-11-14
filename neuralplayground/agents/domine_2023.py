@@ -32,7 +32,7 @@ from neuralplayground.agents.domine_2023_extras.class_utils import (
     rng_sequence_from_rng,
     set_device,
     update_outputs_test,
-    get_activations_graph_n,
+    get_activations_graph_n,get_length_shortest_path,
 )
 from sklearn.metrics import matthews_corrcoef, roc_auc_score
 
@@ -251,14 +251,18 @@ class Domine2023(
                 i = i + 1
 
             graph_ids = graph_ids + (jnp.squeeze(targets * i))
+            denom = [jnp.size(jnp.where(graph_ids[:] ==  n)) for n in range((len(graph.n_node)-1)*2+1)]
+            denom= jnp.asarray(denom)
+            denom = jnp.where(denom == 0, 1, denom)
             assert graph_ids.shape[0] == node_features.shape[0]
             summed_outputs = jnp.squeeze(
                 jop.segment_sum(outputs[0].nodes, graph_ids.astype(int))
             )
             summed_node_features = jop.segment_sum(node_features, graph_ids.astype(int))
-            return (
-                summed_outputs - summed_node_features
-            ) ** 2  # np.concatenate((np.squeeze(loss_per_graph),np.asarray(len_shortest_path)),axis=0)
+            mean_summed_outputs = summed_outputs /denom
+            mean_summed_node_features=summed_node_features / denom
+
+            return (mean_summed_outputs - mean_summed_node_features) ** 2  # np.concatenate((np.squeeze(loss_per_graph),np.asarray(len_shortest_path)),axis=0)
 
         self._compute_loss_nodes_shortest_path = compute_loss_nodes_shortest_path
 
@@ -478,6 +482,7 @@ class Domine2023(
 
         # Log
         wandb_logs = {
+            "loss_test_per_node": jnp.log(jnp.squeeze(loss_test_per_node)),
             "log_loss_test": jnp.log(loss_test),
             "log_loss_test_wse": jnp.log(loss_test_wse),
             "log_loss": jnp.log(loss),
@@ -579,18 +584,20 @@ class Domine2023(
             "Log_Losse_per_node",
         )
         transposed_list = [list(item) for item in zip(*self.log_losses_per_graph_test)]
+
         plot_curves(
             transposed_list,
             os.path.join(
                 self.save_path, "Log_Losses_per_graph_test_" + trainning_step + ".pdf"
             ),
-            "Log_Loss_per_graph",
+            "Log_Loss_per_graph " ,
             ["GRAPH" + str(n) for n in range(self.batch_size_test + 1)],
         )
 
         transposed_list = [
             list(item) for item in zip(*self.log_losses_per_shortest_path_test)
         ]
+        a = get_length_shortest_path(self.graph_test, self.target_test)
         plot_curves(
             transposed_list,
             os.path.join(
@@ -598,7 +605,7 @@ class Domine2023(
             ),
             "Log_Loss_on shortest_path",
             ["Other_node graph" + str(n) for n in range(self.batch_size_test + 1)]
-            + ["SHORTEEST_PATH graph" + str(n) for n in range(self.batch_size_test)],
+            + ["SHORTEST_PATH graph_len_" + str(a[n]) for n in range(self.batch_size_test)],
         )
 
         plot_curves(

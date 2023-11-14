@@ -111,6 +111,7 @@ def sample_padded_grid_batch_shortest_path(
                 n_node=jnp.array([n_node], dtype=int),
                 n_edge=jnp.array([n_edge], dtype=int),
                 globals=global_context,
+
             )
 
         else:

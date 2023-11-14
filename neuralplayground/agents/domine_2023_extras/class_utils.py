@@ -1,6 +1,7 @@
 # @title Make rng sequence generator
 
 import jax
+import jax.numpy as jnp
 import jraph
 import networkx as nx
 import torch
@@ -84,3 +85,16 @@ def update_outputs_test(outputs, indices):
     for ind in indices:
         outputs_wse = outputs_wse.at[ind].set(0)
     return outputs_wse
+
+def get_length_shortest_path(graph,targets):
+    i = int(0)
+    for n in graph.n_node:
+        if i == 0:
+            graph_ids = jnp.zeros(n) + i
+        else:
+            graph_id = jnp.zeros(n) + i
+            graph_ids = jnp.concatenate([graph_ids, graph_id], axis=0)
+        i = i + 1
+    graph_ids = graph_ids + (jnp.squeeze(targets * i))
+    denom = [jnp.size(jnp.where(graph_ids[:] == i+n)) for n in range((len(graph.n_node))-1)]
+    return denom
