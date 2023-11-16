@@ -1,29 +1,24 @@
-# TODO: NOTE to self: This is a work in progress, it has not been tested to work, I think Jax is not a good way to implement in object oriented coding.
-# I think if I want to implement it here I should use neuralplayground it would be in pytorch.
-
 import argparse
 import os
 import shutil
 from datetime import datetime
-from typing import Union
 from pathlib import Path
 import haiku as hk
 import jax
 import jax.ops as jop
 import jax.numpy as jnp
-import numpy as np
 import optax
 import wandb
+from sklearn.metrics import matthews_corrcoef, roc_auc_score
 from neuralplayground.agents.agent_core import AgentCore
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
 from neuralplayground.agents.domine_2023_extras.class_Graph_generation import (
-    sample_padded_grid_batch_shortest_path,
+    sample_padded_batch_graph,
 )
 from neuralplayground.agents.domine_2023_extras.class_grid_run_config import GridConfig
 from neuralplayground.agents.domine_2023_extras.class_models import get_forward_function
 from neuralplayground.agents.domine_2023_extras.class_plotting_utils import (
-    plot_graph_grid_activations,
     plot_input_target_output,
     plot_message_passing_layers,
     plot_curves,
@@ -32,11 +27,12 @@ from neuralplayground.agents.domine_2023_extras.class_utils import (
     rng_sequence_from_rng,
     set_device,
     update_outputs_test,
-    get_activations_graph_n,get_length_shortest_path,
+    get_length_shortest_path,
 )
-from sklearn.metrics import matthews_corrcoef, roc_auc_score
 
 
+
+#TODO: Implement all in Neuralplayground
 class Domine2023(
     AgentCore,
 ):
@@ -63,15 +59,24 @@ class Domine2023(
         batch_size_test: int = 4,
         nx_min_test: int = 4,
         nx_max_test: int = 7,
+        grid: bool= True,
+        plot: bool= True,
+        dist_cutoff=10,
+        n_std_dist_cutoff=5,
+
         **mod_kwargs,
     ):
-        self.plot = True
+
+        self.grid = grid
+        self.plot = plot
         self.obs_history = []
         self.grad_history = []
         self.train_on_shortest_path = train_on_shortest_path
         self.experiment_name = experiment_name
         self.resample = resample
         self.wandb_on = wandb_on
+        self.dist_cutoff = dist_cutoff ,
+        self.n_std_dist_cutoff= n_std_dist_cutoff,
 
         self.seed = seed
         self.feature_position = feature_position
@@ -82,7 +87,6 @@ class Domine2023(
         self.num_message_passing_steps = num_message_passing_steps
         self.learning_rate = learning_rate
         self.num_training_steps = num_training_steps
-        # cconfig.num_training_steps  # @param
 
         # This can be tought of the brain making different rep of different  granularity
         # Could be explained during sleep
@@ -122,44 +126,56 @@ class Domine2023(
         self.rng_seq = rng_sequence_from_rng(rng)
 
         if self.train_on_shortest_path:
-            self.graph, self.targets = sample_padded_grid_batch_shortest_path(
+            self.graph, self.targets = sample_padded_batch_graph(
                 rng,
                 self.batch_size,
                 self.feature_position,
                 self.weighted,
                 self.nx_min,
                 self.nx_max,
+                self.grid,
+                self.dist_cutoff[0],
+                self.n_std_dist_cutoff[0],
             )
             rng = next(self.rng_seq)
-            self.graph_test, self.target_test = sample_padded_grid_batch_shortest_path(
+            self.graph_test, self.target_test = sample_padded_batch_graph(
                 rng,
                 self.batch_size_test,
                 self.feature_position,
                 self.weighted,
                 self.nx_min_test,
                 self.nx_max_test,
+                self.grid,
+                self.dist_cutoff[0],
+                self.n_std_dist_cutoff[0],
             )
 
         else:
-            self.graph_test, self.target_test = sample_padded_grid_batch_shortest_path(
+            self.graph_test, self.target_test = sample_padded_batch_graph(
                 rng,
                 self.batch_size_test,
                 self.feature_position,
                 self.weighted,
                 self.nx_min_test,
                 self.nx_max_test,
+                self.grid,
+                self.dist_cutoff[0],
+                self.n_std_dist_cutoff[0],
             )
             self.target_test = jnp.reshape(
                 self.graph_test.nodes[:, 0], (self.graph_test.nodes[:, 0].shape[0], -1)
             )
             rng = next(self.rng_seq)
-            self.graph, self.targets = sample_padded_grid_batch_shortest_path(
+            self.graph, self.targets = sample_padded_batch_graph(
                 rng,
                 self.batch_size,
                 self.feature_position,
                 self.weighted,
                 self.nx_min,
                 self.nx_max,
+                self.grid,
+                self.dist_cutoff[0],
+                self.n_std_dist_cutoff[0],
             )
             self.targets = jnp.reshape(
                 self.graph.nodes[:, 0], (self.graph.nodes[:, 0].shape[0], -1)
@@ -234,7 +250,6 @@ class Domine2023(
             mean_node_features = summed_node_features / denom
             mean_outputs = jnp.squeeze(summed_outputs) / denom
             return (mean_node_features - mean_outputs) ** 2
-
         self._compute_loss_per_graph = compute_loss_per_graph
 
         def compute_loss_nodes_shortest_path(params, graph, targets):
@@ -263,7 +278,6 @@ class Domine2023(
             mean_summed_node_features=summed_node_features / denom
 
             return (mean_summed_outputs - mean_summed_node_features) ** 2  # np.concatenate((np.squeeze(loss_per_graph),np.asarray(len_shortest_path)),axis=0)
-
         self._compute_loss_nodes_shortest_path = compute_loss_nodes_shortest_path
 
         def update_step(params, opt_state):
@@ -273,7 +287,6 @@ class Domine2023(
             updates, opt_state = optimizer.update(grads, opt_state, params)
             params = optax.apply_updates(params, updates)
             return params, opt_state, loss
-
         self._update_step = jax.jit(update_step)
 
         def evaluate(params, inputs, target, wse_value=True, indices=None):
@@ -391,24 +404,30 @@ class Domine2023(
         rng = next(self.rng_seq)
         if self.resample:
             if self.train_on_shortest_path:
-                self.graph, self.targets = sample_padded_grid_batch_shortest_path(
+                self.graph, self.targets = sample_padded_batch_graph(
                     rng,
                     self.batch_size,
                     self.feature_position,
                     self.weighted,
                     self.nx_min,
                     self.nx_max,
+                    self.grid,
+                    self.dist_cutoff,
+                    self.n_std_dist_cutoff[0],
                 )
             else:
                 rng = next(self.rng_seq)
                 # Sample
-                self.graph, self.targets = sample_padded_grid_batch_shortest_path(
+                self.graph, self.targets = sample_padded_batch_graph(
                     rng,
                     self.batch_size,
                     self.feature_position,
                     self.weighted,
                     self.nx_min,
                     self.nx_max,
+                    self.grid,
+                    self.dist_cutoff,
+                    self.n_std_dist_cutoff[0],
                 )
                 self.targets = jnp.reshape(
                     self.graph.nodes[:, 0], (self.graph.nodes[:, 0].shape[0], -1)
@@ -597,7 +616,7 @@ class Domine2023(
         transposed_list = [
             list(item) for item in zip(*self.log_losses_per_shortest_path_test)
         ]
-        a = get_length_shortest_path(self.graph_test, self.target_test)
+        shortest_path_length = get_length_shortest_path(self.graph_test, self.target_test)
         plot_curves(
             transposed_list,
             os.path.join(
@@ -605,7 +624,7 @@ class Domine2023(
             ),
             "Log_Loss_on shortest_path",
             ["Other_node graph" + str(n) for n in range(self.batch_size_test + 1)]
-            + ["SHORTEST_PATH graph_len_" + str(a[n]) for n in range(self.batch_size_test)],
+            + ["SHORTEST_PATH graph_len_" + str(shortest_path_length [n]) for n in range(self.batch_size_test)],
         )
 
         plot_curves(
@@ -823,18 +842,11 @@ if __name__ == "__main__":
         arena_x_limits=arena_x_limits,
         residual=config.residual,
         layer_norm=config.layer_norm,
+        grid = config.grid,
+        plot = config.plot,
+         dist_cutoff=config.dist_cutoff,
+        n_std_dist_cutoff= config.n_std_dist_cutoff,
     )
 
     for n in range(config.num_training_steps):
         agent.update()
-
-# TODO: Run manadger (not possible for now), to get a seperated code we would juste need to change the paths and config this would mean get rid of the comfig
-# The other alternative is to see that we have multiple env that we resample every time
-# TODO: Make juste an env type (so that is accomodates for not only 2 d env// different transmats)
-# TODO: Make The plotting in the general plotting utilse
-# if __name__ == "__main__":
-#  x = Domine2023()
-# x = x.replace(obs_history=[1, 2], num_hidden=2)
-# x.num_hidden = 5
-#
-#  x.update()

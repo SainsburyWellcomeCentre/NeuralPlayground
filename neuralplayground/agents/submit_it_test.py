@@ -7,7 +7,6 @@ from neuralplayground.agents.domine_2023_extras.class_grid_run_config import Gri
 
 from neuralplayground.agents import Domine2023
 from neuralplayground.agents.domine_2023_extras.class_utils import (
-    rng_sequence_from_rng,
     set_device,
 )
 
@@ -46,6 +45,10 @@ def submit_it_function(path):
         arena_x_limits=arena_x_limits,
         residual=config.residual,
         layer_norm=config.layer_norm,
+        grid=config.grid,
+        plot=config.plot,
+        dist_cutoff=config.dist_cutoff,
+        n_std_dist_cutoff=config.n_std_dist_cutoff,
     )
 
     for n in range(config.num_training_steps):
@@ -78,8 +81,6 @@ path = [
 job = executor.map_array(submit_it_function, path)  # will compute add(5, 7)
 print(job[0].job_id)  # ID of your job
 print(job[1].job_id)
-# output = job[0].result()  # waits for completion and returns output
 
 
-# waits for completion and returns output
-# 5 + 7 = 12...  your addition was computed in the cluster
+

@@ -2,7 +2,7 @@ import haiku as hk
 import jraph
 
 # TODO(clementine): set up object oriented GNN classes (eventually)
-
+# TODO(clementine): change the pooling function
 
 def get_forward_function(
     num_hidden,
@@ -75,12 +75,3 @@ def message_passing_layer(x, edge_mlp_sizes, node_mlp_sizes, use_layer_norm):
         update_edge_fn=update_edge_fn, update_node_fn=update_node_fn
     )(x)
     return x
-
-
-# def message_passing_layer(x, edge_mlp_sizes, node_mlp_sizes):
-#   update_edge_fn = jraph.concatenated_args(hk.nets.MLP(output_sizes=edge_mlp_sizes))
-#   update_node_fn = jraph.concatenated_args(hk.nets.MLP(output_sizes=node_mlp_sizes))
-#  x = jraph.GraphNetwork(
-#     update_edge_fn=update_edge_fn, update_node_fn=update_node_fn
-# )(x)
-# return x

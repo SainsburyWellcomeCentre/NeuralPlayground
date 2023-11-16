@@ -160,5 +160,22 @@ class ConfigTemplate:
                 name="layer_norm",
                 types=[bool],
             ),
+            config_field.Field(
+                name="grid",
+                types=[bool],
+            ),
+            config_field.Field(
+                name="plot",
+                types=[bool],
+            ),
+            config_field.Field(
+                name="dist_cutoff",
+                types=[int],
+            ),
+            config_field.Field(
+                name="n_std_dist_cutoff",
+                types=[int]
+            ),
         ],
     )
+

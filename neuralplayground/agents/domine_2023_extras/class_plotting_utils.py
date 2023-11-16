@@ -1,7 +1,5 @@
-# @title Make rng sequence generator
 import matplotlib.pyplot as plt
 import jax.numpy as jnp
-
 import networkx as nx
 from neuralplayground.agents.domine_2023_extras.class_utils import (
     convert_jraph_to_networkx_graph,
@@ -276,9 +274,6 @@ def plot_curves(curves, path, title, legend_labels=None, x_label=None, y_label=N
         ax.set_ylabel(y_label)
     colormap = plt.get_cmap("viridis")
 
-    num_colors_needed = 15  # Change this to the number of colors you need
-
-    # Create a list of equally spaced values from 0 to 1
     values = jnp.linspace(0, 1, len(curves))
 
     # Map the values to colors using the chosen colormap

@@ -3,6 +3,8 @@ train_on_shortest_path: True  # make sure it works when this is the case
 resample: False # @param
 wandb_on: True
 seed: 45
+grid: True
+plot: True
 
 feature_position: True  # make sure it works when this is the case
 weighted: False

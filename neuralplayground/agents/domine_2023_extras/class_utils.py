@@ -1,5 +1,3 @@
-# @title Make rng sequence generator
-
 import jax
 import jax.numpy as jnp
 import jraph
