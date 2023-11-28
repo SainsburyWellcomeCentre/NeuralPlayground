@@ -1,7 +1,7 @@
-
 import argparse
 import os
 import time
+
 os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
 from neuralplayground.agents.domine_2023_extras.class_grid_run_config import GridConfig
 
@@ -95,9 +95,6 @@ agent_2 = Domine2023(
 
 for n in range(config.num_training_steps):
     agent_2.update()
-
-
-
 
 
 parser = argparse.ArgumentParser()
@@ -213,8 +210,30 @@ for n in range(config.num_training_steps):
 
 
 import statistics
-print(statistics.mean([agent_1.roc_aucs_train[-1],agent_2.roc_aucs_train[-1]]))
-print(statistics.stdev([agent_1.roc_aucs_train[-1],agent_2.roc_aucs_train[-1]]))
+
+print(statistics.mean([agent_1.roc_aucs_train[-1], agent_2.roc_aucs_train[-1]]))
+print(statistics.stdev([agent_1.roc_aucs_train[-1], agent_2.roc_aucs_train[-1]]))
 import statistics
-print(statistics.mean([agent_1.roc_aucs_train,agent_2.roc_aucs_train,agent_3.roc_aucs_train,agent_4.roc_aucs_train,agent_5.roc_aucs_train]))
-print(statistics.stdev([agent_1.roc_aucs_train,agent_2.roc_aucs_train,agent_3.roc_aucs_train,agent_4.roc_aucs_train,agent_5.roc_aucs_train]))
+
+print(
+    statistics.mean(
+        [
+            agent_1.roc_aucs_train,
+            agent_2.roc_aucs_train,
+            agent_3.roc_aucs_train,
+            agent_4.roc_aucs_train,
+            agent_5.roc_aucs_train,
+        ]
+    )
+)
+print(
+    statistics.stdev(
+        [
+            agent_1.roc_aucs_train,
+            agent_2.roc_aucs_train,
+            agent_3.roc_aucs_train,
+            agent_4.roc_aucs_train,
+            agent_5.roc_aucs_train,
+        ]
+    )
+)

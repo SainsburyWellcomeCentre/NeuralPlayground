@@ -1,9 +1,11 @@
-experiment_name: 'shortp_resample_l_r'
+experiment_name: 'd_shortp_resample_r'
 train_on_shortest_path: True  # make sure it works when this is the case
 resample: True # @param
 wandb_on: True
 seed: 45
-grid: True
+grid: False
+dist_cutoff: 10
+n_std_dist_cutoff: 5
 plot: True
 
 feature_position: False  # make sure it works when this is the case
@@ -15,7 +17,7 @@ num_message_passing_steps: 3  # @param
 learning_rate: 0.00001 # @param
 num_training_steps: 1000 # @param
 residual: True
-layer_norm: True
+layer_norm: False
 
 # Env Stuff
 batch_size: 2

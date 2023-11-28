@@ -1,9 +1,11 @@
-experiment_name: 'shortp_resample_p_l_r'
+experiment_name: 'd_shortp_resample_p_l_r'
 train_on_shortest_path: True  # make sure it works when this is the case
 resample: True # @param
 wandb_on: True
 seed: 45
-grid: True
+grid: False
+dist_cutoff: 10
+n_std_dist_cutoff: 5
 plot: True
 
 feature_position: True  # make sure it works when this is the case

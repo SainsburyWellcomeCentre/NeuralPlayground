@@ -1,9 +1,11 @@
-experiment_name: 'Identity_resample_l_r'
+experiment_name: 'd_Identity_resample_l_r'
 train_on_shortest_path: False  # make sure it works when this is the case
 resample: True # @param
 wandb_on: True
 seed: 45
-grid: True
+grid: False
+dist_cutoff: 10
+n_std_dist_cutoff: 5
 plot: True
 
 feature_position: False  # make sure it works when this is the case
@@ -13,7 +15,7 @@ num_hidden: 160 # @param
 num_layers: 1  # @param
 num_message_passing_steps: 2  # @param
 learning_rate: 0.00001 # @param
-num_training_steps: 300 # @param
+num_training_steps: 1000 # @param
 residual: True
 layer_norm: True
 
