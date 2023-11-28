@@ -1,0 +1,29 @@
+experiment_name: 'g_shortp_r'
+train_on_shortest_path: True # make sure it works when this is the case
+resample: False # @param
+wandb_on: True
+seed: 45
+grid: True
+dist_cutoff: 10
+n_std_dist_cutoff: 5
+plot: True
+
+feature_position: False  # make sure it works when this is the case
+weighted: False
+
+num_hidden: 160 # @param
+num_layers: 2  # @param
+num_message_passing_steps: 3  # @param
+learning_rate: 0.00001 # @param
+num_training_steps: 1000 # @param
+residual: True
+layer_norm: False
+
+# Env Stuff
+batch_size: 2
+nx_min: 5
+nx_max: 6
+
+batch_size_test: 4
+nx_min_test: 5
+nx_max_test: 6
