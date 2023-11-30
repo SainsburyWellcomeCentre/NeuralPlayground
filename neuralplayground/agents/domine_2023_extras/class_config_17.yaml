@@ -1,6 +1,6 @@
-experiment_name: 'd_Identity_w_l_r'
+experiment_name: 'd_Identity_l_r'
 train_on_shortest_path: False  # make sure it works when this is the case
-resample: True # @param
+resample: False # @param
 wandb_on: True
 seed: 45
 grid: False
@@ -9,7 +9,7 @@ n_std_dist_cutoff: 5
 plot: True
 
 feature_position: False  # make sure it works when this is the case
-weighted: True
+weighted: False
 
 num_hidden: 160 # @param
 num_layers: 1  # @param

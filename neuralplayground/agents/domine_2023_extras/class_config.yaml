@@ -6,10 +6,9 @@ seed: 46
 grid: False
 dist_cutoff: 10
 n_std_dist_cutoff: 5
-
 plot: True
 
-feature_position: True  # make sure it works when this is the case
+feature_position: False  # make sure it works when this is the case
 weighted: True
 
 num_hidden: 160 # @param

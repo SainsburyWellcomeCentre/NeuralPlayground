@@ -1,4 +1,4 @@
-experiment_name: 'd_Identity_l_r'
+experiment_name: 'd_Identity_r'
 train_on_shortest_path: False  # make sure it works when this is the case
 resample: False # @param
 wandb_on: True
@@ -17,7 +17,7 @@ num_message_passing_steps: 2  # @param
 learning_rate: 0.00001 # @param
 num_training_steps: 1000 # @param
 residual: True
-layer_norm: True
+layer_norm: False
 
 # Env Stuff
 batch_size: 2

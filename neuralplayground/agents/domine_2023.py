@@ -112,7 +112,7 @@ class Domine2023(
         if self.wandb_on:
             dateTimeObj = datetime.now()
             wandb.init(
-                project="graph-test",
+                project="graph-delaunay",
                 entity="graph-brain",
                 name=experiment_name + dateTimeObj.strftime("%d%b_%H_%M_%S"),
             )

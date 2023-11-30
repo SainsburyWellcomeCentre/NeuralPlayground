@@ -1,4 +1,4 @@
-experiment_name: 'g_Identity_resample_r'
+experiment_name: 'g_Identity_resample_p_l_r'
 train_on_shortest_path: False  # make sure it works when this is the case
 resample: True # @param
 wandb_on: True
@@ -8,7 +8,7 @@ dist_cutoff: 10
 n_std_dist_cutoff: 5
 plot: True
 
-feature_position: False  # make sure it works when this is the case
+feature_position: True  # make sure it works when this is the case
 weighted: False
 
 num_hidden: 160 # @param
@@ -17,7 +17,7 @@ num_message_passing_steps: 2  # @param
 learning_rate: 0.00001 # @param
 num_training_steps: 1000 # @param
 residual: True
-layer_norm: False
+layer_norm: True
 
 # Env Stuff
 batch_size: 2
