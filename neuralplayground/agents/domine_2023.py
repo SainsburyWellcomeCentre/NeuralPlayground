@@ -806,7 +806,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--config_path",
         metavar="-C",
-        default="domine_2023_extras/class_config.yaml",
+        default="domine_2023_extras/class_config_base.yaml",
         help="path to base configuration file.",
     )
 
