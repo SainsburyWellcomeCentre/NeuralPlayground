@@ -1,6 +1,6 @@
 experiment_name: 'd_shortp_w_l_r'
 train_on_shortest_path: True  # make sure it works when this is the case
-resample: True # @param
+resample: False # @param
 wandb_on: True
 seed: 46
 grid: False

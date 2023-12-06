@@ -57,9 +57,14 @@ def sample_padded_batch_graph(
     graphs = []
     target = []
 
+
     for n_x, n_y in zip(n_xs, n_ys):
         if grid:
             nx_graph = get_grid_adjacency(n_x, n_y)
+            # TODO: Check that this is working fine
+            n=0
+            for node in nx_graph.nodes:
+                nx_graph.nodes[node]['pos'] = np.array(node, dtype=float)
             i_start_1 = jax.random.randint(next(rng_seq), shape=(1,), minval=0, maxval=n_x)
             i_start_2 = jax.random.randint(next(rng_seq), shape=(1,), minval=0, maxval=n_y)
             i_end_1 = jax.random.randint(next(rng_seq), shape=(1,), minval=0, maxval=n_x)
@@ -69,9 +74,11 @@ def sample_padded_batch_graph(
             node_number_start = (i_start_1) * n_y + (i_start_2)
             node_number_end = (i_end_1) * n_y + (i_end_2)
         else:
-            #TODO:UPDATE
+            #TODO:Positon that have position information ; oriiginal  use the pos here bellow check that the new update of the positon is working fine
             seed = jax.random.randint(next(rng_seq), shape=(1,), minval=0, maxval=1000)
             nx_graph, pos = random_geometric_delaunay_graph_generator(int(max_n/batch_size)-1, seed[0], dist_cutoff, n_std_dist_cutoff)
+            for node, pos_i in zip(nx_graph.nodes, pos):
+                nx_graph.nodes[node]['pos'] = pos_i
             i_start_1 = jax.random.randint(next(rng_seq), shape=(1,), minval=0, maxval=int(max_n/batch_size)-1).tolist()
             i_end_1 = jax.random.randint(next(rng_seq), shape=(1,), minval=0, maxval=int(max_n/batch_size)-1).tolist()
             start = i_start_1[0]
@@ -95,8 +102,6 @@ def sample_padded_batch_graph(
 
         # make it a node feature of the input graph if a node is a start/end node
         input_node_features = jnp.zeros((int(nx_graph.number_of_nodes()), 1))
-
-
 
         input_node_features = input_node_features.at[node_number_start, 0].set(
             1
@@ -178,9 +183,9 @@ def sample_padded_batch_graph(
             target.append(nodes_on_shortest_labels)  # set start node feature
         else:
             for i in nodes_on_shortest_path_indexes:
-                l = jnp.argwhere(
-                        (node_positions - i) == 0)
-                nodes_on_shortest_labels = nodes_on_shortest_labels.at[l[0, 0]].set(1)
+                a= np.array([np.array(nx_graph.nodes[n]) for n in nx_graph.nodes])
+                #TODO: Check that this is the right indexing
+                nodes_on_shortest_labels = nodes_on_shortest_labels.at[i].set(1)
             target.append(nodes_on_shortest_labels)  # set start node feature
 
     targets = jnp.concatenate(target)
@@ -200,7 +205,8 @@ def sample_padded_batch_graph(
 def grid_networkx_to_graphstuple(nx_graph):
     """Get edges for a grid graph."""
     nx_graph = nx.DiGraph(nx_graph)
-    node_positions = jnp.array(nx_graph.nodes)
+    node_positions =  np.array([np.array(nx_graph.nodes[n]['pos']) for n in nx_graph.nodes])
+    # jnp.array(nx_graph.nodes)
     node_to_inds = {n: i for i, n in enumerate(nx_graph.nodes)}
     senders_receivers = [(node_to_inds[s], node_to_inds[r]) for s, r in nx_graph.edges]
     edge_displacements = jnp.array(

@@ -350,7 +350,7 @@ class Domine2023(
                     self.experiment_name + dateTimeObj.strftime("%d%b_%H_%M_%S"),
                 )
             )
-            self.saving_run_parameters()
+        self.saving_run_parameters()
 
     def saving_run_parameters(self):
         path = os.path.join(self.save_path, "run.py")

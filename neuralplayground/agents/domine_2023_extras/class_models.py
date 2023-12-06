@@ -75,3 +75,21 @@ def message_passing_layer(x, edge_mlp_sizes, node_mlp_sizes, use_layer_norm):
         update_edge_fn=update_edge_fn, update_node_fn=update_node_fn
     )(x)
     return x
+
+
+#  attention_logit_fn = None
+#   attention_reduce_fn = None
+#
+#   # Creates a new GraphNetwork in its most general form.
+#   # Most of the arguments have defaults and can be omitted if a feature
+#   # is not used.
+#   # There are also predefined GraphNetworks available (see models.py)
+#   network = jraph.GraphNetwork(
+#       update_edge_fn=update_edge_fn,
+#       update_node_fn=update_node_fn,
+#       update_global_fn=update_globals_fn,
+#       attention_logit_fn=attention_logit_fn,
+#       aggregate_edges_for_nodes_fn=aggregate_edges_for_nodes_fn,
+#       aggregate_nodes_for_globals_fn=aggregate_nodes_for_globals_fn,
+#       aggregate_edges_for_globals_fn=aggregate_edges_for_globals_fn,
+#       attention_reduce_fn=attention_reduce_fn)
