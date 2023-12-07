@@ -122,15 +122,8 @@ def sample_padded_batch_graph(
 
 
         if feature_position:
-            if grid:
-                input_node_features = jnp.concatenate(
-                    (input_node_features, node_positions), axis=1
-                )
-            else:
-                #TODO: Undo that line
-                input_node_features = jnp.concatenate(
-                    (input_node_features, node_positions), axis=1
-                )
+            input_node_features = jnp.concatenate( (input_node_features, node_positions), axis=1 )
+
 
         nx_graph = nx.DiGraph(nx_graph)
         if weighted:

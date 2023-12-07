@@ -624,7 +624,7 @@ class Domine2023(
             ),
             "Log_Loss_on shortest_path",
             ["Other_node graph" + str(n) for n in range(self.batch_size_test + 1)]
-            + ["SHORTEST_PATH graph_len_" + str(shortest_path_length [n]) for n in range(self.batch_size_test)],
+            + ["SHORTEST_PATH graph_len_" + (str(shortest_path_length [n])+ "graph_size" for n, p in zip(self.graph_test.n_node)) +  + (str(n) for n in  self.graph_test.n_node)],
         )
 
         plot_curves(
