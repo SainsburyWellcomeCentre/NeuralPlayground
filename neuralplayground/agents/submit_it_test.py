@@ -62,7 +62,7 @@ executor = submitit.AutoExecutor(folder="log_test")
 # at most 2 jobs at once. By default, this is several hundreds
 
 # set timeout in min, and partition for running the job
-executor.update_parameters(timeout_min=1000,mem_gb=2)
+executor.update_parameters(timeout_min=1000,mem_gb=10)
 path = [
     "/domine_2023_extras/Big/class_config.yaml",
     "/domine_2023_extras/Big/class_config_1.yaml",
