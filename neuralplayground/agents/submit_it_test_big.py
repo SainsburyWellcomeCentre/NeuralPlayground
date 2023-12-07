@@ -112,6 +112,7 @@ path = [
     "/domine_2023_extras/class_config_45.yaml",
     "/domine_2023_extras/class_config_46.yaml",
     "/domine_2023_extras/class_config_47.yaml",
+    "/domine_2023_extras/class_config_48.yaml",
 ]
 
 job = executor.map_array(submit_it_function, path)  # will compute add(5, 7)
