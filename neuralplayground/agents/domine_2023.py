@@ -617,15 +617,6 @@ class Domine2023(
             list(item) for item in zip(*self.log_losses_per_shortest_path_test)
         ]
         shortest_path_length = get_length_shortest_path(self.graph_test, self.target_test)
-        plot_curves(
-            transposed_list,
-            os.path.join(
-                self.save_path, "Log_Loss_on_shortest_path" + trainning_step + ".pdf"
-            ),
-            "Log_Loss_on shortest_path",
-            ["Other_node graph" + str(n) for n in range(self.batch_size_test + 1)]
-            + ["SHORTEST_PATH graph_len_" + (str(shortest_path_length [n])+ "graph_size" for n, p in zip(self.graph_test.n_node)) +  + (str(n) for n in  self.graph_test.n_node)],
-        )
 
         plot_curves(
             [self.losses_train_wse],
@@ -637,6 +628,14 @@ class Domine2023(
             os.path.join(self.save_path, "losses_test_wse_" + trainning_step + ".pdf"),
             "losses_test_wse",
         )
+        plot_curves(
+            transposed_list,
+            os.path.join(
+                self.save_path, "Log_Loss_on_shortest_path" + trainning_step + ".pdf"),
+            "Log_Loss_on shortest_path",
+            ["Other_node graph" + str(n) for n in range(self.batch_size_test + 1)]+
+             ["SHORTEST_PATH graph_len_" + str(shortest_path_length[n]) + "graph_size" + str(p) for n, p in
+               enumerate(self.graph_test.n_node[:-1])])
 
         plot_curves(
             [self.roc_aucs_test, self.roc_aucs_train],
