@@ -220,6 +220,12 @@ class Domine2023(
 
         self._compute_loss = jax.jit(compute_loss)
 
+        def compute_output(params, graph, ):
+            outputs = net_hk.apply(params, graph)
+            return outputs
+
+        self._compute_output = jax.jit(compute_output)
+
         def compute_loss_per_node(params, graph, targets):
             outputs = net_hk.apply(params, graph)
             return (outputs[0].nodes - targets) ** 2
@@ -227,7 +233,7 @@ class Domine2023(
         self._compute_loss_per_node = jax.jit(compute_loss_per_node)
 
         def compute_loss_per_graph(params, graph, targets):
-            outputs = net_hk.apply(params, graph)
+            outputs = self._compute_output(params, graph)
             node_features = jnp.squeeze(targets)  # n_node_total x n_feat
             # graph id for each node
             i = int(0)
@@ -250,6 +256,7 @@ class Domine2023(
             mean_node_features = summed_node_features / denom
             mean_outputs = jnp.squeeze(summed_outputs) / denom
             return (mean_node_features - mean_outputs) ** 2
+
         self._compute_loss_per_graph = compute_loss_per_graph
 
         def compute_loss_nodes_shortest_path(params, graph, targets):
@@ -307,6 +314,7 @@ class Domine2023(
                 roc_auc = False
 
             return outputs, roc_auc, MCC
+
 
         self._evaluate = evaluate
 

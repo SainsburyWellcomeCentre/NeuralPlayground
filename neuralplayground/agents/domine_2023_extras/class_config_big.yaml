@@ -1,7 +1,7 @@
 experiment_name: 'g_shortp_l_r'
 train_on_shortest_path: True  # make sure it works when this is the case
 resample: False # @param
-wandb_on: True
+wandb_on: False
 seed: 45
 grid: True
 dist_cutoff: 10

@@ -11,7 +11,6 @@ from neuralplayground.agents.domine_2023_extras.class_utils import rng_sequence_
 def get_grid_adjacency(n_x, n_y, atol=1e-1):
     return nx.grid_2d_graph(n_x, n_y)  # Get directed grid graph
 
-
 def sample_padded_batch_graph(
     rng,
     batch_size,
@@ -56,7 +55,6 @@ def sample_padded_batch_graph(
     # Construct graphs with sampled dimensions.
     graphs = []
     target = []
-
 
     for n_x, n_y in zip(n_xs, n_ys):
         if grid:
@@ -120,10 +118,8 @@ def sample_padded_batch_graph(
             global_context,
         ) = grid_networkx_to_graphstuple(nx_graph)
 
-
         if feature_position:
             input_node_features = jnp.concatenate( (input_node_features, node_positions), axis=1 )
-
 
         nx_graph = nx.DiGraph(nx_graph)
         if weighted:
@@ -142,7 +138,8 @@ def sample_padded_batch_graph(
         else:
             if grid:
                 # edge_displacement=np.sum(abs(edge_displacements),1).reshape(-1, 1)
-                distance = jnp.sqrt(jnp.sum((edge_displacements) ** 2, 1)).reshape(-1, 1)
+                #distance = jnp.sqrt(jnp.sum((edge_displacements) ** 2, 1)).reshape(-1, 1)
+                distance = (node_positions[receivers] - node_positions[senders])
                 graph = jraph.GraphsTuple(
                     nodes=input_node_features,
                     senders=senders,
@@ -153,14 +150,16 @@ def sample_padded_batch_graph(
                     globals=global_context,
                 )
             else:
-                edges_features = jnp.array(
-                    [nx_graph[s][r]["weight"] for s, r in nx_graph.edges]
-                ).reshape(-1,1)
+                #edges_features = jnp.array(
+                 #   [nx_graph[s][r]["weight"] for s, r in nx_graph.edges]
+                #).reshape(-1,1)
+                #TODO: make sure that this correction is actualy correct
+                distance = (node_positions[receivers] - node_positions[senders])
                 graph = jraph.GraphsTuple(
                     nodes=input_node_features,
                     senders=senders,
                     receivers=receivers,
-                    edges=edges_features,
+                    edges=distance,
                     n_node=jnp.array([n_node], dtype=int),
                     n_edge=jnp.array([n_edge], dtype=int),
                     globals=global_context,
@@ -178,7 +177,7 @@ def sample_padded_batch_graph(
             target.append(nodes_on_shortest_labels)  # set start node feature
         else:
             for i in nodes_on_shortest_path_indexes:
-                a= np.array([np.array(nx_graph.nodes[n]) for n in nx_graph.nodes])
+
                 #TODO: Check that this is the right indexing
                 nodes_on_shortest_labels = nodes_on_shortest_labels.at[i].set(1)
             target.append(nodes_on_shortest_labels)  # set start node feature
@@ -207,6 +206,7 @@ def grid_networkx_to_graphstuple(nx_graph):
     edge_displacements = jnp.array(
         [jnp.array(r) - jnp.array(s) for s, r in nx_graph.edges]
     )
+
     senders, receivers = zip(*senders_receivers)
     n_node = node_positions.shape[0]
     n_edge = edge_displacements.shape[0]
