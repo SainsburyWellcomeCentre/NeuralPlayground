@@ -112,7 +112,7 @@ class Domine2023(
         if self.wandb_on:
             dateTimeObj = datetime.now()
             wandb.init(
-                project="graph-delaunay_3",
+                project="graph-delaunay_4",
                 entity="graph-brain",
                 name=experiment_name + dateTimeObj.strftime("%d%b_%H_%M_%S"),
             )
@@ -232,24 +232,21 @@ class Domine2023(
 
         self._compute_loss_per_node = jax.jit(compute_loss_per_node)
 
-        def compute_loss_per_graph(params, graph, targets):
+        def compute_loss_per_graph(params, graph, targets, n_node):
             outputs = self._compute_output(params, graph)
             node_features = jnp.squeeze(targets)  # n_node_total x n_feat
-            # graph id for each node
-            i = int(0)
-            for n in graph.n_node:
-                if i == 0:
-                    graph_ids = jnp.zeros(n) + i
-                else:
-                    graph_id = jnp.zeros(n) + i
-                    graph_ids = jnp.concatenate([graph_ids, graph_id], axis=0)
-                i = i + 1
-            graph_ids = jnp.concatenate(
-                [jnp.zeros(n) + i for i, n in enumerate(graph.n_node)], axis=0
-            )
-            assert graph_ids.shape[0] == node_features.shape[0]
-            summed_outputs = jop.segment_sum(outputs[0].nodes, graph_ids.astype(int))
-            summed_node_features = jop.segment_sum(node_features, graph_ids.astype(int))
+            n_graph = n_node.shape[0]
+            sum_n_node = jnp.sum(n_node)
+            graph_idx = jnp.arange(n_graph)
+            # To aggregate nodes and edges from each graph to global features,
+            # we first construct tensors that map the node to the corresponding graph.
+            # For example, if you have `n_node=[1,2]`, we construct the tensor
+            # [0, 1, 1]. We then do the same for edges.
+            node_gr_idx = jnp.repeat(
+                graph_idx, n_node, axis=0, total_repeat_length=sum_n_node)
+            assert node_gr_idx.shape[0] == node_features.shape[0]
+            summed_outputs = jop.segment_sum(outputs[0].nodes, node_gr_idx.astype(int))
+            summed_node_features = jop.segment_sum(node_features, node_gr_idx .astype(int))
             assert summed_node_features.shape[0] == graph.n_node.shape[0]
             denom = graph.n_node
             denom = jnp.where(denom == 0, 1, denom)
@@ -477,7 +474,7 @@ class Domine2023(
             self.params, self.graph_test, self.target_test
         )
         loss_test_per_graph = self._compute_loss_per_graph(
-            self.params, self.graph_test, self.target_test
+            self.params, self.graph_test, self.target_test, self.graph_test.n_node
         )
         loss_nodes_shortest_path = self._compute_loss_nodes_shortest_path(
             self.params, self.graph_test, self.target_test
@@ -554,11 +551,11 @@ class Domine2023(
                     outfile.write("roc_auc_wse" + str(roc_auc_test_wse) + "\n")
                     outfile.write("MCC_wse" + str(MCC_test_wse) + "\n")
                 wandb.finish()
+
             if self.plot == True:
                 print("Plotting and Saving Figures")
                 self.plot_learning_curves(str(self.global_steps))
                 self.plot_activation(str(self.global_steps))
-
         return
 
     def plot_learning_curves(self, trainning_step):

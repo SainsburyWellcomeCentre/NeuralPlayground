@@ -122,15 +122,17 @@ def sample_padded_batch_graph(
             input_node_features = jnp.concatenate( (input_node_features, node_positions), axis=1 )
 
         nx_graph = nx.DiGraph(nx_graph)
+        distance = (node_positions[receivers] - node_positions[senders])
         if weighted:
             edges_features = jnp.array(
                 [nx_graph[s][r]["weight"] for s, r in nx_graph.edges]
             )
+            weighted_distance =edges_features *distance
             graph = jraph.GraphsTuple(
                 nodes=input_node_features,
                 senders=senders,
                 receivers=receivers,
-                edges=edges_features,
+                edges=weighted_distance,
                 n_node=jnp.array([n_node], dtype=int),
                 n_edge=jnp.array([n_edge], dtype=int),
                 globals=global_context,
@@ -139,7 +141,6 @@ def sample_padded_batch_graph(
             if grid:
                 # edge_displacement=np.sum(abs(edge_displacements),1).reshape(-1, 1)
                 #distance = jnp.sqrt(jnp.sum((edge_displacements) ** 2, 1)).reshape(-1, 1)
-                distance = (node_positions[receivers] - node_positions[senders])
                 graph = jraph.GraphsTuple(
                     nodes=input_node_features,
                     senders=senders,
@@ -154,7 +155,7 @@ def sample_padded_batch_graph(
                  #   [nx_graph[s][r]["weight"] for s, r in nx_graph.edges]
                 #).reshape(-1,1)
                 #TODO: make sure that this correction is actualy correct
-                distance = (node_positions[receivers] - node_positions[senders])
+
                 graph = jraph.GraphsTuple(
                     nodes=input_node_features,
                     senders=senders,
