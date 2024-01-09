@@ -1,15 +1,15 @@
 experiment_name: 'g_identity_p_l_r'
 train_on_shortest_path: False  # make sure it works when this is the case
-resample: True # @param
-wandb_on: False
+resample: False # @param
+wandb_on: True
 seed: 45
-grid: False
+grid: True
 dist_cutoff: 10
 n_std_dist_cutoff: 5
 plot: True
 
 feature_position: True  # make sure it works when this is the case
-weighted: True
+weighted: False
 
 num_hidden: 160 # @param
 num_layers: 1  # @param
@@ -21,9 +21,9 @@ layer_norm: True
 
 # Env Stuff
 batch_size: 2
-nx_min: 2
-nx_max: 3
+nx_min: 5
+nx_max: 6
 
 batch_size_test: 4
-nx_min_test: 2
-nx_max_test: 3
+nx_min_test: 5
+nx_max_test: 6
