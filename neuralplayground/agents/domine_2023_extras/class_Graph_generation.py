@@ -138,33 +138,33 @@ def sample_padded_batch_graph(
                 globals=global_context,
             )
         else:
-            if grid:
+            #if grid:
                 # edge_displacement=np.sum(abs(edge_displacements),1).reshape(-1, 1)
                 #distance = jnp.sqrt(jnp.sum((edge_displacements) ** 2, 1)).reshape(-1, 1)
-                graph = jraph.GraphsTuple(
-                    nodes=input_node_features,
-                    senders=senders,
-                    edges=distance,
-                    receivers=receivers,
-                    n_node=jnp.array([n_node], dtype=int),
-                    n_edge=jnp.array([n_edge], dtype=int),
-                    globals=global_context,
-                )
-            else:
+            graph = jraph.GraphsTuple(
+                nodes=input_node_features,
+                senders=senders,
+                edges=distance,
+                receivers=receivers,
+                n_node=jnp.array([n_node], dtype=int),
+                n_edge=jnp.array([n_edge], dtype=int),
+                globals=global_context,
+            )
+            #else:
                 #edges_features = jnp.array(
                  #   [nx_graph[s][r]["weight"] for s, r in nx_graph.edges]
                 #).reshape(-1,1)
                 #TODO: make sure that this correction is actualy correct
 
-                graph = jraph.GraphsTuple(
-                    nodes=input_node_features,
-                    senders=senders,
-                    receivers=receivers,
-                    edges=distance,
-                    n_node=jnp.array([n_node], dtype=int),
-                    n_edge=jnp.array([n_edge], dtype=int),
-                    globals=global_context,
-                )
+                #graph = jraph.GraphsTuple(
+                    #nodes=input_node_features,
+                    #senders=senders,
+                # receivers=receivers,
+                # edges=distance,
+                # n_node=jnp.array([n_node], dtype=int),
+                # n_edge=jnp.array([n_edge], dtype=int),
+                #  globals=global_context,
+                # )
 
         graphs.append(graph)
         nodes_on_shortest_labels = jnp.zeros((n_node, 1))

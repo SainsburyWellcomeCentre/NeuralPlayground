@@ -2,7 +2,7 @@ experiment_name: 'd_Identity_r'
 train_on_shortest_path: False  # make sure it works when this is the case
 resample: False # @param
 wandb_on: True
-seed: 45
+seed: 46
 grid: False
 dist_cutoff: 10
 n_std_dist_cutoff: 5

@@ -112,7 +112,7 @@ class Domine2023(
         if self.wandb_on:
             dateTimeObj = datetime.now()
             wandb.init(
-                project="graph-delaunay_4",
+                project="graph-delaunay_5",
                 entity="graph-brain",
                 name=experiment_name + dateTimeObj.strftime("%d%b_%H_%M_%S"),
             )
@@ -407,10 +407,10 @@ class Domine2023(
             Path(os.getcwd()).resolve(), "domine_2023_extras/class_plotting_utils.py"
         )
         shutil.copyfile(HERE, path)
-
+        #ToDo:change that eventually because it is not saving the right things
         path = os.path.join(self.save_path, "class_config_run.yaml")
         HERE = os.path.join(
-            Path(os.getcwd()).resolve(), "domine_2023_extras/class_config.yaml"
+            Path(os.getcwd()).resolve(), "domine_2023_extras/class_config_base.yaml"
         )
         shutil.copyfile(HERE, path)
 
