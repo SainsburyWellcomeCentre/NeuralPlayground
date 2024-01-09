@@ -138,6 +138,8 @@ class Stachenfeld2018(AgentCore):
         self.width = int(self.room_width * self.state_density)
         self.depth = int(self.room_depth * self.state_density)
         self.n_state = int(self.depth * self.width)
+        self.action_set = np.array([[0, 1], [0, -1], [1, 0], [-1, 0]])
+        self.n_actions = self.action_set.shape[0]
         self.obs_history = []
         if twoD:
             self.create_transmat(self.state_density, "2D_env")
@@ -202,15 +204,16 @@ class Stachenfeld2018(AgentCore):
         if len(obs) == 0:
             action = None
         else:
-            action = np.random.normal(scale=self.agent_step_size, size=(2,))
-            arrow = [[0, 1], [0, -1], [1, 0], [-1, 0]]
-            action = np.random.normal(scale=0.1, size=(2,))
-            diff = action - arrow
-            dist = np.sum(diff**2, axis=1)
-            index = np.argmin(dist)
-            action = arrow[index]
-            self.next_state = self.obs_to_state(obs)
-            action = np.array(action)
+            action_id = np.random.choice(np.arange(self.n_actions))
+            action = self.action_set[action_id] * self.agent_step_size
+            # action = np.random.normal(scale=self.agent_step_size, size=(2,))
+            # arrow = [[0, 1], [0, -1], [1, 0], [-1, 0]]
+            # diff = action - arrow
+            # dist = np.sum(diff**2, axis=1)
+            # index = np.argmin(dist)
+            # action = arrow[index]
+            # self.next_state = self.obs_to_state(obs)
+            # action = np.array(action)
         return action
 
     def get_T_from_M(self, M: np.ndarray):
