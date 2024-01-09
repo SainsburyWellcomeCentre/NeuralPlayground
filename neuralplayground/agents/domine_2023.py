@@ -232,27 +232,55 @@ class Domine2023(
 
         self._compute_loss_per_node = jax.jit(compute_loss_per_node)
 
-        def compute_loss_per_graph(params, graph, targets, n_node):
+        def compute_loss_per_graph(params, graph, targets):
             outputs = self._compute_output(params, graph)
             node_features = jnp.squeeze(targets)  # n_node_total x n_feat
-            n_graph = n_node.shape[0]
-            sum_n_node = jnp.sum(n_node)
-            graph_idx = jnp.arange(n_graph)
+            # graph id for each node
+            i = int(0)
+            for n in graph.n_node:
+                if i == 0:
+                    graph_ids = jnp.zeros(n) + i
+                else:
+                    graph_id = jnp.zeros(n) + i
+                    graph_ids = jnp.concatenate([graph_ids, graph_id], axis=0)
+                i = i + 1
+            graph_ids = jnp.concatenate(
+                [jnp.zeros(n) + i for i, n in enumerate(graph.n_node)], axis=0
+            )
+            assert graph_ids.shape[0] == node_features.shape[0]
+            summed_outputs = jop.segment_sum(outputs[0].nodes, graph_ids.astype(int))
+            summed_node_features = jop.segment_sum(node_features, graph_ids.astype(int))
+            assert summed_node_features.shape[0] == graph.n_node.shape[0]
+            denom = graph.n_node
+            denom = jnp.where(denom == 0, 1, denom)
+
+            mean_node_features = summed_node_features / denom
+            mean_outputs = jnp.squeeze(summed_outputs) / denom
+            return (mean_node_features - mean_outputs) ** 2
+
+            self._compute_loss_per_graph = compute_loss_per_graph
+
+        #def compute_loss_per_graph(params, graph, targets, n_node):
+        #    outputs = self._compute_output(params, graph)
+            #  node_features = jnp.squeeze(targets)  # n_node_total x n_feat
+            #   n_graph = n_node.shape[0]
+            #   sum_n_node = jnp.sum(n_node)
+            #   graph_idx = jnp.arange(n_graph)
             # To aggregate nodes and edges from each graph to global features,
             # we first construct tensors that map the node to the corresponding graph.
             # For example, if you have `n_node=[1,2]`, we construct the tensor
             # [0, 1, 1]. We then do the same for edges.
-            node_gr_idx = jnp.repeat(
-                graph_idx, n_node, axis=0, total_repeat_length=sum_n_node)
-            assert node_gr_idx.shape[0] == node_features.shape[0]
-            summed_outputs = jop.segment_sum(outputs[0].nodes, node_gr_idx.astype(int))
-            summed_node_features = jop.segment_sum(node_features, node_gr_idx .astype(int))
-            assert summed_node_features.shape[0] == graph.n_node.shape[0]
-            denom = graph.n_node
-            denom = jnp.where(denom == 0, 1, denom)
-            mean_node_features = summed_node_features / denom
-            mean_outputs = jnp.squeeze(summed_outputs) / denom
-            return (mean_node_features - mean_outputs) ** 2
+            #   node_gr_idx = jnp.repeat(
+            #       graph_idx, n_node, axis=0, total_repeat_length=sum_n_node)
+            #   assert node_gr_idx.shape[0] == node_features.shape[0]
+            #   summed_outputs = jop.segment_sum(outputs[0].nodes, node_gr_idx.astype(int))
+            #   summed_node_features = jop.segment_sum(node_features, node_gr_idx .astype(int))
+            #  assert summed_node_features.shape[0] == graph.n_node.shape[0]
+            #  denom = graph.n_node
+            #  denom = jnp.where(denom == 0, 1, denom)
+            # mean_node_features = summed_node_features / denom
+            #  mean_outputs = jnp.squeeze(summed_outputs) / denom
+        #  return (mean_node_features - mean_outputs) ** 2
 
         self._compute_loss_per_graph = compute_loss_per_graph
 
