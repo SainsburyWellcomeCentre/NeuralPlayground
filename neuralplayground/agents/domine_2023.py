@@ -483,6 +483,7 @@ class Domine2023(
         self.outputs_train, roc_auc_train, MCC_train = self._evaluate(
             self.params, self.graph, self.targets, True
         )
+        
         self.roc_aucs_train.append(roc_auc_train)
         self.MCCs_train.append(MCC_train)
 
@@ -502,7 +503,7 @@ class Domine2023(
             self.params, self.graph_test, self.target_test
         )
         loss_test_per_graph = self._compute_loss_per_graph(
-            self.params, self.graph_test, self.target_test, self.graph_test.n_node
+            self.params, self.graph_test, self.target_test
         )
         loss_nodes_shortest_path = self._compute_loss_nodes_shortest_path(
             self.params, self.graph_test, self.target_test
