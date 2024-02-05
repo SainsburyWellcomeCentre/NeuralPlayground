@@ -277,9 +277,11 @@ def compare_to_agents(forward, model, environments, include_stay_still=True):
             correct_edge.append(
                 True
                 if prev_a is None
-                else True
-                if action_taken[prev_g, prev_a]
-                else np.random.randint(model.hyper["n_x"]) == torch.argmax(step.x[env_i]).numpy()
+                else (
+                    True
+                    if action_taken[prev_g, prev_a]
+                    else np.random.randint(model.hyper["n_x"]) == torch.argmax(step.x[env_i]).numpy()
+                )
             )
             # Update the previous action as taken
             if prev_a is not None:
