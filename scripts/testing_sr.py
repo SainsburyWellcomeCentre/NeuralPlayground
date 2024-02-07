@@ -25,7 +25,7 @@ def main():
     # Init agent
     discount = .9
     threshold = 1e-6
-    lr_td = 1e-2
+    lr_td = 0.2
     t_episode = 100  # 1000
     n_episode = 100  # 1000
     state_density = int(1 / agent_step_size)
@@ -35,7 +35,11 @@ def main():
 
     sr_sum = agent.successor_rep_solution()
     state_to_state = np.reshape(sr_sum, newshape=(agent.width, agent.depth, agent.width, agent.depth))
+
+    sr_td = agent.update_successor_rep_td_full(300, 300)
+
     print(sr_sum)
+
     plt.imshow(sr_sum)
     plt.show()
 

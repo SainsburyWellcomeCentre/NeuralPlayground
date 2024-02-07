@@ -362,11 +362,24 @@ class Stachenfeld2018(AgentCore):
         """
         random_state = np.random.RandomState(1234)
         t_elapsed = 0
-        srmat0 = np.eye(self.n_state)
-        srmat_full = srmat0.copy()
+        # srmat0 = srmat0.copy() Doesn't seem necessary
+        srmat_full = np.eye(self.n_state)
         for i in range(n_episode):
+            #curr_state = np.array([np.random.randint(self.depth), np.random.randint(self.width)])
             curr_state = random_state.randint(self.n_state)
             for j in range(t_episode):
+                # action = self.action_set[random_state.randint(4), :]
+                # next_state = curr_state + action
+                # next_state = np.clip(next_state, 0, [self.depth - 1, self.width - 1])
+                # curr_state_vec = np.zeros((self.depth, self.width))
+                # curr_state_vec[curr_state[0], curr_state[1]] = 1
+                # curr_state_vec = curr_state_vec.flatten().astype(bool)
+                # next_state_vec = np.zeros((self.depth, self.width))
+                # next_state_vec[next_state[0], next_state[1]] = 1
+                # next_state_vec = next_state_vec.flatten().astype(bool)
+                # td_error = curr_state_vec + self.gamma * srmat_full[next_state_vec, :] - srmat_full[curr_state_vec, :]
+                # srmat_full[curr_state_vec, :] = srmat_full[curr_state_vec, :] + self.learning_rate * td_error
+                #
                 a = np.array([curr_state])
                 x = a.flatten()
                 b = np.eye(self.n_state)[x, : self.n_state]
