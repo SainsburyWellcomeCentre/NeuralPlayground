@@ -360,7 +360,7 @@ class Stachenfeld2018(AgentCore):
         # srmat0 = srmat0.copy() Doesn't seem necessary
         srmat_full = np.eye(self.n_state)
         for i in range(n_episode):
-            #curr_state = np.array([np.random.randint(self.depth), np.random.randint(self.width)])
+            # curr_state = np.array([np.random.randint(self.depth), np.random.randint(self.width)])
             curr_state = random_state.randint(self.n_state)
             for j in range(t_episode):
                 # action = self.action_set[random_state.randint(4), :]
@@ -395,12 +395,16 @@ class Stachenfeld2018(AgentCore):
         self,
         sr_matrix=None,
         eigen_vector: int = 10,
+        get_eigen_vals: bool = False,
     ):
         if sr_matrix is None:
             sr_matrix = self.successor_rep_solution()
         evals, evecs = np.linalg.eig(sr_matrix)
         r_out_im = evecs[:, eigen_vector].reshape((self.resolution_width, self.resolution_depth)).real
-        return r_out_im
+        if get_eigen_vals:
+            return r_out_im.T, evals
+        else:
+            return r_out_im.T
 
     def plot_transition(self, T=None, save_path: str = None, ax: mpl.axes.Axes = None):
         """
