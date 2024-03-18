@@ -31,12 +31,23 @@ def main():
     state_density = int(1 / agent_step_size)
     agent = Stachenfeld2018(discount=discount, threshold=threshold, lr_td=lr_td,
                             room_width=env.room_width, room_depth=env.room_depth, state_density=state_density,
-                            twoD=True)
+                            twoD=True, agent_step_size=agent_step_size)
 
     sr_sum = agent.successor_rep_solution()
     state_to_state = np.reshape(sr_sum, newshape=(agent.width, agent.depth, agent.width, agent.depth))
 
-    sr_td = agent.update_successor_rep_td_full(300, 300)
+    # sr_td = agent.update_successor_rep_td_full(300, 300)
+
+    plot_every = 1000
+    total_iters = 0
+    obs, state = env.reset()
+    for i in tqdm(range(n_episode)):
+        for j in range(t_episode):
+            obs = obs[:2]
+            action = agent.act(obs)  # the action is link to density of state to make sure we always land in a new
+            obs, new_state, reward = env.step(action)
+            agent.update(next_state=obs)
+            total_iters += 1
 
     print(sr_sum)
 

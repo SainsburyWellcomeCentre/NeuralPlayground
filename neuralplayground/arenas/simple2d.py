@@ -228,8 +228,7 @@ class Simple2D(Environment):
                 new_state = self.state + action
             new_state, valid_action = self.validate_action(self.state, action, new_state)
             # If you get reward, it should be coded here
-        self.state = np.asarray(new_state)
-        observation = self.make_observation()
+
         self._increase_global_step()
         reward = self.reward_function(action, self.state)
         transition = {
@@ -240,6 +239,8 @@ class Simple2D(Environment):
             "step": self.global_steps,
         }
         self.history.append(transition)
+        self.state = np.asarray(new_state)
+        observation = self.make_observation()
         return observation, new_state, reward
 
     def validate_action(self, pre_state, action, new_state):

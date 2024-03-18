@@ -200,7 +200,6 @@ class Stachenfeld2018(AgentCore):
             self.obs_history = [
                 obs,
             ]
-
         if len(obs) == 0:
             action = None
         else:
@@ -230,7 +229,7 @@ class Stachenfeld2018(AgentCore):
              The computed transition matrix from the successor representation matrix M
         """
         T = (1 / self.gamma) * np.linalg.inv(M) @ (M - np.eye(self.n_state))
-        return T
+        return np.clip(T, 0, 1)
 
     def create_transmat(self, state_density: float, name_env: str, plotting_variable: bool = False):
         """
@@ -322,7 +321,7 @@ class Stachenfeld2018(AgentCore):
 
         return self.srmat_sum
 
-    def update(self):
+    def update(self, next_state):
         """
         Compute the successor representation matrix using TD learning while interacting with the environment
 
@@ -331,28 +330,24 @@ class Stachenfeld2018(AgentCore):
             srmat: (n_state, n_state) successor representation matrix
         """
 
-        if hasattr(self, "next_state"):
-            if self.initial_obs_variable is None:
-                self.curr_state = self.next_state
-                self.initial_obs_variable = True
-            next_state = self.next_state
-            self.n_state = self.transmat_norm.shape[0]
-            a = np.array(self.curr_state)
-            x = a.flatten()
-            b = np.eye(self.n_state)[x, : self.n_state]
-            L = b.reshape(a.shape + (self.n_state,))
-            curr_state_vec = L
+        self.curr_state = self.obs_history[-1]
+        self.n_state = self.transmat_norm.shape[0]
+        curr_state_vec = np.zeros(self.n_state)
+        current_state_index = np.argmin(np.sum(np.square(self.xy_combinations.T - self.curr_state[:, np.newaxis]), axis=0))
+        next_state_index = np.argmin(np.sum(np.square(self.xy_combinations.T - next_state[:, np.newaxis]), axis=0))
+        curr_state_vec[current_state_index] = 1
 
-            td_error = curr_state_vec + self.gamma * self.srmat[:, next_state] - self.srmat[:, self.curr_state]
-            self.srmat[:, self.curr_state] = self.srmat[:, self.curr_state] + self.learning_rate * td_error
+        td_error = curr_state_vec.T + self.gamma * self.srmat[:, next_state_index] - self.srmat[:, current_state_index]
+        self.srmat[:, current_state_index] = self.srmat[:, current_state_index] + self.learning_rate * td_error
 
-            self.grad_history.append(np.sqrt(np.sum(td_error**2)))
-            self.curr_state = next_state
-            return {"state_td_error": td_error}
+        self.grad_history.append(np.sqrt(np.sum(td_error**2)))
+        self.curr_state = next_state
+        return {"state_td_error": td_error}
 
     def update_successor_rep_td_full(self, n_episode: int = 100, t_episode: int = 100):
         """
         Compute the successor representation matrix using TD learning
+        assuming no walls in the 2d environment
 
         Returns:
         ----------
