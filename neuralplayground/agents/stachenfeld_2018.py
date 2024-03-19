@@ -402,7 +402,7 @@ class Stachenfeld2018(AgentCore):
         evals, evecs = np.linalg.eig(sr_matrix)
         r_out_im = evecs[:, eigen_vector].reshape((self.resolution_width, self.resolution_depth)).real
         if get_eigen_vals:
-            return r_out_im.T, evals
+            return r_out_im.T, evals[eigen_vector]
         else:
             return r_out_im.T
 
