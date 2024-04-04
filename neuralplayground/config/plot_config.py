@@ -142,7 +142,6 @@ class TableConfig(NPGConfig):
 
 
 class PlotsConfig(NPGConfig):
-
     """Config object for plots, all plots are config are stored in this object
     Attributes
     ----------
