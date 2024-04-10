@@ -394,17 +394,37 @@ class Stachenfeld2018(AgentCore):
     def get_rate_map_matrix(
         self,
         sr_matrix=None,
-        eigen_vector: int = 10,
+        eigen_vector: Union[int, list, tuple, np.ndarray] = None,
         get_eigen_vals: bool = False,
     ):
+        """
+        Compute the rate map matrix from the successor representation matrix using the eigen-decomposition
+        Parameters
+        ----------
+        sr_matrix: array
+            Successor representation matrix
+        eigen_vector: int, list, tuple, np.ndarray
+            The eigen vector to be used to compute the rate map matrix
+        get_eigen_vals: bool
+            If True, returns the eigen values of the matrix
+        Returns
+        -------
+        r_out_im: array
+            The rate map matrix
+        """
         if sr_matrix is None:
             sr_matrix = self.successor_rep_solution()
         evals, evecs = np.linalg.eig(sr_matrix)
-        r_out_im = evecs[:, eigen_vector].reshape((self.resolution_width, self.resolution_depth)).real
-        if get_eigen_vals:
-            return r_out_im.T, evals[eigen_vector]
+        if isinstance(eigen_vector, list) or isinstance(eigen_vector, tuple) or isinstance(eigen_vector, np.ndarray):
+            r_out_im = evecs[:, eigen_vector].reshape((len(eigen_vector), self.resolution_width, self.resolution_depth)).real
+            r_out_im = np.transpose(r_out_im, (0, 2, 1))
         else:
-            return r_out_im.T
+            r_out_im = evecs[:, eigen_vector].reshape((self.resolution_width, self.resolution_depth)).real
+            r_out_im = r_out_im.T
+        if get_eigen_vals:
+            return r_out_im, evals[eigen_vector]
+        else:
+            return r_out_im
 
     def plot_transition(self, T=None, save_path: str = None, ax: mpl.axes.Axes = None):
         """
