@@ -317,3 +317,80 @@ def make_agent_comparison(envs, parameters, agents, exps=None, recording_index=N
                     ax[3][i + k + m + 2].set_axis_off()
                     ax[4][i + k + m + 2].set_axis_off()
     return ax
+
+
+def plot_trajectory_place_cells_activity(
+    place_cells_center, place_cell_activity, trajectory, ax1, ax2, plot_n_cells=30, log_scale=False, raster=False
+):
+    """Nice place cells raster following trajectory
+
+    Parameters
+    ----------
+    place_cells_center: np.array
+        Center of the place cells (n_cells, pos)
+    place_cell_activity: np.array
+        Activity of the place cells (n_cells, time)
+    trajectory: np.array
+        Trajectory of the agent (time, pos)
+    ax1 and ax2: mpl.axes._subplots.AxesSubplot (matplotlib axis from subplots)
+        axis from subplot from matplotlib where the ratemap will be plotted.
+    plot_n_cells: int
+        Number of cells to plot
+    log_scale: bool
+        If True, the activity is plotted in log scale
+
+    Returns
+    -------
+    ax1 and ax2: mpl.axes._subplots.AxesSubplot (matplotlib axis from subplots)
+        Modified axis where the comparison is plotted
+    """
+
+    # Find unique closest place cell id list to the trajectory
+    closest_cell_id = []
+    for t in range(len(trajectory)):
+        dist = np.linalg.norm(place_cells_center - trajectory[t, :], axis=1)
+        closest_cell_id.append(np.argmin(dist))
+    closest_cell_id_tr = np.array(closest_cell_id).astype(int)
+    time_order_cells_ids = []
+    for i in range(len(closest_cell_id_tr)):
+        if i == 0:
+            time_order_cells_ids.append(closest_cell_id_tr[i])
+        else:
+            if closest_cell_id_tr[i] != time_order_cells_ids[-1]:
+                time_order_cells_ids.append(closest_cell_id_tr[i])
+    time_order_cells_ids = np.array(time_order_cells_ids).astype(int)
+    np.unique(time_order_cells_ids)  # np.unique(closest_cell_id_tr)
+    init_x = trajectory[0, 0]
+    init_y = trajectory[0, 1]
+
+    colors = plt.cm.viridis(np.linspace(0, 1, len(time_order_cells_ids)))
+    # visited_centers = place_cells_center[unique_closest_cell_id]
+    order_by_activity = np.array(
+        time_order_cells_ids
+    )  # np.argsort(np.argmax(place_cell_activity[unique_closest_cell_id, :], axis=1))
+    visited_centers = place_cells_center[order_by_activity, :]
+    visited_activity = place_cell_activity[order_by_activity, :]
+    # unique_closest_cell_id = unique_closest_cell_id[order_by_activity]
+
+    ax1.scatter(place_cells_center[:, 0], place_cells_center[:, 1], c="lightgrey", label="Place cells")
+    ax1.scatter(visited_centers[:, 0], visited_centers[:, 1], c=colors)
+    ax1.scatter(init_x, init_y, color="black", marker="o", s=150)
+    ax1.plot(trajectory[:, 0], trajectory[:, 1], c="black", label="Trajectory")
+    ax1.set_xlabel("x pos [m]")
+    ax1.set_ylabel("y pos [m]")
+
+    max_rate = np.max(place_cell_activity[time_order_cells_ids, :])
+    for i in range(plot_n_cells):
+        if i >= len(order_by_activity):
+            break
+        if raster:
+            ax2.plot(visited_activity[i] + i * max_rate, c=colors[i])
+        else:
+            ax2.plot(visited_activity[i], c=colors[i])
+
+    ax2.set_title("Place cells activity")
+    ax2.set_xlabel("Time")
+    ax2.set_ylabel("Activity")
+    if log_scale:
+        ax2.set_yscale("log")
+    return ax1, ax2

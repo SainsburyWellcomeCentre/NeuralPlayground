@@ -12,15 +12,14 @@ the neuralplayground main codebase.
 """
 
 import numpy as np
-import torch
 import scipy
+import torch
 
 
 class PlaceCells(object):
-
     # Here we replace the options object with explicit arguments
     def __init__(self, Np, place_cell_rf, surround_scale, room_width, room_depth, periodic, DoG, device):
-    #def __init__(self, options, us=None):
+        # def __init__(self, options, us=None):
         self.Np = Np
         self.sigma = place_cell_rf
         self.surround_scale = surround_scale
@@ -35,13 +34,13 @@ class PlaceCells(object):
         np.random.seed(0)
         usx = np.random.uniform(-self.room_width / 2, self.room_width / 2, (self.Np,))
         usy = np.random.uniform(-self.room_width / 2, self.room_width / 2, (self.Np,))
-        self.us = torch.tensor(np.vstack([usx, usy]).T)
+        self.cell_positions = torch.tensor(np.vstack([usx, usy]).T)
         # If using a GPU, put on GPU
-        self.us = self.us.to(self.device)
+        self.cell_positions = self.cell_positions.to(self.device)
         # self.us = torch.tensor(np.load('models/example_pc_centers.npy')).cuda()
 
     def get_activation(self, pos):
-        '''
+        """
         Get place cell activations for a given position.
 
         Args:
@@ -49,8 +48,8 @@ class PlaceCells(object):
 
         Returns:
             outputs: Place cell activations with shape [batch_size, sequence_length, Np].
-        '''
-        d = torch.abs(pos[:, :, None, :] - self.us[None, None, ...]).float()
+        """
+        d = torch.abs(pos[:, :, None, :] - self.cell_positions[None, None, ...]).float()
 
         if self.is_periodic:
             dx = d[:, :, :, 0]
@@ -59,17 +58,17 @@ class PlaceCells(object):
             dy = torch.minimum(dy, self.room_depth - dy)
             d = torch.stack([dx, dy], axis=-1)
 
-        norm2 = (d ** 2).sum(-1)
+        norm2 = (d**2).sum(-1)
 
         # Normalize place cell outputs with prefactor alpha=1/2/np.pi/self.sigma**2,
         # or, simply normalize with softmax, which yields same normalization on
         # average and seems to speed up training.
-        outputs = self.softmax(-norm2 / (2 * self.sigma ** 2))
+        outputs = self.softmax(-norm2 / (2 * self.sigma**2))
 
         if self.DoG:
             # Again, normalize with prefactor
             # beta=1/2/np.pi/self.sigma**2/self.surround_scale, or use softmax.
-            outputs -= self.softmax(-norm2 / (2 * self.surround_scale * self.sigma ** 2))
+            outputs -= self.softmax(-norm2 / (2 * self.surround_scale * self.sigma**2))
 
             # Shift and scale outputs so that they lie in [0,1].
             min_output, _ = outputs.min(-1, keepdims=True)
@@ -78,7 +77,7 @@ class PlaceCells(object):
         return outputs
 
     def get_nearest_cell_pos(self, activation, k=3):
-        '''
+        """
         Decode position using centers of k maximally active place cells.
 
         Args:
@@ -87,13 +86,13 @@ class PlaceCells(object):
 
         Returns:
             pred_pos: Predicted 2d position with shape [batch_size, sequence_length, 2].
-        '''
+        """
         _, idxs = torch.topk(activation, k=k)
-        pred_pos = self.us[idxs].mean(-2)
+        pred_pos = self.cell_positions[idxs].mean(-2)
         return pred_pos
 
     def grid_pc(self, pc_outputs, res=32):
-        ''' Interpolate place cell outputs onto a grid'''
+        """Interpolate place cell outputs onto a grid"""
         coordsx = np.linspace(-self.room_width / 2, self.room_width / 2, res)
         coordsy = np.linspace(-self.room_depth / 2, self.room_depth / 2, res)
         grid_x, grid_y = np.meshgrid(coordsx, coordsy)
@@ -105,15 +104,19 @@ class PlaceCells(object):
         T = pc_outputs.shape[0]  # T vs transpose? What is T? (dim's?)
         pc = np.zeros([T, res, res])
         for i in range(len(pc_outputs)):
-            gridval = scipy.interpolate.griddata(self.us.cpu(), pc_outputs[i], grid)
+            gridval = scipy.interpolate.griddata(self.cell_positions.cpu(), pc_outputs[i], grid)
             pc[i] = gridval.reshape([res, res])
 
         return pc
 
     def compute_covariance(self, res=30):
-        '''Compute spatial covariance matrix of place cell outputs'''
-        pos = np.array(np.meshgrid(np.linspace(-self.room_width / 2, self.room_width / 2, res),
-                                   np.linspace(-self.room_depth / 2, self.room_depth / 2, res))).T
+        """Compute spatial covariance matrix of place cell outputs"""
+        pos = np.array(
+            np.meshgrid(
+                np.linspace(-self.room_width / 2, self.room_width / 2, res),
+                np.linspace(-self.room_depth / 2, self.room_depth / 2, res),
+            )
+        ).T
 
         pos = torch.tensor(pos)
 
@@ -134,3 +137,8 @@ class PlaceCells(object):
         Cmean = np.roll(np.roll(Cmean, res // 2, axis=0), res // 2, axis=1)
 
         return Cmean
+
+    def get_place_cell_positions(self, return_numpy=True):
+        if return_numpy:
+            return self.cell_positions.detach().cpu().numpy()
+        return self.cell_positions

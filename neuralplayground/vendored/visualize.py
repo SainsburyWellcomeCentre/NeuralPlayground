@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
+import cv2
 import numpy as np
 from matplotlib import pyplot as plt
-import cv2
 
 
 def concat_images(images, image_width, spacer_size):
-    """ Concat image horizontally with spacer """
+    """Concat image horizontally with spacer"""
     spacer = np.ones([image_width, spacer_size, 4], dtype=np.uint8) * 255
     images_with_spacers = []
 
@@ -21,15 +21,14 @@ def concat_images(images, image_width, spacer_size):
 
 
 def concat_images_in_rows(images, row_size, image_width, spacer_size=4):
-    """ Concat images in rows """
+    """Concat images in rows"""
     column_size = len(images) // row_size
-    spacer_h = np.ones([spacer_size, image_width * column_size + (column_size - 1) * spacer_size, 4],
-                       dtype=np.uint8) * 255
+    spacer_h = np.ones([spacer_size, image_width * column_size + (column_size - 1) * spacer_size, 4], dtype=np.uint8) * 255
 
     row_images_with_spacers = []
 
     for row in range(row_size):
-        row_images = images[column_size * row:column_size * row + column_size]
+        row_images = images[column_size * row : column_size * row + column_size]
         row_concated_images = concat_images(row_images, image_width, spacer_size)
         row_images_with_spacers.append(row_concated_images)
 
@@ -46,9 +45,9 @@ def convert_to_colormap(im, cmap):
     return im
 
 
-def rgb(im, cmap='jet', smooth=True):
+def rgb(im, cmap="jet", smooth=True):
     cmap = plt.cm.get_cmap(cmap)
-    np.seterr(invalid='ignore')  # ignore divide by zero err
+    np.seterr(invalid="ignore")  # ignore divide by zero err
     im = (im - np.min(im)) / (np.max(im) - np.min(im))
     if smooth:
         im = cv2.GaussianBlur(im, (3, 3), sigmaX=1, sigmaY=0)
@@ -57,16 +56,16 @@ def rgb(im, cmap='jet', smooth=True):
     return im
 
 
-def plot_ratemaps(activations, n_plots, cmap='jet', smooth=True, width=16):
+def plot_ratemaps(activations, n_plots, cmap="jet", smooth=True, width=16):
     images = [rgb(im, cmap, smooth) for im in activations[:n_plots]]
     rm_fig = concat_images_in_rows(images, n_plots // width, activations.shape[-1])
     return rm_fig
 
 
-def compute_ratemaps(model, trajectory_generator, sequence_length, batch_size, 
-                     room_width, room_depth, res=20, n_avg=None, Ng=512, idxs=None):
-
-    '''Compute spatial firing fields'''
+def compute_ratemaps(
+    model, trajectory_generator, sequence_length, batch_size, room_width, room_depth, res=20, n_avg=None, Ng=512, idxs=None
+):
+    """Compute spatial firing fields"""
 
     if not n_avg:
         n_avg = 1000 // sequence_length

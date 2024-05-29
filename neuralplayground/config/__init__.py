@@ -15,3 +15,5 @@ else:
 from .load_config import generate_config_file
 
 STATE_LABELS = _get_state_labels()
+
+from .plot_config import load_plot_config

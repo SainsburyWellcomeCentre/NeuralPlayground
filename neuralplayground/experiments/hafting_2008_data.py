@@ -221,6 +221,7 @@ class Hafting2008Data(Experiment):
         """Print original readme of the dataset"""
         readme_path = glob.glob(self.data_path + "readme" + "*.txt")[0]
         with open(readme_path, "r") as fin:
+            print("Dataset readme:")
             print(fin.read())
 
     def get_recorded_session(self, recording_index: int = None):
