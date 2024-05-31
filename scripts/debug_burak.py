@@ -29,14 +29,10 @@ def simulate(filename, simulate_non_periodic, use_spiking):
 
 
 def gc_non_periodic(filename, n, tau, dt, beta, alphabar, abar, wtphase, alpha, useSpiking):
-    room_width = 2 * 100  # Two meters
-    room_depth = 2 * 100  # Two meters
     sequence_length = 100000
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    generator = TrajectoryGenerator(
-        sequence_length, batch_size=1, room_width=room_width, room_depth=room_depth, device=device, place_cells=None
-    )
-    traj = generator.generate_trajectory(room_width, room_depth, batch_size=1)
+    generator = TrajectoryGenerator(sequence_length, batch_size=1, room_width=4, room_depth=4, device=device, place_cells=None)
+    traj = generator.generate_trajectory(room_width=4, room_depth=4, batch_size=1)
     # If no data is loaded, use random trajectories.
     enclosure_radius = 2 * 100  # Two meters
     temp_velocity = np.random.rand() / 2
@@ -46,8 +42,8 @@ def gc_non_periodic(filename, n, tau, dt, beta, alphabar, abar, wtphase, alpha, 
     position_x[0] = 0
     position_y[0] = 0
     headDirection[0] = np.random.rand() * 2 * np.pi
-    traj_x = traj["target_x"][0, :] * 10
-    traj_y = traj["target_y"][0, :] * 10
+    traj_x = traj["target_x"][0, :]
+    traj_y = traj["target_y"][0, :]
     traj["target_hd"][0, :]
 
     for i in range(sequence_length):
@@ -75,7 +71,7 @@ def gc_non_periodic(filename, n, tau, dt, beta, alphabar, abar, wtphase, alpha, 
     sampling_length = len(position_x)
     # HeadDirection var doesn't care about the range of angles apparently
 
-    plt.plot(position_x, position_y, label="matlab code")
+    # plt.plot(position_x, position_y, label="matlab code")
     plt.plot(traj_x, traj_y, label="python code")
     plt.legend()
     plt.show()
@@ -199,3 +195,6 @@ def gc_non_periodic(filename, n, tau, dt, beta, alphabar, abar, wtphase, alpha, 
 if __name__ == "__main__":
     # Example usage
     spikes = simulate("test_file", False, False)  # Replace with your actual filename
+    # agent = Burak2009()
+    # grid_cell = agent.ideal_grid_cells(periodic_boundary=False)
+    # print("debugging")

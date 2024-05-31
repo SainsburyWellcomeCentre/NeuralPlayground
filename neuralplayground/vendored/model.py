@@ -1,23 +1,31 @@
 # -*- coding: utf-8 -*-
+import numpy as np
 import torch
+from tqdm import tqdm
 
 
-class RNN(torch.nn.Module):
+class Sorscher2022(torch.nn.Module):
     # Here we replace the options object with explicit arguments
-    def __init__(self, Ng, Np, sequence_length, weight_decay, place_cells, activation="tanh"):
-        super(RNN, self).__init__()
+    def __init__(
+        self, Ng, Np, sequence_length, weight_decay, place_cells, activation="tanh", learning_rate=5e-3, device="cuda"
+    ):
+        super().__init__()
         self.Ng = Ng
         self.Np = Np
         self.sequence_length = sequence_length
         self.weight_decay = weight_decay
         self.place_cells = place_cells
+        self.activation = activation
+        self.learning_rate = learning_rate
+        self.built_network()
+        self.optimizer = torch.optim.Adam(self.parameters(), lr=self.learning_rate)
 
+    def built_network(self):
         # Input weights
         self.encoder = torch.nn.Linear(self.Np, self.Ng, bias=False)
-        self.RNN = torch.nn.RNN(input_size=2, hidden_size=self.Ng, nonlinearity=activation, bias=False)
+        self.RNN = torch.nn.RNN(input_size=2, hidden_size=self.Ng, nonlinearity=self.activation, bias=False)
         # Linear read-out weights
         self.decoder = torch.nn.Linear(self.Ng, self.Np, bias=False)
-
         self.softmax = torch.nn.Softmax(dim=-1)
 
     def g(self, inputs):
@@ -74,3 +82,34 @@ class RNN(torch.nn.Module):
         err = torch.sqrt(((pos - pred_pos) ** 2).sum(-1)).mean()
 
         return loss, err
+
+    def bptt_update(self, inputs, place_cells_activity, position):
+        """
+        Perform backpropagation through time and update weights.
+        """
+        self.zero_grad()
+        loss, err = self.compute_loss(inputs, place_cells_activity, position)
+        loss.backward()
+        self.optimizer.step()
+        return loss.detach().cpu().numpy(), err.detach().cpu().numpy()
+
+    def train_RNN(self, data_generator, training_steps):
+        """
+        Perform backpropagation through time and update weights.
+        """
+        loss_hist = []
+        pos_err_hist = []
+
+        for i in tqdm(range(training_steps)):
+            # Inputs below is a tuple with velocity vector and initial place cell activity
+            # pc outputs is the place cell activity for the whole trajectory, these are the target of the bptt step
+            inputs, pc_outputs, positions = next(data_generator)
+            loss, pos_err = self.bptt_update(inputs=inputs, place_cells_activity=pc_outputs, position=positions)
+            loss_hist.append(loss)
+            pos_err_hist.append(pos_err)
+
+        # Save training results for later
+        self.loss_hist = np.array(loss_hist)
+        self.pos_err_hist = np.array(pos_err_hist)
+
+        return self.loss_hist, self.pos_err_hist

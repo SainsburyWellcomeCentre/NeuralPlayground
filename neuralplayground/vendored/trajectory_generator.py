@@ -116,7 +116,7 @@ class TrajectoryGenerator(object):
 
         return traj
 
-    def get_generator(self, batch_size=None, room_width=None, room_depth=None):
+    def get_batch_generator(self, batch_size=None, room_width=None, room_depth=None):
         """
         Returns a generator that yields batches of trajectories
         """
@@ -130,15 +130,20 @@ class TrajectoryGenerator(object):
         while True:
             traj = self.generate_trajectory(room_width, room_depth, batch_size)
 
+            # Velocity vector
             v = np.stack([traj["ego_v"] * np.cos(traj["target_hd"]), traj["ego_v"] * np.sin(traj["target_hd"])], axis=-1)
             v = torch.tensor(v, dtype=torch.float32).transpose(0, 1)
 
+            # Target position
             pos = np.stack([traj["target_x"], traj["target_y"]], axis=-1)
             pos = torch.tensor(pos, dtype=torch.float32).transpose(0, 1)
             # Put on GPU if GPU is available
             pos = pos.to(self.device)
+
+            # Place cell activity at target position
             place_outputs = self.place_cells.get_activation(pos)
 
+            # initial position in place cell space
             init_pos = np.stack([traj["init_x"], traj["init_y"]], axis=-1)
             init_pos = torch.tensor(init_pos, dtype=torch.float32)
             init_pos = init_pos.to(self.device)
