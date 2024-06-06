@@ -159,7 +159,7 @@ class BatchEnvironment(Environment):
             state_history[0]
             next_state_history[-1]
 
-            cmap = mpl.cm.get_cmap("plasma")
+            cmap = mpl.colormaps.get_cmap("plasma")
             norm = plt.Normalize(0, len(state_history))
 
             aux_x = []
