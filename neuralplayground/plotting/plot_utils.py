@@ -52,7 +52,7 @@ def make_plot_trajectories(arena_limits, x, y, ax, plot_every):
         config_vars.EXTERNAL_WALL_COLOR,
         lw=config_vars.EXTERNAL_WALL_THICKNESS,
     )
-    cmap = mpl.cm.get_cmap(config_vars.TRAJECTORY_COLORMAP)
+    cmap = mpl.colormaps.get_cmap(config_vars.TRAJECTORY_COLORMAP)
     norm = plt.Normalize(0, np.size(x))
 
     aux_x = []
