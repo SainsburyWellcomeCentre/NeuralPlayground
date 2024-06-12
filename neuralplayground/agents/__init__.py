@@ -5,5 +5,6 @@ from .weber_2018 import Weber2018
 from ..vendored import TrajectoryGenerator
 from .burak2009 import Burak2009
 from ..vendored import Sorscher2022
+from .Sorscher_2022 import Sorscher2022exercise
 
 # from .whittington_2020 import Whittington2020

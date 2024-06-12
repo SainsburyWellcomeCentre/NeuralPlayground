@@ -2,6 +2,8 @@
 import numpy as np
 import torch
 from tqdm import tqdm
+import pickle
+import pandas as pd
 
 
 class Sorscher2022(torch.nn.Module):
@@ -32,10 +34,10 @@ class Sorscher2022(torch.nn.Module):
         """
         Compute grid cell activations.
         Args:
-            inputs: Batch of 2d velocity inputs with shape [batch_size, sequence_length, 2].
+            inputs: tuple with velocity and initial place cell activity with shapes [seq_len, batch, 2] and [batch, Np].
 
         Returns:
-            g: Batch of grid cell activations with shape [batch_size, sequence_length, Ng].
+            g: Batch of grid cell activations with shape [sequence_length, batch, Ng].
         """
         v, p0 = inputs
         init_state = self.encoder(p0)[None]
@@ -113,3 +115,13 @@ class Sorscher2022(torch.nn.Module):
         self.pos_err_hist = np.array(pos_err_hist)
 
         return self.loss_hist, self.pos_err_hist
+
+    def save_model(self, path):
+        # torch.save(self.state_dict(), path+".torch")
+        pickle.dump(self.__dict__, open(path+".pkl", "wb"))
+
+    def load_model(self, path):
+        # self.load_state_dict(torch.load(path))
+        # self.eval()
+        self.__dict__ = pd.read_pickle(path+".pkl")
+        return self

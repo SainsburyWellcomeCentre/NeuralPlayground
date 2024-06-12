@@ -23,12 +23,15 @@ class Burak2009(AgentCore):
         wtphase: int = 2,  # wtphase is 'l' from Equation (2)
         alpha: float = 1,  # The velocity gain from Equation (4)
         time_step_dt=0.5,  # Default timestep (ms)
+        room_width=2.2,
+        room_depth=2.2,
+        offset_weights=False,
         **mod_kwargs,
     ):
         mod_kwargs["agent_step_size"] = agent_step_size
         super().__init__(model_name, **mod_kwargs)
         self.agent_step_size = agent_step_size
-        self.n_neurons = n_neurons
+        self.n_neurons = n_neurons  # this should be the square of a number
         self.tau = tau
         self.lambda_ = lambda_
         self.beta = beta
@@ -37,9 +40,60 @@ class Burak2009(AgentCore):
         self.wtphase = wtphase
         self.alpha = alpha
         self.time_step_dt = time_step_dt
-        self._initialize_weights()
+        self.offset_weights = offset_weights
+        self._initialize_fourier_weights()
+        self._initialize_explicit_weights()
 
-    def _initialize_weights(self):
+    def _initialize_explicit_weights(self):
+        """ This is from Sorscher equations 35, 36 abd 38 """
+        self.k0 = np.array([1, 0])
+        self.k60 = np.array([0.5, np.sqrt(3) / 2])
+        self.k120 = np.array([-0.5, np.sqrt(3) / 2])
+        self.k_vec = np.stack([self.k0, self.k60, self.k120], axis=0)
+        self.L = np.sqrt(self.n_neurons).astype(int)
+
+        Jij = np.zeros((self.n_neurons, self.n_neurons))
+        grid_location = np.arange(1, self.L+1)
+        print("Building recurrent matrix")
+        sheet_locations = []
+        for i in range(self.L):
+            for j in range(self.L):
+                sheet_locations.append(np.array([grid_location[i], grid_location[j]]))
+        sheet_locations = np.stack(sheet_locations, axis=0)
+        Mx = np.mod(sheet_locations[:, 1], 2)*((-1)**(sheet_locations[:, 0]))
+        My = np.mod(sheet_locations[:, 0], 2)*((-1)**(sheet_locations[:, 1]))
+        Mixy = np.stack([Mx, My], axis=1)
+        for i in range(self.n_neurons):
+            si = sheet_locations[i, :]
+            for j in range(self.n_neurons):
+                sj = sheet_locations[j, :]
+                if self.offset_weights:
+                    s_diff = si - sj - Mixy[j, :]
+                else:
+                    s_diff = si - sj
+                Jij[i, j] = self.weight_function(s_diff[:, np.newaxis])
+        self.Jij = Jij
+        self.Mixy = Mixy
+        self.bi = np.ones((self.n_neurons, 1))*0.1
+        self.sheet_locations = sheet_locations
+        print("debug")
+
+    def rate_update(self, rates, velocity):
+        matrix_product = self.Jij @ rates
+        velocity_product = self.Mixy @ velocity
+        new_rates = matrix_product + velocity_product #+ self.bi
+        return npRelu(new_rates)
+        #return np.clip(new_rates, 0, 10)
+        #return npsigmoid(new_rates)
+
+    def weight_function(self, x):
+        # Make sure x.shape = (dim, 1), eq 37 in Sorscher
+        inner = 2*np.pi/self.L*(self.k_vec @ x)
+        element_wise_cos = np.cos(inner)
+        return np.sum(element_wise_cos)
+
+
+    def _initialize_fourier_weights(self):
         # Padding for convolutions
         self.big = 2 * self.n_neurons
         dim = self.n_neurons // 2
@@ -233,5 +287,22 @@ class Burak2009(AgentCore):
         return single_neuron_response, r
 
 
+def npRelu(x):
+    return np.maximum(0, x)
+
+
+def npsigmoid(z):
+    return 1/(1 + np.exp(-z))
+
+
 if __name__ == "__main__":
-    pass
+    n_neurons = 24 ** 2
+    ideal_rnn = Burak2009(n_neurons=n_neurons)
+    periodic_grid_cell = ideal_rnn.ideal_grid_cells(periodic_boundary=True)
+    iters = 1000
+    rates = np.zeros((n_neurons, 1))
+    # Random initial rates
+    # rates = np.random.normal(size=(n_neurons, 1))
+    velocity = np.zeros((2, 1))
+    for i in tqdm(range(iters)):
+        rates = ideal_rnn.rate_update(rates, velocity=velocity)
