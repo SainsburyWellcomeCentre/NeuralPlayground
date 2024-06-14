@@ -7,7 +7,8 @@ import pandas as pd
 
 class Sorscher2022exercise(object):
     def __init__(
-        self, Ng, Np, sequence_length, weight_decay, place_cells, activation=torch.nn.ReLU, learning_rate=5e-3, device="cuda"
+        self, Ng, Np, sequence_length, weight_decay, place_cells, activation=torch.nn.ReLU, learning_rate=5e-3,
+            device="cuda", learning_rule="adam"
     ):
         super().__init__()
         self.Ng = Ng
@@ -26,10 +27,16 @@ class Sorscher2022exercise(object):
         self.device = device
         self.dtype = torch.float32
         self._initialize_weights()
-        self.optimizer = torch.optim.Adam([self.encoder_W,
-                                           self.recurrent_W,
-                                           self.velocity_W,
-                                           self.decoder_W], lr=self.learning_rate)
+        if learning_rule == "adam":
+            self.optimizer = torch.optim.Adam([self.encoder_W,
+                                              self.recurrent_W,
+                                              self.velocity_W,
+                                              self.decoder_W], lr=self.learning_rate)
+        elif learning_rule == "rmsprop":
+            self.optimizer = torch.optim.RMSprop([self.encoder_W,
+                                                 self.recurrent_W,
+                                                 self.velocity_W,
+                                                 self.decoder_W], lr=self.learning_rate)
 
     def _initialize_weights(self):
         # Input weights

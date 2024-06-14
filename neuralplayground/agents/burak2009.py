@@ -23,9 +23,8 @@ class Burak2009(AgentCore):
         wtphase: int = 2,  # wtphase is 'l' from Equation (2)
         alpha: float = 1,  # The velocity gain from Equation (4)
         time_step_dt=0.5,  # Default timestep (ms)
-        room_width=2.2,
-        room_depth=2.2,
         offset_weights=False,
+        compute_sorscher_weights=False,
         **mod_kwargs,
     ):
         mod_kwargs["agent_step_size"] = agent_step_size
@@ -42,7 +41,8 @@ class Burak2009(AgentCore):
         self.time_step_dt = time_step_dt
         self.offset_weights = offset_weights
         self._initialize_fourier_weights()
-        self._initialize_explicit_weights()
+        if compute_sorscher_weights:
+            self._initialize_explicit_weights()
 
     def _initialize_explicit_weights(self):
         """ This is from Sorscher equations 35, 36 abd 38 """
@@ -53,7 +53,8 @@ class Burak2009(AgentCore):
         self.L = np.sqrt(self.n_neurons).astype(int)
 
         Jij = np.zeros((self.n_neurons, self.n_neurons))
-        grid_location = np.arange(1, self.L+1)
+        grid_location = np.arange(self.L)
+
         print("Building recurrent matrix")
         sheet_locations = []
         for i in range(self.L):
@@ -61,7 +62,7 @@ class Burak2009(AgentCore):
                 sheet_locations.append(np.array([grid_location[i], grid_location[j]]))
         sheet_locations = np.stack(sheet_locations, axis=0)
         Mx = np.mod(sheet_locations[:, 1], 2)*((-1)**(sheet_locations[:, 0]))
-        My = np.mod(sheet_locations[:, 0], 2)*((-1)**(sheet_locations[:, 1]))
+        My = np.mod(sheet_locations[:, 1]+1, 2)*((-1)**(sheet_locations[:, 0]))
         Mixy = np.stack([Mx, My], axis=1)
         for i in range(self.n_neurons):
             si = sheet_locations[i, :]
@@ -297,12 +298,12 @@ def npsigmoid(z):
 
 if __name__ == "__main__":
     n_neurons = 24 ** 2
-    ideal_rnn = Burak2009(n_neurons=n_neurons)
-    periodic_grid_cell = ideal_rnn.ideal_grid_cells(periodic_boundary=True)
+    ideal_rnn = Burak2009(n_neurons=n_neurons, compute_sorscher_weights=True)
+    # periodic_grid_cell = ideal_rnn.ideal_grid_cells(periodic_boundary=True)
     iters = 1000
     rates = np.zeros((n_neurons, 1))
     # Random initial rates
     # rates = np.random.normal(size=(n_neurons, 1))
-    velocity = np.zeros((2, 1))
-    for i in tqdm(range(iters)):
-        rates = ideal_rnn.rate_update(rates, velocity=velocity)
+    # velocity = np.zeros((2, 1))
+    # for i in tqdm(range(iters)):
+    #     rates = ideal_rnn.rate_update(rates, velocity=velocity)

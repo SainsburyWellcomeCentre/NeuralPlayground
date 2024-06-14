@@ -14,7 +14,7 @@ from neuralplayground.plotting import plot_trajectory_place_cells_activity, plot
 from neuralplayground.config import load_plot_config
 
 
-def main(activation="relu"):
+def main(activation="tanh"):
 
     print("Pre-training the network")
     print("Activation function: ", activation)
@@ -60,21 +60,21 @@ def main(activation="relu"):
 
     gen = generator.get_batch_generator()
 
-    real_rnn = Sorscher2022(Ng=n_grid_cells,
-                            Np=n_place_cells,
-                            sequence_length=sequence_length,
-                            weight_decay=weight_decay,
-                            place_cells=place_cells,
-                            activation=activation,
-                            learning_rate=learning_rate)
+    # real_rnn = Sorscher2022(Ng=n_grid_cells,
+    #                         Np=n_place_cells,
+    #                         sequence_length=sequence_length,
+    #                         weight_decay=weight_decay,
+    #                         place_cells=place_cells,
+    #                         activation=activation,
+    #                         learning_rate=learning_rate)
 
-    # real_rnn = Sorscher2022exercise(Ng=n_grid_cells,
-    #                                 Np=n_place_cells,
-    #                                 sequence_length=sequence_length,
-    #                                 weight_decay=weight_decay,
-    #                                 place_cells=place_cells,
-    #                                 activation="relu",
-    #                                 learning_rate=learning_rate)
+    real_rnn = Sorscher2022exercise(Ng=n_grid_cells,
+                                    Np=n_place_cells,
+                                    sequence_length=sequence_length,
+                                    weight_decay=weight_decay,
+                                    place_cells=place_cells,
+                                    activation="relu",
+                                    learning_rate=learning_rate)
 
     loss_hist, pos_err_hist = real_rnn.train_RNN(gen, training_steps)
 
