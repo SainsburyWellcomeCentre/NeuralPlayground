@@ -274,7 +274,7 @@ class Burak2009(AgentCore):
             rfield += convolution
 
             # Neural Transfer Function
-            fr = np.where(rfield > 0, rfield, 0)
+            fr = np.maximum(rfield, 0)
 
             # Neuron dynamics (Eq. 1)
             r_old = r
@@ -283,9 +283,58 @@ class Burak2009(AgentCore):
 
             # Track single neuron response
             if fr[single_neuron[0], single_neuron[1]] > 0:
-                single_neuron_response[increment] = 1
+                single_neuron_response[increment] = fr[single_neuron[0], single_neuron[1]]
 
         return single_neuron_response, r
+
+    def update_rate_map(self, headDirection, velocity, grid_cell_rate):
+        increment = 1
+        r = grid_cell_rate
+
+        for iter in range(len(velocity)):
+            theta_v = headDirection[iter]
+            vel = velocity[iter]
+
+            left = -np.cos(theta_v)
+            right = np.cos(theta_v)
+            up = np.sin(theta_v)
+            down = -np.sin(theta_v)
+
+            increment += 1
+
+            # Break feedforward input into its directional components
+            # Equation (4)
+            rfield = self.venvelope * (
+                    (1 + self.alpha * vel * right) * self.typeR
+                    + (1 + self.alpha * vel * left) * self.typeL
+                    + (1 + self.alpha * vel * up) * self.typeU
+                    + (1 + self.alpha * vel * down) * self.typeD
+            )
+
+            # Convolute population activity with shifted symmetric weights.
+            # real() is implemented for octave compatibility
+            convolution = np.real(
+                ifft2(
+                    fft2(r * self.typeR) * self.ftr_small
+                    + fft2(r * self.typeL) * self.ftl_small
+                    + fft2(r * self.typeD) * self.ftd_small
+                    + fft2(r * self.typeU) * self.ftu_small
+                )
+            )
+
+            # Add feedforward inputs to the shifted population activity to
+            # yield the new population activity.
+            rfield += convolution
+
+            # Neural Transfer Function
+            fr = np.maximum(rfield, 0)
+
+            # Neuron dynamics (Eq. 1)
+            r_old = r
+            r_new = np.minimum(10, (self.time_step_dt / self.tau) * (5 * fr - r_old) + r_old)
+            r = r_new
+
+        return r
 
 
 def npRelu(x):
