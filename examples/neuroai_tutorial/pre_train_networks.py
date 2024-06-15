@@ -14,7 +14,7 @@ from neuralplayground.plotting import plot_trajectory_place_cells_activity, plot
 from neuralplayground.config import load_plot_config
 
 
-def main(activation="relu"):
+def main(activation="tanh"):
 
     print("Pre-training the network")
     print("Activation function: ", activation)

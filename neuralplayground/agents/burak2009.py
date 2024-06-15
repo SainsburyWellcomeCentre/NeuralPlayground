@@ -287,9 +287,11 @@ class Burak2009(AgentCore):
 
         return single_neuron_response, r
 
-    def update_rate_map(self, headDirection, velocity, grid_cell_rate):
+    def update_rate_map(self, headDirection, velocity, grid_cell_rate, get_pattern_change=False):
         increment = 1
         r = grid_cell_rate
+        if get_pattern_change:
+            pattern_change = np.zeros(r.shape)
 
         for iter in range(len(velocity)):
             theta_v = headDirection[iter]
@@ -304,12 +306,15 @@ class Burak2009(AgentCore):
 
             # Break feedforward input into its directional components
             # Equation (4)
-            rfield = self.venvelope * (
-                    (1 + self.alpha * vel * right) * self.typeR
-                    + (1 + self.alpha * vel * left) * self.typeL
-                    + (1 + self.alpha * vel * up) * self.typeU
-                    + (1 + self.alpha * vel * down) * self.typeD
-            )
+            velocity_input = (1 + self.alpha * vel * right) * self.typeR \
+                              + (1 + self.alpha * vel * left) * self.typeL \
+                              + (1 + self.alpha * vel * up) * self.typeU \
+                              + (1 + self.alpha * vel * down) * self.typeD
+            up_vel = (1 + self.alpha * vel * up) * self.typeU
+            down_vel = (1 + self.alpha * vel * down) * self.typeD
+            left_vel = (1 + self.alpha * vel * left) * self.typeL
+            right_vel = (1 + self.alpha * vel * right) * self.typeR
+            rfield = self.venvelope * (up_vel + down_vel + left_vel + right_vel)
 
             # Convolute population activity with shifted symmetric weights.
             # real() is implemented for octave compatibility
@@ -325,6 +330,17 @@ class Burak2009(AgentCore):
             # Add feedforward inputs to the shifted population activity to
             # yield the new population activity.
             rfield += convolution
+            if get_pattern_change:
+                non_linear_der = (rfield > 0).astype(float)
+                delta_conv = np.real(
+                    ifft2(
+                        fft2(non_linear_der * right_vel * self.typeR) * self.ftr_small
+                        + fft2(non_linear_der * left_vel * self.typeL) * self.ftl_small
+                        + fft2(non_linear_der * down_vel * self.typeD) * self.ftd_small
+                        + fft2(non_linear_der * up_vel * self.typeU) * self.ftu_small
+                    )
+                )
+                pattern_change += delta_conv
 
             # Neural Transfer Function
             fr = np.maximum(rfield, 0)
@@ -334,7 +350,10 @@ class Burak2009(AgentCore):
             r_new = np.minimum(10, (self.time_step_dt / self.tau) * (5 * fr - r_old) + r_old)
             r = r_new
 
-        return r
+        if get_pattern_change:
+            return r, pattern_change
+        else:
+            return r
 
 
 def npRelu(x):
