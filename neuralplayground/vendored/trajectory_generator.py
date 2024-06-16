@@ -45,13 +45,11 @@ class TrajectoryGenerator(object):
         is_near_wall = (d_wall < self.border_region) * (np.abs(a_wall) < np.pi / 2)
         turn_angle = np.zeros_like(hd)
         turn_angle[is_near_wall] = np.sign(a_wall[is_near_wall]) * (np.pi / 2 - np.abs(a_wall[is_near_wall]))
-
         return is_near_wall, turn_angle
 
     def generate_trajectory(self, room_width, room_depth, batch_size):
         """Generate a random walk in a rectangular box"""
         samples = self.sequence_length
-        # TODO: Convert this number to arguments of the generator
         dt = 0.02  # time step increment (seconds)
         sigma = 5.76 * 2  # stdev rotation velocity (rads/sec)
         b = 0.13 * 2 * np.pi  # forward velocity rayleigh dist scale (m/sec)

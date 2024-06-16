@@ -44,56 +44,6 @@ class Burak2009(AgentCore):
         if compute_sorscher_weights:
             self._initialize_explicit_weights()
 
-    def _initialize_explicit_weights(self):
-        """ This is from Sorscher equations 35, 36 abd 38 """
-        self.k0 = np.array([1, 0])
-        self.k60 = np.array([0.5, np.sqrt(3) / 2])
-        self.k120 = np.array([-0.5, np.sqrt(3) / 2])
-        self.k_vec = np.stack([self.k0, self.k60, self.k120], axis=0)
-        self.L = np.sqrt(self.n_neurons).astype(int)
-
-        Jij = np.zeros((self.n_neurons, self.n_neurons))
-        grid_location = np.arange(self.L)
-
-        print("Building recurrent matrix")
-        sheet_locations = []
-        for i in range(self.L):
-            for j in range(self.L):
-                sheet_locations.append(np.array([grid_location[i], grid_location[j]]))
-        sheet_locations = np.stack(sheet_locations, axis=0)
-        Mx = np.mod(sheet_locations[:, 1], 2)*((-1)**(sheet_locations[:, 0]))
-        My = np.mod(sheet_locations[:, 1]+1, 2)*((-1)**(sheet_locations[:, 0]))
-        Mixy = np.stack([Mx, My], axis=1)
-        for i in range(self.n_neurons):
-            si = sheet_locations[i, :]
-            for j in range(self.n_neurons):
-                sj = sheet_locations[j, :]
-                if self.offset_weights:
-                    s_diff = si - sj - Mixy[j, :]
-                else:
-                    s_diff = si - sj
-                Jij[i, j] = self.weight_function(s_diff[:, np.newaxis])
-        self.Jij = Jij
-        self.Mixy = Mixy
-        self.bi = np.ones((self.n_neurons, 1))*0.1
-        self.sheet_locations = sheet_locations
-        print("debug")
-
-    def rate_update(self, rates, velocity):
-        matrix_product = self.Jij @ rates
-        velocity_product = self.Mixy @ velocity
-        new_rates = matrix_product + velocity_product #+ self.bi
-        return npRelu(new_rates)
-        #return np.clip(new_rates, 0, 10)
-        #return npsigmoid(new_rates)
-
-    def weight_function(self, x):
-        # Make sure x.shape = (dim, 1), eq 37 in Sorscher
-        inner = 2*np.pi/self.L*(self.k_vec @ x)
-        element_wise_cos = np.cos(inner)
-        return np.sum(element_wise_cos)
-
-
     def _initialize_fourier_weights(self):
         # Padding for convolutions
         self.big = 2 * self.n_neurons
@@ -354,14 +304,6 @@ class Burak2009(AgentCore):
             return r, pattern_change
         else:
             return r
-
-
-def npRelu(x):
-    return np.maximum(0, x)
-
-
-def npsigmoid(z):
-    return 1/(1 + np.exp(-z))
 
 
 if __name__ == "__main__":
