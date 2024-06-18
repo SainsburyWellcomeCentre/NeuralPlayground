@@ -29,7 +29,7 @@ dependencies = [
   "tqdm",
   "jupyter",
   "ipython",
-  "matplotlib",
+  "matplotlib < 3.9.0",
   "deepdiff",
   "opencv-python",
   "gymnasium",
