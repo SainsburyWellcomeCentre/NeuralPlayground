@@ -143,9 +143,22 @@ class Sorscher2022exercise(object):
 
         return self.loss_hist, self.pos_err_hist
 
-    def save_model(self, path):
-        # torch.save(self.state_dict(), path+".torch")
+    def save_model(self, path, cpu=False):
+        if cpu:
+            self.convert_params_to_cpu()
         pickle.dump(self.__dict__, open(path+".pkl", "wb"))
+
+    def convert_params_to_cpu(self):
+        self.encoder_W = self.encoder_W.cpu()
+        self.recurrent_W = self.recurrent_W.cpu()
+        self.velocity_W = self.velocity_W.cpu()
+        self.decoder_W = self.decoder_W.cpu()
+
+    def convert_params_to_gpu(self):
+        self.encoder_W = self.encoder_W.to(self.device)
+        self.recurrent_W = self.recurrent_W.to(self.device)
+        self.velocity_W = self.velocity_W.to(self.device)
+        self.decoder_W = self.decoder_W.to(self.device)
 
     def load_model(self, path):
         # self.load_state_dict(torch.load(path))
