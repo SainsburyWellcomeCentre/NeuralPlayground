@@ -49,9 +49,9 @@ def main(activation="tanh"):
                              device=device)
 
     # Real RNN parameters
-    n_grid_cells = 32 ** 2  # needs to be the square of a number for later analysis
-    learning_rate = 2e-4
-    training_steps = int(2e5)
+    n_grid_cells = 24 ** 2  # needs to be the square of a number for later analysis
+    learning_rate = 5e-4
+    training_steps = int(1e5)
     weight_decay = 1e-4
 
     generator = TrajectoryGenerator(sequence_length, batch_size, room_width, room_depth, device,
@@ -74,12 +74,13 @@ def main(activation="tanh"):
                                     weight_decay=weight_decay,
                                     place_cells=place_cells,
                                     activation=activation,
-                                    learning_rate=learning_rate)
+                                    learning_rate=learning_rate,
+                                    device=device)
 
     loss_hist, pos_err_hist = real_rnn.train_RNN(gen, training_steps)
 
     # Save the model
-    save_path = "tmp_tutorial_model/long_pre_trained_"+activation
+    save_path = "tmp_tutorial_model/long_pre_trained_"+activation+".tar"
     real_rnn.save_model(save_path)
 
 

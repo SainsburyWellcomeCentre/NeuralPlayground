@@ -5,10 +5,10 @@ from tqdm import tqdm
 import pandas as pd
 
 
-class Sorscher2022exercise(object):
+class Sorscher2022exercise(torch.nn.Module):
     def __init__(
-        self, Ng, Np, sequence_length, weight_decay, place_cells, activation=torch.nn.ReLU, learning_rate=5e-3,
-            device="cuda", learning_rule="adam"
+        self, Ng, Np, sequence_length, weight_decay, place_cells, device,
+            activation=torch.nn.ReLU, learning_rate=5e-3, learning_rule="adam"
     ):
         super().__init__()
         self.Ng = Ng
@@ -17,26 +17,24 @@ class Sorscher2022exercise(object):
         self.weight_decay = weight_decay
         self.place_cells = place_cells
         self.activation = activation
+        self.learning_rate = learning_rate
+        self.device = device
+        self.dtype = torch.float32
         if activation == "tanh":
             self.non_linearity = torch.tanh
         elif activation == "relu":
             self.non_linearity = torch.nn.ReLU()
         else:
             self.non_linearity = torch.nn.Identity()
-        self.learning_rate = learning_rate
-        self.device = device
-        self.dtype = torch.float32
         self._initialize_weights()
         if learning_rule == "adam":
-            self.optimizer = torch.optim.Adam([self.encoder_W,
-                                              self.recurrent_W,
-                                              self.velocity_W,
-                                              self.decoder_W], lr=self.learning_rate)
+            self.optimizer = torch.optim.Adam(self.parameters(), lr=self.learning_rate)
         elif learning_rule == "rmsprop":
-            self.optimizer = torch.optim.RMSprop([self.encoder_W,
-                                                 self.recurrent_W,
-                                                 self.velocity_W,
-                                                 self.decoder_W], lr=self.learning_rate)
+            self.optimizer = torch.optim.RMSprop(self.parameters(), lr=self.learning_rate)
+        self.loss_hist = []
+        self.pos_err_hist = []
+        self.to(self.device)
+
 
     def _initialize_weights(self):
         # Input weights
@@ -48,10 +46,14 @@ class Sorscher2022exercise(object):
         np_velocity_W = np.random.uniform(-np.sqrt(k_g), np.sqrt(k_g), size=(self.Ng, 2))
         np_decoder_W = np.random.uniform(-np.sqrt(k_p), np.sqrt(k_p), size=(self.Ng, self.Np))
 
-        self.encoder_W = torch.tensor(np_encoder_W, requires_grad=True, dtype=self.dtype, device=self.device)
-        self.recurrent_W = torch.tensor(recurrent_W, requires_grad=True, dtype=self.dtype, device=self.device)
-        self.velocity_W = torch.tensor(np_velocity_W, requires_grad=True, dtype=self.dtype, device=self.device)
-        self.decoder_W = torch.tensor(np_decoder_W, requires_grad=True, dtype=self.dtype, device=self.device)
+        self.encoder_W = torch.nn.Parameter(torch.tensor(np_encoder_W, dtype=self.dtype, device=self.device),
+                                            requires_grad=True)
+        self.recurrent_W = torch.nn.Parameter(torch.tensor(recurrent_W, dtype=self.dtype, device=self.device),
+                                              requires_grad=True)
+        self.velocity_W = torch.nn.Parameter(torch.tensor(np_velocity_W, dtype=self.dtype, device=self.device),
+                                             requires_grad=True)
+        self.decoder_W = torch.nn.Parameter(torch.tensor(np_decoder_W, dtype=self.dtype, device=self.device),
+                                            requires_grad=True)
 
         self.softmax = torch.nn.Softmax(dim=-1)
 
@@ -126,45 +128,48 @@ class Sorscher2022exercise(object):
         """
         Perform backpropagation through time and update weights.
         """
-        loss_hist = []
-        pos_err_hist = []
-
         for i in tqdm(range(training_steps)):
             # Inputs below is a tuple with velocity vector and initial place cell activity
             # pc outputs is the place cell activity for the whole trajectory, these are the target of the bptt step
             inputs, pc_outputs, positions = next(data_generator)
             loss, pos_err = self.bptt_update(inputs=inputs, place_cells_activity=pc_outputs, position=positions)
-            loss_hist.append(loss)
-            pos_err_hist.append(pos_err)
-
-        # Save training results for later
-        self.loss_hist = np.array(loss_hist)
-        self.pos_err_hist = np.array(pos_err_hist)
+            self.loss_hist.append(loss)
+            self.pos_err_hist.append(pos_err)
 
         return self.loss_hist, self.pos_err_hist
 
-    def save_model(self, path, cpu=False):
-        if cpu:
-            self.convert_params_to_cpu()
-        pickle.dump(self.__dict__, open(path+".pkl", "wb"))
-
-    def convert_params_to_cpu(self):
-        self.encoder_W = self.encoder_W.cpu()
-        self.recurrent_W = self.recurrent_W.cpu()
-        self.velocity_W = self.velocity_W.cpu()
-        self.decoder_W = self.decoder_W.cpu()
-
-    def convert_params_to_gpu(self):
-        self.encoder_W = self.encoder_W.to(self.device)
-        self.recurrent_W = self.recurrent_W.to(self.device)
-        self.velocity_W = self.velocity_W.to(self.device)
-        self.decoder_W = self.decoder_W.to(self.device)
+    def save_model(self, path):
+        torch.save({
+            'loss_hist': self.loss_hist,
+            'pos_err_hist': self.pos_err_hist,
+            'Ng': self.Ng,
+            'Np': self.Np,
+            'sequence_length': self.sequence_length,
+            'weight_decay': self.weight_decay,
+            'activation': self.activation,
+            'learning_rate': self.learning_rate,
+            'device': self.device,
+            'non_linearity': self.non_linearity,
+            'softmax': self.softmax,
+            'model_state_dict': self.state_dict(),
+            'optimizer_state_dict': self.optimizer.state_dict(),
+        }, path)
 
     def load_model(self, path):
-        # self.load_state_dict(torch.load(path))
-        # self.eval()
-        self.__dict__ = pd.read_pickle(path+".pkl")
-        return self
+        checkpoint = torch.load(path, map_location=self.device)
+        self.loss_hist = checkpoint['loss_hist']
+        self.pos_err_hist = checkpoint['pos_err_hist']
+        self.Ng = checkpoint['Ng']
+        self.Np = checkpoint['Np']
+        self.sequence_length = checkpoint['sequence_length']
+        self.weight_decay = checkpoint['weight_decay']
+        self.activation = checkpoint['activation']
+        self.learning_rate = checkpoint['learning_rate']
+        self.device = checkpoint['device']
+        self.non_linearity = checkpoint['non_linearity']
+        self.softmax = checkpoint['softmax']
+        self.load_state_dict(checkpoint['model_state_dict'])
+        self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
 
 
 class SorscherIdealRNN(object):
