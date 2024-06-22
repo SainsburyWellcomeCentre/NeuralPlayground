@@ -185,6 +185,9 @@ class Burak2009(AgentCore):
         single_neuron_response = np.zeros(sampling_length)
         single_neuron = [self.n_neurons // 2, self.n_neurons // 2]
 
+        # ADDED THIS: store firing rate of whole population
+        frs = [grid_cell_rate]
+
         for iter in tqdm(range(sampling_length - 20)):
             theta_v = headDirection[increment]
             vel = np.sqrt(
@@ -235,7 +238,11 @@ class Burak2009(AgentCore):
             if fr[single_neuron[0], single_neuron[1]] > 0:
                 single_neuron_response[increment] = fr[single_neuron[0], single_neuron[1]]
 
-        return single_neuron_response, r
+            # ADDED THIS: every 10 steps (could be optional parameter), store firing rate of whole population
+            if iter % 10 == 0:
+                frs.append(fr)
+
+        return single_neuron_response, r, frs
 
     def update_rate_map(self, headDirection, velocity, grid_cell_rate, get_pattern_change=False):
         increment = 1
