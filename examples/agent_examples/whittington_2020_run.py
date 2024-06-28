@@ -14,8 +14,8 @@ from neuralplayground.backend import SingleSim, tem_training_loop
 from neuralplayground.experiments import Sargolini2006Data
 
 # Set the location for saving the results of the simulation
-simulation_id = "TEM_custom_sim"
-save_path = os.path.join(os.getcwd(), "results_sim")
+simulation_id = "TEM_big_50K"
+save_path = os.path.join(os.getcwd(), "results_big_50K")
 # save_path = os.path.join(os.getcwd(), "examples", "agent_examples", "trained_results")
 agent_class = Whittington2020
 env_class = BatchEnvironment
@@ -26,40 +26,40 @@ full_agent_params = params.copy()
 
 # Set the x and y limits for the arena
 arena_x_limits = [
-    [-5, 5],
-    [-4, 4],
-    [-5, 5],
-    [-6, 6],
-    [-4, 4],
-    [-5, 5],
-    [-6, 6],
-    [-5, 5],
-    [-4, 4],
-    [-5, 5],
-    [-6, 6],
-    [-5, 5],
-    [-4, 4],
-    [-5, 5],
-    [-6, 6],
-    [-5, 5],
+    [-10, 10],
+    [-8, 8],
+    [-10, 10],
+    [-12, 12],
+    [-8, 8],
+    [-10, 10],
+    [-12, 12],
+    [-10, 10],
+    [-8, 8],
+    [-10, 10],
+    [-12, 12],
+    [-10, 10],
+    [-8, 8],
+    [-10, 10],
+    [-12, 12],
+    [-10, 10],
 ]
 arena_y_limits = [
-    [-5, 5],
-    [-4, 4],
-    [-5, 5],
-    [-6, 6],
-    [-4, 4],
-    [-5, 5],
-    [-6, 6],
-    [-5, 5],
-    [-4, 4],
-    [-5, 5],
-    [-6, 6],
-    [-5, 5],
-    [-4, 4],
-    [-5, 5],
-    [-6, 6],
-    [-5, 5],
+    [-10, 10],
+    [-8, 8],
+    [-10, 10],
+    [-12, 12],
+    [-8, 8],
+    [-10, 10],
+    [-12, 12],
+    [-10, 10],
+    [-8, 8],
+    [-10, 10],
+    [-12, 12],
+    [-10, 10],
+    [-8, 8],
+    [-10, 10],
+    [-12, 12],
+    [-10, 10],
 ]
 
 # Set parameters for the environment that generates observations
