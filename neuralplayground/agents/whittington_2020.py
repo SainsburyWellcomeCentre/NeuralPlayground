@@ -550,7 +550,8 @@ class Whittington2020(AgentCore):
                 rate_map_mat = self.get_rate_map_matrix(rate_maps, i, j)
 
                 # Plot the rate map in the corresponding subplot
-                make_plot_rate_map(rate_map_mat, axs[ax_row, ax_col], f"Cell {j+1}", "", "", "")
+                # make_plot_rate_map(rate_map_mat, axs[ax_row, ax_col], f"Cell {j+1}", "", "", "")
+                make_plot_rate_map(rate_map_mat[::-1, :], axs[ax_row, ax_col], f"Cell {j+1}", "", "", "")
 
             # Hide unused subplots for the current frequency
             for j in range(n_cells, num_rows * num_cols):

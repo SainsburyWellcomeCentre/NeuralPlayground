@@ -82,6 +82,7 @@ class PlotSim(object):
         save_path : str
             The path where the results of the simulation will be saved
         """
+        n_walks = self.plotting_loop_params["n_walk"]
         # Initializing models
         print("---> Initializing models")
         agent, env = self._init_models()
