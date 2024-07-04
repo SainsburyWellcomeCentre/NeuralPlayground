@@ -1,11 +1,10 @@
 #!/bin/bash
 # Set the job name variable
-NAME="TEM_big_50K"
-#SBATCH --job-name=$NAME
+#SBATCH --job-name=TEM_huge_50K
 #SBATCH --mem=50000 # memory pool for all cores
 #SBATCH --time=72:00:00 # time
-#SBATCH -o TEM_logs/$NAME.%N.%j.out # STDOUT
-#SBATCH -e TEM_logs/$NAME.%N.%j.err # STDERR
+#SBATCH -o TEM_logs/TEM_huge_50K.%N.%j.out # STDOUT
+#SBATCH -e TEM_logs/TEM_huge_50K.%N.%j.err # STDERR
 #SBATCH -p gpu
 #SBATCH --gres=gpu:1
 #SBATCH --ntasks=1
