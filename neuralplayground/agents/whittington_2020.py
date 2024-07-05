@@ -307,6 +307,15 @@ class Whittington2020(AgentCore):
             )
             self.logger.info("Weights:" + str([w for w in loss_weights.numpy()]))
             self.logger.info(" ")
+
+            self.accuracy_history['iter'].append(self.iter)
+            self.accuracy_history['p_accuracy'].append(acc_p)
+            self.accuracy_history['g_accuracy'].append(acc_g)
+            self.accuracy_history['gt_accuracy'].append(acc_gt)
+
+        # Save accuracies periodically (e.g., every 100 iterations)
+        if (self.iter) % 100 == 0:
+            self.save_accuracies()
         # # Also store the internal state (all learnable parameters) and the hyperparameters periodically
         # if self.iter % self.pars["save_interval"] == 0:
         #     torch.save(self.tem.state_dict(), self.model_path + "/tem_" + str(self.iter) + ".pt")
@@ -346,6 +355,11 @@ class Whittington2020(AgentCore):
         # Initialise whether a state has been visited for each world
         self.visited = [[False for _ in range(self.n_states[env])] for env in range(self.pars["batch_size"])]
         self.prev_iter = None
+        self.accuracy_history = {
+            'iter': [],
+            'p_accuracy': [],
+            'g_accuracy': [],
+            'gt_accuracy': []}
 
     def save_agent(self, save_path: str):
         """Save current state and information in general to re-instantiate the agent
@@ -394,6 +408,14 @@ class Whittington2020(AgentCore):
             os.path.join(self.script_path, "whittington_2020_utils.py"),
         )
         return
+    
+    def save_accuracies(self):
+        current_dir = os.path.dirname(os.getcwd())
+        run_path = os.path.join(current_dir, "agent_examples", "results_sim")
+        run_path = os.path.normpath(run_path)
+        accuracy_file = os.path.join(run_path, f"accuracies.pkl")
+        with open(accuracy_file, 'wb') as f:
+            pickle.dump(self.accuracy_history, f)
 
     def action_policy(self):
         """
@@ -499,7 +521,7 @@ class Whittington2020(AgentCore):
         )
         acc_p, acc_g, acc_gt = np.mean([[np.mean(a) for a in step.correct()] for step in forward], axis=0)
         acc_p, acc_g, acc_gt = [a * 100 for a in (acc_p, acc_g, acc_gt)]
-        # self.zero_shot = analyse.zero_shot(forward, tem, environments, include_stay_still=include_stay_still)
+        self.zero_shot = analyse.zero_shot(forward, tem, environments, include_stay_still=include_stay_still)
         # analyse.location_occupation(forward, tem, environments)
         self.g_rates, self.p_rates = analyse.rate_map(forward, tem, environments)
         from_acc, to_acc = analyse.location_accuracy(forward, tem, environments)
@@ -572,3 +594,22 @@ class Whittington2020(AgentCore):
                 int(self.room_depths[0] * self.state_densities[0]),
             ),
         )
+    
+    def plot_accuracies(self, save_path=None):
+        accuracy_data = self.accuracy_history
+        plt.figure(figsize=(10, 6))
+        plt.plot(accuracy_data['iter'], accuracy_data['p_accuracy'], label='p accuracy')
+        plt.plot(accuracy_data['iter'], accuracy_data['g_accuracy'], label='g accuracy')
+        plt.plot(accuracy_data['iter'], accuracy_data['gt_accuracy'], label='gt accuracy')
+        plt.xlabel('Iteration')
+        plt.ylabel('Accuracy (%)')
+        plt.title('TEM Model Accuracies Over Training')
+        plt.legend()
+        plt.grid(True)
+        
+        if save_path:
+            plt.savefig(save_path)
+        else:
+            plt.show()
+        
+        plt.close()

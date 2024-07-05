@@ -211,10 +211,10 @@ class DiscreteObjectEnvironment(Environment):
             )
             new_pos_state = np.concatenate(new_pos_state)
         else:
-            if action[0] == 0:
-                action_rev = np.array([0.0, -action[1]])
-            else:
-                action_rev = action
+            # if action[0] == 0:
+            #     action_rev = np.array([0.0, -action[1]])
+            # else:
+            action_rev = action
             if normalize_step and np.linalg.norm(action) > 0:
                 action_rev = action_rev / np.linalg.norm(action_rev)
                 new_pos_state = np.add(self.state[-1], [self.agent_step_size * e for e in action_rev]).tolist()

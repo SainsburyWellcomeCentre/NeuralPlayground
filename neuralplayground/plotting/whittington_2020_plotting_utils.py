@@ -120,8 +120,6 @@ class PlotSim(object):
         # Run around environment
         observation, state = env.reset(random_state=random_state, custom_state=custom_state)
         while agent.n_walk < n_walks:
-            if agent.n_walk % 1000 == 0 and agent.n_walk > 0:
-                print(agent.n_walk)
             action = agent.batch_act(observation)
             observation, state, reward = env.step(action, normalize_step=True)
         return agent, env
