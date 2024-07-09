@@ -85,6 +85,7 @@ class Whittington2020(AgentCore):
         super().__init__()
         self.mod_kwargs = mod_kwargs.copy()
         params = mod_kwargs["params"]
+        self.save_name = mod_kwargs["save_name"]
         self.room_widths = mod_kwargs["room_widths"]
         self.room_depths = mod_kwargs["room_depths"]
         self.state_densities = mod_kwargs["state_densities"]
@@ -347,7 +348,7 @@ class Whittington2020(AgentCore):
         # self.writer = SummaryWriter(self.train_path)
         # Create a logger to write log output to file
         current_dir = os.path.dirname(os.getcwd())
-        run_path = os.path.join(current_dir, "agent_examples", "results_sim")
+        run_path = os.path.join(current_dir, "agent_examples", self.save_name)
         run_path = os.path.normpath(run_path)
         self.logger = utils.make_logger(run_path)
         # Make an ADAM optimizer for TEM
@@ -411,7 +412,7 @@ class Whittington2020(AgentCore):
     
     def save_accuracies(self):
         current_dir = os.path.dirname(os.getcwd())
-        run_path = os.path.join(current_dir, "agent_examples", "results_sim")
+        run_path = os.path.join(current_dir, "agent_examples", self.save_name)
         run_path = os.path.normpath(run_path)
         accuracy_file = os.path.join(run_path, f"accuracies.pkl")
         with open(accuracy_file, 'wb') as f:

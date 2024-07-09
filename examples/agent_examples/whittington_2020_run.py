@@ -14,7 +14,7 @@ from neuralplayground.backend import SingleSim, tem_training_loop
 from neuralplayground.experiments import Sargolini2006Data
 
 # Set the location for saving the results of the simulation
-simulation_id = "TEM_results_test"
+simulation_id = "TEM_results_2SD_50K"
 save_path = os.path.join(os.getcwd(), simulation_id)
 # save_path = os.path.join(os.getcwd(), "examples", "agent_examples", "trained_results")
 agent_class = Whittington2020
@@ -96,6 +96,7 @@ room_depths = [int(np.diff(arena_y_limits)[i]) for i in range(env_params["batch_
 # Set parameters for the agent
 agent_params = {
     "model_name": "Whittington2020",
+    "save_name": str(simulation_id)[4:],
     "params": full_agent_params,
     "batch_size": env_params["batch_size"],
     "room_widths": room_widths,
@@ -105,7 +106,7 @@ agent_params = {
 }
 
 # Full model training consists of 20000 episodes
-training_loop_params = {"n_episode": 101, "params": full_agent_params}
+training_loop_params = {"n_episode": 50000, "params": full_agent_params,'random_state': False, 'custom_state': [0.0, 0.0]}
 
 # Create the training simulation object
 sim = SingleSim(

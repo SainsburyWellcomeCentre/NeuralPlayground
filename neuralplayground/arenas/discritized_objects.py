@@ -109,13 +109,13 @@ class DiscreteObjectEnvironment(Environment):
         self.resolution_w = int(self.state_density * self.room_width)
         self.resolution_d = int(self.state_density * self.room_depth)
         self.x_array = np.linspace(
-            -self.room_width / 2 + (1 / 2 * self.state_density),
-            self.room_width / 2 - (1 / 2 * self.state_density),
+            -(self.room_width / 2) + (1 / (2 * self.state_density)),
+            (self.room_width / 2) - (1 / (2 * self.state_density)),
             num=self.resolution_w,
         )
         self.y_array = np.linspace(
-            -self.room_depth / 2 + (1 / 2 * self.state_density),
-            self.room_depth / 2 - (1 / 2 * self.state_density),
+            -(self.room_depth / 2) + (1 / (2 * self.state_density)),
+            (self.room_depth / 2) - (1 / (2 * self.state_density)),
             num=self.resolution_d,
         )
         self.mesh = np.array(np.meshgrid(self.x_array, self.y_array))
@@ -160,6 +160,11 @@ class DiscreteObjectEnvironment(Environment):
         if custom_state is not None:
             pos = np.array(custom_state)
 
+        # Snap the initial position to the nearest discrete state
+        x_index = np.argmin(np.abs(self.x_array - pos[0]))
+        y_index = np.argmin(np.abs(self.y_array - pos[1]))
+        pos = np.array([self.x_array[x_index], self.y_array[y_index]])
+
         # Reset to first position recorded in this session
         if self.use_behavioral_data:
             pos, head_dir = self.experiment.position[0, :], self.experiment.head_direction[0, :]
@@ -172,7 +177,7 @@ class DiscreteObjectEnvironment(Environment):
         self.state = observation
         return observation, self.state
 
-    def step(self, action: np.ndarray, normalize_step: bool = False, skip_every: int = 10):
+    def step(self, action: np.ndarray, normalize_step: bool = True, skip_every: int = 10):
         """
         Runs the environment dynamics. Increasing global counters. Given some action, return observation,
         new state and reward.
@@ -210,19 +215,20 @@ class DiscreteObjectEnvironment(Environment):
                 self.experiment.head_direction[self.global_steps * skip_every, :],
             )
             new_pos_state = np.concatenate(new_pos_state)
-        else:
-            # if action[0] == 0:
-            #     action_rev = np.array([0.0, -action[1]])
-            # else:
+        if not self.use_behavioral_data:
             action_rev = action
-            if normalize_step and np.linalg.norm(action) > 0:
-                action_rev = action_rev / np.linalg.norm(action_rev)
+            if normalize_step:
                 new_pos_state = np.add(self.state[-1], [self.agent_step_size * e for e in action_rev]).tolist()
             else:
                 new_pos_state = np.add(self.state[-1], action_rev).tolist()
-            new_pos_state, valid_action = self.validate_action(
+            new_pos_state, invalid_action = self.validate_action(
                 self.state[-1], [self.agent_step_size * e for e in action_rev], new_pos_state[:2]
             )
+            
+            # Ensure the new position is snapped to a discrete state
+            x_index = np.argmin(np.abs(self.x_array - new_pos_state[0]))
+            y_index = np.argmin(np.abs(self.y_array - new_pos_state[1]))
+            new_pos_state = [self.x_array[x_index], self.y_array[y_index]]
         reward = self.reward_function(action, self.state[-1])  # If you get reward, it should be coded here
         observation = self.make_object_observation(new_pos_state)
         self.state = observation
@@ -345,6 +351,12 @@ class DiscreteObjectEnvironment(Environment):
         for wall in self.wall_list:
             new_state, crossed = check_crossing_wall(pre_state=pre_state, new_state=np.asarray(new_state), wall=wall)
             crossed_wall = crossed or crossed_wall
+        
+        # Snap the new_state back to the nearest discrete state
+        x_index = np.argmin(np.abs(self.x_array - new_state[0]))
+        y_index = np.argmin(np.abs(self.y_array - new_state[1]))
+        new_state = np.array([self.x_array[x_index], self.y_array[y_index]])
+        
         return new_state, crossed_wall
 
     def plot_trajectory(
