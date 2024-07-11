@@ -14,7 +14,7 @@ from neuralplayground.backend import SingleSim, tem_training_loop
 from neuralplayground.experiments import Sargolini2006Data
 
 # Set the location for saving the results of the simulation
-simulation_id = "TEM_results_small"
+simulation_id = "TEM_results_new"
 save_path = os.path.join(os.getcwd(), simulation_id)
 # save_path = os.path.join(os.getcwd(), "examples", "agent_examples", "trained_results")
 agent_class = Whittington2020
@@ -26,48 +26,48 @@ full_agent_params = params.copy()
 
 # Set the x and y limits for the arena
 arena_x_limits = [
-    [-3, 3],
-    [-2, 2],
-    [-3, 3],
-    [-3, 3],
-    [-2, 2],
-    [-3, 3],
-    [-1, 1],
-    [-3, 3],
-    [-2, 2],
-    [-3, 3],
-    [-1, 1],
-    [-3, 3],
-    [-2, 2],
-    [-3, 3],
-    [-1, 1],
-    [-3, 3],
+    [-5, 5],
+    [-4, 4],
+    [-5, 5],
+    [-6, 6],
+    [-4, 4],
+    [-5, 5],
+    [-6, 6],
+    [-5, 5],
+    [-4, 4],
+    [-5, 5],
+    [-6, 6],
+    [-5, 5],
+    [-4, 4],
+    [-5, 5],
+    [-6, 6],
+    [-5, 5],
 ]
 arena_y_limits = [
-    [-3, 3],
-    [-2, 2],
-    [-3, 3],
-    [-3, 3],
-    [-2, 2],
-    [-3, 3],
-    [-1, 1],
-    [-3, 3],
-    [-2, 2],
-    [-3, 3],
-    [-1, 1],
-    [-3, 3],
-    [-2, 2],
-    [-3, 3],
-    [-1, 1],
-    [-3, 3],
+    [-5, 5],
+    [-4, 4],
+    [-5, 5],
+    [-6, 6],
+    [-4, 4],
+    [-5, 5],
+    [-6, 6],
+    [-5, 5],
+    [-4, 4],
+    [-5, 5],
+    [-6, 6],
+    [-5, 5],
+    [-4, 4],
+    [-5, 5],
+    [-6, 6],
+    [-5, 5],
 ]
 
 # Set parameters for the environment that generates observations
 discrete_env_params = {
     "environment_name": "DiscreteObject",
-    "state_density": 1,
+    "state_density": 2,
     "n_objects": params["n_x"],
-    "agent_step_size": 1, # Note: this must be 1 / state density
+    "agent_step_size": 1/2, # Note: this must be 1 / state density
     "use_behavioural_data": False,
     "data_path": None,
     "experiment_class": Sargolini2006Data,

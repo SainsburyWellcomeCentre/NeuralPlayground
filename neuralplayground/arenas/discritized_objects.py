@@ -312,17 +312,18 @@ class DiscreteObjectEnvironment(Environment):
         """
         self.default_walls = []
         self.default_walls.append(
-            np.array([[self.arena_limits[0, 0], self.arena_limits[1, 0]], [self.arena_limits[0, 0], self.arena_limits[1, 1]]])
+            np.array([[self.arena_limits[0, 0] - 0.1, self.arena_limits[1, 0] + 0.1], [self.arena_limits[0, 0] - 0.1, self.arena_limits[1, 1] + 0.1]])
         )
         self.default_walls.append(
-            np.array([[self.arena_limits[0, 1], self.arena_limits[1, 0]], [self.arena_limits[0, 1], self.arena_limits[1, 1]]])
+            np.array([[self.arena_limits[0, 1] + 0.1, self.arena_limits[1, 0] - 0.1], [self.arena_limits[0, 1] + 0.1, self.arena_limits[1, 1] + 0.1]])
         )
         self.default_walls.append(
-            np.array([[self.arena_limits[0, 0], self.arena_limits[1, 0]], [self.arena_limits[0, 1], self.arena_limits[1, 0]]])
+            np.array([[self.arena_limits[0, 0] - 0.1, self.arena_limits[1, 0] - 0.1], [self.arena_limits[0, 1] + 0.1, self.arena_limits[1, 0] - 0.1]])
         )
         self.default_walls.append(
-            np.array([[self.arena_limits[0, 0], self.arena_limits[1, 1]], [self.arena_limits[0, 1], self.arena_limits[1, 1]]])
+            np.array([[self.arena_limits[0, 0] - 0.1, self.arena_limits[1, 1] + 0.1], [self.arena_limits[0, 1] + 0.1, self.arena_limits[1, 1] + 0.1]])
         )
+
 
     def _create_custom_walls(self):
         """Custom walls method. In this case is empty since the environment is a simple square room
