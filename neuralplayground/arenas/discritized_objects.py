@@ -98,32 +98,30 @@ class DiscreteObjectEnvironment(Environment):
         self.arena_limits = np.array(
             [[self.arena_x_limits[0], self.arena_x_limits[1]], [self.arena_y_limits[0], self.arena_y_limits[1]]]
         )
-        self.room_width = np.diff(self.arena_x_limits)[0]
-        self.room_depth = np.diff(self.arena_y_limits)[0]
+        self.room_width = self.arena_x_limits[1] - self.arena_x_limits[0]
+        self.room_depth = self.arena_y_limits[1] - self.arena_y_limits[0]
         self.agent_step_size = env_kwargs["agent_step_size"]
         self._create_default_walls()
         self._create_custom_walls()
         self.wall_list = self.default_walls + self.custom_walls
 
         # Variables for discretised state space
-        self.resolution_w = int(self.state_density * self.room_width)
-        self.resolution_d = int(self.state_density * self.room_depth)
-        self.x_array = np.linspace(
-            -(self.room_width / 2) + (1 / (2 * self.state_density)),
-            (self.room_width / 2) - (1 / (2 * self.state_density)),
-            num=self.resolution_w,
-        )
-        self.y_array = np.linspace(
-            -(self.room_depth / 2) + (1 / (2 * self.state_density)),
-            (self.room_depth / 2) - (1 / (2 * self.state_density)),
-            num=self.resolution_d,
-        )
-        self.mesh = np.array(np.meshgrid(self.x_array, self.y_array))
-        self.xy_combination = np.stack(np.array(np.meshgrid(self.x_array, self.y_array)), axis=-1)
+        self.resolution_w = int(self.room_width * self.state_density)
+        self.resolution_d = int(self.room_depth * self.state_density)
+        self.state_size = 1 / self.state_density
+
+        self.x_array = np.linspace(self.arena_x_limits[0] + self.state_size/2, 
+                                   self.arena_x_limits[1] - self.state_size/2, 
+                                   self.resolution_w)
+        self.y_array = np.linspace(self.arena_y_limits[0] + self.state_size/2, 
+                                   self.arena_y_limits[1] - self.state_size/2, 
+                                   self.resolution_d)
+        self.mesh = np.meshgrid(self.x_array, self.y_array)
+        self.xy_combination =  np.column_stack([self.mesh[0].ravel(), self.mesh[1].ravel()])
         self.ws = int(self.room_width * self.state_density)
         self.hs = int(self.room_depth * self.state_density)
         self.n_states = self.resolution_w * self.resolution_d
-        self.objects = np.empty(shape=(self.n_states, self.n_objects))
+        self.objects = self.generate_objects()
 
     def reset(self, random_state=True, custom_state=None):
         """
@@ -161,8 +159,8 @@ class DiscreteObjectEnvironment(Environment):
             pos = np.array(custom_state)
 
         # Snap the initial position to the nearest discrete state
-        x_index = np.argmin(np.abs(self.x_array - pos[0]))
-        y_index = np.argmin(np.abs(self.y_array - pos[1]))
+        x_index = np.clip(int((pos[0] - self.arena_x_limits[0]) // self.state_size), 0, self.resolution_w - 1)
+        y_index = np.clip(int((pos[1] - self.arena_y_limits[0]) // self.state_size), 0, self.resolution_d - 1)
         pos = np.array([self.x_array[x_index], self.y_array[y_index]])
 
         # Reset to first position recorded in this session
@@ -224,11 +222,6 @@ class DiscreteObjectEnvironment(Environment):
             new_pos_state, invalid_action = self.validate_action(
                 self.state[-1], [self.agent_step_size * e for e in action_rev], new_pos_state[:2]
             )
-            
-            # Ensure the new position is snapped to a discrete state
-            x_index = np.argmin(np.abs(self.x_array - new_pos_state[0]))
-            y_index = np.argmin(np.abs(self.y_array - new_pos_state[1]))
-            new_pos_state = [self.x_array[x_index], self.y_array[y_index]]
         reward = self.reward_function(action, self.state[-1])  # If you get reward, it should be coded here
         observation = self.make_object_observation(new_pos_state)
         self.state = observation
@@ -245,23 +238,13 @@ class DiscreteObjectEnvironment(Environment):
 
     def generate_objects(self):
         """
-        Generate objects in the environment. In this case, the objects are one-hot encoded vectors.
-        Returns
-        -------
-            objects: ndarray (n_states, n_objects)
-                Array of the objects in the environment, one-hot encoded
+        Randomly assign objects to each state.
         """
-        poss_objects = np.zeros(shape=(self.n_objects, self.n_objects))
-        for i in range(self.n_objects):
-            for j in range(self.n_objects):
-                if j == i:
-                    poss_objects[i][j] = 1
-        # Generate landscape of objects in each environment
-        objects = np.zeros(shape=(self.n_states, self.n_objects))
-        for i in range(self.n_states):
-            rand = random.randint(0, self.n_objects - 1)
-            objects[i, :] = poss_objects[rand]
+        n_states = self.resolution_w * self.resolution_d
+        object_indices = np.random.randint(0, self.n_objects, size=n_states)
+        objects = np.eye(self.n_objects)[object_indices]
         return objects
+
 
     def make_object_observation(self, pos):
         """
@@ -281,25 +264,20 @@ class DiscreteObjectEnvironment(Environment):
         return [index, object, pos]
 
     def pos_to_state(self, pos):
-        """
-        Convert an (x,y) position to a discretised state index
-        Parameters
-        ----------
-            pos: ndarray (2,)
-                Vector of the x and y coordinate of the position of the animal in the environment
-        Returns
-        -------
-            index: int
-                Index of the state in the discretised state space
-        """
+        """Convert an (x,y) position to a discretised state index"""
         if not self.use_behavioral_data and np.shape(pos) == (2, 2):
             pos = pos[0]
         elif self.use_behavioral_data and len(pos) > 2:
             pos = pos[:2]
-        diff = (self.xy_combination - pos) ** 2
-        dist = np.sum(diff**2, axis=-1)
-        index = np.argmin(dist)
-        return index
+        
+        x_index = np.floor((pos[0] - self.arena_x_limits[0]) / self.state_size).astype(int)
+        y_index = np.floor((pos[1] - self.arena_y_limits[0]) / self.state_size).astype(int)
+        
+        # Ensure indices are within bounds
+        x_index = np.clip(x_index, 0, self.resolution_w - 1)
+        y_index = np.clip(y_index, 0, self.resolution_d - 1)
+        
+        return y_index * self.resolution_w + x_index
 
     def _create_default_walls(self):
         """Generate walls to limit the arena based on the limits given in kwargs when initializing the object.
@@ -436,3 +414,56 @@ class DiscreteObjectEnvironment(Environment):
         print(image.shape)
         cv2.imshow("2D_env", image)
         cv2.waitKey(10)
+
+    def visualize_environment(self):
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 10))
+
+        # Visualize discretization
+        ax1.set_title("Environment Discretization")
+        for x in np.arange(self.arena_x_limits[0], self.arena_x_limits[1] + self.state_size, self.state_size):
+            ax1.axvline(x, color='gray', linestyle='-', linewidth=1)
+        for y in np.arange(self.arena_y_limits[0], self.arena_y_limits[1] + self.state_size, self.state_size):
+            ax1.axhline(y, color='gray', linestyle='-', linewidth=1)
+        ax1.scatter(self.xy_combination[:, 0], self.xy_combination[:, 1], color='red', s=20, zorder=2)
+        ax1.set_aspect('equal')
+        ax1.set_xlim(self.arena_x_limits)
+        ax1.set_ylim(self.arena_y_limits)
+        ax1.set_xlabel("X")
+        ax1.set_ylabel("Y")
+
+        # Visualize object assignment
+        ax2.set_title("Object Assignment" + f" (n_objects={self.n_objects})," + f" (n_states={self.n_states})," + f" (grid={self.resolution_w}x{self.resolution_d})")
+        object_grid = np.argmax(self.objects, axis=1).reshape((self.resolution_d, self.resolution_w))
+        im = ax2.imshow(object_grid, cmap='tab20', extent=[*self.arena_x_limits, *self.arena_y_limits], origin='lower')
+        plt.colorbar(im, ax=ax2, label="Object ID")
+
+        # Add text labels for object IDs and scatter plot for xy_combination
+        for i in range(self.resolution_d):
+            for j in range(self.resolution_w):
+                ax2.text(self.x_array[j], self.y_array[i], str(object_grid[i, j]), 
+                         ha='center', va='center', color='white', fontweight='bold')
+        
+        ax2.scatter(self.xy_combination[:, 0], self.xy_combination[:, 1], color='red', s=20, zorder=2)
+
+        ax2.set_aspect('equal')
+        ax2.set_xlim(self.arena_x_limits)
+        ax2.set_ylim(self.arena_y_limits)
+        ax2.set_xlabel("X")
+        ax2.set_ylabel("Y")
+
+        plt.tight_layout()
+        plt.show()
+
+        # Print statistics
+        print(f"Arena dimensions: {self.room_width} x {self.room_depth}")
+        print(f"State density: {self.state_density}")
+        print(f"State size: {self.state_size} x {self.state_size}")
+        print(f"Number of discrete states: {self.resolution_w * self.resolution_d}")
+        print(f"Number of unique objects: {self.n_objects}")
+        print(f"Grid dimensions: {self.resolution_w} x {self.resolution_d}")
+        
+        # Print object distribution
+        unique, counts = np.unique(np.argmax(self.objects, axis=1), return_counts=True)
+        print("\nObject distribution:")
+        for obj, count in zip(unique, counts):
+            print(f"Object {obj}: {count} states ({count/(self.resolution_w * self.resolution_d):.2%})")
