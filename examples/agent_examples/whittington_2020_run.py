@@ -67,7 +67,7 @@ discrete_env_params = {
     "environment_name": "DiscreteObject",
     "state_density": 1,
     "n_objects": params["n_x"],
-    "agent_step_size": 1, # Note: this must be 1 / state density
+    "agent_step_size": 1,  # Note: this must be 1 / state density
     "use_behavioural_data": False,
     "data_path": None,
     "experiment_class": Sargolini2006Data,
@@ -106,7 +106,7 @@ agent_params = {
 }
 
 # Full model training consists of 20000 episodes
-training_loop_params = {"n_episode": 10000, "params": full_agent_params,'random_state': False, 'custom_state': [0.0, 0.0]}
+training_loop_params = {"n_episode": 10000, "params": full_agent_params, "random_state": False, "custom_state": [0.0, 0.0]}
 
 # Create the training simulation object
 sim = SingleSim(

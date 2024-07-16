@@ -77,7 +77,9 @@ def episode_based_training_loop(agent: AgentCore, env: Environment, t_episode: i
     return agent, env, dict_training
 
 
-def tem_training_loop(agent: AgentCore, env: Environment, n_episode: int, params: dict, random_state: bool = True, custom_state: list = None):
+def tem_training_loop(
+    agent: AgentCore, env: Environment, n_episode: int, params: dict, random_state: bool = True, custom_state: list = None
+):
     """Training loop for agents and environments that use a TEM-based update.
 
     Parameters

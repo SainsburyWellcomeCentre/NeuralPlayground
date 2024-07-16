@@ -208,7 +208,7 @@ class BatchEnvironment(Environment):
         for i, environment in enumerate(self.environments):
             environment.history = [sublist[i] for sublist in self.history]
             axs[i] = environment.plot_trajectory(ax=axs[i])
-            axs[i].set_aspect('equal')
+            axs[i].set_aspect("equal")
             axs[i].set_title(f"Environment {i+1}")
 
         # Adjust spacing between subplots

@@ -1,10 +1,8 @@
-import random
-
 import cv2
 import matplotlib.pyplot as plt
-from matplotlib.colors import LogNorm
 import numpy as np
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+from matplotlib.colors import LogNorm
 
 from neuralplayground.arenas.arena_core import Environment
 from neuralplayground.plotting.plot_utils import make_plot_trajectories
@@ -111,14 +109,14 @@ class DiscreteObjectEnvironment(Environment):
         self.resolution_d = int(self.room_depth * self.state_density)
         self.state_size = 1 / self.state_density
 
-        self.x_array = np.linspace(self.arena_x_limits[0] + self.state_size/2, 
-                                   self.arena_x_limits[1] - self.state_size/2, 
-                                   self.resolution_w)
-        self.y_array = np.linspace(self.arena_y_limits[0] + self.state_size/2, 
-                                   self.arena_y_limits[1] - self.state_size/2, 
-                                   self.resolution_d)
+        self.x_array = np.linspace(
+            self.arena_x_limits[0] + self.state_size / 2, self.arena_x_limits[1] - self.state_size / 2, self.resolution_w
+        )
+        self.y_array = np.linspace(
+            self.arena_y_limits[0] + self.state_size / 2, self.arena_y_limits[1] - self.state_size / 2, self.resolution_d
+        )
         self.mesh = np.meshgrid(self.x_array, self.y_array)
-        self.xy_combination =  np.column_stack([self.mesh[0].ravel(), self.mesh[1].ravel()])
+        self.xy_combination = np.column_stack([self.mesh[0].ravel(), self.mesh[1].ravel()])
         self.n_states = self.resolution_w * self.resolution_d
         self.objects = self.generate_objects()
         self.occupancy_grid = np.zeros((self.resolution_d, self.resolution_w))
@@ -248,7 +246,6 @@ class DiscreteObjectEnvironment(Environment):
         objects = np.eye(self.n_objects)[object_indices]
         return objects
 
-
     def make_object_observation(self, pos):
         """
         Make an observation of the object in the environment at the current position.
@@ -272,14 +269,14 @@ class DiscreteObjectEnvironment(Environment):
             pos = pos[0]
         elif self.use_behavioral_data and len(pos) > 2:
             pos = pos[:2]
-        
+
         x_index = np.floor((pos[0] - self.arena_x_limits[0]) / self.state_size).astype(int)
         y_index = np.floor((pos[1] - self.arena_y_limits[0]) / self.state_size).astype(int)
-        
+
         # Ensure indices are within bounds
         x_index = np.clip(x_index, 0, self.resolution_w - 1)
         y_index = np.clip(y_index, 0, self.resolution_d - 1)
-        
+
         return y_index * self.resolution_w + x_index
 
     def _create_default_walls(self):
@@ -293,18 +290,37 @@ class DiscreteObjectEnvironment(Environment):
         """
         self.default_walls = []
         self.default_walls.append(
-            np.array([[self.arena_limits[0, 0] - 0.1, self.arena_limits[1, 0] + 0.1], [self.arena_limits[0, 0] - 0.1, self.arena_limits[1, 1] + 0.1]])
+            np.array(
+                [
+                    [self.arena_limits[0, 0] - 0.1, self.arena_limits[1, 0] + 0.1],
+                    [self.arena_limits[0, 0] - 0.1, self.arena_limits[1, 1] + 0.1],
+                ]
+            )
         )
         self.default_walls.append(
-            np.array([[self.arena_limits[0, 1] + 0.1, self.arena_limits[1, 0] - 0.1], [self.arena_limits[0, 1] + 0.1, self.arena_limits[1, 1] + 0.1]])
+            np.array(
+                [
+                    [self.arena_limits[0, 1] + 0.1, self.arena_limits[1, 0] - 0.1],
+                    [self.arena_limits[0, 1] + 0.1, self.arena_limits[1, 1] + 0.1],
+                ]
+            )
         )
         self.default_walls.append(
-            np.array([[self.arena_limits[0, 0] - 0.1, self.arena_limits[1, 0] - 0.1], [self.arena_limits[0, 1] + 0.1, self.arena_limits[1, 0] - 0.1]])
+            np.array(
+                [
+                    [self.arena_limits[0, 0] - 0.1, self.arena_limits[1, 0] - 0.1],
+                    [self.arena_limits[0, 1] + 0.1, self.arena_limits[1, 0] - 0.1],
+                ]
+            )
         )
         self.default_walls.append(
-            np.array([[self.arena_limits[0, 0] - 0.1, self.arena_limits[1, 1] + 0.1], [self.arena_limits[0, 1] + 0.1, self.arena_limits[1, 1] + 0.1]])
+            np.array(
+                [
+                    [self.arena_limits[0, 0] - 0.1, self.arena_limits[1, 1] + 0.1],
+                    [self.arena_limits[0, 1] + 0.1, self.arena_limits[1, 1] + 0.1],
+                ]
+            )
         )
-
 
     def _create_custom_walls(self):
         """Custom walls method. In this case is empty since the environment is a simple square room
@@ -333,12 +349,12 @@ class DiscreteObjectEnvironment(Environment):
         for wall in self.wall_list:
             new_state, crossed = check_crossing_wall(pre_state=pre_state, new_state=np.asarray(new_state), wall=wall)
             crossed_wall = crossed or crossed_wall
-        
+
         # Snap the new_state back to the nearest discrete state
         x_index = np.argmin(np.abs(self.x_array - new_state[0]))
         y_index = np.argmin(np.abs(self.y_array - new_state[1]))
         new_state = np.array([self.x_array[x_index], self.y_array[y_index]])
-        
+
         return new_state, crossed_wall
 
     def plot_trajectory(
@@ -424,31 +440,43 @@ class DiscreteObjectEnvironment(Environment):
         # Visualize discretization
         ax1.set_title("Environment Discretization")
         for x in np.arange(self.arena_x_limits[0], self.arena_x_limits[1] + self.state_size, self.state_size):
-            ax1.axvline(x, color='gray', linestyle='-', linewidth=1)
+            ax1.axvline(x, color="gray", linestyle="-", linewidth=1)
         for y in np.arange(self.arena_y_limits[0], self.arena_y_limits[1] + self.state_size, self.state_size):
-            ax1.axhline(y, color='gray', linestyle='-', linewidth=1)
-        ax1.scatter(self.xy_combination[:, 0], self.xy_combination[:, 1], color='red', s=20, zorder=2)
-        ax1.set_aspect('equal')
+            ax1.axhline(y, color="gray", linestyle="-", linewidth=1)
+        ax1.scatter(self.xy_combination[:, 0], self.xy_combination[:, 1], color="red", s=20, zorder=2)
+        ax1.set_aspect("equal")
         ax1.set_xlim(self.arena_x_limits)
         ax1.set_ylim(self.arena_y_limits)
         ax1.set_xlabel("X")
         ax1.set_ylabel("Y")
 
         # Visualize object assignment
-        ax2.set_title("Object Assignment" + f" (n_objects={self.n_objects})," + f" (n_states={self.n_states})," + f" (grid={self.resolution_w}x{self.resolution_d})")
+        ax2.set_title(
+            "Object Assignment"
+            + f" (n_objects={self.n_objects}),"
+            + f" (n_states={self.n_states}),"
+            + f" (grid={self.resolution_w}x{self.resolution_d})"
+        )
         object_grid = np.argmax(self.objects, axis=1).reshape((self.resolution_d, self.resolution_w))
-        im = ax2.imshow(object_grid, cmap='tab20', extent=[*self.arena_x_limits, *self.arena_y_limits], origin='lower')
+        im = ax2.imshow(object_grid, cmap="tab20", extent=[*self.arena_x_limits, *self.arena_y_limits], origin="lower")
         plt.colorbar(im, ax=ax2, label="Object ID")
 
         # Add text labels for object IDs and scatter plot for xy_combination
         for i in range(self.resolution_d):
             for j in range(self.resolution_w):
-                ax2.text(self.x_array[j], self.y_array[i], str(object_grid[i, j]), 
-                         ha='center', va='center', color='white', fontweight='bold')
-        
-        ax2.scatter(self.xy_combination[:, 0], self.xy_combination[:, 1], color='red', s=20, zorder=2)
+                ax2.text(
+                    self.x_array[j],
+                    self.y_array[i],
+                    str(object_grid[i, j]),
+                    ha="center",
+                    va="center",
+                    color="white",
+                    fontweight="bold",
+                )
 
-        ax2.set_aspect('equal')
+        ax2.scatter(self.xy_combination[:, 0], self.xy_combination[:, 1], color="red", s=20, zorder=2)
+
+        ax2.set_aspect("equal")
         ax2.set_xlim(self.arena_x_limits)
         ax2.set_ylim(self.arena_y_limits)
         ax2.set_xlabel("X")
@@ -464,7 +492,7 @@ class DiscreteObjectEnvironment(Environment):
         print(f"Number of discrete states: {self.resolution_w * self.resolution_d}")
         print(f"Number of unique objects: {self.n_objects}")
         print(f"Grid dimensions: {self.resolution_w} x {self.resolution_d}")
-        
+
         # Print object distribution
         unique, counts = np.unique(np.argmax(self.objects, axis=1), return_counts=True)
         print("\nObject distribution:")
@@ -474,32 +502,45 @@ class DiscreteObjectEnvironment(Environment):
     def visualize_occupancy(self, log_scale=True):
         fig, ax = plt.subplots(figsize=(12, 10))
         cmap = plt.cm.YlOrRd
-        
+
         if log_scale:
             # Use log scale for better visualization of differences
-            im = ax.imshow(self.occupancy_grid, cmap=cmap, norm=LogNorm(), extent=[*self.arena_x_limits, *self.arena_y_limits], origin='lower')
+            im = ax.imshow(
+                self.occupancy_grid,
+                cmap=cmap,
+                norm=LogNorm(),
+                extent=[*self.arena_x_limits, *self.arena_y_limits],
+                origin="lower",
+            )
         else:
-            im = ax.imshow(self.occupancy_grid, cmap=cmap, extent=[*self.arena_x_limits, *self.arena_y_limits], origin='lower')
-        
-        plt.colorbar(im, ax=ax, label='Number of visits (log scale)' if log_scale else 'Number of visits')
-        
-        ax.set_title('Agent Occupancy Heatmap')
-        ax.set_xlabel('X')
-        ax.set_ylabel('Y')
-        
+            im = ax.imshow(self.occupancy_grid, cmap=cmap, extent=[*self.arena_x_limits, *self.arena_y_limits], origin="lower")
+
+        plt.colorbar(im, ax=ax, label="Number of visits (log scale)" if log_scale else "Number of visits")
+
+        ax.set_title("Agent Occupancy Heatmap")
+        ax.set_xlabel("X")
+        ax.set_ylabel("Y")
+
         # Add grid lines
         for x in np.arange(self.arena_x_limits[0], self.arena_x_limits[1] + self.state_size, self.state_size):
-            ax.axvline(x, color='gray', linestyle='--', linewidth=0.5)
+            ax.axvline(x, color="gray", linestyle="--", linewidth=0.5)
         for y in np.arange(self.arena_y_limits[0], self.arena_y_limits[1] + self.state_size, self.state_size):
-            ax.axhline(y, color='gray', linestyle='--', linewidth=0.5)
-        
+            ax.axhline(y, color="gray", linestyle="--", linewidth=0.5)
+
         # Add text annotations for each cell
         for i in range(self.resolution_d):
             for j in range(self.resolution_w):
                 value = self.occupancy_grid[i, j]
-                text_color = 'white' if value > np.mean(self.occupancy_grid) else 'black'
-                ax.text(self.x_array[j], self.y_array[i], f'{int(value)}', 
-                        ha='center', va='center', color=text_color, fontweight='bold')
-        
+                text_color = "white" if value > np.mean(self.occupancy_grid) else "black"
+                ax.text(
+                    self.x_array[j],
+                    self.y_array[i],
+                    f"{int(value)}",
+                    ha="center",
+                    va="center",
+                    color=text_color,
+                    fontweight="bold",
+                )
+
         plt.tight_layout()
         plt.show()
