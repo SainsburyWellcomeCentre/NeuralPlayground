@@ -318,6 +318,9 @@ class SingleSim(object):
         print("---> Training loop")
         trained_agent, trained_env, training_hist = self.training_loop(agent, env, **self.training_loop_params)
 
+        # for i in range(16):
+        #     trained_env.environments[i].visualize_occupancy()
+
         # Saving models
         print("---> Saving models")
         self._save_models(save_path, trained_agent, trained_env, training_hist)

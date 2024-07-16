@@ -2,6 +2,7 @@ import random
 
 import cv2
 import matplotlib.pyplot as plt
+from matplotlib.colors import LogNorm
 import numpy as np
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 
@@ -118,10 +119,9 @@ class DiscreteObjectEnvironment(Environment):
                                    self.resolution_d)
         self.mesh = np.meshgrid(self.x_array, self.y_array)
         self.xy_combination =  np.column_stack([self.mesh[0].ravel(), self.mesh[1].ravel()])
-        self.ws = int(self.room_width * self.state_density)
-        self.hs = int(self.room_depth * self.state_density)
         self.n_states = self.resolution_w * self.resolution_d
         self.objects = self.generate_objects()
+        self.occupancy_grid = np.zeros((self.resolution_d, self.resolution_w))
 
     def reset(self, random_state=True, custom_state=None):
         """
@@ -169,6 +169,7 @@ class DiscreteObjectEnvironment(Environment):
             custom_state = np.concatenate([pos, head_dir])
 
         self.objects = self.generate_objects()
+        self.occupancy_grid = np.zeros((self.resolution_d, self.resolution_w))
 
         # Fully observable environment, make_observation returns the state
         observation = self.make_object_observation(pos)
@@ -224,6 +225,8 @@ class DiscreteObjectEnvironment(Environment):
             )
         reward = self.reward_function(action, self.state[-1])  # If you get reward, it should be coded here
         observation = self.make_object_observation(new_pos_state)
+        state_index = self.pos_to_state(new_pos_state)
+        self.occupancy_grid[state_index // self.resolution_w, state_index % self.resolution_w] += 1
         self.state = observation
         self.transition = {
             "action": action,
@@ -467,3 +470,36 @@ class DiscreteObjectEnvironment(Environment):
         print("\nObject distribution:")
         for obj, count in zip(unique, counts):
             print(f"Object {obj}: {count} states ({count/(self.resolution_w * self.resolution_d):.2%})")
+
+    def visualize_occupancy(self, log_scale=True):
+        fig, ax = plt.subplots(figsize=(12, 10))
+        cmap = plt.cm.YlOrRd
+        
+        if log_scale:
+            # Use log scale for better visualization of differences
+            im = ax.imshow(self.occupancy_grid, cmap=cmap, norm=LogNorm(), extent=[*self.arena_x_limits, *self.arena_y_limits], origin='lower')
+        else:
+            im = ax.imshow(self.occupancy_grid, cmap=cmap, extent=[*self.arena_x_limits, *self.arena_y_limits], origin='lower')
+        
+        plt.colorbar(im, ax=ax, label='Number of visits (log scale)' if log_scale else 'Number of visits')
+        
+        ax.set_title('Agent Occupancy Heatmap')
+        ax.set_xlabel('X')
+        ax.set_ylabel('Y')
+        
+        # Add grid lines
+        for x in np.arange(self.arena_x_limits[0], self.arena_x_limits[1] + self.state_size, self.state_size):
+            ax.axvline(x, color='gray', linestyle='--', linewidth=0.5)
+        for y in np.arange(self.arena_y_limits[0], self.arena_y_limits[1] + self.state_size, self.state_size):
+            ax.axhline(y, color='gray', linestyle='--', linewidth=0.5)
+        
+        # Add text annotations for each cell
+        for i in range(self.resolution_d):
+            for j in range(self.resolution_w):
+                value = self.occupancy_grid[i, j]
+                text_color = 'white' if value > np.mean(self.occupancy_grid) else 'black'
+                ax.text(self.x_array[j], self.y_array[i], f'{int(value)}', 
+                        ha='center', va='center', color=text_color, fontweight='bold')
+        
+        plt.tight_layout()
+        plt.show()
