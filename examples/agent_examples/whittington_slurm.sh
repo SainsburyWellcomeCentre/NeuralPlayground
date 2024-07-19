@@ -1,11 +1,12 @@
 #!/bin/bash
 #SBATCH --job-name=TEM_cpu
-#SBATCH --mem=20000
-#SBATCH --time=72:00:00
 #SBATCH -o TEM_logs/TEM_cpu.%N.%j.out
 #SBATCH -e TEM_logs/TEM_cpu.%N.%j.err
 #SBATCH -p cpu
-#SBATCH --ntasks=1
+#SBATCH --nodes 1
+#SBATCH --cpus-per-task 4
+#SBATCH --mem 16
+#SBATCH --time=72:00
 
 source ~/.bashrc
 
