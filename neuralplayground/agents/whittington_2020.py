@@ -106,6 +106,8 @@ class Whittington2020(AgentCore):
         self.prev_observations = None
         self.reset()
 
+        self.iter = 0
+
     def reset(self):
         """
         initialise model and associated variables for training, set n_walk=-1 initially to account for the lack of
@@ -212,7 +214,7 @@ class Whittington2020(AgentCore):
         Compute forward pass through model, updating weights, calculating TEM variables and collecting
         losses / accuracies
         """
-        self.iter = int((len(self.obs_history) / 20) - 1)
+        # self.iter = int((len(self.obs_history) / 20) - 1)
         self.global_steps += 1
         history = self.obs_history[-self.pars["n_rollout"] :]
         locations = [[{"id": env_step[0], "shiny": None} for env_step in step] for step in history]
@@ -313,10 +315,11 @@ class Whittington2020(AgentCore):
             self.accuracy_history["p_accuracy"].append(acc_p)
             self.accuracy_history["g_accuracy"].append(acc_g)
             self.accuracy_history["gt_accuracy"].append(acc_gt)
+        self.iter += 1
 
         # Save accuracies periodically (e.g., every 100 iterations)
-        if (self.iter) % 100 == 0:
-            self.save_accuracies()
+        # if (self.iter) % 100 == 0:
+        #     self.save_accuracies()
         # # Also store the internal state (all learnable parameters) and the hyperparameters periodically
         # if self.iter % self.pars["save_interval"] == 0:
         #     torch.save(self.tem.state_dict(), self.model_path + "/tem_" + str(self.iter) + ".pt")

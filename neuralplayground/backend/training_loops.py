@@ -100,13 +100,30 @@ def tem_training_loop(
     dict_training : dict
         Dictionary containing the training history from the training loop and update method.
     """
+    import numpy as np
+
     training_dict = [agent.mod_kwargs, env.env_kwargs, agent.tem.hyper]
+
+    max_steps_per_env = np.random.randint(40, 60, size=params["batch_size"])
+    current_steps = np.zeros(params["batch_size"], dtype=int)
+
     obs, state = env.reset(random_state=random_state, custom_state=custom_state)
+
     for i in range(n_episode):
         while agent.n_walk < params["n_rollout"]:
             actions = agent.batch_act(obs)
             obs, state, reward = env.step(actions, normalize_step=True)
         agent.update()
+        current_steps += params["n_rollout"]
+        finished_walks = current_steps >= max_steps_per_env
+
+        if any(finished_walks):
+            for env_i in np.where(finished_walks)[0]:
+                env.reset_env(env_i)
+                agent.prev_iter[0].a[env_i] = None
+
+                max_steps_per_env[env_i] = np.random.randint(40, 60)
+                current_steps[env_i] = 0
     return agent, env, training_dict
 
 

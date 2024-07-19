@@ -299,7 +299,6 @@ class SingleSim(object):
 
         original_stdout = sys.stdout
         original_stderr = sys.stderr
-
         sys.stdout = open(run_log_path, "w")
         sys.stderr = open(error_log_path, "w")
 
@@ -317,9 +316,6 @@ class SingleSim(object):
         # Training loop
         print("---> Training loop")
         trained_agent, trained_env, training_hist = self.training_loop(agent, env, **self.training_loop_params)
-
-        # for i in range(16):
-        #     trained_env.environments[i].visualize_occupancy()
 
         # Saving models
         print("---> Saving models")

@@ -74,6 +74,9 @@ class BatchEnvironment(Environment):
 
         return all_observations, all_states
 
+    def reset_env(self, env_i):
+        self.environments[env_i].reset_objects()
+
     def step(self, actions: np.ndarray, normalize_step: bool = True):
         """
         Step the environment

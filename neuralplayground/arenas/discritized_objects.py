@@ -121,6 +121,9 @@ class DiscreteObjectEnvironment(Environment):
         self.objects = self.generate_objects()
         self.occupancy_grid = np.zeros((self.resolution_d, self.resolution_w))
 
+        self.steps_in_curr_env = 0
+        self.max_steps_per_env = 5000
+
     def reset(self, random_state=True, custom_state=None):
         """
         Reset the environment variables and distribution of sensory objects.
@@ -173,6 +176,12 @@ class DiscreteObjectEnvironment(Environment):
         observation = self.make_object_observation(pos)
         self.state = observation
         return observation, self.state
+
+    def reset_objects(self):
+        """
+        Reset the distribution of sensory objects.
+        """
+        self.objects = self.generate_objects()
 
     def step(self, action: np.ndarray, normalize_step: bool = True, skip_every: int = 10):
         """
@@ -235,6 +244,10 @@ class DiscreteObjectEnvironment(Environment):
         }
         self.history.append(self.transition)
         self._increase_global_step()
+        self.steps_in_curr_env += 1
+        if self.steps_in_curr_env >= self.max_steps_per_env:
+            self.steps_in_curr_env = 0
+            self.reset_objects()
         return observation, self.state, reward
 
     def generate_objects(self):
