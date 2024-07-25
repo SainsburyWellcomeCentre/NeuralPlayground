@@ -1,12 +1,14 @@
 #!/bin/bash
-#SBATCH --job-name=TEM_cpu
-#SBATCH -o TEM_logs/TEM_cpu.%N.%j.out
-#SBATCH -e TEM_logs/TEM_cpu.%N.%j.err
-#SBATCH -p cpu
-#SBATCH --nodes 1
-#SBATCH --cpus-per-task 4
-#SBATCH --mem 16
-#SBATCH --time=72:00
+
+#SBATCH -J TEM_pray # job name
+#SBATCH -p gpu # partition (queue)
+#SBATCH -N 1   # number of nodes
+#SBATCH --mem 16G # memory pool for all cores
+#SBATCH -n 4 # number of cores
+#SBATCH -t 0-72:00 # time (D-HH:MM)
+#SBATCH --gres gpu:1 # request 1 GPU (of any kind)
+#SBATCH -o TEM_pray.%x.%N.%j.out # STDOUT
+#SBATCH -e TEM_pray.%x.%N.%j.err # STDERR
 
 source ~/.bashrc
 
