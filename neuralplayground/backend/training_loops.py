@@ -104,7 +104,7 @@ def tem_training_loop(
 
     training_dict = [agent.mod_kwargs, env.env_kwargs, agent.tem.hyper]
 
-    max_steps_per_env = np.random.randint(40, 60, size=params["batch_size"])
+    max_steps_per_env = np.random.randint(4000, 6000, size=params["batch_size"])
     current_steps = np.zeros(params["batch_size"], dtype=int)
 
     obs, state = env.reset(random_state=random_state, custom_state=custom_state)
@@ -122,7 +122,7 @@ def tem_training_loop(
                 env.reset_env(env_i)
                 agent.prev_iter[0].a[env_i] = None
 
-                max_steps_per_env[env_i] = np.random.randint(40, 60)
+                max_steps_per_env[env_i] = np.random.randint(4000, 6000)
                 current_steps[env_i] = 0
     return agent, env, training_dict
 
