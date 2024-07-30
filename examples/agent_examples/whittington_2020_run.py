@@ -14,7 +14,7 @@ from neuralplayground.backend import SingleSim, tem_training_loop
 from neuralplayground.experiments import Sargolini2006Data
 
 # Set the location for saving the results of the simulation
-simulation_id = "TEM_results_big_mem"
+simulation_id = "TEM_results_all_5x5"
 save_path = os.path.join(os.getcwd(), simulation_id)
 # save_path = os.path.join(os.getcwd(), "examples", "agent_examples", "trained_results")
 agent_class = Whittington2020
@@ -27,47 +27,47 @@ full_agent_params = params.copy()
 # Set the x and y limits for the arena
 arena_x_limits = [
     [-5, 5],
-    [-4, 4],
     [-5, 5],
-    [-6, 6],
-    [-4, 4],
     [-5, 5],
-    [-6, 6],
     [-5, 5],
-    [-4, 4],
     [-5, 5],
-    [-6, 6],
     [-5, 5],
-    [-4, 4],
     [-5, 5],
-    [-6, 6],
+    [-5, 5],
+    [-5, 5],
+    [-5, 5],
+    [-5, 5],
+    [-5, 5],
+    [-5, 5],
+    [-5, 5],
+    [-5, 5],
     [-5, 5],
 ]
 arena_y_limits = [
     [-5, 5],
-    [-4, 4],
     [-5, 5],
-    [-6, 6],
-    [-4, 4],
     [-5, 5],
-    [-6, 6],
     [-5, 5],
-    [-4, 4],
     [-5, 5],
-    [-6, 6],
     [-5, 5],
-    [-4, 4],
     [-5, 5],
-    [-6, 6],
+    [-5, 5],
+    [-5, 5],
+    [-5, 5],
+    [-5, 5],
+    [-5, 5],
+    [-5, 5],
+    [-5, 5],
+    [-5, 5],
     [-5, 5],
 ]
 
 # Set parameters for the environment that generates observations
 discrete_env_params = {
     "environment_name": "DiscreteObject",
-    "state_density": 1,
+    "state_density": 1 / 2,
     "n_objects": params["n_x"],
-    "agent_step_size": 1,  # Note: this must be 1 / state density
+    "agent_step_size": 2,  # Note: this must be 1 / state density
     "use_behavioural_data": False,
     "data_path": None,
     "experiment_class": Sargolini2006Data,
@@ -106,7 +106,7 @@ agent_params = {
 }
 
 # Full model training consists of 20000 episodes
-training_loop_params = {"n_episode": 20000, "params": full_agent_params, "random_state": False, "custom_state": [0.0, 0.0]}
+training_loop_params = {"n_episode": 10000, "params": full_agent_params, "random_state": True, "custom_state": [0.0, 0.0]}
 
 # Create the training simulation object
 sim = SingleSim(

@@ -256,6 +256,25 @@ class Whittington2020(AgentCore):
         self.final_model_input = model_input
 
         forward = self.tem(model_input, self.prev_iter)
+        # if self.prev_iter is None:
+        #     with open('OG_log.txt', 'a') as f:
+        #         f.write('Walk number: ' + str(self.global_steps) + '\n')
+        #         for c in model_input:
+        #             f.write('ID: ' + str(c[0]) + '\n')
+        #             f.write('Observation: ' + str([np.argmax(a) for a in c[1]]) + '\n')
+        #             f.write('Action: ' + str(c[2]) + '\n')
+        #         f.write('prev_iter: ' + str(self.prev_iter) + '\n')
+        # else:
+        #     with open('OG_log.txt', 'a') as f:
+        #         f.write('Walk number: ' + str(self.global_steps) + '\n')
+        #         for c in model_input:
+        #             f.write('ID: ' + str(c[0]) + '\n')
+        #             f.write('Observation: ' + str([np.argmax(a) for a in c[1]]) + '\n')
+        #             f.write('Action: ' + str(c[2]) + '\n')
+        #         f.write('prev_iter.L: ' + str(self.prev_iter[0].L) + '\n')
+        #         f.write('prev_iter.a: ' + str(self.prev_iter[0].a) + '\n')
+        #         f.write('prev_iter.M: ' + str(self.prev_iter[0].M) + '\n')
+        #         f.write('prev_iter.x: ' + str([torch.argmax(x) for x in self.prev_iter[0].x]) + '\n')
 
         # Accumulate loss from forward pass
         loss = torch.tensor(0.0)
