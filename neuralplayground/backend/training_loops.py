@@ -120,8 +120,14 @@ def tem_training_loop(
                 env.reset_env(env_i)
                 agent.prev_iter[0].a[env_i] = None
 
-                max_steps_per_env[env_i] = np.random.randint(4000, 6000)
+                max_steps_per_env[env_i] = params["n_rollout"] * np.random.randint(
+                    agent.walk_length_center - params["walk_it_window"] * 0.5,
+                    agent.walk_length_center + params["walk_it_window"] * 0.5,
+                )
                 current_steps[env_i] = 0
+                agent.logger.info(
+                    "Iteration {:d}: new walk of length {:d} for batch entry {:d}".format(i, max_steps_per_env[env_i], env_i)
+                )
         agent.update()
     return agent, env, training_dict
 

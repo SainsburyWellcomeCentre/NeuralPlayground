@@ -1,14 +1,14 @@
 #!/bin/bash
 
-#SBATCH -J TEM_all_5x5 # job name
+#SBATCH -J TEM_var_walks # job name
 #SBATCH -p gpu # partition (queue)
 #SBATCH -N 1   # number of nodes
 #SBATCH --mem 50G # memory pool for all cores
 #SBATCH -n 4 # number of cores
 #SBATCH -t 0-72:00 # time (D-HH:MM)
 #SBATCH --gres gpu:1 # request 1 GPU (of any kind)
-#SBATCH -o TEM_all_5x5.%x.%N.%j.out # STDOUT
-#SBATCH -e TEM_all_5x5.%x.%N.%j.err # STDERR
+#SBATCH -o TEM_var_walks.%x.%N.%j.out # STDOUT
+#SBATCH -e TEM_var_walks.%x.%N.%j.err # STDERR
 
 source ~/.bashrc
 
