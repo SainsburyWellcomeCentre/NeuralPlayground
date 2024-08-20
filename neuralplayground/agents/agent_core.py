@@ -219,6 +219,7 @@ class LevyFlightAgent(RandomAgent):
             position variation to compute next position
         """
         # Pick direction
+
         direction = super().act(obs)
         # Normalize direction to step size
         direction = direction / np.sqrt(np.sum(direction**2)) * self.step_size
@@ -260,3 +261,46 @@ class LevyFlightAgent(RandomAgent):
                 return self.action_buffer.pop()
             else:
                 return action
+
+class TrajectoryGenerator(RandomAgent):
+    def __init__(
+            self,step_size: float = 0.02,):
+        super().__init__(step_size=step_size)
+        self.action_buffer = []
+        self.b = 0.13 * 2 * np.pi  # forward velocity rayleigh dist scale (m/sec)
+        self.sigma = 1   # stdev rotation velocity (rads/sec)
+        self.mu = 0  # turn angle bias
+        self.reset()
+    def reset(self):
+        self.head_dir = np.random.uniform(0, 2 * np.pi)
+        self.velocity = 0
+        self.turn_angle = 0
+
+    def act(self, obs, crossed_border):
+        # Pick direction
+            """The base model executes a random action from a normal distribution
+            Parameters
+            ----------
+            obs:
+                Whatever observation from the environment class needed to choose the right action
+            Returns
+            -------
+            d_pos: nd.array (2,)
+                position variation to compute next position
+            """
+            #is_near_wall, turn_angle = self.avoid_wall(position[:, t], head_dir[:, t], room_width, room_depth)
+            v =  np.random.rayleigh(self.b,1)
+            v[crossed_border] *= 0.25
+
+            turn_angle = np.zeros(1)
+            random_turn = np.random.normal(self.mu, self.sigma, 1)
+            self.turn_angle += self.step_size * random_turn
+
+            self.velocity = self.step_size * v
+
+            d_pos = self.velocity * np.stack([np.cos(self.head_dir), np.sin(self.head_dir)]).reshape(-1)
+            self.head_dir = self.head_dir + self.turn_angle
+
+            self.head_dir = np.mod(self.head_dir + np.pi, 2 * np.pi) - np.pi
+
+            return d_pos
