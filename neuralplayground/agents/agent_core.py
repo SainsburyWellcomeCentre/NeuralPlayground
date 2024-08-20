@@ -13,6 +13,8 @@ import pandas as pd
 from deepdiff import DeepDiff
 from scipy.stats import levy_stable
 
+from neuralplayground.vendored import TrajectoryGenerator
+
 
 class AgentCore(object):
     """Abstract class for all EHC models
@@ -261,3 +263,44 @@ class LevyFlightAgent(RandomAgent):
                 return self.action_buffer.pop()
             else:
                 return action
+
+
+class RatMovementAgent(RandomAgent):
+
+    def __init__(
+        self,
+        room_width: float,
+        room_depth: float,
+        step_size: float = 1.0,
+        auto_scale: bool = True,
+        forward_velocity: float = None,
+        turn_angle_bias: float = None,
+        turn_angle_stdev: float = None,
+        border_region: float = None,
+        time_step_size: float = None,
+    ):
+        super().__init__(step_size=step_size)
+        self.step_size = step_size
+        self.room_width = room_width
+        self.room_depth = room_depth
+        self.traj_generator = TrajectoryGenerator(
+            room_width,
+            room_depth,
+            forward_velocity=forward_velocity,
+            turn_angle_bias=turn_angle_bias,
+            turn_angle_stdev=turn_angle_stdev,
+            border_region=border_region,
+            time_step_size=time_step_size,
+            auto_scale=auto_scale,
+        )
+        self.initial_head_dir = np.random.uniform(0, 2 * np.pi)
+        self.current_head_dir = self.initial_head_dir
+        self.traj_generator.forward_velocity = self.traj_generator.forward_velocity * step_size
+
+    def act(self, obs):
+        current_pos = obs
+        new_pos, new_head_dir, pos_update, head_dir_update = self.traj_generator.single_step(
+            current_pos, self.current_head_dir
+        )
+        self.current_head_dir = new_head_dir
+        return pos_update

@@ -20,23 +20,59 @@ class TrajectoryGenerator(object):
         self,
         room_width,
         room_depth,
-        sequence_length=20,
-        batch_size=32,
         forward_velocity=0.13 * 2 * np.pi,
         turn_angle_bias=0,
         turn_angle_stdev=5.76 * 2,
         border_region=0.03,
         time_step_size=0.02,
+        auto_scale=True,
+        sequence_length=20,
+        batch_size=32,
     ):
         self.sequence_length = sequence_length
         self.batch_size = batch_size
         self.room_width = room_width
         self.room_depth = room_depth
-        self.forward_velocity = forward_velocity  # forward velocity rayleigh dist scale (m/sec)
-        self.turn_angle_bias = turn_angle_bias
-        self.turn_angle_stdev = turn_angle_stdev  # stdev rotation velocity (rads/sec)
-        self.border_region = border_region
-        self.dt = time_step_size  # seconds
+        self.set_parameters(forward_velocity, turn_angle_bias, turn_angle_stdev, time_step_size, border_region, auto_scale)
+        if self.auto_scale:
+            # This is from the original room size for these parameters
+            scale_factor = ((room_width + room_depth) / 2.0) / 2.2
+            self.forward_velocity = scale_factor * self.forward_velocity
+            self.border_region = scale_factor * self.border_region
+
+    def set_parameters(
+        self,
+        forward_velocity=None,
+        turn_angle_bias=None,
+        turn_angle_stdev=None,
+        time_step_size=None,
+        border_region=None,
+        auto_scale=None,
+    ):
+        if forward_velocity:
+            self.forward_velocity = forward_velocity
+        else:
+            self.forward_velocity = 0.13 * 2 * np.pi
+        if turn_angle_bias:
+            self.turn_angle_bias = turn_angle_bias
+        else:
+            self.turn_angle_bias = 0
+        if turn_angle_stdev:
+            self.turn_angle_stdev = turn_angle_stdev
+        else:
+            self.turn_angle_stdev = 5.76 * 2
+        if time_step_size:
+            self.dt = time_step_size
+        else:
+            self.dt = 0.02
+        if border_region:
+            self.border_region = border_region
+        else:
+            self.border_region = 0.03
+        if auto_scale:
+            self.auto_scale = auto_scale
+        else:
+            self.auto_scale = True
 
     def avoid_wall(self, position, hd, room_width, room_depth):
         """
@@ -186,21 +222,31 @@ class TrajectoryGenerator(object):
         return pos, v
         # return (inputs, pos, place_outputs)
 
-    def single_step_trajectory(self, position, head_dir):
+    def single_step(self, position, head_dir):
         """Generate a single step of a random walk in a rectangular box"""
         dt = self.dt
         random_turn = np.random.normal(self.turn_angle_bias, self.turn_angle_stdev)
         v = np.random.rayleigh(self.forward_velocity)
         # v = np.abs(np.random.normal(0, self.forward_velocity * np.pi / 2))
         is_near_wall, turn_angle = self.avoid_wall(
-            position[np.newaxis, :], head_dir[np.newaxis, :], self.room_width, self.room_depth
+            position[np.newaxis, :],
+            np.array(
+                [
+                    head_dir,
+                ]
+            )[np.newaxis, :],
+            self.room_width,
+            self.room_depth,
         )
-        v[is_near_wall] *= 0.25
-        v = v[0, :]
+        if is_near_wall[0][0]:
+            v *= 0.25
+        turn_angle = turn_angle[0][0]
         turn_angle += dt * random_turn
         velocity = v * dt
         update = velocity * np.array([np.cos(head_dir), np.sin(head_dir)])
-        position += update
-        head_dir += turn_angle
+        position = update + position
+        head_dir = turn_angle + head_dir
         head_dir = np.mod(head_dir + np.pi, 2 * np.pi) - np.pi
-        return position, head_dir
+        pos_update = update
+        head_dir_update = turn_angle
+        return position, head_dir, pos_update, head_dir_update
