@@ -106,7 +106,7 @@ agent_params = {
 }
 
 # Full model training consists of 20000 episodes
-training_loop_params = {"n_episode": 1000, "params": full_agent_params, "random_state": False, "custom_state": [0.0, 0.0]}
+training_loop_params = {"n_episode": 20000, "params": full_agent_params, "random_state": False, "custom_state": [0.0, 0.0]}
 
 # Create the training simulation object
 sim = SingleSim(
