@@ -112,6 +112,7 @@ def tem_training_loop(
         while agent.n_walk < params["n_rollout"]:
             actions = agent.batch_act(obs)
             obs, state, reward = env.step(actions, normalize_step=True)
+        agent.update()
 
         current_steps += params["n_rollout"]
         finished_walks = current_steps >= max_steps_per_env
@@ -128,7 +129,7 @@ def tem_training_loop(
                 agent.logger.info(
                     "Iteration {:d}: new walk of length {:d} for batch entry {:d}".format(i, max_steps_per_env[env_i], env_i)
                 )
-        agent.update()
+    # env.plot_trajectories();
     return agent, env, training_dict
 
 

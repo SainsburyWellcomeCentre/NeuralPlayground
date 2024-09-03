@@ -214,7 +214,7 @@ class Whittington2020(AgentCore):
         Compute forward pass through model, updating weights, calculating TEM variables and collecting
         losses / accuracies
         """
-        # self.iter = int((len(self.obs_history) / 20) - 1)
+        self.iter = int((len(self.obs_history) / 20) - 1)
         self.global_steps += 1
         history = self.obs_history[-self.pars["n_rollout"] :]
         locations = [[{"id": env_step[0], "shiny": None} for env_step in step] for step in history]
@@ -256,6 +256,9 @@ class Whittington2020(AgentCore):
         self.final_model_input = model_input
 
         forward = self.tem(model_input, self.prev_iter)
+        chunk = [[step[0][0], np.argmax(step[1][0]), step[2][0]] for step in model_input]
+        for i in range(len(chunk)):
+            self.logger.info(chunk[i])
         # if self.prev_iter is None:
         #     with open('OG_log.txt', 'a') as f:
         #         f.write('Walk number: ' + str(self.global_steps) + '\n')
@@ -309,7 +312,7 @@ class Whittington2020(AgentCore):
         acc_p, acc_g, acc_gt = np.mean([[np.mean(a) for a in step.correct()] for step in forward], axis=0)
         acc_p, acc_g, acc_gt = [a * 100 for a in (acc_p, acc_g, acc_gt)]
         # Log progress
-        if self.iter % 10 == 0:
+        if self.iter % 1 == 0:
             # Write series of messages to logger from this backprop iteration
             self.logger.info("Finished backprop iter {:d} in {:.2f} seconds.".format(self.iter, time.time() - start_time))
             self.logger.info(
