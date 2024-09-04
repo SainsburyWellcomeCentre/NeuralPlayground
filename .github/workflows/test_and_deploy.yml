@@ -38,11 +38,10 @@ jobs:
             ~/.NeuralPlayground/*
           key: cached-test-data
           enableCrossOsArchive: true
-      - uses: neuroinformatics-unit/actions/test@v2
+      - uses: neuroinformatics-unit/actions/test@v2.0.0
         with:
           python-version: ${{ matrix.python-version }}
           use-xvfb: true
-          secret-codecov-token: ${{ secrets.CODECOV_TOKEN }}
 
   build_sdist_wheels:
     name: Build source distribution
