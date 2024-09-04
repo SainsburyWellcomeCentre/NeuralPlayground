@@ -99,6 +99,9 @@ exclude = ["__init__.py","build",".eggs"]
 select = ["I", "E", "F"]
 fix = true
 
+[tool.ruff.lint.per-file-ignores]
+"*.ipynb" = ["E501"]
+
 [tool.cibuildwheel]
 build = "cp38-* cp39-* cp310-* cp311-*"
 
