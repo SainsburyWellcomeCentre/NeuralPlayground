@@ -96,8 +96,10 @@ ignore = [
 [tool.ruff]
 line-length = 127
 exclude = ["__init__.py","build",".eggs"]
-select = ["I", "E", "F"]
 fix = true
+
+[tool.ruff.lint]
+select = ["I", "E", "F", "NPY201"]
 
 [tool.cibuildwheel]
 build = "cp38-* cp39-* cp310-* cp311-*"

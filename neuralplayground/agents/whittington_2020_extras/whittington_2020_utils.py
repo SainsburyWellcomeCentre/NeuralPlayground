@@ -325,7 +325,7 @@ def check_wall(pre_state, new_state, wall, wall_closenes=1e-5, tolerance=1e-9):
     larger_than_zero = intersection >= 0
 
     # If condition is true, then the points cross the wall
-    cross_wall = np.alltrue(np.logical_and(smaller_than_one, larger_than_zero))
+    cross_wall = np.all(np.logical_and(smaller_than_one, larger_than_zero))
     if cross_wall:
         new_state = (intersection[-1] - wall_closenes) * (new_state - pre_state) + pre_state
 
