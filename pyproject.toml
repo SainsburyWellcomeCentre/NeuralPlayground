@@ -103,9 +103,3 @@ select = ["I", "E", "F", "NPY201"]
 
 [tool.ruff.lint.per-file-ignores]
 "*.ipynb" = ["E501", "E402"]
-
-[tool.cibuildwheel]
-build = "cp38-* cp39-* cp310-* cp311-*"
-
-[tool.cibuildwheel.macos]
-archs = ["x86_64", "arm64"]
