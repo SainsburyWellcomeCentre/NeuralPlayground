@@ -311,6 +311,7 @@ class Whittington2020(AgentCore):
         # Compute model accuracies
         acc_p, acc_g, acc_gt = np.mean([[np.mean(a) for a in step.correct()] for step in forward], axis=0)
         acc_p, acc_g, acc_gt = [a * 100 for a in (acc_p, acc_g, acc_gt)]
+        self.accuracies = (acc_p + acc_g + acc_gt) / 3
         # Log progress
         if self.iter % 1 == 0:
             # Write series of messages to logger from this backprop iteration
