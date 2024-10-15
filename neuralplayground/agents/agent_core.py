@@ -82,9 +82,7 @@ class AgentCore(object):
 
         self.obs_history.append(obs)
         if len(self.obs_history) >= 1000:  # reset every 1000
-            self.obs_history = [
-                obs,
-            ]
+            self.obs_history.pop(0)
         if policy_func is not None:
             return policy_func(obs)
 
