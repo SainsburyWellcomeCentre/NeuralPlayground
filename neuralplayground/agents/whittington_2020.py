@@ -340,39 +340,14 @@ class Whittington2020(AgentCore):
             self.accuracy_history["gt_accuracy"].append(acc_gt)
         self.iter += 1
 
-        # Save accuracies periodically (e.g., every 100 iterations)
-        # if (self.iter) % 100 == 0:
-        #     self.save_accuracies()
-        # # Also store the internal state (all learnable parameters) and the hyperparameters periodically
-        # if self.iter % self.pars["save_interval"] == 0:
-        #     torch.save(self.tem.state_dict(), self.model_path + "/tem_" + str(self.iter) + ".pt")
-        #     torch.save(self.tem.hyper, self.model_path + "/params_" + str(self.iter) + ".pt")
-
-        # # Save the final state of the model after training has finished
-        # if self.iter == self.pars["train_it"] - 1:
-        #     torch.save(self.tem.state_dict(), self.model_path + "/tem_" + str(self.iter) + ".pt")
-        #     torch.save(self.tem.hyper, self.model_path + "/params_" + str(self.iter) + ".pt")
+        # if self.iter % 10 == 0:
+        #     print("Iteration: ", self.iter)
+        #     print("Accuracies: ", acc_p, acc_g, acc_gt)
 
     def initialise(self):
         """
         Generate random distribution of objects and intialise optimiser, logger and relevant variables
         """
-        # Create directories for storing all information about the current run
-        # (
-        #     self.run_path,
-        #     self.train_path,
-        #     self.model_path,
-        #     self.save_path,
-        #     self.script_path,
-        #     self.envs_path,
-        # ) = utils.make_directories()
-        # # Save all python files in current directory to script directory
-        # self.save_files()
-        # # Save parameters
-        # np.save(os.path.join(self.save_path, "params"), self.pars)
-        # # Create a tensor board to stay updated on training progress. Start tensorboard with tensorboard --logdir=runs
-        # self.writer = SummaryWriter(self.train_path)
-        # Create a logger to write log output to file
         current_dir = os.path.dirname(os.getcwd())
         run_path = os.path.join(current_dir, "agent_examples", self.save_name)
         run_path = os.path.normpath(run_path)
@@ -533,8 +508,9 @@ class Whittington2020(AgentCore):
         return final_model_input, history, environments
 
     def plot_run(self, tem, model_input, environments):
-        with torch.no_grad():
-            forward = tem(model_input, prev_iter=None)
+        # with torch.no_grad():
+        #     forward = tem(model_input, prev_iter=None)
+        forward = tem(model_input, prev_iter=None)
         include_stay_still = True
         # shiny_envs = [False, False, False, False]
         # env_to_plot = 0
