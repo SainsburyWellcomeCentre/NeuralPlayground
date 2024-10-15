@@ -21,9 +21,10 @@ layer_norm: True
 
 # Env Stuff
 batch_size: 2
-nx_min: 5
-nx_max: 6
+num_nodes_max: 5
+num_nodes_min: 5
+num_features: 6
 
 batch_size_test: 4
-nx_min_test: 5
-nx_max_test: 6
+num_nodes_max_test: 5
+num_nodes_min_test: 5

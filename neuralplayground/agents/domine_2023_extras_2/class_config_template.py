@@ -2,80 +2,6 @@ from config_manager import config_field, config_template
 
 
 class ConfigTemplate:
-    _grid_template = config_template.Template(
-        fields=[
-            config_field.Field(
-                name="resample",
-                types=[bool],
-            ),
-            config_field.Field(
-                name="residual",
-                types=[bool],
-            ),
-            config_field.Field(
-                name="train_on_shortest_path",
-                types=[bool],
-            ),
-            config_field.Field(
-                name="wandb_on",
-                types=[bool],
-            ),
-            config_field.Field(
-                name="weighted",
-                types=[bool],
-            ),
-            config_field.Field(
-                name="seed",
-                types=[int],
-            ),
-            config_field.Field(
-                name="batch_size",
-                types=[int],
-            ),
-            config_field.Field(
-                name="nx_min",
-                types=[int],
-            ),
-            config_field.Field(
-                name="nx_max",
-                types=[int],
-            ),
-            config_field.Field(
-                name="batch_size_test",
-                types=[int],
-            ),
-            config_field.Field(
-                name="nx_min_test",
-                types=[int],
-            ),
-            config_field.Field(
-                name="nx_max_test",
-                types=[int],
-            ),
-            config_field.Field(
-                name="num_hidden",
-                types=[int],
-            ),
-            config_field.Field(
-                name="num_layers",
-                types=[int],
-            ),
-            # @param
-            config_field.Field(
-                name="num_message_passing_steps",
-                types=[int],
-            ),
-            # @param
-            config_field.Field(
-                name="learning_rate",
-                types=[float],
-            ),
-            config_field.Field(
-                name="num_training_steps",
-                types=[float, int],
-            ),
-        ],
-    )
     base_config_template = config_template.Template(
         fields=[
             config_field.Field(
@@ -87,10 +13,6 @@ class ConfigTemplate:
                 types=[bool],
             ),
             config_field.Field(
-                name="train_on_shortest_path",
-                types=[bool],
-            ),
-            config_field.Field(
                 name="wandb_on",
                 types=[bool],
             ),
@@ -99,11 +21,15 @@ class ConfigTemplate:
                 types=[int],
             ),
             config_field.Field(
-                name="nx_min",
+                name="num_nodes_min",
                 types=[int],
             ),
             config_field.Field(
-                name="nx_max",
+                name="num_features",
+                types=[int],
+            ),
+            config_field.Field(
+                name="num_nodes_max",
                 types=[int],
             ),
             config_field.Field(
@@ -111,11 +37,11 @@ class ConfigTemplate:
                 types=[int],
             ),
             config_field.Field(
-                name="nx_min_test",
+                name="num_nodes_min_test",
                 types=[int],
             ),
             config_field.Field(
-                name="nx_max_test",
+                name="num_nodes_max_test",
                 types=[int],
             ),
             config_field.Field(
@@ -161,20 +87,8 @@ class ConfigTemplate:
                 types=[bool],
             ),
             config_field.Field(
-                name="grid",
-                types=[bool],
-            ),
-            config_field.Field(
                 name="plot",
                 types=[bool],
-            ),
-            config_field.Field(
-                name="dist_cutoff",
-                types=[int],
-            ),
-            config_field.Field(
-                name="n_std_dist_cutoff",
-                types=[int]
             ),
         ],
     )
