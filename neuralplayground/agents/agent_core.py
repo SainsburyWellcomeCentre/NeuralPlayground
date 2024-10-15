@@ -266,6 +266,12 @@ class LevyFlightAgent(RandomAgent):
 
 
 class RatMovementAgent(RandomAgent):
+    """Vendored code to generate smooth animal trajectory, for more details about the implementation
+    visit the original code at
+    https://github.com/ganguli-lab/grid-pattern-formation/blob/master/trajectory_generator.py
+    and the foraging method used in this paper
+    https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1002553
+    """
 
     def __init__(
         self,
@@ -279,10 +285,39 @@ class RatMovementAgent(RandomAgent):
         border_region: float = None,
         time_step_size: float = None,
     ):
+        """Agent that follows a trajectory generator
+
+        Parameters
+        ----------
+        room_width: float
+            Width of the room
+        room_depth: float
+            Depth of the room
+        step_size: float
+            Size of forward velocity
+        auto_scale: bool
+            If True, the parameters are scaled to the room size
+        forward_velocity: float
+            Forward velocity
+        turn_angle_bias: float
+            Turn angle bias
+        turn_angle_stdev: float
+            Turn angle standard deviation
+        border_region: float
+            Border region
+        time_step_size: float
+            Time step size
+        """
         super().__init__(step_size=step_size)
         self.step_size = step_size
         self.room_width = room_width
         self.room_depth = room_depth
+        self.auto_scale = auto_scale
+        self.forward_velocity = forward_velocity
+        self.turn_angle_bias = turn_angle_bias
+        self.turn_angle_stdev = turn_angle_stdev
+        self.border_region = border_region
+        self.time_step_size = time_step_size
         self.traj_generator = TrajectoryGenerator(
             room_width,
             room_depth,
