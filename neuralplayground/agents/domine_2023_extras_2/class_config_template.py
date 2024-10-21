@@ -67,8 +67,8 @@ class ConfigTemplate:
                 types=[float],
             ),
             config_field.Field(
-                name="feature_position",
-                types=[bool],
+                name="dataset",
+                types=[str],
             ),
             config_field.Field(
                 name="weighted",

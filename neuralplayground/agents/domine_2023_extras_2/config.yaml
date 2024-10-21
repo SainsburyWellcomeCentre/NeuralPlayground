@@ -1,16 +1,16 @@
-experiment_name: 'g_identity_p_l_r'
+experiment_name: 'hello'
 resample: False # @param
 wandb_on: False
 seed: 45
 plot: True
-feature_position: True  # make sure it works when this is the case
+dataset: 'random'  # 'random' or 'omniglot'
 weighted: False
 
 num_hidden: 15 # @param
 num_layers: 1  # @param
-num_message_passing_steps: 3  # @param
-learning_rate: 0.01 # @param
-num_training_steps: 2000 # @param
+num_message_passing_steps: 4  # @param
+learning_rate: 0.001 # @param
+num_training_steps: 3000 # @param
 residual: True
 layer_norm: False
 
@@ -18,8 +18,8 @@ layer_norm: False
 batch_size: 2
 num_nodes_max: 5
 num_nodes_min: 5
-num_features: 160
+num_features: 1
 
-batch_size_test: 4
-num_nodes_max_test: 5
+batch_size_test:  2
+num_nodes_max_test: 7
 num_nodes_min_test: 5

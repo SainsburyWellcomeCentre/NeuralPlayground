@@ -1,8 +1,8 @@
 
 import numpy as np
 import torch
-import scipy.spatial as spatial
-
+import torchvision
+from torchvision import transforms
 from neuralplayground.agents.domine_2023_extras.class_utils import rng_sequence_from_rng
 
 def create_random_matrix(rows, cols, low=0, high=1):
@@ -18,6 +18,41 @@ def create_random_matrix(rows, cols, low=0, high=1):
     """
     return np.random.uniform(low, high, (rows, cols))
 
+
+def get_omniglot_items(n):
+    # Define transformations for the images
+    transform = transforms.Compose([
+        transforms.ToTensor(),  # Convert to tensor
+        transforms.Resize((28, 28)),  # Resize to 28x28 (if needed)
+        transforms.RandomRotation(20),  # Randomly rotate the image by up to 20 degrees
+        transforms.RandomHorizontalFlip(p=0.5)  # Randomly flip the image horizontally with 50% probability
+    ])
+
+    # Load the Omniglot dataset with the defined transformation
+    dataset = torchvision.datasets.Omniglot(
+        root='./data',
+        background=True,  # Use background set, set to False to use evaluation set
+        download=True,
+        transform=transform  # Apply the defined transformations
+    )
+    # Initialize list to hold sampled features
+    features = []
+
+    # Randomly sample n items from the dataset
+    for _ in range(n):
+        # Get a random index in the range of the dataset length
+        random_idx = np.random.randint(0, len(dataset))
+        # Retrieve the item (image, label)
+        image, label = dataset[random_idx]
+        # Convert the image to a numpy array (already transformed)
+        image_vector = image.numpy()
+        # Reshape the image from (1, 28, 28) to (1, n), where n is 28 * 28 = 784
+        image_vector = image_vector.flatten()
+        # Append the image to the feature list (image is already transformed and a tensor)
+        features.append(image_vector)  # Convert to numpy array for convenience
+    # Convert list of features to numpy array
+    features_array = np.array(features)
+    return features_array
 
 def create_line_graph_edge_list_with_features(num_nodes):
     """
@@ -61,12 +96,11 @@ def sample_target(source, sink):
     :return: 1, -1, or 0 based on the comparison
     """
     if source > sink:
-        return torch.tensor([1], dtype=torch.float32)
+        return torch.tensor([1], dtype=torch.long)
     elif source < sink:
-        return  torch.tensor([0], dtype=torch.float32)
+        return  torch.tensor([0], dtype= torch.long)
     else:
         return 'error'
-
 
 def generate_source_and_sink(num_nodes):
     """
@@ -81,16 +115,32 @@ def generate_source_and_sink(num_nodes):
         sink = np.random.randint(0, num_nodes)
 
     return source, sink
-def sample_graph(num_features, num_nodes):
-    node_features = torch.tensor(create_random_matrix(num_features, num_nodes))
+def sample_random_graph(num_features, num_nodes):
+    node_features = torch.tensor(create_random_matrix(num_nodes,num_features))
     edges , edge_features_tensor =  create_line_graph_edge_list_with_features(num_nodes)
     input_node_features = np.zeros((int(num_nodes), 2))
     sink, source = generate_source_and_sink(num_nodes)
     input_node_features[source, 0] = 1  # Set source node feature
     input_node_features[sink, 1] = 1  # Set sink node feature
     # Concatenate the feature matrices along the feature dimension (axis=1)
-    combined_node_features = np.concatenate([node_features.T, input_node_features], axis=1)
+    combined_node_features = np.concatenate([node_features, input_node_features], axis=1)
     # Convert combined node features back to a tensor
     node_features = torch.tensor(combined_node_features, dtype=torch.float32)
     return node_features, edges, edge_features_tensor, source, sink
+
+#TODO: we need to merge this two potentially
+
+def sample_omniglot_graph(num_nodes):
+    node_features = torch.tensor(get_omniglot_items(num_nodes))
+    edges , edge_features_tensor = create_line_graph_edge_list_with_features(num_nodes)
+    input_node_features = np.zeros((int(num_nodes), 2))
+    sink, source = generate_source_and_sink(num_nodes)
+    input_node_features[source, 0] = 1  # Set source node feature
+    input_node_features[sink, 1] = 1  # Set sink node feature
+    # Concatenate the feature matrices along the feature dimension (axis=1)
+    combined_node_features = np.concatenate([node_features, input_node_features], axis=1)
+    # Convert combined node features back to a tensor
+    node_features = torch.tensor(combined_node_features, dtype=torch.float32)
+    return node_features, edges, edge_features_tensor, source, sink
+
 
