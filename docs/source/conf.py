@@ -44,6 +44,7 @@ extensions = [
     "sphinx_sitemap",
     "myst_parser",
     "nbsphinx",
+    "sphinx_design",
 ]
 
 # Configure the myst parser to enable cool markdown features
