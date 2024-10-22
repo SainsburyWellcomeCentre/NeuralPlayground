@@ -13,6 +13,7 @@ Welcome to NeuralPlayground's documentation!
    installation
    getting_started
    api_index
+   readme_link
 
 .. card:: Card Title
 
