@@ -413,9 +413,15 @@ class DiscreteObjectEnvironment(Environment):
         history = self.history[-history_length:]
         ax = self.plot_trajectory(history_data=history, ax=ax)
         canvas.draw()
-        image = np.frombuffer(canvas.tostring_rgb(), dtype="uint8")
-        image = image.reshape(f.canvas.get_width_height()[::-1] + (3,))
-        print(image.shape)
+        width, height = f.canvas.get_width_height()
+        # Get the RGBA buffer from the canvas
+        image = np.frombuffer(canvas.buffer_rgba(), dtype="uint8")
+        image = image.reshape((height, width, 4))
+        # Remove the alpha channel (RGBA -> RGB)
+        image_rgb = image[:, :, :3]
+        # Convert RGB to BGR for OpenCV
+        image_bgr = cv2.cvtColor(image_rgb, cv2.COLOR_RGB2BGR)
+        print(image_bgr.shape)
         if display:
-            cv2.imshow("2D_env", image)
+            cv2.imshow("2D_env", image_bgr)
             cv2.waitKey(10)
