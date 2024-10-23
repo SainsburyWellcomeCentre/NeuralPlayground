@@ -406,7 +406,7 @@ class DiscreteObjectEnvironment(Environment):
         else:
             return ax
 
-    def render(self, history_length=30):
+    def render(self, history_length=30, display=True):
         """Render the environment live through iterations"""
         f, ax = plt.subplots(1, 1, figsize=(8, 6))
         canvas = FigureCanvas(f)
@@ -416,5 +416,6 @@ class DiscreteObjectEnvironment(Environment):
         image = np.frombuffer(canvas.tostring_rgb(), dtype="uint8")
         image = image.reshape(f.canvas.get_width_height()[::-1] + (3,))
         print(image.shape)
-        cv2.imshow("2D_env", image)
-        cv2.waitKey(10)
+        if display:
+            cv2.imshow("2D_env", image)
+            cv2.waitKey(10)
