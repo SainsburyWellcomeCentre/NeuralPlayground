@@ -152,3 +152,52 @@ def plot_curves(curves, path, title, legend_labels=None, x_label=None, y_label=N
     plt.savefig(path)
     plt.show()
     plt.close()
+
+def plot_curves_2(curves, std_devs=None, path=None, title=None, legend_labels=None, x_label=None, y_label=None):
+        fig, ax = plt.subplots(figsize=(8, 6))
+        ax.set_title(title)
+
+        if x_label:
+            ax.set_xlabel(x_label)
+        if y_label:
+            ax.set_ylabel(y_label)
+
+        colormap = plt.get_cmap("viridis")
+
+        # Use numpy linspace to create the values array
+        values = np.linspace(0, 1, len(curves))
+
+        # Map the values to colors using the chosen colormap
+        colors = [colormap(value) for value in values]
+
+        for i, curve in enumerate(curves):
+            label = legend_labels[i] if legend_labels else None
+            color = colors[i % len(colors)]
+
+            # Convert PyTorch tensors to NumPy arrays for plotting
+            if isinstance(curve, torch.Tensor):
+                curve = curve.detach().numpy()
+
+            # Plot the average curve
+            ax.plot(curve, label=label, color=color)
+
+            # If std_devs are provided, plot the shaded region for the standard deviation
+            if std_devs is not None:
+                std_dev = std_devs[i]
+
+                # Convert std_dev to numpy if it is a PyTorch tensor
+                if isinstance(std_dev, torch.Tensor):
+                    std_dev = std_dev.detach().numpy()
+
+                # Shaded region (curve ± std deviation)
+                ax.fill_between(np.arange(len(curve)), np.asarray(curve) - np.asarray( std_dev), np.asarray(curve) + np.asarray(std_dev), color=color, alpha=0.3)
+
+        if legend_labels:
+            ax.legend()
+
+        # Save plot to file if path is provided
+        if path:
+            plt.savefig(path)
+
+        plt.show()
+        plt.close()

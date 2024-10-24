@@ -3,7 +3,7 @@ resample: False # @param
 wandb_on: False
 seed: 45
 plot: True
-dataset: 'random'  # 'random' or 'omniglot'
+dataset: 'random'  # 'random' or 'omniglot' or position
 weighted: False
 
 num_hidden: 15 # @param
@@ -21,5 +21,5 @@ num_nodes_min: 5
 num_features: 1
 
 batch_size_test:  2
-num_nodes_max_test: 7
-num_nodes_min_test: 5
+num_nodes_max_test: [40]
+num_nodes_min_test: 10

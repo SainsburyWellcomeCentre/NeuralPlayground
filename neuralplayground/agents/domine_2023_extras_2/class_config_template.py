@@ -42,7 +42,7 @@ class ConfigTemplate:
             ),
             config_field.Field(
                 name="num_nodes_max_test",
-                types=[int],
+                types=[list],
             ),
             config_field.Field(
                 name="num_hidden",

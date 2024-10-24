@@ -17,7 +17,6 @@ class GCNModel(nn.Module):
         self.layer_norm = layer_norm
         self.norm_layers = nn.ModuleList(
             [nn.LayerNorm(num_hidden) for _ in range(num_message_passing_steps)]) if layer_norm else None
-
         # Define the softmax layer
         self.softmax = nn.Softmax(dim=1)  # Apply softmax across the logits (along the class dimension)
 

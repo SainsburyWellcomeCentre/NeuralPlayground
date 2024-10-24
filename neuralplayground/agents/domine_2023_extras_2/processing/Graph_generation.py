@@ -5,7 +5,7 @@ import torchvision
 from torchvision import transforms
 from neuralplayground.agents.domine_2023_extras.class_utils import rng_sequence_from_rng
 
-def create_random_matrix(rows, cols, low=0, high=1):
+def create_random_matrix(rows, cols,seed, low=0, high=1):
     """
     Generates a random matrix with the specified dimensions.
     Parameters:
@@ -17,7 +17,6 @@ def create_random_matrix(rows, cols, low=0, high=1):
     numpy.ndarray: A matrix of shape (rows, cols) with random values.
     """
     return np.random.uniform(low, high, (rows, cols))
-
 
 def get_omniglot_items(n):
     # Define transformations for the images
@@ -115,8 +114,9 @@ def generate_source_and_sink(num_nodes):
         sink = np.random.randint(0, num_nodes)
 
     return source, sink
-def sample_random_graph(num_features, num_nodes):
-    node_features = torch.tensor(create_random_matrix(num_nodes,num_features))
+def sample_random_graph(num_features, num_nodes,seed):
+    # This is a graph with edges feature and random features
+    node_features = torch.tensor(create_random_matrix(num_nodes,num_features,seed))
     edges , edge_features_tensor =  create_line_graph_edge_list_with_features(num_nodes)
     input_node_features = np.zeros((int(num_nodes), 2))
     sink, source = generate_source_and_sink(num_nodes)
@@ -130,7 +130,8 @@ def sample_random_graph(num_features, num_nodes):
 
 #TODO: we need to merge this two potentially
 
-def sample_omniglot_graph(num_nodes):
+def sample_omniglot_graph(num_nodes,seed):
+    # This is a graph with edges feature and omniglot features
     node_features = torch.tensor(get_omniglot_items(num_nodes))
     edges , edge_features_tensor = create_line_graph_edge_list_with_features(num_nodes)
     input_node_features = np.zeros((int(num_nodes), 2))
@@ -143,4 +144,34 @@ def sample_omniglot_graph(num_nodes):
     node_features = torch.tensor(combined_node_features, dtype=torch.float32)
     return node_features, edges, edge_features_tensor, source, sink
 
+def sample_random_graph_position(num_features, num_nodes,seed):
+    # This is a graph with edges feature and position features
+    node_features = torch.tensor(create_random_matrix(num_nodes,num_features))
+    edges , edge_features_tensor =  create_line_graph_edge_list_with_features(num_nodes)
+    input_node_features = np.zeros((int(num_nodes), 2))
+    sink, source = generate_source_and_sink(num_nodes)
+    input_node_features[source, 0] = 1  # Set source node feature
+    input_node_features[sink, 1] = 1  # Set sink node feature
+    # Concatenate the feature matrices along the feature dimension (axis=1)
+    combined_node_features = np.concatenate([node_features, input_node_features], axis=1)
+    position =  torch.tensor([np.arange(0, num_nodes)])
+    combined_node_features_pos = np.concatenate([combined_node_features, position.T], axis=1)
+    # Convert combined node features back to a tensor
+    node_features = torch.tensor(combined_node_features_pos , dtype=torch.float32)
+    return node_features, edges, edge_features_tensor, source, sink
 
+def sample_random_graph_position_no_edges(num_features, num_nodes,seed):
+    # This is a graph with no edges feature but position features
+    node_features = torch.tensor(create_random_matrix(num_nodes,num_features))
+    edges , edge_features_tensor =  create_line_graph_edge_list_with_features(num_nodes)
+    input_node_features = np.zeros((int(num_nodes), 2))
+    sink, source = generate_source_and_sink(num_nodes)
+    input_node_features[source, 0] = 1  # Set source node feature
+    input_node_features[sink, 1] = 1  # Set sink node feature
+    # Concatenate the feature matrices along the feature dimension (axis=1)
+    combined_node_features = np.concatenate([node_features, input_node_features], axis=1)
+    # Convert combined node features back to a tensor
+    node_features = torch.tensor(combined_node_features, dtype=torch.float32)
+    return node_features, edges, source, sink
+
+#TODO: we need to merge this into one function because this is ungly
