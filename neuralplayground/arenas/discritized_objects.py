@@ -97,8 +97,8 @@ class DiscreteObjectEnvironment(Environment):
         self.arena_limits = np.array(
             [[self.arena_x_limits[0], self.arena_x_limits[1]], [self.arena_y_limits[0], self.arena_y_limits[1]]]
         )
-        self.room_width = np.diff(self.arena_x_limits)[0]
-        self.room_depth = np.diff(self.arena_y_limits)[0]
+        self.room_width = np.diff(self.arena_x_limits)[0].item()
+        self.room_depth = np.diff(self.arena_y_limits)[0].item()
         self.agent_step_size = env_kwargs["agent_step_size"]
         self._create_default_walls()
         self._create_custom_walls()
