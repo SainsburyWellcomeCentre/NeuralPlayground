@@ -10,8 +10,14 @@ Welcome to NeuralPlayground's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   installation
    getting_started
    api_index
+   readme_link
+
+.. card:: Card Title
+
+    Card content
 
 By default the documentation includes the following sections:
 
