@@ -3,14 +3,14 @@ resample: False # @param
 wandb_on: False
 seed: 45
 plot: True
-dataset: 'random'  # 'random' or 'omniglot' or position
+dataset: 'positional'  # 'random' or 'omniglot' or positional'positional_no_edges
 weighted: False
 
 num_hidden: 15 # @param
 num_layers: 1  # @param
-num_message_passing_steps: 4  # @param
-learning_rate: 0.001 # @param
-num_training_steps: 3000 # @param
+num_message_passing_steps: 0  # @param
+learning_rate: 0.005 # @param
+num_training_steps: 80 # @param
 residual: True
 layer_norm: False
 
@@ -21,5 +21,5 @@ num_nodes_min: 5
 num_features: 1
 
 batch_size_test:  2
-num_nodes_max_test: [40]
+num_nodes_max_test: [6,7,8,9] #min2
 num_nodes_min_test: 10

@@ -1,6 +1,7 @@
 import argparse
 import os
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
+import math
 import torch
 import shutil
 from datetime import datetime
@@ -8,12 +9,13 @@ from pathlib import Path
 import torch.nn as nn
 import torch.optim as optim
 import wandb
+import numpy as np
 from neuralplayground.agents.agent_core import AgentCore
 from neuralplayground.agents.domine_2023_extras_2.utils.plotting_utils import plot_curves, plot_curves_2, plot_2dgraphs
 from neuralplayground.agents.domine_2023_extras_2.models.GCN_model import GCNModel
 from neuralplayground.agents.domine_2023_extras_2.class_grid_run_config import GridConfig
 from neuralplayground.agents.domine_2023_extras_2.utils.utils import set_device
-from neuralplayground.agents.domine_2023_extras_2.processing.Graph_generation import sample_random_graph, sample_target, sample_omniglot_graph, sample_random_graph_position
+from neuralplayground.agents.domine_2023_extras_2.processing.Graph_generation import sample_graph, sample_target, sample_omniglot_graph, sample_fixed_graph
 from torchmetrics import Accuracy, Precision, AUROC, Recall, MatthewsCorrCoef
 from torchmetrics.classification import BinaryAccuracy
 
@@ -25,10 +27,11 @@ class Domine2023(AgentCore):
                  train_on_shortest_path=True, resample=True, wandb_on=False, seed=41, dataset = 'random',
                  weighted=True, num_hidden=100, num_layers=2, num_message_passing_steps=3, learning_rate=0.001,
                  num_training_steps=10, residual=True, layer_norm=True, batch_size=4, num_features=4, num_nodes_max=7,
-                 batch_size_test=4, num_nodes_min_test=4, num_nodes_max_test=[7], plot=True, **mod_kwargs):
+                 batch_size_test=4, num_nodes_min_test=4, num_nodes_max_test=[7], plot=True,  **mod_kwargs):
         super(Domine2023, self).__init__()
 
         # General
+        np.random.seed(seed)
         self.plot = plot
         self.obs_history = []
         self.grad_history = []
@@ -54,9 +57,30 @@ class Domine2023(AgentCore):
         self.num_nodes_max = num_nodes_max
         self.num_nodes_max_test = num_nodes_max_test
 
+
+        def set_initial_seed(seed):
+            # Set the seed for NumPy
+            np.random.seed(seed)
+
+            # Set the seed for PyTorch
+            torch.manual_seed(seed)
+
+            # If using CUDA
+            if torch.cuda.is_available():
+                torch.cuda.manual_seed(seed)
+                torch.cuda.manual_seed_all(seed)  # If you are using multi-GPU
+
+            # Optional: For deterministic behavior, you can use the following:
+            # This is usually needed for reproducibility with certain layers like convolution.
+            torch.backends.cudnn.deterministic = True
+            torch.backends.cudnn.benchmark = False
+
+        set_initial_seed(seed)
+
         self.batch_size_test = batch_size_test
         self.arena_x_limits = mod_kwargs["arena_x_limits"]
         self.arena_y_limits = mod_kwargs["arena_y_limits"]
+        save_path = mod_kwargs["save_path"]
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         if self.dataset == 'random':
             self.model = GCNModel(self.num_hidden, self.num_features + 2, self.num_layers,
@@ -104,20 +128,7 @@ class Domine2023(AgentCore):
         if self.wandb_on:
             wandb.log(self.wandb_logs)
         else:
-            dateTimeObj = datetime.now()
-            save_path = os.path.join(Path(os.getcwd()).resolve(), "results")
-            os.mkdir(
-                os.path.join(
-                    save_path,
-                    self.experiment_name + dateTimeObj.strftime("%d%b_%H_%M_%S"),
-                )
-            )
-            self.save_path = os.path.join(
-                os.path.join(
-                    save_path,
-                    self.experiment_name + dateTimeObj.strftime("%d%b_%H_%M_%S"),
-                )
-            )
+            self.save_path= save_path
         self.save_run_parameters()
 
     def save_run_parameters(self):
@@ -132,25 +143,27 @@ class Domine2023(AgentCore):
         for file_name, source in files_to_copy:
             shutil.copyfile(os.path.join(Path(os.getcwd()).resolve(), source), os.path.join(self.save_path, file_name))
 
-    def load_data(self, train, dataset, batch_size,num_nodes,seed):
+    def load_data(self, fixed, dataset, batch_size,num_nodes):
         # Initialize lists to store batch data
         node_features_batch, edges_batch, edge_features_batch, target_batch = [], [], [], []
 
         # Determine the max nodes to use based on whether it is training or testing
 
-
         # Loop to generate a batch of data
         for _ in range(batch_size):
+            if fixed:
+                node_features, edges, edge_features_tensor, source, sink = sample_fixed_graph(self.num_features,
+                                                                                              num_nodes,feature_type=  dataset)
+            else:
             # Handle Omniglot dataset
-            if dataset == 'omniglot':
-                node_features, edges, edge_features_tensor, source, sink = sample_omniglot_graph(num_nodes,seed)
-            # Handle Random dataset
-            elif dataset == 'random':
-                node_features, edges, edge_features_tensor, source, sink = sample_random_graph(self.num_features,
-                                                                                               num_nodes,seed)
-            elif dataset == 'positional':
-                node_features, edges, edge_features_tensor, source, sink = sample_random_graph_position(self.num_features ,
-                                                                                               num_nodes,seed)
+                if dataset == 'omniglot':
+                    node_features, edges, edge_features_tensor, source, sink = sample_omniglot_graph(num_nodes)
+                # Handle Random dataset
+                else:
+                    node_features, edges, edge_features_tensor, source, sink = sample_graph(self.num_features,
+                                                                                                   num_nodes,feature_type= dataset)
+
+
 
             # Sample the target based on source and sink
             target = sample_target(source, sink)
@@ -226,7 +239,6 @@ class Domine2023(AgentCore):
                 outputs = Softmax(outputs)
                 predicted_labels = torch.argmax(outputs, dim=1)  # Outputs: [0, 1, 0, 1]
                 # Initialize the BinaryAccuracy metric
-                # TODO : My accuracy is not working, the way it should be i think due to the labes aot
                 acc = self.ACC(predicted_labels, labels)
             return acc
 
@@ -243,15 +255,28 @@ class Domine2023(AgentCore):
 
     def train(self):
         # Load validation data
-        node_features_val, edges_val, edge_features_tensor_val, target_val = self.load_data(train=False,
+        val_graphs = {num_node: [] for num_node in self.num_nodes_max_test}
+        for i in range(len(self.num_nodes_max_test)):
+            node_features_val, edges_val, edge_features_tensor_val, target_val = self.load_data(fixed=False,
                                                                                             dataset=self.dataset,
-                                                                                             batch_size=self.batch_size, num_nodes= self.num_nodes_max_test[0],seed=self.seed)
+                                                                                             batch_size=self.batch_size, num_nodes= self.num_nodes_max_test[i])
+            val_graphs[self.num_nodes_max_test[i]] = [node_features_val, edges_val, edge_features_tensor_val, target_val]
+
+        #for i in len(self.num_nodes_max_test):
+        # This is an attemp
+        node_features_val_f, edges_val_f, edge_features_tensor_val_f, target_val_f = self.load_data(fixed=True,
+                                                                                            dataset=self.dataset,
+                                                                                            batch_size=self.batch_size,
+                                                                                            num_nodes=
+                                                                                            self.num_nodes_max_test[0],
+                                                                                        )
+         # need to save the fixed one node_featur
 
         for epoch in range(self.num_training_steps):
-            train_losses, train_roc_auc, train_mcc = 0, 0, 0
-            node_features, edges, edge_features_tensor, target = self.load_data(train=True,
+
+            node_features, edges, edge_features_tensor, target = self.load_data(fixed=False,
                                                                                 dataset=self.dataset,
-                                                                                batch_size=self.batch_size, num_nodes= self.num_nodes_max, seed=seed)
+                                                                                batch_size=self.batch_size, num_nodes= self.num_nodes_max)
             #Train on each batch
             batch_losses, batch_acc = self.update_step(node_features, edges,
                                                                           edge_features_tensor, target, train=True,  batch_size=self.batch_size)
@@ -266,17 +291,19 @@ class Domine2023(AgentCore):
 
             self.ACCs_train.append(train_acc)
 
-
+            # Validation
             with torch.no_grad():
-
-                val_losses, val_acc = self.update_step(node_features_val, edges_val,
+                for num_node in self.num_nodes_max_test:
+                    node_features_val, edges_val, edge_features_tensor_val, target_val = val_graphs[num_node]
+                    val_losses, val_acc = self.update_step(node_features_val, edges_val,
                                                                     edge_features_tensor_val, target_val,
                                                                     train=False,batch_size=self.batch_size)
-            self.losses_val.append(val_losses)
+                    self.losses_val[num_node].append(val_losses)
+                    self.ACCs_val[num_node].append(val_acc)
 
-            self.ACCs_val.append(val_acc)
 
             # Log training details
+            #TODO: Need to update this
             self.log_training(train_losses, val_losses, train_acc, val_acc)
 
             # Plot progress every epoch
@@ -288,37 +315,39 @@ class Domine2023(AgentCore):
 
 
         if self.plot:
-            os.mkdir(os.path.join(self.save_path, "results"))
+            os.makedirs(os.path.join(self.save_path, "results"), exist_ok=True)
             self.save_path = os.path.join(self.save_path, "results")
             file_name = f"Losses_{seed}.pdf"
 
             # Combine the path and file name
+            list_of_lists = [value for value in self.losses_val.values()]
+            list_of_list_name = [f'loss_val_len{value}' for value in self.losses_val]
+            # Append losses_train to the list of lists
+            list_of_lists.append(self.losses_train)
+            list_of_list_name.append('loss_train')
 
             plot_curves(
-                [
-                    self.losses_train,
-                    self.losses_val],
+                list_of_lists                ,
                 os.path.join(self.save_path, file_name ),
                 "All_Losses",
-                legend_labels=["loss", "loss tesft"],
+                legend_labels=list_of_list_name,
             )
-            file_name = f"ACCs_train_{seed}.pdf"
+
+            file_name = f"ACCs_val_{seed}.pdf"
+            plot_curves( [value for value in self.ACCs_val.values()],
+                os.path.join(self.save_path, file_name),
+                "ACC Val",
+                legend_labels=[f'ACC_val_len{value}' for value in self.losses_val],
+            )
+            file_name =  f"ACCs_train_{seed}.pdf"
+
             plot_curves(
                 [
                     self.ACCs_train,
                 ],
                 os.path.join(self.save_path, file_name),
-                "ACC Train",
-                legend_labels=["ACC Train"],
-            )
-            file_name =  f"ACCs_val_{seed}.pdf"
-            plot_curves(
-                [
-                    self.ACCs_val,
-                ],
-                os.path.join(self.save_path, file_name),
-                "ACC val",
-                legend_labels=["ACC val"],
+                "ACC train",
+                legend_labels=["ACC train"],
             )
 
 
@@ -349,9 +378,10 @@ class Domine2023(AgentCore):
         self.grad_history = []
         self.global_steps = 0
         self.losses_train  = []
-        self.losses_val = []
+        self.losses_val = {num_node: [] for num_node in self.num_nodes_max_test}
+        self.ACCs_val = {num_node: [] for num_node in self.num_nodes_max_test}
         self.ACCs_train = []
-        self.ACCs_val = []
+
         return
 
 
@@ -367,12 +397,25 @@ if __name__ == "__main__":
     arena_x_limits = [-100, 100]
     arena_y_limits = [-100, 100]
 
-    seeds = [41, 42, 43, 45, 46 ]
+    seeds = [41,42]
     losses_train = {seed: [] for seed in seeds}
     losses_val = {seed: [] for seed in seeds}
     ACCs_train = {seed: [] for seed in seeds}
     ACCs_val = {seed: [] for seed in seeds}
-
+    dateTimeObj = datetime.now()
+    save_path = os.path.join(Path(os.getcwd()).resolve(), "results")
+    os.mkdir(
+        os.path.join(
+            save_path,
+            config.experiment_name + dateTimeObj.strftime("%d%b_%H_%M_%S"),
+        )
+    )
+    save_path = os.path.join(
+        os.path.join(
+            save_path,
+            config.experiment_name + dateTimeObj.strftime("%d%b_%H_%M_%S"),
+        )
+    )
     for seed in seeds:
         agent = Domine2023(
             experiment_name=config.experiment_name,
@@ -398,7 +441,9 @@ if __name__ == "__main__":
             residual=config.residual,
             layer_norm=config.layer_norm,
             plot=config.plot,
+            save_path = save_path
         )
+
 
 
         losse_train, ACC_train, losse_val, ACC_val = agent.train()
@@ -407,17 +452,14 @@ if __name__ == "__main__":
         ACCs_train[seed]= ACC_train
         ACCs_val[seed] = ACC_val
 
+    save_path = os.path.join(save_path, "results")
     num_training_steps = config.num_training_steps
-    import math
-
-    num_training_steps = config.num_training_steps
-
     # Initialize lists to store standard deviation results
     std_losses_train = []
     std_accs_train = []
-    std_losses_val = []
-    std_accs_val = []
+
     # Compute average and standard deviation for training loss
+
     avg_losses_train = []
     for epoch_idx in range(num_training_steps):
         # Average the loss for this epoch over all seeds
@@ -441,36 +483,53 @@ if __name__ == "__main__":
         std_epoch_acc = math.sqrt(variance_acc)
         std_accs_train.append(std_epoch_acc)
 
+
     # Compute average and standard deviation for validation loss
-    avg_losses_val = []
-    for epoch_idx in range(num_training_steps):
-        avg_epoch_loss_val = sum(losses_val[seed][epoch_idx] for seed in seeds) / len(seeds)
-        avg_losses_val.append(avg_epoch_loss_val)
+    avg_losses_val_len = []
+    std_losses_val_len = []
+    for i in config.num_nodes_max_test:
+        avg_losses_val = []
+        std_losses_val = []
+        for epoch_idx in range(num_training_steps):
+            avg_epoch_loss_val = sum(losses_val[seed][i][epoch_idx] for seed in seeds) / len(seeds)
+            avg_losses_val.append(avg_epoch_loss_val)
+            variance_loss_val = sum(
+                (losses_val[seed][i][epoch_idx] - avg_epoch_loss_val) ** 2 for seed in seeds) / len(seeds)
+            std_epoch_loss_val = math.sqrt(variance_loss_val)
+            std_losses_val.append(std_epoch_loss_val)
+        avg_losses_val_len.append(avg_losses_val)
+        std_losses_val_len.append(std_losses_val)
 
-        # Compute standard deviation for this epoch
-        variance_loss_val = sum((losses_val[seed][epoch_idx] - avg_epoch_loss_val) ** 2 for seed in seeds) / len(seeds)
-        std_epoch_loss_val = math.sqrt(variance_loss_val)
-        std_losses_val.append(std_epoch_loss_val)
+    #Compute average and standard deviation for validation accuracy
+    avg_accs_val_len = []
+    std_accs_val_len = []
+    for i in config.num_nodes_max_test:
+        avg_accs_val = []
+        std_accs_val = []
+        for epoch_idx in range(num_training_steps):
+            avg_epoch_acc_val = sum(ACCs_val[seed][i][epoch_idx] for seed in seeds) / len(seeds)
+            avg_accs_val.append(avg_epoch_acc_val)
 
-    # Compute average and standard deviation for validation accuracy
-    avg_accs_val = []
-    for epoch_idx in range(num_training_steps):
-        avg_epoch_acc_val = sum(ACCs_val[seed][epoch_idx] for seed in seeds) / len(seeds)
-        avg_accs_val.append(avg_epoch_acc_val)
+            # Compute standard deviation for this epoch
+            variance_acc_val = sum((ACCs_val[seed][i][epoch_idx] - avg_epoch_acc_val) ** 2 for seed in seeds) / len(seeds)
+            std_epoch_acc_val = math.sqrt(variance_acc_val)
+            std_accs_val.append(std_epoch_acc_val)
+        avg_accs_val_len.append(avg_accs_val)
+        std_accs_val_len.append(std_accs_val)
 
-        # Compute standard deviation for this epoch
-        variance_acc_val = sum((ACCs_val[seed][epoch_idx] - avg_epoch_acc_val) ** 2 for seed in seeds) / len(seeds)
-        std_epoch_acc_val = math.sqrt(variance_acc_val)
-        std_accs_val.append(std_epoch_acc_val)
 
-    save_path = os.path.join(Path(os.getcwd()).resolve(), "results")
+
+    list_of_list_name = [f'loss_val_len{value}' for value in losses_val[seed]]
+    # Append losses_train to the list of lists
+    avg_losses_val_len.append(avg_losses_train)
+    list_of_list_name.append('loss_train')
+    std_losses_val_len.append(std_accs_train)
+
     plot_curves_2(
-        [
-            avg_losses_train,
-            avg_losses_val],[std_accs_train,std_accs_val],
+        avg_losses_val_len,std_losses_val_len,
         os.path.join(save_path, "Losses.pdf"),
         "All_Losses",
-        legend_labels=["loss", "loss tesft"],
+        legend_labels= list_of_list_name,
     )
     plot_curves_2(
         [
@@ -481,19 +540,18 @@ if __name__ == "__main__":
         legend_labels=["ACC Train"],
     )
 
+    list_of_list_name = [f'loss_val_len{value}' for value in losses_val[seed]]
     plot_curves_2(
-        [
-            avg_accs_val,
-        ],[std_accs_val], os.path.join(save_path, "ACCs_val.pdf"),
+        avg_accs_val_len,std_accs_val_len, os.path.join(save_path, "ACCs_val.pdf"),
         "ACC val",
-        legend_labels=["ACC val"],
+        legend_labels=list_of_list_name,
     )
     print()
 
-    #TODO: They all have different evaluation ( netwokr ) do we want ot eva
-    #TODO: How to actually get the seed to be fixed for each run
+    #TODO: They all have different evaluation ( netwokr ) do we want ot eval ( for the average it should be ifne)
     #TODO: Think about nice visualisaiton
-    # I need to check the saving and the logging of the results
+    #TODO: update the plotting for the other curves
+    # I need to check the logging of the results
     # TODO. : plan a set of experiements to run, sudy how different initialisiton
     #TODO: Get a different set of valisaion lenght for each run
 

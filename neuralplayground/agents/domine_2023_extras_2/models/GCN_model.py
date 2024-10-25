@@ -23,7 +23,7 @@ class GCNModel(nn.Module):
     def forward(self, node, edges, edges_attr):
         x, edge_index = node, edges
         x = self.conv_1(x, edge_index, edges_attr)
-
+        x = torch.relu(x)
         for i, conv in enumerate(self.conv_layers):
             x_res = x
             x = conv(x, edge_index, edges_attr)
