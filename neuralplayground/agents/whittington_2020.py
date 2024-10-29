@@ -256,9 +256,15 @@ class Whittington2020(AgentCore):
         self.final_model_input = model_input
 
         forward = self.tem(model_input, self.prev_iter)
-        chunk = [[step[0][0], np.argmax(step[1][0]), step[2][0]] for step in model_input]
-        for i in range(len(chunk)):
-            self.logger.info(chunk[i])
+        # chunk = [[step[0][0], np.argmax(step[1][0]), step[2][0]] for step in model_input]
+        for i in range(len(model_input)):
+            # self.logger.info(chunk[i])
+            ids = [step["id"] for step in model_input[i][0]]
+            objs = [int(np.argmax(step)) for step in model_input[i][1]]
+            actions = model_input[i][2]
+            self.logger.info("IDs: " + str(ids))
+            self.logger.info("Objs: " + str(objs))
+            self.logger.info("Actions: " + str(actions))
         # if self.prev_iter is None:
         #     with open('OG_log.txt', 'a') as f:
         #         f.write('Walk number: ' + str(self.global_steps) + '\n')
