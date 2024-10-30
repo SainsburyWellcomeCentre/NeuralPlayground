@@ -12,3 +12,4 @@ recursive-include documents *.md
 recursive-include neuralplayground *.md
 
 include neuralplayground/vendored/LICENCE_vendored
+recursive-exclude docs *

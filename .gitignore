@@ -62,3 +62,6 @@ coverage.xml
 
 # PyPI distribution / packages
 dist/
+
+# Sphinx documentation
+docs/build/
