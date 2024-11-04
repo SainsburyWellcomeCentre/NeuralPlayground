@@ -1,0 +1,695 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Welcome to NeuralPlayground’s documentation! &#8212; NeuralPlayground</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!-- 
+    this give us a css class that will be invisible only if js is disabled 
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=26a4bc78f4c0ddb94549"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
+
+    <script src="_static/documentation_options.js?v=f7cdbf68"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'index';</script>
+    <link rel="canonical" href="https://SainsburyWellcomeCentre.github.io/NeuralPlayground/index.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="#">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">NeuralPlayground v0.0.9</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/SainsburyWellcomeCentre/NeuralPlayground" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/SainsburyWellcomeCentre/NeuralPlayground" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none"></div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="welcome-to-neuralplayground-s-documentation">
+<h1>Welcome to NeuralPlayground’s documentation!<a class="headerlink" href="#welcome-to-neuralplayground-s-documentation" title="Link to this heading">#</a></h1>
+<blockquote>
+<div><p><a class="reference external" href="https://opensource.org/licenses/MIT"><img alt="License" src="https://img.shields.io/badge/License-MIT-orange.svg" /></a>
+<img alt="CI" src="https://img.shields.io/github/actions/workflow/status/SainsburyWellcomeCentre/NeuralPlayground/test_and_deploy.yml?label=CI" />
+<a class="reference external" href="https://codecov.io/gh/SainsburyWellcomeCentre/NeuralPlayground"><img alt="codecov" src="https://codecov.io/gh/SainsburyWellcomeCentre/NeuralPlayground/branch/main/graph/badge.svg?token=P8CCH3TI8K" /></a>
+<a class="reference external" href="https://github.com/charliermarsh/ruff"><img alt="Ruff" src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/charliermarsh/ruff/main/assets/badge/v0.json" /></a>
+<a class="reference external" href="https://github.com/python/black"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg" /></a>
+<a class="reference external" href="https://github.com/pre-commit/pre-commit"><img alt="pre-commit" src="https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&amp;logoColor=white" /></a></p>
+<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+<p><a class="reference internal" href="#contributors"><img alt="All Contributors" src="https://img.shields.io/badge/all_contributors-9-orange.svg?style=flat-square" /></a></p>
+<!-- ALL-CONTRIBUTORS-BADGE:END -->
+<section class="tex2jax_ignore mathjax_ignore" id="neuralplayground">
+<h2>NeuralPlayground<a class="headerlink" href="#neuralplayground" title="Link to this heading">#</a></h2>
+<section id="a-standardised-environment-for-the-hippocampus-and-entorhinal-cortex-models">
+<h3><em>A standardised environment for the hippocampus and entorhinal cortex models.</em> <a href="https://githubtocolab.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/colab_example.ipynb" target="_parent"><img alt="Open In Colab" src="https://colab.research.google.com/assets/colab-badge.svg" /></a><a class="headerlink" href="#a-standardised-environment-for-the-hippocampus-and-entorhinal-cortex-models" title="Link to this heading">#</a></h3>
+<a class="reference internal image-reference" href="_images/NPG_GH-social-preview_white-bg.jpg"><img alt="NeuralPlayground Logo" src="_images/NPG_GH-social-preview_white-bg.jpg" style="width: 500px;" />
+</a>
+<!-- TOC -->
+<ul class="simple">
+<li><p><a class="reference internal" href="#introduction">Introduction</a></p></li>
+<li><p><a class="reference internal" href="#installation">Installation</a></p>
+<ul>
+<li><p><a class="reference internal" href="#create-a-conda-environment">Create a conda environment</a></p></li>
+<li><p><a class="reference internal" href="#pip-install">Pip install</a></p></li>
+<li><p><a class="reference internal" href="#install-for-development">Install for development</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#usage">Usage</a></p>
+<ul>
+<li><p><a class="reference internal" href="#agent-arena-interaction">Agent Arena interaction</a></p></li>
+<li><p><a class="reference internal" href="#simulation-manager">Simulation Manager</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#i-want-to-contribute">I want to contribute</a></p></li>
+<li><p><a class="reference internal" href="#cite">Cite</a></p></li>
+<li><p><a class="reference internal" href="#license">License</a></p></li>
+<li><p><a class="reference internal" href="#contributors">Contributors</a></p></li>
+</ul>
+<!-- /TOC -->
+</section>
+<section id="introduction">
+<h3>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">#</a></h3>
+<p>The abstract representation of space has been extensively studied in the hippocampus and entorhinal cortex.
+A growing variety of theoretical models have been proposed
+to capture the rich neural and behavioral phenomena associated with these circuits. However, objective comparison
+of these theories against each other and against empirical data is challenging.</p>
+<p>Although the significance of virtuous interaction between experiments and theory is widely recognized, the tools
+available to facilitate comparison are limited. Some important challenge we aim to solve are:</p>
+<ol class="arabic simple">
+<li><p>Lack availability and accessibility of data in a standardized, labeled format.</p></li>
+<li><p>Standard and easy ways to compare model output with empirical data.</p></li>
+<li><p>A repository of models and data sets that are relevant for the field of hippocampus and entorhinal cortex.</p></li>
+</ol>
+<p>To address this gap, we present an open-source standardised software framework - NeuralPlayground - to enable
+comparison between the hippocampus and entorhinal cortex models. This Python software package offers a reproducible
+way to compare models against a centralised library of published experimental results, including neural recordings
+and animal behavior. The framework currently contains implementations of three Agents, as well as three Experiments
+providing simple interfaces to publicly available neural and behavioral data. It also contains a customizable
+2-dimensional Arena (continuous and discrete) able to produce common experimental environments in which the agents can
+move in and interact with. Each module can also be used separately, allowing flexible access to influential
+models and data sets.</p>
+<p>We currently rely on visual comparison of a hand-selected number of outputs of the model with neural recordings as
+shown in <a class="reference external" href="https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/comparisons_examples/comparison_from_manager.ipynb">github.com/NeuralPlayground/examples/comparison</a>.
+In the future, a set of quantitative and
+qualitative measures will be added for systematic comparisons across Agents, Arenas, and Experiments.
+We want to restate that this won’t constitute a definitive judgment on the ability of an Agent to replicate the brain
+mechanism. Instead, this allows an objective and complete comparison to the current evidence in the field, as is
+typically done in publications, which can be used to guide model design and development.</p>
+<p>Altogether, we hope our framework, offers
+a foundation that the community will build upon, working toward a shared, standardized, open, and
+reproducible computational understanding of the hippocampus and entorhinal cortex.</p>
+<p>Try our short tutorial online in Colab. <a href="https://githubtocolab.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/colab_example.ipynb" target="_parent"><img alt="Open In Colab" src="https://colab.research.google.com/assets/colab-badge.svg" /></a></p>
+</section>
+<section id="installation">
+<h3>Installation<a class="headerlink" href="#installation" title="Link to this heading">#</a></h3>
+<section id="create-a-conda-environment">
+<h4>Create a conda environment<a class="headerlink" href="#create-a-conda-environment" title="Link to this heading">#</a></h4>
+<p>We advise you to install the package in a virtual environment,
+to avoid conflicts with other packages. For example, using <code class="docutils literal notranslate"><span class="pre">conda</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">create</span> <span class="o">--</span><span class="n">name</span> <span class="n">NPG</span><span class="o">-</span><span class="n">env</span> <span class="n">python</span><span class="o">=</span><span class="mf">3.10</span>
+<span class="n">conda</span> <span class="n">activate</span> <span class="n">NPG</span><span class="o">-</span><span class="n">env</span>
+<span class="n">conda</span> <span class="n">install</span> <span class="n">pip</span>
+</pre></div>
+</div>
+</section>
+<section id="pip-install">
+<h4>Pip install<a class="headerlink" href="#pip-install" title="Link to this heading">#</a></h4>
+<p>You can use <code class="docutils literal notranslate"><span class="pre">pip</span></code> get the latest release of NeuralPlayground from PyPI.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># install the latest release</span>
+<span class="n">pip</span> <span class="n">install</span> <span class="n">NeuralPlayground</span>
+
+<span class="c1"># upgrade to the latest release</span>
+<span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">U</span> <span class="n">NeuralPlayground</span>
+
+<span class="c1"># install a particular release</span>
+<span class="n">pip</span> <span class="n">install</span> <span class="n">NeuralPlayground</span><span class="o">==</span><span class="mf">0.0.5</span>
+</pre></div>
+</div>
+<blockquote>
+<div><p><strong>Note</strong></p>
+<p>If you wish to run our implementation of the Tolman-Eichenbaum machine, there are additional dependencies to install. These can be found in the <a class="reference external" href="https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples/agent_examples/TEM_README.md">TEM_README.md</a> file.</p>
+</div></blockquote>
+</section>
+<section id="install-for-development">
+<h4>Install for development<a class="headerlink" href="#install-for-development" title="Link to this heading">#</a></h4>
+<p>If you want to contribute to the project, get the latest development version
+from GitHub, and install it in editable mode, including the “dev” dependencies:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/SainsburyWellcomeCentre/NeuralPlayground/<span class="w"> </span>--single-branch
+<span class="nb">cd</span><span class="w"> </span>NeuralPlayground
+pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.<span class="o">[</span>dev<span class="o">]</span>
+</pre></div>
+</div>
+<blockquote>
+<div><p><strong>Note</strong></p>
+<p>if you are using the <code class="docutils literal notranslate"><span class="pre">zsh</span></code> shell (default on macOS), replace the last command with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s1">&#39;.[dev]&#39;</span>
+</pre></div>
+</div>
+</div></blockquote>
+</section>
+</section>
+<section id="usage">
+<h3>Usage<a class="headerlink" href="#usage" title="Link to this heading">#</a></h3>
+<p>Try our package! We are gathering opinions to focus our efforts on improving aspects of the code or adding new features,
+so if you tell us what you would like to have, we might just implement it 😊.
+This open-source software was built to be collaborative and lasting. We hope that the framework will be simple
+enough to be adopted by a great number of neuroscientists, eventually guiding the path to the computational
+understanding of the HEC mechanisms. We follow reproducible, inclusive, and collaborative project design guidelines.
+All relevant documents can be found in <a class="reference external" href="https://github.com/ClementineDomine/NeuralPlayground/blob/main/documents/">Documents</a>.</p>
+<section id="agent-arena-interaction">
+<h4>Agent Arena interaction<a class="headerlink" href="#agent-arena-interaction" title="Link to this heading">#</a></h4>
+<p>You can pick an Agent and an Arena of your choice to run a simulation. Arenas and simulations have a simple interface to interact with each other as in <a class="reference external" href="https://gymnasium.farama.org/">OpenAI gymnasium</a>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># import an agent based on a plasticity model of grid cells</span>
+<span class="kn">from</span> <span class="nn">neuralplayground.agents</span> <span class="kn">import</span> <span class="n">Weber2018</span>
+<span class="c1"># import a square 2D arena</span>
+<span class="kn">from</span> <span class="nn">neuralplayground.arenas</span> <span class="kn">import</span> <span class="n">Simple2D</span>
+<span class="c1"># Initialize the agent</span>
+<span class="n">agent</span> <span class="o">=</span> <span class="n">Weber2018</span><span class="p">()</span>
+<span class="c1"># Initialize the arena</span>
+<span class="n">arena</span> <span class="o">=</span> <span class="n">Simple2D</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>To make the agent interact with the arena, a very simple loop can be the following:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">iterations</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="n">obs</span><span class="p">,</span> <span class="n">state</span> <span class="o">=</span> <span class="n">arena</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">iterations</span><span class="p">):</span>
+    <span class="c1"># Observe to choose an action</span>
+    <span class="n">action</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">act</span><span class="p">(</span><span class="n">obs</span><span class="p">)</span>
+    <span class="c1"># Run environment for given action</span>
+    <span class="n">obs</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">reward</span> <span class="o">=</span> <span class="n">arena</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">action</span><span class="p">)</span>
+    <span class="c1"># Update agent parameters</span>
+    <span class="n">update_output</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>This process is the base of our package. We provide a more detailed example in <a href="https://githubtocolab.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/colab_example.ipynb" target="_parent"><img alt="Open In Colab" src="https://colab.research.google.com/assets/colab-badge.svg" /></a>.
+Also, specific examples of how to use each module can be found in <a class="reference external" href="https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples/agent_examples">agent</a>,
+<a class="reference external" href="https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/arena_examples/arena_examples.ipynb">arena</a>
+and <a class="reference external" href="https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/experimental_examples/experimental_data_examples.ipynb">experiment</a> jupyter notebooks.</p>
+<blockquote>
+<div><p><strong>Note</strong></p>
+<p>Check our Tolman-Eichenbaum Machine Implementation in
+<a class="reference external" href="https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/neuralplayground/agents/whittington_2020.py">this branch</a> (work in progress), you will also need to install <a class="reference external" href="https://pytorch.org/">pytorch</a> ro run it.</strong></p>
+</div></blockquote>
+</section>
+<section id="simulation-manager">
+<h4>Simulation Manager<a class="headerlink" href="#simulation-manager" title="Link to this heading">#</a></h4>
+<p>We provide some backend tools to run simulations and compare the results with experimental data in the background,
+including some methods to keep track of your runs, and a comparison board to visualise the results. You can check
+the details in <a class="reference external" href="https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/comparisons_examples/simulation_manager.ipynb">Simulation Manager</a>
+and <a class="reference external" href="https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/comparisons_examples/comparison_from_manager.ipynb">Comparison Board</a> jupyters. In addition,
+we have some <a class="reference external" href="https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/neuralplayground/backend/default_simulation.py">default simulations</a>
+you can try out, for which you don’t need to write much code, since they are
+implemented using a SingleSim
+class. For example</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Import default simulation, which is a SingleSim</span>
+<span class="kn">from</span> <span class="nn">neuralplayground.backend.default_simulation</span> <span class="kn">import</span> <span class="n">stachenfeld_in_2d</span>
+<span class="kn">from</span> <span class="nn">neuralplayground.backend.default_simulation</span> <span class="kn">import</span> <span class="n">weber_in_2d</span>
+<span class="n">stachenfeld_in_2d</span><span class="o">.</span><span class="n">run_sim</span><span class="p">(</span><span class="n">save_path</span><span class="o">=</span><span class="s2">&quot;my_results&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This class allows you to run a simulation with a single line of code, and it will automatically save the results in a
+folder with the name you provide, keeping track of any errors and logs. You can also use our
+<a class="reference external" href="https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/comparisons_examples/simulation_manager.ipynb">Simulation Manager</a>
+to run multiple simulations at once, save the results, keep run of each run and possible errors for easy debugging, and other functions.</p>
+<p>To make the agent interact with the arena, a very simple loop can be the following:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">iterations</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="n">obs</span><span class="p">,</span> <span class="n">state</span> <span class="o">=</span> <span class="n">arena</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">iterations</span><span class="p">):</span>
+    <span class="c1"># Observe to choose an action</span>
+    <span class="n">action</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">act</span><span class="p">(</span><span class="n">obs</span><span class="p">)</span>
+    <span class="c1"># Run environment for given action</span>
+    <span class="n">obs</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">reward</span> <span class="o">=</span> <span class="n">arena</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">action</span><span class="p">)</span>
+    <span class="c1"># Update agent parameters</span>
+    <span class="n">update_output</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>This process is the base of our package. We provide a more detailed example in <a href="https://githubtocolab.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/colab_example.ipynb" target="_parent"><img alt="Open In Colab" src="https://colab.research.google.com/assets/colab-badge.svg" /></a>.
+Also, specific examples of how to use each module can be found in <a class="reference external" href="https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples/agent_examples">agent</a>,
+<a class="reference external" href="https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/arena_examples/arena_examples.ipynb">arena</a>
+and <a class="reference external" href="https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/experimental_examples/experimental_data_examples.ipynb">experiment</a> jupyter notebooks.</p>
+<blockquote>
+<div><p><strong>Note</strong></p>
+<p>Check our Tolman-Eichenbaum Machine Implementation in
+<a class="reference external" href="https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/neuralplayground/agents/whittington_2020.py">this branch</a> (work in progress), you will also need to install <a class="reference external" href="https://pytorch.org/">pytorch</a> ro run it.</strong></p>
+</div></blockquote>
+</section>
+<section id="id1">
+<h4>Simulation Manager<a class="headerlink" href="#id1" title="Link to this heading">#</a></h4>
+<p>We provide some backend tools to run simulations and compare the results with experimental data in the background,
+including some methods to keep track of your runs, and a comparison board to visualise the results. You can check
+the details in <a class="reference external" href="https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/comparisons_examples/simulation_manager.ipynb">Simulation Manager</a>
+and <a class="reference external" href="https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/comparisons_examples/comparison_from_manager.ipynb">Comparison Board</a> jupyters. In addition,
+we have some <a class="reference external" href="https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/neuralplayground/backend/default_simulation.py">default simulations</a>
+you can try out, for which you don’t need to write much code, since they are
+implemented using a SingleSim class. For example</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Import default simulation, which is a SingleSim</span>
+<span class="kn">from</span> <span class="nn">neuralplayground.backend.default_simulation</span> <span class="kn">import</span> <span class="n">stachenfeld_in_2d</span>
+<span class="kn">from</span> <span class="nn">neuralplayground.backend.default_simulation</span> <span class="kn">import</span> <span class="n">weber_in_2d</span>
+<span class="n">stachenfeld_in_2d</span><span class="o">.</span><span class="n">run_sim</span><span class="p">(</span><span class="n">save_path</span><span class="o">=</span><span class="s2">&quot;my_results&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This class allows you to run a simulation with a single line of code, and it will automatically save the results in a
+folder with the name you provide, keeping track of any errors and logs. You can also use our
+<a class="reference external" href="https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/comparisons_examples/simulation_manager.ipynb">Simulation Manager</a>
+to run multiple simulations at once, save the results, keep run of each run and possible errors for easy debugging, and other functions.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>
+<span class="c1"># Import Simulation Manager</span>
+<span class="kn">from</span> <span class="nn">neuralplayground.backend</span> <span class="kn">import</span> <span class="n">SimulationManager</span>
+
+<span class="c1"># Initialise simulation manager</span>
+<span class="n">my_sims</span> <span class="o">=</span> <span class="p">[</span><span class="n">weber_in_2d</span><span class="p">,</span> <span class="n">stachenfeld_in_2d</span><span class="p">]</span>
+<span class="n">my_manager</span> <span class="o">=</span> <span class="n">SimulationManager</span><span class="p">(</span><span class="n">simulation_list</span> <span class="o">=</span> <span class="n">my_sims</span><span class="p">,</span>
+                               <span class="n">runs_per_sim</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>  <span class="c1"># Run 5 instances per simulation</span>
+                               <span class="n">manager_id</span> <span class="o">=</span> <span class="s2">&quot;example_simulation&quot;</span><span class="p">,</span>
+                               <span class="n">verbose</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+<span class="n">my_manager</span><span class="o">.</span><span class="n">generate_sim_paths</span><span class="p">()</span>
+<span class="n">my_manager</span><span class="o">.</span><span class="n">run_all</span><span class="p">()</span>
+<span class="n">my_manager</span><span class="o">.</span><span class="n">check_run_status</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>To compare the results, use the comparison board described in <a class="reference external" href="https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/comparisons_examples/comparison_from_manager.ipynb">Comparison Board</a> jupyter
+notebook. With time, we will build an interface for easy model comparison and visualisation of the results!</p>
+<a class="reference internal image-reference" href="_images/board_diagram.jpeg"><img alt="NeuralPlayground Logo" src="_images/board_diagram.jpeg" style="width: 500px;" />
+</a>
+</section>
+</section>
+<section id="i-want-to-contribute">
+<h3>I want to contribute<a class="headerlink" href="#i-want-to-contribute" title="Link to this heading">#</a></h3>
+<p>There are many ways to contribute to our project.</p>
+<ol class="arabic simple">
+<li><p>Implement a hippocampal and entorhinal cortex <a class="reference external" href="https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground/agents">Agent</a> of your choice.</p></li>
+<li><p>Work on improving the <a class="reference external" href="https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground/arenas">Arena</a>.</p></li>
+<li><p>Add an <a class="reference external" href="https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground/experiments">Experimental</a> data set.</p></li>
+<li><p>Implementing <a class="reference external" href="https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground/comparison/metrics.py">metrics</a> to compare the output of the Agent with the experimental data.</p></li>
+<li><p>Refactor the code to improve the readability and efficiency.</p></li>
+</ol>
+<p>All contributions should be submitted through a pull request and will be reviewed by the maintainers.
+Before sending a pull request, make sure you have the done following:</p>
+<ol class="arabic simple">
+<li><p>Checked the Licensing frameworks.</p></li>
+<li><p>Used the <a class="reference internal" href="#install-for-development">right development environment</a>. Make sure to initialise the pre-commit hooks with <code class="docutils literal notranslate"><span class="pre">pre-commit</span> <span class="pre">install</span></code> and run <code class="docutils literal notranslate"><span class="pre">pre-commit</span> <span class="pre">run</span> <span class="pre">-a</span></code> to format the code and check for errors.</p></li>
+<li><p>Followed the <a class="reference external" href="https://www.python.org/dev/peps/pep-0008/">PEP8</a> and <a class="reference external" href="https://numpydoc.readthedocs.io/en/latest/format.html">numpy docstring</a> style convention. More details found in <a class="reference external" href="https://github.com/ClementineDomine/NeuralPlayground/tree/main/documents/style_guide.md">Style Guide</a>.</p></li>
+<li><p>Implemented and ran <a class="reference external" href="https://github.com/SainsburyWellcomeCentre/NeuralPlayground/tree/main/tests">tests</a>.</p></li>
+<li><p>Comment your work.</p></li>
+</ol>
+<p><strong>All contributions to the repository are acknowledged through the all-contributors bot.</strong>
+Refer to the <a class="reference external" href="http://README.md">README.md</a> files found in each of the modules for further details on how to contribute to them.</p>
+</section>
+<section id="cite">
+<h3>Cite<a class="headerlink" href="#cite" title="Link to this heading">#</a></h3>
+<p>See <a class="reference external" href="https://github.com/ClementineDomine/NeuralPlayground/blob/main/documents/citation.cff">Citation</a> for the correct citation of this framework.</p>
+</section>
+<section id="license">
+<h3>License<a class="headerlink" href="#license" title="Link to this heading">#</a></h3>
+<p>⚖️ <a class="reference external" href="https://github.com/ClementineDomine/NeuralPlayground/blob/main/LICENSE">MIT</a></p>
+</section>
+<section id="contributors">
+<h3>Contributors<a class="headerlink" href="#contributors" title="Link to this heading">#</a></h3>
+<p>Thanks go to these wonderful people (<a class="reference external" href="https://allcontributors.org/docs/en/emoji-key">emoji key</a>):</p>
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+<table>
+  <tbody>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/ClementineDomine"><img src="https://avatars.githubusercontent.com/u/18595111?v=4?s=100" width="100px;" alt="Clementine Domine"/><br /><sub><b>Clementine Domine</b></sub></a><br /><a href="#design-ClementineDomine" title="Design">🎨</a> <a href="#mentoring-ClementineDomine" title="Mentoring">🧑‍🏫</a> <a href="https://github.com/SainsburyWellcomeCentre/NeuralPlayground/commits?author=ClementineDomine" title="Code">💻</a> <a href="#data-ClementineDomine" title="Data">🔣</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/rodrigcd"><img src="https://avatars.githubusercontent.com/u/22643681?v=4?s=100" width="100px;" alt="rodrigcd"/><br /><sub><b>rodrigcd</b></sub></a><br /><a href="#design-rodrigcd" title="Design">🎨</a> <a href="#mentoring-rodrigcd" title="Mentoring">🧑‍🏫</a> <a href="https://github.com/SainsburyWellcomeCentre/NeuralPlayground/commits?author=rodrigcd" title="Code">💻</a> <a href="#data-rodrigcd" title="Data">🔣</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/LukeHollingsworth"><img src="https://avatars.githubusercontent.com/u/93782020?v=4?s=100" width="100px;" alt="Luke Hollingsworth"/><br /><sub><b>Luke Hollingsworth</b></sub></a><br /><a href="https://github.com/SainsburyWellcomeCentre/NeuralPlayground/commits?author=LukeHollingsworth" title="Documentation">📖</a> <a href="https://github.com/SainsburyWellcomeCentre/NeuralPlayground/commits?author=LukeHollingsworth" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="http://saxelab.org"><img src="https://avatars.githubusercontent.com/u/4165949?v=4?s=100" width="100px;" alt="Andrew Saxe"/><br /><sub><b>Andrew Saxe</b></sub></a><br /><a href="#mentoring-asaxe" title="Mentoring">🧑‍🏫</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/DrCaswellBarry"><img src="https://avatars.githubusercontent.com/u/17472149?v=4?s=100" width="100px;" alt="DrCaswellBarry"/><br /><sub><b>DrCaswellBarry</b></sub></a><br /><a href="#mentoring-DrCaswellBarry" title="Mentoring">🧑‍🏫</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="http://nikosirmpilatze.com"><img src="https://avatars.githubusercontent.com/u/20923448?v=4?s=100" width="100px;" alt="Niko Sirmpilatze"/><br /><sub><b>Niko Sirmpilatze</b></sub></a><br /><a href="#infra-niksirbi" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#maintenance-niksirbi" title="Maintenance">🚧</a> <a href="#tool-niksirbi" title="Tools">🔧</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="http://adamltyson.com"><img src="https://avatars.githubusercontent.com/u/13147259?v=4?s=100" width="100px;" alt="Adam Tyson"/><br /><sub><b>Adam Tyson</b></sub></a><br /><a href="#maintenance-adamltyson" title="Maintenance">🚧</a> <a href="#infra-adamltyson" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
+    </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/rhayman"><img src="https://avatars.githubusercontent.com/u/5619644?v=4?s=100" width="100px;" alt="rhayman"/><br /><sub><b>rhayman</b></sub></a><br /><a href="https://github.com/SainsburyWellcomeCentre/NeuralPlayground/commits?author=rhayman" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/JarvisDevon"><img src="https://avatars.githubusercontent.com/u/30460455?v=4?s=100" width="100px;" alt="Devon Jarvis"/><br /><sub><b>Devon Jarvis</b></sub></a><br /><a href="https://github.com/SainsburyWellcomeCentre/NeuralPlayground/commits?author=JarvisDevon" title="Documentation">📖</a> <a href="https://github.com/SainsburyWellcomeCentre/NeuralPlayground/commits?author=JarvisDevon" title="Code">💻</a></td>
+    </tr>
+  </tbody>
+</table>
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+<!-- ALL-CONTRIBUTORS-LIST:END -->
+<p>This project follows the <a class="reference external" href="https://github.com/all-contributors/all-contributors">all-contributors</a> specification. Contributions of any kind are welcome!</p>
+</section>
+</section>
+</div></blockquote>
+<section id="index-search">
+<h2>Index &amp; Search<a class="headerlink" href="#index-search" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#index-search">Index &amp; Search</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="_sources/index.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, University College London.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
