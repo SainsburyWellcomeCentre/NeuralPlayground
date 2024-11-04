@@ -6,5 +6,5 @@ pydata-sphinx-theme
 setuptools-scm
 sphinx
 sphinx-autodoc-typehints
-sphinx-sitemap
 sphinx-design
+sphinx-sitemap
