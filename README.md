@@ -15,7 +15,7 @@
 
 
 
-<img src="images/NPG_GH-social-preview_white-bg.jpg" alt="NeuralPlayground Logo" width="500"/>
+<img src="../../images/NPG_GH-social-preview_white-bg.jpg" alt="NeuralPlayground Logo" width="500"/>
 
 
 <!-- TOC -->
@@ -156,7 +156,7 @@ and [experiment](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blo
 > **Note**
 > 
 > Check our Tolman-Eichenbaum Machine Implementation in
-[this branch](https://github.com/ClementineDomine/NeuralPlayground/tree/whittington_2020) (work in progress), you will also need to install [pytorch](https://pytorch.org/) ro run it.</strong>
+[this branch](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/neuralplayground/agents/whittington_2020.py) (work in progress), you will also need to install [pytorch](https://pytorch.org/) ro run it.</strong>
 
 ### Simulation Manager
 
@@ -166,7 +166,7 @@ the details in [Simulation Manager](https://github.com/SainsburyWellcomeCentre/N
 and [Comparison Board](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/comparisons_examples/comparison_from_manager.ipynb) jupyters. In addition,
 we have some [default simulations](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/neuralplayground/backend/default_simulation.py)
 you can try out, for which you don't need to write much code, since they are
-implemented using a [SingleSim](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/55085e792f5dc446e0c3a808cd0d9901a37484a8/neuralplayground/backend/simulation_manager.py#L211)
+implemented using a SingleSim
 class. For example
 
 ```python
@@ -200,7 +200,7 @@ and [experiment](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blo
 > **Note**
 > 
 > Check our Tolman-Eichenbaum Machine Implementation in
-[this branch](https://github.com/ClementineDomine/NeuralPlayground/tree/whittington_2020) (work in progress), you will also need to install [pytorch](https://pytorch.org/) ro run it.</strong>
+[this branch](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/neuralplayground/agents/whittington_2020.py) (work in progress), you will also need to install [pytorch](https://pytorch.org/) ro run it.</strong>
 
 ### Simulation Manager
 
@@ -210,8 +210,7 @@ the details in [Simulation Manager](https://github.com/SainsburyWellcomeCentre/N
 and [Comparison Board](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/comparisons_examples/comparison_from_manager.ipynb) jupyters. In addition,
 we have some [default simulations](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/neuralplayground/backend/default_simulation.py)
 you can try out, for which you don't need to write much code, since they are
-implemented using a [SingleSim](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/55085e792f5dc446e0c3a808cd0d9901a37484a8/neuralplayground/backend/simulation_manager.py#L211)
-class. For example
+implemented using a SingleSim class. For example
 
 ```python
 # Import default simulation, which is a SingleSim 
@@ -242,7 +241,7 @@ my_manager.check_run_status()
 To compare the results, use the comparison board described in [Comparison Board](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/comparisons_examples/comparison_from_manager.ipynb) jupyter
 notebook. With time, we will build an interface for easy model comparison and visualisation of the results!
 
-<img src="images/board_diagram.jpeg" alt="NeuralPlayground Logo" width="500"/>
+<img src="../../images/board_diagram.jpeg" alt="NeuralPlayground Logo" width="500"/>
 
 ## I want to contribute
 
@@ -267,7 +266,7 @@ Before sending a pull request, make sure you have the done following:
 
 3. Followed the [PEP8](https://www.python.org/dev/peps/pep-0008/) and [numpy docstring](https://numpydoc.readthedocs.io/en/latest/format.html) style convention. More details found in [Style Guide](https://github.com/ClementineDomine/NeuralPlayground/tree/main/documents/style_guide.md).
 
-4. Implemented and ran [tests](https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground/tests).
+4. Implemented and ran [tests](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/tree/main/tests).
 
 5. Comment your work.
 
