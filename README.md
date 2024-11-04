@@ -98,7 +98,7 @@ pip install NeuralPlayground==0.0.5
 ```
 > **Note**
 > 
-> If you wish to run our implementation of the Tolman-Eichenbaum machine, there are additional dependencies to install. These can be found in the [TEM_README.md](examples/agent_examples/TEM_README.md) file.
+> If you wish to run our implementation of the Tolman-Eichenbaum machine, there are additional dependencies to install. These can be found in the [TEM_README.md](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples/agent_examples/TEM_README.md) file.
 
 ### Install for development
 
@@ -126,21 +126,15 @@ understanding of the HEC mechanisms. We follow reproducible, inclusive, and coll
 All relevant documents can be found in [Documents](https://github.com/ClementineDomine/NeuralPlayground/blob/main/documents/).
 
 ### Agent Arena interaction
-
-
-You can pick an Agent, an Arena of your choice to run a simulation.
-arenas and simulations have a simple interface to interact with each other as in [OpenAI gymnasium](https://gymnasium.farama.org/).
-
+You can pick an Agent and an Arena of your choice to run a simulation. Arenas and simulations have a simple interface to interact with each other as in [OpenAI gymnasium](https://gymnasium.farama.org/).
 ```python
 # import an agent based on a plasticity model of grid cells
 from neuralplayground.agents import Weber2018
 # import a square 2D arena
-from neuralplayground.arenas import Simple2D  
-
-# Initialise the agent
+from neuralplayground.arenas import Simple2D
+# Initialize the agent
 agent = Weber2018()
-
-# Initialise the arena
+# Initialize the arena
 arena = Simple2D()
 ```
 To make the agent interact with the arena, a very simple loop can be the following:
@@ -186,25 +180,7 @@ folder with the name you provide, keeping track of any errors and logs. You can 
 [Simulation Manager](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/comparisons_examples/simulation_manager.ipynb)
 to run multiple simulations at once, save the results, keep run of each run and possible errors for easy debugging, and other functions.
 
-```python
 
-
-
-You can pick an Agent, an Arena of your choice to run a simulation.
-arenas and simulations have a simple interface to interact with each other as in [OpenAI gymnasium](https://gymnasium.farama.org/).
-
-```python
-# import an agent based on a plasticity model of grid cells
-from neuralplayground.agents import Weber2018
-# import a square 2D arena
-from neuralplayground.arenas import Simple2D  
-
-# Initialise the agent
-agent = Weber2018()
-
-# Initialise the arena
-arena = Simple2D()
-```
 To make the agent interact with the arena, a very simple loop can be the following:
 ```python
 iterations = 1000
@@ -305,7 +281,7 @@ See [Citation](https://github.com/ClementineDomine/NeuralPlayground/blob/main/do
 
 ## License
 
-⚖️ [MIT](./LICENSE)
+⚖️ [MIT](https://github.com/ClementineDomine/NeuralPlayground/blob/main/LICENSE)
 
 
 ## Contributors
