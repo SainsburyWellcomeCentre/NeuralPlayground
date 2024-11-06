@@ -244,10 +244,10 @@ class DiscreteObjectEnvironment(Environment):
         }
         self.history.append(self.transition)
         self._increase_global_step()
-        self.steps_in_curr_env += 1
-        if self.steps_in_curr_env >= self.max_steps_per_env:
-            self.steps_in_curr_env = 0
-            self.reset_objects()
+        # self.steps_in_curr_env += 1
+        # if self.steps_in_curr_env >= self.max_steps_per_env:
+        #     self.steps_in_curr_env = 0
+        #     self.reset_objects()
         return observation, self.state, reward
 
     def generate_objects(self):
