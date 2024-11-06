@@ -9,7 +9,7 @@ from plotly.subplots import make_subplots
 import networkx as nx
 import numpy as np
 import torch
-
+from scipy.ndimage import convolve1d
 
 def plot_2dgraphs(edges_list, node_features, edge_features_list, subplots_titles, path=None, colorscale='Plasma', size=5, show=True):
     """
@@ -120,7 +120,7 @@ def color_map(output):
     sm._A = []
     return sm
 
-def plot_curves(curves, path, title, legend_labels=None, x_label=None, y_label=None):
+def plot_curves(curves, path, title, legend_labels=None, x_label=None, y_label=None, time_steps=100):
     fig, ax = plt.subplots(figsize=(8, 6))
     ax.set_title(title)
 
@@ -137,6 +137,9 @@ def plot_curves(curves, path, title, legend_labels=None, x_label=None, y_label=N
     # Map the values to colors using the chosen colormap
     colors = [colormap(value) for value in values]
 
+    # Create a simple kernel for convolution (moving average)
+    kernel = np.ones(time_steps) / time_steps
+
     for i, curve in enumerate(curves):
         label = legend_labels[i] if legend_labels else None
         color = colors[i % len(colors)]
@@ -145,6 +148,9 @@ def plot_curves(curves, path, title, legend_labels=None, x_label=None, y_label=N
         if isinstance(curve, torch.Tensor):
             curve = curve.detach().numpy()
 
+        # Apply convolution to smooth the curve over the specified time steps
+        curve = convolve1d(curve, kernel, mode='reflect')
+
         ax.plot(curve, label=label, color=color)
 
     if legend_labels:
@@ -152,52 +158,60 @@ def plot_curves(curves, path, title, legend_labels=None, x_label=None, y_label=N
     plt.savefig(path)
     plt.show()
     plt.close()
+def plot_curves_2(curves, std_devs=None, path=None, title=None, legend_labels=None, x_label=None, y_label=None, time_steps=1):
+    fig, ax = plt.subplots(figsize=(8, 6))
+    ax.set_title(title)
 
-def plot_curves_2(curves, std_devs=None, path=None, title=None, legend_labels=None, x_label=None, y_label=None):
-        fig, ax = plt.subplots(figsize=(8, 6))
-        ax.set_title(title)
+    if x_label:
+        ax.set_xlabel(x_label)
+    if y_label:
+        ax.set_ylabel(y_label)
 
-        if x_label:
-            ax.set_xlabel(x_label)
-        if y_label:
-            ax.set_ylabel(y_label)
+    colormap = plt.get_cmap("viridis")
 
-        colormap = plt.get_cmap("viridis")
+    # Use numpy linspace to create the values array
+    values = np.linspace(0, 1, len(curves))
 
-        # Use numpy linspace to create the values array
-        values = np.linspace(0, 1, len(curves))
+    # Map the values to colors using the chosen colormap
+    colors = [colormap(value) for value in values]
 
-        # Map the values to colors using the chosen colormap
-        colors = [colormap(value) for value in values]
+    # Create a simple kernel for convolution (moving average)
+    kernel = np.ones(time_steps) / time_steps
 
-        for i, curve in enumerate(curves):
-            label = legend_labels[i] if legend_labels else None
-            color = colors[i % len(colors)]
+    for i, curve in enumerate(curves):
+        label = legend_labels[i] if legend_labels else None
+        color = colors[i % len(colors)]
 
-            # Convert PyTorch tensors to NumPy arrays for plotting
-            if isinstance(curve, torch.Tensor):
-                curve = curve.detach().numpy()
+        # Convert PyTorch tensors to NumPy arrays for plotting
+        if isinstance(curve, torch.Tensor):
+            curve = curve.detach().numpy()
 
-            # Plot the average curve
-            ax.plot(curve, label=label, color=color)
+        # Apply convolution to smooth the curve over the specified time steps
+        curve = convolve1d(curve, kernel, mode='reflect')
 
-            # If std_devs are provided, plot the shaded region for the standard deviation
-            if std_devs is not None:
-                std_dev = std_devs[i]
+        # Plot the smoothed average curve
+        ax.plot(curve, label=label, color=color)
 
-                # Convert std_dev to numpy if it is a PyTorch tensor
-                if isinstance(std_dev, torch.Tensor):
-                    std_dev = std_dev.detach().numpy()
+        # If std_devs are provided, plot the shaded region for the standard deviation
+        if std_devs is not None:
+            std_dev = std_devs[i]
 
-                # Shaded region (curve ± std deviation)
-                ax.fill_between(np.arange(len(curve)), np.asarray(curve) - np.asarray( std_dev), np.asarray(curve) + np.asarray(std_dev), color=color, alpha=0.3)
+            # Convert std_dev to numpy if it is a PyTorch tensor
+            if isinstance(std_dev, torch.Tensor):
+                std_dev = std_dev.detach().numpy()
 
-        if legend_labels:
-            ax.legend()
+            # Apply convolution to smooth the standard deviation over the specified time steps
+            std_dev = convolve1d(std_dev, kernel, mode='reflect')
 
-        # Save plot to file if path is provided
-        if path:
-            plt.savefig(path)
+            # Shaded region (curve ± std deviation)
+            ax.fill_between(np.arange(len(curve)), curve - std_dev, curve + std_dev, color=color, alpha=0.3)
 
-        plt.show()
-        plt.close()
+    if legend_labels:
+        ax.legend()
+
+    # Save plot to file if path is provided
+    if path:
+        plt.savefig(path)
+
+    plt.show()
+    plt.close()

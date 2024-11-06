@@ -1,25 +1,20 @@
-experiment_name: 'hello'
-resample: False # @param
+experiment_name: 'random_mp_0'
 wandb_on: False
 seed: 45
 plot: True
-dataset: 'positional'  # 'random' or 'omniglot' or positional'positional_no_edges
-weighted: False
+dataset: 'random'  # 'random' or 'omniglot' or positional'positional_no_edges
 
 num_hidden: 15 # @param
 num_layers: 1  # @param
-num_message_passing_steps: 0  # @param
-learning_rate: 0.005 # @param
-num_training_steps: 80 # @param
+num_message_passing_steps: 0  # @param which is effectivly 5
+learning_rate: 0.001 # @param
+num_training_steps: 15000 # @param
 residual: True
-layer_norm: False
 
 # Env Stuff
 batch_size: 2
-num_nodes_max: 5
-num_nodes_min: 5
+num_nodes_max: 15
 num_features: 1
-
 batch_size_test:  2
-num_nodes_max_test: [6,7,8,9] #min2
-num_nodes_min_test: 10
+num_nodes_max_test: [4,5,6,7,8,10]
+

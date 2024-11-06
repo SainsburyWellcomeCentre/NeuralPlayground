@@ -163,7 +163,9 @@ def sample_graph(num_features, num_nodes, feature_type='random'):
 
     # Append position features if specified
     if feature_type == 'positional' or feature_type == 'positional_no_edges':
-        position = torch.tensor(np.arange(num_nodes)).unsqueeze(1)  # Shape: (num_nodes, 1)
+        # Position also do the moving
+        position = torch.tensor(np.linspace(0,1,num_nodes)).unsqueeze(1)
+        # Shape: (num_nodes, 1)
         combined_node_features = np.concatenate([combined_node_features, position], axis=1)
 
     # Convert combined node features to a tensor
@@ -171,7 +173,7 @@ def sample_graph(num_features, num_nodes, feature_type='random'):
 
     # Return based on feature_type
     if feature_type == 'positional_no_edges':
-        return node_features, edges, source, sink  # No edge features
+        return node_features, edges, edge_features_tensor, source, sink  # No edge features
     else:
         return node_features, edges, edge_features_tensor, source, sink
 
@@ -185,7 +187,6 @@ def sample_fixed_graph(num_features, num_nodes, feature_type='random', sositype=
     source = 2
     input_node_features[source, 0] = 1  # Set source node feature
     input_node_features[sink, 1] = 1  # Set sink node feature
-
     # Combine node features and input features
     combined_node_features = np.concatenate([node_features.T, input_node_features], axis=1)
     # Append position features if specified
@@ -198,7 +199,7 @@ def sample_fixed_graph(num_features, num_nodes, feature_type='random', sositype=
 
     # Return based on feature_type
     if feature_type == 'positional_no_edges':
-        return node_features, edges, source, sink  # No edge features
+        return node_features, edges, edge_features_tensor, source, sink # No edge features
     else:
         return node_features, edges, edge_features_tensor, source, sink
 
