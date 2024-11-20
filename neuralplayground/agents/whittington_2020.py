@@ -256,34 +256,13 @@ class Whittington2020(AgentCore):
         self.final_model_input = model_input
 
         forward = self.tem(model_input, self.prev_iter)
-        # chunk = [[step[0][0], np.argmax(step[1][0]), step[2][0]] for step in model_input]
         for i in range(len(model_input)):
-            # self.logger.info(chunk[i])
             ids = [step["id"] for step in model_input[i][0]]
             objs = [int(np.argmax(step)) for step in model_input[i][1]]
             actions = model_input[i][2]
             self.logger.info("IDs: " + str(ids))
             self.logger.info("Objs: " + str(objs))
             self.logger.info("Actions: " + str(actions))
-        # if self.prev_iter is None:
-        #     with open('OG_log.txt', 'a') as f:
-        #         f.write('Walk number: ' + str(self.global_steps) + '\n')
-        #         for c in model_input:
-        #             f.write('ID: ' + str(c[0]) + '\n')
-        #             f.write('Observation: ' + str([np.argmax(a) for a in c[1]]) + '\n')
-        #             f.write('Action: ' + str(c[2]) + '\n')
-        #         f.write('prev_iter: ' + str(self.prev_iter) + '\n')
-        # else:
-        #     with open('OG_log.txt', 'a') as f:
-        #         f.write('Walk number: ' + str(self.global_steps) + '\n')
-        #         for c in model_input:
-        #             f.write('ID: ' + str(c[0]) + '\n')
-        #             f.write('Observation: ' + str([np.argmax(a) for a in c[1]]) + '\n')
-        #             f.write('Action: ' + str(c[2]) + '\n')
-        #         f.write('prev_iter.L: ' + str(self.prev_iter[0].L) + '\n')
-        #         f.write('prev_iter.a: ' + str(self.prev_iter[0].a) + '\n')
-        #         f.write('prev_iter.M: ' + str(self.prev_iter[0].M) + '\n')
-        #         f.write('prev_iter.x: ' + str([torch.argmax(x) for x in self.prev_iter[0].x]) + '\n')
 
         # Accumulate loss from forward pass
         loss = torch.tensor(0.0)
@@ -345,10 +324,6 @@ class Whittington2020(AgentCore):
             self.accuracy_history["g_accuracy"].append(acc_g)
             self.accuracy_history["gt_accuracy"].append(acc_gt)
         self.iter += 1
-
-        # if self.iter % 10 == 0:
-        #     print("Iteration: ", self.iter)
-        #     print("Accuracies: ", acc_p, acc_g, acc_gt)
 
     def initialise(self):
         """
