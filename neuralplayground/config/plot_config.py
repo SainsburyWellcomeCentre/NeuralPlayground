@@ -101,6 +101,9 @@ class AgentComparisonConfig(NPGConfig):
         self.FONTSIZE = kwargs["fontsize"]
         self.PLOT_SAC_EXP = kwargs["plot_sac_exp"]
         self.PLOT_SAC_AGT = kwargs["plot_sac_agt"]
+        self.TEXT_FONTSIZE = kwargs["text_fontsize"]
+        self.HORIZONTAL_AXIS_SPACING = kwargs["horizontal_axis_spacing"]
+        self.VERTICAL_AXIS_SPACING = kwargs["vertical_axis_spacing"]
 
 
 class TableConfig(NPGConfig):
@@ -139,7 +142,6 @@ class TableConfig(NPGConfig):
 
 
 class PlotsConfig(NPGConfig):
-
     """Config object for plots, all plots are config are stored in this object
     Attributes
     ----------

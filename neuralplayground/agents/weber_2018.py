@@ -7,7 +7,6 @@ This implementation can interact with environments from the package as shown in 
 Check examples/testing_weber_model.ipynb
 """
 
-
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np

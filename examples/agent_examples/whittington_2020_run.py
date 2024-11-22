@@ -13,9 +13,8 @@ from neuralplayground.arenas import BatchEnvironment, DiscreteObjectEnvironment
 from neuralplayground.backend import SingleSim, tem_training_loop
 from neuralplayground.experiments import Sargolini2006Data
 
-# Set the location for saving the results of the simulation
-simulation_id = "TEM_begging"
-save_path = os.path.join(os.getcwd(), simulation_id)
+simulation_id = "TEM_custom_sim"
+save_path = os.path.join(os.getcwd(), "examples", "agent_examples", "results_sim")
 # save_path = os.path.join(os.getcwd(), "examples", "agent_examples", "trained_results")
 agent_class = Whittington2020
 env_class = BatchEnvironment

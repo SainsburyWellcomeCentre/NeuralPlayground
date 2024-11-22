@@ -23,7 +23,7 @@ LOCAL_DATA_DIR.mkdir(parents=True, exist_ok=True)
 # is stored in a zip file with the suffix "_subset".
 dataset_manager = pooch.create(
     path=LOCAL_DATA_DIR,
-    base_url=f"{DATA_URL}/data",
+    base_url=f"{DATA_URL}/data/",
     registry={
         "hafting_2008_subset.zip": "ca3b1bf417e496d81734b5d7beff93a9ac0c0c58660472db8c04c0ff097d6e2a",  # noqa: E501
         "hafting_2008_full.zip": "de778df50f21998c00f606208441a6d1e41ce25c4226e6abc013281690ff8dbe",  # noqa: E501

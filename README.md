@@ -9,11 +9,14 @@
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 # NeuralPlayground 
+
+
 ## *A standardised environment for the hippocampus and entorhinal cortex models.* <a href="https://githubtocolab.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/colab_example.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
 
-<div align="center">
-<img src="images/NPG_GH-social-preview_white-bg.jpg" alt="NeuralPlayground Logo" width="500"/>
-</div>
+
+
+<img src="../../images/NPG_GH-social-preview_white-bg.jpg" alt="NeuralPlayground Logo" width="500"/>
+
 
 <!-- TOC -->
 - [Introduction](#introduction)
@@ -95,7 +98,7 @@ pip install NeuralPlayground==0.0.5
 ```
 > **Note**
 > 
-> If you wish to run our implementation of the Tolman-Eichenbaum machine, there are additional dependencies to install. These can be found in the [TEM_README.md](examples/agent_examples/TEM_README.md) file.
+> If you wish to run our implementation of the Tolman-Eichenbaum machine, there are additional dependencies to install. These can be found in the [TEM_README.md](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples/agent_examples/TEM_README.md) file.
 
 ### Install for development
 
@@ -123,20 +126,15 @@ understanding of the HEC mechanisms. We follow reproducible, inclusive, and coll
 All relevant documents can be found in [Documents](https://github.com/ClementineDomine/NeuralPlayground/blob/main/documents/).
 
 ### Agent Arena interaction
-
-You can pick an Agent, an Arena of your choice to run a simulation.
-arenas and simulations have a simple interface to interact with each other as in [OpenAI gymnasium](https://gymnasium.farama.org/).
-
+You can pick an Agent and an Arena of your choice to run a simulation. Arenas and simulations have a simple interface to interact with each other as in [OpenAI gymnasium](https://gymnasium.farama.org/).
 ```python
 # import an agent based on a plasticity model of grid cells
 from neuralplayground.agents import Weber2018
 # import a square 2D arena
-from neuralplayground.arenas import Simple2D  
-
-# Initialise the agent
+from neuralplayground.arenas import Simple2D
+# Initialize the agent
 agent = Weber2018()
-
-# Initialise the arena
+# Initialize the arena
 arena = Simple2D()
 ```
 To make the agent interact with the arena, a very simple loop can be the following:
@@ -158,7 +156,7 @@ and [experiment](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blo
 > **Note**
 > 
 > Check our Tolman-Eichenbaum Machine Implementation in
-[this branch](https://github.com/ClementineDomine/NeuralPlayground/tree/whittington_2020) (work in progress), you will also need to install [pytorch](https://pytorch.org/) ro run it.</strong>
+[this branch](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/neuralplayground/agents/whittington_2020.py) (work in progress), you will also need to install [pytorch](https://pytorch.org/) ro run it.</strong>
 
 ### Simulation Manager
 
@@ -168,7 +166,7 @@ the details in [Simulation Manager](https://github.com/SainsburyWellcomeCentre/N
 and [Comparison Board](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/comparisons_examples/comparison_from_manager.ipynb) jupyters. In addition,
 we have some [default simulations](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/neuralplayground/backend/default_simulation.py)
 you can try out, for which you don't need to write much code, since they are
-implemented using a [SingleSim](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/55085e792f5dc446e0c3a808cd0d9901a37484a8/neuralplayground/backend/simulation_manager.py#L211)
+implemented using a SingleSim
 class. For example
 
 ```python
@@ -182,7 +180,51 @@ folder with the name you provide, keeping track of any errors and logs. You can 
 [Simulation Manager](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/comparisons_examples/simulation_manager.ipynb)
 to run multiple simulations at once, save the results, keep run of each run and possible errors for easy debugging, and other functions.
 
+
+To make the agent interact with the arena, a very simple loop can be the following:
 ```python
+iterations = 1000
+obs, state = arena.reset()
+for j in range(iterations):
+    # Observe to choose an action
+    action = agent.act(obs)
+    # Run environment for given action
+    obs, state, reward = arena.step(action)
+    # Update agent parameters
+    update_output = agent.update()
+```
+This process is the base of our package. We provide a more detailed example in <a href="https://githubtocolab.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/colab_example.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>.
+Also, specific examples of how to use each module can be found in [agent](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples/agent_examples),
+[arena](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/arena_examples/arena_examples.ipynb) 
+and [experiment](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/experimental_examples/experimental_data_examples.ipynb) jupyter notebooks.
+> **Note**
+> 
+> Check our Tolman-Eichenbaum Machine Implementation in
+[this branch](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/neuralplayground/agents/whittington_2020.py) (work in progress), you will also need to install [pytorch](https://pytorch.org/) ro run it.</strong>
+
+### Simulation Manager
+
+We provide some backend tools to run simulations and compare the results with experimental data in the background,
+including some methods to keep track of your runs, and a comparison board to visualise the results. You can check
+the details in [Simulation Manager](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/comparisons_examples/simulation_manager.ipynb)
+and [Comparison Board](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/comparisons_examples/comparison_from_manager.ipynb) jupyters. In addition,
+we have some [default simulations](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/neuralplayground/backend/default_simulation.py)
+you can try out, for which you don't need to write much code, since they are
+implemented using a SingleSim class. For example
+
+```python
+# Import default simulation, which is a SingleSim 
+from neuralplayground.backend.default_simulation import stachenfeld_in_2d
+from neuralplayground.backend.default_simulation import weber_in_2d
+stachenfeld_in_2d.run_sim(save_path="my_results")
+```
+This class allows you to run a simulation with a single line of code, and it will automatically save the results in a
+folder with the name you provide, keeping track of any errors and logs. You can also use our 
+[Simulation Manager](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/comparisons_examples/simulation_manager.ipynb)
+to run multiple simulations at once, save the results, keep run of each run and possible errors for easy debugging, and other functions.
+
+```python
+
 # Import Simulation Manager
 from neuralplayground.backend import SimulationManager
 
@@ -199,7 +241,7 @@ my_manager.check_run_status()
 To compare the results, use the comparison board described in [Comparison Board](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/comparisons_examples/comparison_from_manager.ipynb) jupyter
 notebook. With time, we will build an interface for easy model comparison and visualisation of the results!
 
-<img src="images/board_diagram.jpeg" alt="NeuralPlayground Logo" width="500"/>
+<img src="../../images/board_diagram.jpeg" alt="NeuralPlayground Logo" width="500"/>
 
 ## I want to contribute
 
@@ -224,7 +266,7 @@ Before sending a pull request, make sure you have the done following:
 
 3. Followed the [PEP8](https://www.python.org/dev/peps/pep-0008/) and [numpy docstring](https://numpydoc.readthedocs.io/en/latest/format.html) style convention. More details found in [Style Guide](https://github.com/ClementineDomine/NeuralPlayground/tree/main/documents/style_guide.md).
 
-4. Implemented and ran [tests](https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground/tests).
+4. Implemented and ran [tests](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/tree/main/tests).
 
 5. Comment your work.
 
@@ -238,7 +280,7 @@ See [Citation](https://github.com/ClementineDomine/NeuralPlayground/blob/main/do
 
 ## License
 
-⚖️ [MIT](./LICENSE)
+⚖️ [MIT](https://github.com/ClementineDomine/NeuralPlayground/blob/main/LICENSE)
 
 
 ## Contributors

@@ -96,11 +96,10 @@ ignore = [
 [tool.ruff]
 line-length = 127
 exclude = ["__init__.py","build",".eggs"]
-select = ["I", "E", "F"]
 fix = true
 
-[tool.cibuildwheel]
-build = "cp38-* cp39-* cp310-* cp311-*"
+[tool.ruff.lint]
+select = ["I", "E", "F", "NPY201"]
 
-[tool.cibuildwheel.macos]
-archs = ["x86_64", "arm64"]
+[tool.ruff.lint.per-file-ignores]
+"*.ipynb" = ["E501", "E402"]

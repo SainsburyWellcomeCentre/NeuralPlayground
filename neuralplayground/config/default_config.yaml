@@ -25,11 +25,13 @@ plot_config:
     grid: False
 
   agent_comparison_plot:
-    figsize: [12, 15]
-    fontsize: 10
+    figsize: [7, 12]
+    fontsize: 12
     plot_sac_exp: True
     plot_sac_agt: True
-
+    text_fontsize: 12
+    horizontal_axis_spacing: 0.0
+    vertical_axis_spacing: 0.4
 
   table_plot:
     table_fontsize: 7

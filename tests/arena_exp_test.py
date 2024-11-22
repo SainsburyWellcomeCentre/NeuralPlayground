@@ -51,7 +51,7 @@ class TestSimple2D(object):
             action = agent.act(obs)
             # Run environment for given action
             obs, state, reward = init_env[0].step(action)
-            init_env[0].render()
+            init_env[0].render(display=False)
         init_env[0].plot_trajectory()
 
 
@@ -302,7 +302,7 @@ class TestBatchEnvironment(object):
                 action = agent.batch_act(obs)
                 # Run environment for given action
                 obs, state, reward = env.step(action, normalize_step=True)
-        env.plot_trajectory()
+        env.plot_trajectories()
 
     def test_init_env(self, init_env):
         assert isinstance(init_env[0], BatchEnvironment)

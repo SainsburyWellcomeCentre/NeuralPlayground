@@ -4,6 +4,7 @@ Any neuralplayground model should inherit this class in order to interact with
 environments and compare against experimental results.
 We expect to make profound changes in this module as we add more EHC model to the repo
 """
+
 import os
 import pickle
 
@@ -19,7 +20,7 @@ class AgentCore(object):
     Attributes
     ----------
     agent_name : str
-        Name of the specific instantiation of the ExcInhPlasticity class
+        Name of the specific instantiation of the agent class
     mod_kwargs: dict
         Dictionary of specific parameters to be used by children classes
     metadata
@@ -65,11 +66,11 @@ class AgentCore(object):
         obs
             Observation from the environment class needed to choose the right action
         policy_func
-            Arbitrary function that represents a custom policy that receives and observation and gives an action
+            Arbitrary function that represents a custom policy that receives an observation and gives an action
         Returns
         -------
-        action: float
-            action value which in this case is random number draw from a Gaussian
+        action: np.array(dtype=float)
+            action value which in this case is random number draw from a 2D-Gaussian
         """
 
         if len(obs) == 0:
@@ -79,10 +80,9 @@ class AgentCore(object):
 
         self.obs_history.append(obs)
         if len(self.obs_history) >= 1000:  # reset every 1000
-            # self.obs_history = [
-            #     obs,
-            # ]
-            self.obs_history.pop(0)
+            self.obs_history = [
+                obs,
+            ]
         if policy_func is not None:
             return policy_func(obs)
 
@@ -93,7 +93,7 @@ class AgentCore(object):
         return None
 
     def save_agent(self, save_path: str, raw_object: bool = True):
-        """Save current state and information in general to re-instantiate the environment
+        """Save current state and information in general to re-instantiate the agent
 
         Parameters
         ----------
@@ -109,15 +109,15 @@ class AgentCore(object):
         else:
             pickle.dump(self.__dict__, open(os.path.join(save_path), "wb"), pickle.HIGHEST_PROTOCOL)
 
-    def restore_agent(self, save_path: str):
+    def restore_agent(self, restore_path: str):
         """Restore saved environment
 
         Parameters
         ----------
-        save_path: str
-            Path to retrieve the environment saved using save_agent method (raw_object=False)
+        restore_path: str
+            Path to retrieve the agent saved using save_agent method (raw_object=False)
         """
-        self.__dict__ = pd.read_pickle(save_path)
+        self.__dict__ = pd.read_pickle(restore_path)
 
     def __eq__(self, other):
         diff = DeepDiff(self.__dict__, other.__dict__)

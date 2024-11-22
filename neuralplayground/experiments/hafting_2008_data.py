@@ -59,6 +59,8 @@ class Hafting2008Data(Experiment):
         Get identifiers to sort the experimental data
     get_recording_data(recording_index: int = None)
         Get experimental data for a given recordin index
+    get_tetrode_data(session_data: str = None, tetrode_id: str = None)
+        Return time stamp, position and spikes for a given session and tetrode
     plot_recording_tetr(recording_index: Union[int, tuple, list] = None,
                         save_path: Union[str, tuple, list] = None,
                         ax: Union[mpl.axes.Axes, tuple, list] = None,

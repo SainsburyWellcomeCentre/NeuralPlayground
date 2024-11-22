@@ -1014,7 +1014,7 @@ class Model(torch.nn.Module):
         """
         activation = (
             [utils.leaky_relu(torch.clamp(p_f, min=-1, max=1)) for p_f in p]
-            if type(p) is list
+            if isinstance(p, list)
             else utils.leaky_relu(torch.clamp(p, min=-1, max=1))
         )
         return activation
@@ -1099,7 +1099,7 @@ class MLP(torch.nn.Module):
         super(MLP, self).__init__()
         # Check if this network consists of module: are input and output dimensions lists? If not, make them
         # (but remember it wasn't)
-        if type(in_dim) is list:
+        if isinstance(in_dim, list):
             self.is_list = True
         else:
             in_dim = [in_dim]
@@ -1142,7 +1142,7 @@ class MLP(torch.nn.Module):
             value: value to set weights to
         """
         # If single value is provided: copy it for each module
-        if type(value) is not list:
+        if not isinstance(value, list):
             input_value = [value for n in range(self.N)]
         else:
             input_value = value
