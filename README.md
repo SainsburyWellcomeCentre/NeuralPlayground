@@ -104,7 +104,7 @@ pip install NeuralPlayground==0.0.5
 
 If you want to contribute to the project, get the latest development version
 from GitHub, and install it in editable mode, including the "dev" dependencies:
-
+#### Unix (Linux and macOS)
 ```bash
 git clone https://github.com/SainsburyWellcomeCentre/NeuralPlayground/ --single-branch
 cd NeuralPlayground
