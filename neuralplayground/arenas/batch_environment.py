@@ -7,26 +7,25 @@ from neuralplayground.arenas.discritized_objects import DiscreteObjectEnvironmen
 
 
 class BatchEnvironment(Environment):
+    """
+    Class to handle a batch of environments, where each environment is an instance of the same class. This is useful for training a single agent on multiple environments simultaneously.
+    ----------
+    environment_name: str
+        Name of the environment
+    env_class: object
+        Class of the environment
+    batch_size: int
+        Number of environments in the batch
+    **env_kwargs: dict
+        Keyword arguments for the environment
+    """
     def __init__(
         self,
         environment_name: str = "BatchEnv",
         env_class: object = DiscreteObjectEnvironment,
         batch_size: int = 1,
         **env_kwargs,
-    ):
-        """
-        Initialise a batch of environments. This is useful for training a single agent on multiple environments simultaneously.
-        Parameters
-        ----------
-            environment_name: str
-                Name of the environment
-            env_class: object
-                Class of the environment
-            batch_size: int
-                Number of environments in the batch
-            **env_kwargs: dict
-                Keyword arguments for the environment
-        """
+    ):  
         super().__init__(environment_name, **env_kwargs)
         self.env_kwargs = env_kwargs.copy()
         arg_env_params = env_kwargs["arg_env_params"]
