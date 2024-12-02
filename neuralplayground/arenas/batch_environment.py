@@ -19,13 +19,14 @@ class BatchEnvironment(Environment):
     **env_kwargs: dict
         Keyword arguments for the environment
     """
+
     def __init__(
         self,
         environment_name: str = "BatchEnv",
         env_class: object = DiscreteObjectEnvironment,
         batch_size: int = 1,
         **env_kwargs,
-    ):  
+    ):
         super().__init__(environment_name, **env_kwargs)
         self.env_kwargs = env_kwargs.copy()
         arg_env_params = env_kwargs["arg_env_params"]
