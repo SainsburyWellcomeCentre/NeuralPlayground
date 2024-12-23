@@ -193,7 +193,7 @@ class Whittington2020(AgentCore):
             if all_allowed:
                 self.walk_actions.append(self.prev_actions.copy())
                 self.obs_history.append(self.prev_observations.copy())
-                for batch in range(self.pars["batch_size"]):
+                for batch in range(self.batch_size):
                     new_actions.append(self.action_policy())
                 self.prev_actions = new_actions
                 self.prev_observations = observations
@@ -336,7 +336,7 @@ class Whittington2020(AgentCore):
         # Make an ADAM optimizer for TEM
         self.adam = torch.optim.Adam(self.tem.parameters(), lr=self.pars["lr_max"])
         # Initialise whether a state has been visited for each world
-        self.visited = [[False for _ in range(self.n_states[env])] for env in range(self.pars["batch_size"])]
+        self.visited = [[False for _ in range(self.n_states[env])] for env in range(self.batch_size)]
         self.prev_iter = None
         self.accuracy_history = {"iter": [], "p_accuracy": [], "g_accuracy": [], "gt_accuracy": []}
 

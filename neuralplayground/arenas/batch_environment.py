@@ -8,7 +8,8 @@ from neuralplayground.arenas.discritized_objects import DiscreteObjectEnvironmen
 
 class BatchEnvironment(Environment):
     """
-    Class to handle a batch of environments, where each environment is an instance of the same class. This is useful for training a single agent on multiple environments simultaneously.
+    Class to handle a batch of environments, where each environment is an instance of the same class.
+    This is useful for training a single agent on multiple environments simultaneously.
     ----------
     environment_name: str
         Name of the environment
@@ -19,13 +20,14 @@ class BatchEnvironment(Environment):
     **env_kwargs: dict
         Keyword arguments for the environment
     """
+
     def __init__(
         self,
         environment_name: str = "BatchEnv",
         env_class: object = DiscreteObjectEnvironment,
         batch_size: int = 1,
         **env_kwargs,
-    ):  
+    ):
         super().__init__(environment_name, **env_kwargs)
         self.env_kwargs = env_kwargs.copy()
         arg_env_params = env_kwargs["arg_env_params"]
@@ -208,7 +210,7 @@ class BatchEnvironment(Environment):
 
         # Iterate through each environment and plot its trajectory in a subplot
         for i, environment in enumerate(self.environments):
-            environment.history = [sublist[i] for sublist in self.history]
+            # environment.history = [sublist[i] for sublist in self.history]
             axs[i] = environment.plot_trajectory(ax=axs[i])
             axs[i].set_aspect("equal")
             axs[i].set_title(f"Environment {i+1}")

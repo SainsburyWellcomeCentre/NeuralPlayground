@@ -73,14 +73,14 @@ class DiscreteObjectEnvironment(Environment):
         """
         super().__init__(environment_name, **env_kwargs)
         self.environment_name = environment_name
-        self.use_behavioral_data = env_kwargs["use_behavioural_data"]
+        self.use_behavioural_data = env_kwargs["use_behavioural_data"]
         self.experiment = experiment_class(
             experiment_name=self.environment_name,
             data_path=env_kwargs["data_path"],
             recording_index=recording_index,
             verbose=verbose,
         )
-        if self.use_behavioral_data:
+        if self.use_behavioural_data:
             self.state_dims_labels = ["x_pos", "y_pos", "head_direction_x", "head_direction_y"]
             self.arena_limits = self.experiment.arena_limits
             self.arena_x_limits = self.arena_limits[0].astype(int)
@@ -164,7 +164,7 @@ class DiscreteObjectEnvironment(Environment):
         pos = np.array([self.x_array[x_index], self.y_array[y_index]])
 
         # Reset to first position recorded in this session
-        if self.use_behavioral_data:
+        if self.use_behavioural_data:
             pos, head_dir = self.experiment.position[0, :], self.experiment.head_direction[0, :]
             custom_state = np.concatenate([pos, head_dir])
 
@@ -207,7 +207,7 @@ class DiscreteObjectEnvironment(Environment):
             Array of the observation of the agent in the environment, in this case the sensory object.
         """
         self.old_state = self.state.copy()
-        if self.use_behavioral_data:
+        if self.use_behavioural_data:
             # In this case, the action is ignored and computed from the step in behavioral data recorded from the experiment
             if self.global_steps * skip_every >= self.experiment.position.shape[0] - 1:
                 self.global_steps = np.random.choice(np.arange(skip_every))
@@ -220,7 +220,7 @@ class DiscreteObjectEnvironment(Environment):
                 self.experiment.head_direction[self.global_steps * skip_every, :],
             )
             new_pos_state = np.concatenate(new_pos_state)
-        if not self.use_behavioral_data:
+        if not self.use_behavioural_data:
             action_rev = action
             if normalize_step:
                 new_pos_state = np.add(self.state[-1], [self.agent_step_size * e for e in action_rev]).tolist()
@@ -277,9 +277,9 @@ class DiscreteObjectEnvironment(Environment):
 
     def pos_to_state(self, pos):
         """Convert an (x,y) position to a discretised state index"""
-        if not self.use_behavioral_data and np.shape(pos) == (2, 2):
+        if not self.use_behavioural_data and np.shape(pos) == (2, 2):
             pos = pos[0]
-        elif self.use_behavioral_data and len(pos) > 2:
+        elif self.use_behavioural_data and len(pos) > 2:
             pos = pos[:2]
 
         x_index = np.floor((pos[0] - self.arena_x_limits[0]) / self.state_size).astype(int)
