@@ -1,5 +1,7 @@
 import numpy as np
+
 from .agent_core import AgentCore
+
 
 class SimpleDiscreteAgent(AgentCore):
     """
