@@ -299,7 +299,6 @@ class SingleSim(object):
 
         original_stdout = sys.stdout
         original_stderr = sys.stderr
-
         sys.stdout = open(run_log_path, "w")
         sys.stderr = open(error_log_path, "w")
 

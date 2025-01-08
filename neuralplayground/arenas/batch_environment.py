@@ -3,24 +3,31 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from neuralplayground.arenas.arena_core import Environment
-from neuralplayground.arenas.simple2d import Simple2D
+from neuralplayground.arenas.discritized_objects import DiscreteObjectEnvironment
 
 
 class BatchEnvironment(Environment):
-    def __init__(self, environment_name: str = "BatchEnv", env_class: object = Simple2D, batch_size: int = 1, **env_kwargs):
-        """
-        Initialise a batch of environments. This is useful for training a single agent on multiple environments simultaneously.
-        Parameters
-        ----------
-            environment_name: str
-                Name of the environment
-            env_class: object
-                Class of the environment
-            batch_size: int
-                Number of environments in the batch
-            **env_kwargs: dict
-                Keyword arguments for the environment
-        """
+    """
+    Class to handle a batch of environments, where each environment is an instance of the same class.
+    This is useful for training a single agent on multiple environments simultaneously.
+    ----------
+    environment_name: str
+        Name of the environment
+    env_class: object
+        Class of the environment
+    batch_size: int
+        Number of environments in the batch
+    **env_kwargs: dict
+        Keyword arguments for the environment
+    """
+
+    def __init__(
+        self,
+        environment_name: str = "BatchEnv",
+        env_class: object = DiscreteObjectEnvironment,
+        batch_size: int = 1,
+        **env_kwargs,
+    ):
         super().__init__(environment_name, **env_kwargs)
         self.env_kwargs = env_kwargs.copy()
         arg_env_params = env_kwargs["arg_env_params"]
@@ -33,6 +40,7 @@ class BatchEnvironment(Environment):
             arg_env_params["arena_x_limits"] = self.batch_x_limits[i]
             arg_env_params["arena_y_limits"] = self.batch_y_limits[i]
             self.environments.append(env_class(**arg_env_params))
+            # env_class(**arg_env_params).visualize_environment()
 
         self.room_widths = [np.diff(self.environments[i].arena_x_limits)[0] for i in range(self.batch_size)]
         self.room_depths = [np.diff(self.environments[i].arena_y_limits)[0] for i in range(self.batch_size)]
@@ -67,7 +75,10 @@ class BatchEnvironment(Environment):
 
         return all_observations, all_states
 
-    def step(self, actions: np.ndarray, normalize_step: bool = False):
+    def reset_env(self, env_i):
+        self.environments[env_i].reset_objects()
+
+    def step(self, actions: np.ndarray, normalize_step: bool = True):
         """
         Step the environment
         Parameters
@@ -109,7 +120,13 @@ class BatchEnvironment(Environment):
         return all_observations, all_states, all_rewards
 
     def plot_trajectory(
-        self, history_data: list = None, ax=None, return_figure: bool = False, save_path: str = None, plot_every: int = 1
+        self,
+        env_to_plot: int = 0,
+        history_data: list = None,
+        ax=None,
+        return_figure: bool = False,
+        save_path: str = None,
+        plot_every: int = 1,
     ):
         """Plot the Trajectory of the agent in the environment
         Parameters
@@ -129,10 +146,10 @@ class BatchEnvironment(Environment):
         f: matplotlib.figure
             if return_figure parameters is True
         """
-        env = self.environments[0]
+        env = self.environments[env_to_plot]
         # Use or not saved history
         if history_data is None:
-            history_data = [his[0] for his in self.history]
+            history_data = [his[env_to_plot] for his in self.history]
 
         # Generate Figure
         if ax is None:
@@ -193,12 +210,14 @@ class BatchEnvironment(Environment):
 
         # Iterate through each environment and plot its trajectory in a subplot
         for i, environment in enumerate(self.environments):
+            # environment.history = [sublist[i] for sublist in self.history]
             axs[i] = environment.plot_trajectory(ax=axs[i])
+            axs[i].set_aspect("equal")
             axs[i].set_title(f"Environment {i+1}")
 
         # Adjust spacing between subplots
         plt.tight_layout()
-
+        # plt.show()
         return fig, axs
 
     def collect_environment_info(self, model_input, history, environments):

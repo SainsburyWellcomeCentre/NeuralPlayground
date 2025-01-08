@@ -85,6 +85,9 @@ class Whittington2020(AgentCore):
         super().__init__()
         self.mod_kwargs = mod_kwargs.copy()
         params = mod_kwargs["params"]
+        if "save_name" not in params:
+            params["save_name"] = "default_save_TEM"
+        self.save_name = params["save_name"]
         self.room_widths = mod_kwargs["room_widths"]
         self.room_depths = mod_kwargs["room_depths"]
         self.state_densities = mod_kwargs["state_densities"]
@@ -95,14 +98,17 @@ class Whittington2020(AgentCore):
         self.use_behavioural_data = mod_kwargs["use_behavioural_data"]
         self.n_envs_save = 4
         self.n_states = [
-            int(self.room_widths[i] * self.room_depths[i] * self.state_densities[i]) for i in range(self.batch_size)
+            int(self.room_widths[i] * self.room_depths[i] * (self.state_densities[i] ** 2)) for i in range(self.batch_size)
         ]
         self.poss_actions = [[0, 0], [0, -1], [1, 0], [0, 1], [-1, 0]]
         self.n_actions = len(self.poss_actions)
         self.final_model_input = None
         self.g_rates, self.p_rates = None, None
+        self.correct_model, self.correct_node, self.correct_edge = 0, 0, 0
         self.prev_observations = None
         self.reset()
+
+        self.iter = 0
 
     def reset(self):
         """
@@ -189,7 +195,7 @@ class Whittington2020(AgentCore):
             if all_allowed:
                 self.walk_actions.append(self.prev_actions.copy())
                 self.obs_history.append(self.prev_observations.copy())
-                for batch in range(self.pars["batch_size"]):
+                for batch in range(self.batch_size):
                     new_actions.append(self.action_policy())
                 self.prev_actions = new_actions
                 self.prev_observations = observations
@@ -221,7 +227,7 @@ class Whittington2020(AgentCore):
         action_values = self.step_to_actions(actions)
         self.walk_action_values.append(action_values)
         # Get start time for function timing
-        time.time()
+        start_time = time.time()
         # Get updated parameters for this backprop iteration
         (
             self.eta_new,
@@ -252,6 +258,13 @@ class Whittington2020(AgentCore):
         self.final_model_input = model_input
 
         forward = self.tem(model_input, self.prev_iter)
+        for i in range(len(model_input)):
+            ids = [step["id"] for step in model_input[i][0]]
+            objs = [int(np.argmax(step)) for step in model_input[i][1]]
+            actions = model_input[i][2]
+            self.logger.info("IDs: " + str(ids))
+            self.logger.info("Objs: " + str(objs))
+            self.logger.info("Actions: " + str(actions))
 
         # Accumulate loss from forward pass
         loss = torch.tensor(0.0)
@@ -285,66 +298,49 @@ class Whittington2020(AgentCore):
         # Compute model accuracies
         acc_p, acc_g, acc_gt = np.mean([[np.mean(a) for a in step.correct()] for step in forward], axis=0)
         acc_p, acc_g, acc_gt = [a * 100 for a in (acc_p, acc_g, acc_gt)]
-        # # Log progress
-        # if self.iter % 10 == 0:
-        #     # Write series of messages to logger from this backprop iteration
-        #     self.logger.info("Finished backprop iter {:d} in {:.2f} seconds.".format(self.iter, time.time() - start_time))
-        #     self.logger.info(
-        #         "Loss: {:.2f}. <p_g> {:.2f} <p_x> {:.2f} <x_gen> {:.2f} <x_g> {:.2f} <x_p> {:.2f} <g> {:.2f} \
-        #             <reg_g> {:.2f} <reg_p> {:.2f}".format(
-        #             loss.detach().numpy(), *plot_loss
-        #         )
-        #     )
-        #     self.logger.info("Accuracy: <p> {:.2f}% <g> {:.2f}% <gt> {:.2f}%".format(acc_p, acc_g, acc_gt))
-        #     self.logger.info(
-        #         "Parameters: <max_hebb> {:.2f} <eta> {:.2f} <lambda> {:.2f} <p2g_scale_offset> {:.2f}".format(
-        #             np.max(np.abs(self.prev_iter[0].M[0].numpy())),
-        #             self.tem.hyper["eta"],
-        #             self.tem.hyper["lambda"],
-        #             self.tem.hyper["p2g_scale_offset"],
-        #         )
-        #     )
-        #     self.logger.info("Weights:" + str([w for w in loss_weights.numpy()]))
-        #     self.logger.info(" ")
-        # # Also store the internal state (all learnable parameters) and the hyperparameters periodically
-        # if self.iter % self.pars["save_interval"] == 0:
-        #     torch.save(self.tem.state_dict(), self.model_path + "/tem_" + str(self.iter) + ".pt")
-        #     torch.save(self.tem.hyper, self.model_path + "/params_" + str(self.iter) + ".pt")
+        self.accuracies = (acc_p + acc_g + acc_gt) / 3
+        # Log progress
+        if self.iter % 1 == 0:
+            # Write series of messages to logger from this backprop iteration
+            self.logger.info("Finished backprop iter {:d} in {:.2f} seconds.".format(self.iter, time.time() - start_time))
+            self.logger.info(
+                "Loss: {:.2f}. <p_g> {:.2f} <p_x> {:.2f} <x_gen> {:.2f} <x_g> {:.2f} <x_p> {:.2f} <g> {:.2f} \
+                    <reg_g> {:.2f} <reg_p> {:.2f}".format(
+                    loss.detach().numpy(), *plot_loss
+                )
+            )
+            self.logger.info("Accuracy: <p> {:.2f}% <g> {:.2f}% <gt> {:.2f}%".format(acc_p, acc_g, acc_gt))
+            self.logger.info(
+                "Parameters: <max_hebb> {:.2f} <eta> {:.2f} <lambda> {:.2f} <p2g_scale_offset> {:.2f}".format(
+                    np.max(np.abs(self.prev_iter[0].M[0].numpy())),
+                    self.tem.hyper["eta"],
+                    self.tem.hyper["lambda"],
+                    self.tem.hyper["p2g_scale_offset"],
+                )
+            )
+            self.logger.info("Weights:" + str([w for w in loss_weights.numpy()]))
+            self.logger.info(" ")
 
-        # # Save the final state of the model after training has finished
-        # if self.iter == self.pars["train_it"] - 1:
-        #     torch.save(self.tem.state_dict(), self.model_path + "/tem_" + str(self.iter) + ".pt")
-        #     torch.save(self.tem.hyper, self.model_path + "/params_" + str(self.iter) + ".pt")
+            self.accuracy_history["iter"].append(self.iter)
+            self.accuracy_history["p_accuracy"].append(acc_p)
+            self.accuracy_history["g_accuracy"].append(acc_g)
+            self.accuracy_history["gt_accuracy"].append(acc_gt)
+        self.iter += 1
 
     def initialise(self):
         """
         Generate random distribution of objects and intialise optimiser, logger and relevant variables
         """
-        # Create directories for storing all information about the current run
-        # (
-        #     self.run_path,
-        #     self.train_path,
-        #     self.model_path,
-        #     self.save_path,
-        #     self.script_path,
-        #     self.envs_path,
-        # ) = utils.make_directories()
-        # # Save all python files in current directory to script directory
-        # self.save_files()
-        # # Save parameters
-        # np.save(os.path.join(self.save_path, "params"), self.pars)
-        # # Create a tensor board to stay updated on training progress. Start tensorboard with tensorboard --logdir=runs
-        # self.writer = SummaryWriter(self.train_path)
-        # Create a logger to write log output to file
         current_dir = os.path.dirname(os.getcwd())
-        run_path = os.path.join(current_dir, "agent_examples", "results_sim")
+        run_path = os.path.join(current_dir, "agent_examples", self.save_name)
         run_path = os.path.normpath(run_path)
         self.logger = utils.make_logger(run_path)
         # Make an ADAM optimizer for TEM
         self.adam = torch.optim.Adam(self.tem.parameters(), lr=self.pars["lr_max"])
         # Initialise whether a state has been visited for each world
-        self.visited = [[False for _ in range(self.n_states[env])] for env in range(self.pars["batch_size"])]
+        self.visited = [[False for _ in range(self.n_states[env])] for env in range(self.batch_size)]
         self.prev_iter = None
+        self.accuracy_history = {"iter": [], "p_accuracy": [], "g_accuracy": [], "gt_accuracy": []}
 
     def save_agent(self, save_path: str):
         """Save current state and information in general to re-instantiate the agent
@@ -393,6 +389,14 @@ class Whittington2020(AgentCore):
             os.path.join(self.script_path, "whittington_2020_utils.py"),
         )
         return
+
+    def save_accuracies(self):
+        current_dir = os.path.dirname(os.getcwd())
+        run_path = os.path.join(current_dir, "agent_examples", self.save_name)
+        run_path = os.path.normpath(run_path)
+        accuracy_file = os.path.join(run_path, "accuracies.pkl")
+        with open(accuracy_file, "wb") as f:
+            pickle.dump(self.accuracy_history, f)
 
     def action_policy(self):
         """
@@ -487,17 +491,20 @@ class Whittington2020(AgentCore):
         return final_model_input, history, environments
 
     def plot_run(self, tem, model_input, environments):
-        with torch.no_grad():
-            forward = tem(model_input, prev_iter=None)
-        include_stay_still = False
-        shiny_envs = [False, False, False, False]
-        env_to_plot = 0
-        shiny_envs if shiny_envs[env_to_plot] else [not shiny_env for shiny_env in shiny_envs]
-        correct_model, correct_node, correct_edge = analyse.compare_to_agents(
+        # with torch.no_grad():
+        #     forward = tem(model_input, prev_iter=None)
+        forward = tem(model_input, prev_iter=None)
+        include_stay_still = True
+        # shiny_envs = [False, False, False, False]
+        # env_to_plot = 0
+        # shiny_envs if shiny_envs[env_to_plot] else [not shiny_env for shiny_env in shiny_envs]
+        self.correct_model, self.correct_node, self.correct_edge = analyse.compare_to_agents(
             forward, tem, environments, include_stay_still=include_stay_still
         )
-        analyse.zero_shot(forward, tem, environments, include_stay_still=include_stay_still)
-        analyse.location_occupation(forward, tem, environments)
+        acc_p, acc_g, acc_gt = np.mean([[np.mean(a) for a in step.correct()] for step in forward], axis=0)
+        acc_p, acc_g, acc_gt = [a * 100 for a in (acc_p, acc_g, acc_gt)]
+        self.zero_shot = analyse.zero_shot(forward, tem, environments, include_stay_still=include_stay_still)
+        # analyse.location_occupation(forward, tem, environments)
         self.g_rates, self.p_rates = analyse.rate_map(forward, tem, environments)
         from_acc, to_acc = analyse.location_accuracy(forward, tem, environments)
         return
@@ -547,7 +554,8 @@ class Whittington2020(AgentCore):
                 rate_map_mat = self.get_rate_map_matrix(rate_maps, i, j)
 
                 # Plot the rate map in the corresponding subplot
-                make_plot_rate_map(rate_map_mat, axs[ax_row, ax_col], f"Cell {j+1}", "", "", "")
+                # make_plot_rate_map(rate_map_mat, axs[ax_row, ax_col], f"Cell {j+1}", "", "", "")
+                make_plot_rate_map(rate_map_mat[::-1, :], axs[ax_row, ax_col], f"Cell {j+1}", "", "", "")
 
             # Hide unused subplots for the current frequency
             for j in range(n_cells, num_rows * num_cols):
@@ -561,4 +569,29 @@ class Whittington2020(AgentCore):
 
     def get_rate_map_matrix(self, rate_maps, i, j):
         rate_map = np.asarray(rate_maps[0][i]).T[j]
-        return np.reshape(rate_map, (self.room_widths[0], self.room_depths[0]))
+        return np.reshape(
+            rate_map,
+            (
+                int(self.room_widths[0] * self.state_densities[0]),
+                int(self.room_depths[0] * self.state_densities[0]),
+            ),
+        )
+
+    def plot_accuracies(self, save_path=None):
+        accuracy_data = self.accuracy_history
+        plt.figure(figsize=(10, 6))
+        plt.plot(accuracy_data["iter"], accuracy_data["p_accuracy"], label="p accuracy")
+        plt.plot(accuracy_data["iter"], accuracy_data["g_accuracy"], label="g accuracy")
+        plt.plot(accuracy_data["iter"], accuracy_data["gt_accuracy"], label="gt accuracy")
+        plt.xlabel("Iteration")
+        plt.ylabel("Accuracy (%)")
+        plt.title("TEM Model Accuracies Over Training")
+        plt.legend()
+        plt.grid(True)
+
+        if save_path:
+            plt.savefig(save_path)
+        # else:
+        #     plt.show()
+
+        plt.close()

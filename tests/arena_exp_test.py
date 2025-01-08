@@ -311,58 +311,20 @@ class TestBatchEnvironment(object):
 class TestDiscretizedObjectEnvrionment(TestSimple2D):
     @pytest.fixture
     def init_env(self):
-        env_name = "DiscretizedObjectEnvironment_test"
-        state_density = 1
-        n_objects = 45
-        agent_step_size = 1
-        arena_x_limits = [
-            [-5, 5],
-            [-4, 4],
-            [-5, 5],
-            [-6, 6],
-            [-4, 4],
-            [-5, 5],
-            [-6, 6],
-            [-5, 5],
-            [-4, 4],
-            [-5, 5],
-            [-6, 6],
-            [-5, 5],
-            [-4, 4],
-            [-5, 5],
-            [-6, 6],
-            [-5, 5],
-        ]
-        arena_y_limits = [
-            [-5, 5],
-            [-4, 4],
-            [-5, 5],
-            [-6, 6],
-            [-4, 4],
-            [-5, 5],
-            [-6, 6],
-            [-5, 5],
-            [-4, 4],
-            [-5, 5],
-            [-6, 6],
-            [-5, 5],
-            [-4, 4],
-            [-5, 5],
-            [-6, 6],
-            [-5, 5],
-        ]
-        env = DiscreteObjectEnvironment(
-            environment_name=env_name,
-            env_class=DiscreteObjectEnvironment,
-            arena_x_limits=arena_x_limits,
-            arena_y_limits=arena_y_limits,
-            state_density=state_density,
-            n_objects=n_objects,
-            agent_step_size=agent_step_size,
-            use_behavioural_data=False,
-            data_path=None,
-            experiment_class=Sargolini2006Data,
-        )
+        arena_x_limits = [-5, 5]
+        arena_y_limits = [-5, 5]
+        discrete_env_params = {
+            "environment_name": "DiscreteObject_test",
+            "arena_x_limits": arena_x_limits,
+            "arena_y_limits": arena_y_limits,
+            "state_density": 1,
+            "n_objects": 45,
+            "agent_step_size": 1,  # Note: this must be 1 / state density
+            "use_behavioural_data": False,
+            "data_path": None,
+            "experiment_class": Sargolini2006Data,
+        }
+        env = DiscreteObjectEnvironment(**discrete_env_params)
         return [
             env,
         ]
