@@ -29,13 +29,14 @@ dependencies = [
   "tqdm",
   "jupyter",
   "ipython",
-  "matplotlib",
+  "matplotlib>=3.10.0",
   "deepdiff",
   "opencv-python",
   "gymnasium",
   "scikit-image",
   "pooch",
   "colorama",
+  "pillow",
 ]
 
 [project.urls]
