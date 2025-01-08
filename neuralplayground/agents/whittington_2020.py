@@ -85,7 +85,7 @@ class Whittington2020(AgentCore):
         super().__init__()
         self.mod_kwargs = mod_kwargs.copy()
         params = mod_kwargs["params"]
-        if not "save_name" in params:
+        if "save_name" not in params:
             params["save_name"] = "default_save_TEM"
         self.save_name = params["save_name"]
         self.room_widths = mod_kwargs["room_widths"]
