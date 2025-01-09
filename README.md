@@ -78,7 +78,7 @@ We advise you to install the package in a virtual environment,
 to avoid conflicts with other packages. For example, using `conda`:
 
 ```python
-conda create --name NPG-env python=3.10
+conda create --name NPG-env python=3.12
 conda activate NPG-env
 conda install pip
 ```
