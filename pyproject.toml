@@ -6,7 +6,7 @@ authors = [
 ]
 description = "The standardised environment for the hippocampus and entorhinal cortex models"
 readme = "README.md"
-requires-python = ">=3.10.0"
+requires-python = ">=3.11.0"
 dynamic = ["version"]
 
 license = {text = "MIT"}
@@ -15,8 +15,9 @@ classifiers = [
     "Development Status :: 3 - Alpha",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Operating System :: OS Independent",
     "License :: OSI Approved :: MIT License",
 ]
@@ -27,14 +28,13 @@ dependencies = [
   "tqdm",
   "jupyter",
   "ipython",
-  "matplotlib>=3.10.0",
+  "matplotlib",
   "deepdiff",
   "opencv-python",
   "gymnasium",
   "scikit-image",
   "pooch",
   "colorama",
-  "pillow",
 ]
 
 [project.urls]
@@ -78,7 +78,7 @@ exclude = ["tests*"]
 addopts = "--cov=neuralplayground"
 
 [tool.black]
-target-version = ['py310', 'py311']
+target-version = ['py311', 'py312', 'py313']
 skip-string-normalization = false
 line-length = 127
 

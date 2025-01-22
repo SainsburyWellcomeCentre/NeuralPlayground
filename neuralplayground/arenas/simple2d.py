@@ -354,7 +354,10 @@ class Simple2D(Environment):
         history = self.history[-history_length:]
         ax = self.plot_trajectory(history_data=history, ax=ax)
         canvas.draw()
-        image = np.asarray(canvas.buffer_rgba())
+        image = np.frombuffer(canvas.buffer_rgba(), dtype="uint8")
+        image = image.reshape(f.canvas.get_width_height()[::-1] + (4,))
+        image = cv2.cvtColor(image, cv2.COLOR_RGBA2RGB)
+
         print(image.shape)
         if display:
             cv2.imshow("2D_env", image)

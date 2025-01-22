@@ -1,3 +1,5 @@
+import random
+
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
@@ -73,55 +75,54 @@ class DiscreteObjectEnvironment(Environment):
         """
         super().__init__(environment_name, **env_kwargs)
         self.environment_name = environment_name
-        self.use_behavioural_data = env_kwargs["use_behavioural_data"]
+        self.use_behavioral_data = env_kwargs["use_behavioural_data"]
         self.experiment = experiment_class(
             experiment_name=self.environment_name,
             data_path=env_kwargs["data_path"],
             recording_index=recording_index,
             verbose=verbose,
         )
-        if self.use_behavioural_data:
+        if self.use_behavioral_data:
             self.state_dims_labels = ["x_pos", "y_pos", "head_direction_x", "head_direction_y"]
             self.arena_limits = self.experiment.arena_limits
             self.arena_x_limits = self.arena_limits[0].astype(int)
             self.arena_y_limits = self.arena_limits[1].astype(int)
-            self.state_density = 0.25
         else:
             self.state_dims_labels = ["x_pos", "y_pos"]
             self.arena_x_limits = env_kwargs["arena_x_limits"]
             self.arena_y_limits = env_kwargs["arena_y_limits"]
-            self.state_density = env_kwargs["state_density"]
 
         self.n_objects = env_kwargs["n_objects"]
+        self.state_density = env_kwargs["state_density"]
         self.arena_limits = np.array(
             [[self.arena_x_limits[0], self.arena_x_limits[1]], [self.arena_y_limits[0], self.arena_y_limits[1]]]
         )
-        self.room_width = self.arena_x_limits[1] - self.arena_x_limits[0]
-        self.room_depth = self.arena_y_limits[1] - self.arena_y_limits[0]
+        self.room_width = np.diff(self.arena_x_limits)[0]
+        self.room_depth = np.diff(self.arena_y_limits)[0]
         self.agent_step_size = env_kwargs["agent_step_size"]
         self._create_default_walls()
         self._create_custom_walls()
         self.wall_list = self.default_walls + self.custom_walls
 
         # Variables for discretised state space
-        self.resolution_w = int(self.room_width * self.state_density)
-        self.resolution_d = int(self.room_depth * self.state_density)
-        self.state_size = 1 / self.state_density
-
+        self.resolution_w = int(self.state_density * self.room_width)
+        self.resolution_d = int(self.state_density * self.room_depth)
         self.x_array = np.linspace(
-            self.arena_x_limits[0] + self.state_size / 2, self.arena_x_limits[1] - self.state_size / 2, self.resolution_w
+            -self.room_width / 2 + (1 / 2 * self.state_density),
+            self.room_width / 2 - (1 / 2 * self.state_density),
+            num=self.resolution_w,
         )
         self.y_array = np.linspace(
-            self.arena_y_limits[0] + self.state_size / 2, self.arena_y_limits[1] - self.state_size / 2, self.resolution_d
+            -self.room_depth / 2 + (1 / 2 * self.state_density),
+            self.room_depth / 2 - (1 / 2 * self.state_density),
+            num=self.resolution_d,
         )
-        self.mesh = np.meshgrid(self.x_array, self.y_array)
-        self.xy_combination = np.column_stack([self.mesh[0].ravel(), self.mesh[1].ravel()])
+        self.mesh = np.array(np.meshgrid(self.x_array, self.y_array))
+        self.xy_combination = np.stack(np.array(np.meshgrid(self.x_array, self.y_array)), axis=-1)
+        self.ws = int(self.room_width * self.state_density)
+        self.hs = int(self.room_depth * self.state_density)
         self.n_states = self.resolution_w * self.resolution_d
-        self.objects = self.generate_objects()
-        self.occupancy_grid = np.zeros((self.resolution_d, self.resolution_w))
-
-        self.steps_in_curr_env = 0
-        self.max_steps_per_env = 5000
+        self.objects = np.empty(shape=(self.n_states, self.n_objects))
 
     def reset(self, random_state=True, custom_state=None):
         """
@@ -158,31 +159,19 @@ class DiscreteObjectEnvironment(Environment):
         if custom_state is not None:
             pos = np.array(custom_state)
 
-        # Snap the initial position to the nearest discrete state
-        x_index = np.clip(int((pos[0] - self.arena_x_limits[0]) // self.state_size), 0, self.resolution_w - 1)
-        y_index = np.clip(int((pos[1] - self.arena_y_limits[0]) // self.state_size), 0, self.resolution_d - 1)
-        pos = np.array([self.x_array[x_index], self.y_array[y_index]])
-
         # Reset to first position recorded in this session
-        if self.use_behavioural_data:
+        if self.use_behavioral_data:
             pos, head_dir = self.experiment.position[0, :], self.experiment.head_direction[0, :]
             custom_state = np.concatenate([pos, head_dir])
 
         self.objects = self.generate_objects()
-        self.occupancy_grid = np.zeros((self.resolution_d, self.resolution_w))
 
         # Fully observable environment, make_observation returns the state
         observation = self.make_object_observation(pos)
         self.state = observation
         return observation, self.state
 
-    def reset_objects(self):
-        """
-        Reset the distribution of sensory objects.
-        """
-        self.objects = self.generate_objects()
-
-    def step(self, action: np.ndarray, normalize_step: bool = True, skip_every: int = 10):
+    def step(self, action: np.ndarray, normalize_step: bool = False, skip_every: int = 10):
         """
         Runs the environment dynamics. Increasing global counters. Given some action, return observation,
         new state and reward.
@@ -207,7 +196,7 @@ class DiscreteObjectEnvironment(Environment):
             Array of the observation of the agent in the environment, in this case the sensory object.
         """
         self.old_state = self.state.copy()
-        if self.use_behavioural_data:
+        if self.use_behavioral_data:
             # In this case, the action is ignored and computed from the step in behavioral data recorded from the experiment
             if self.global_steps * skip_every >= self.experiment.position.shape[0] - 1:
                 self.global_steps = np.random.choice(np.arange(skip_every))
@@ -220,19 +209,19 @@ class DiscreteObjectEnvironment(Environment):
                 self.experiment.head_direction[self.global_steps * skip_every, :],
             )
             new_pos_state = np.concatenate(new_pos_state)
-        if not self.use_behavioural_data:
-            action_rev = action
-            if normalize_step:
-                new_pos_state = np.add(self.state[-1], [self.agent_step_size * e for e in action_rev]).tolist()
+        else:
+            if action[0] == 0:
+                action_rev = np.array([0.0, -action[1]])
             else:
-                new_pos_state = np.add(self.state[-1], action_rev).tolist()
-            new_pos_state, invalid_action = self.validate_action(
-                self.state[-1], [self.agent_step_size * e for e in action_rev], new_pos_state[:2]
-            )
+                action_rev = action
+            if normalize_step and np.linalg.norm(action) > 0:
+                action_rev = action_rev / np.linalg.norm(action_rev)
+                new_pos_state = self.state[-1] + self.agent_step_size * action_rev
+            else:
+                new_pos_state = self.state[-1] + action_rev
+            new_pos_state, valid_action = self.validate_action(self.state[-1], action_rev, new_pos_state[:2])
         reward = self.reward_function(action, self.state[-1])  # If you get reward, it should be coded here
         observation = self.make_object_observation(new_pos_state)
-        state_index = self.pos_to_state(new_pos_state)
-        self.occupancy_grid[state_index // self.resolution_w, state_index % self.resolution_w] += 1
         self.state = observation
         self.transition = {
             "action": action,
@@ -243,19 +232,26 @@ class DiscreteObjectEnvironment(Environment):
         }
         self.history.append(self.transition)
         self._increase_global_step()
-        # self.steps_in_curr_env += 1
-        # if self.steps_in_curr_env >= self.max_steps_per_env:
-        #     self.steps_in_curr_env = 0
-        #     self.reset_objects()
         return observation, self.state, reward
 
     def generate_objects(self):
         """
-        Randomly assign objects to each state.
+        Generate objects in the environment. In this case, the objects are one-hot encoded vectors.
+        Returns
+        -------
+            objects: ndarray (n_states, n_objects)
+                Array of the objects in the environment, one-hot encoded
         """
-        n_states = self.resolution_w * self.resolution_d
-        object_indices = np.random.randint(0, self.n_objects, size=n_states)
-        objects = np.eye(self.n_objects)[object_indices]
+        poss_objects = np.zeros(shape=(self.n_objects, self.n_objects))
+        for i in range(self.n_objects):
+            for j in range(self.n_objects):
+                if j == i:
+                    poss_objects[i][j] = 1
+        # Generate landscape of objects in each environment
+        objects = np.zeros(shape=(self.n_states, self.n_objects))
+        for i in range(self.n_states):
+            rand = random.randint(0, self.n_objects - 1)
+            objects[i, :] = poss_objects[rand]
         return objects
 
     def make_object_observation(self, pos):
@@ -276,20 +272,23 @@ class DiscreteObjectEnvironment(Environment):
         return [index, object, pos]
 
     def pos_to_state(self, pos):
-        """Convert an (x,y) position to a discretised state index"""
-        if not self.use_behavioural_data and np.shape(pos) == (2, 2):
+        """
+        Convert an (x,y) position to a discretised state index
+        Parameters
+        ----------
+            pos: ndarray (2,)
+                Vector of the x and y coordinate of the position of the animal in the environment
+        Returns
+        -------
+            index: int
+                Index of the state in the discretised state space
+        """
+        if np.shape(pos) == (2, 2):
             pos = pos[0]
-        elif self.use_behavioural_data and len(pos) > 2:
-            pos = pos[:2]
-
-        x_index = np.floor((pos[0] - self.arena_x_limits[0]) / self.state_size).astype(int)
-        y_index = np.floor((pos[1] - self.arena_y_limits[0]) / self.state_size).astype(int)
-
-        # Ensure indices are within bounds
-        x_index = np.clip(x_index, 0, self.resolution_w - 1)
-        y_index = np.clip(y_index, 0, self.resolution_d - 1)
-
-        return y_index * self.resolution_w + x_index
+        diff = (self.xy_combination - pos) ** 2
+        dist = np.sum(diff**2, axis=-1)
+        index = np.argmin(dist)
+        return index
 
     def _create_default_walls(self):
         """Generate walls to limit the arena based on the limits given in kwargs when initializing the object.
@@ -302,36 +301,16 @@ class DiscreteObjectEnvironment(Environment):
         """
         self.default_walls = []
         self.default_walls.append(
-            np.array(
-                [
-                    [self.arena_limits[0, 0] - 0.1, self.arena_limits[1, 0] + 0.1],
-                    [self.arena_limits[0, 0] - 0.1, self.arena_limits[1, 1] + 0.1],
-                ]
-            )
+            np.array([[self.arena_limits[0, 0], self.arena_limits[1, 0]], [self.arena_limits[0, 0], self.arena_limits[1, 1]]])
         )
         self.default_walls.append(
-            np.array(
-                [
-                    [self.arena_limits[0, 1] + 0.1, self.arena_limits[1, 0] - 0.1],
-                    [self.arena_limits[0, 1] + 0.1, self.arena_limits[1, 1] + 0.1],
-                ]
-            )
+            np.array([[self.arena_limits[0, 1], self.arena_limits[1, 0]], [self.arena_limits[0, 1], self.arena_limits[1, 1]]])
         )
         self.default_walls.append(
-            np.array(
-                [
-                    [self.arena_limits[0, 0] - 0.1, self.arena_limits[1, 0] - 0.1],
-                    [self.arena_limits[0, 1] + 0.1, self.arena_limits[1, 0] - 0.1],
-                ]
-            )
+            np.array([[self.arena_limits[0, 0], self.arena_limits[1, 0]], [self.arena_limits[0, 1], self.arena_limits[1, 0]]])
         )
         self.default_walls.append(
-            np.array(
-                [
-                    [self.arena_limits[0, 0] - 0.1, self.arena_limits[1, 1] + 0.1],
-                    [self.arena_limits[0, 1] + 0.1, self.arena_limits[1, 1] + 0.1],
-                ]
-            )
+            np.array([[self.arena_limits[0, 0], self.arena_limits[1, 1]], [self.arena_limits[0, 1], self.arena_limits[1, 1]]])
         )
 
     def _create_custom_walls(self):
@@ -359,14 +338,8 @@ class DiscreteObjectEnvironment(Environment):
         """
         crossed_wall = False
         for wall in self.wall_list:
-            new_state, crossed = check_crossing_wall(pre_state=pre_state, new_state=np.asarray(new_state), wall=wall)
+            new_state, crossed = check_crossing_wall(pre_state=pre_state, new_state=new_state, wall=wall)
             crossed_wall = crossed or crossed_wall
-
-        # Snap the new_state back to the nearest discrete state
-        x_index = np.argmin(np.abs(self.x_array - new_state[0]))
-        y_index = np.argmin(np.abs(self.y_array - new_state[1]))
-        new_state = np.array([self.x_array[x_index], self.y_array[y_index]])
-
         return new_state, crossed_wall
 
     def plot_trajectory(
@@ -440,7 +413,11 @@ class DiscreteObjectEnvironment(Environment):
         history = self.history[-history_length:]
         ax = self.plot_trajectory(history_data=history, ax=ax)
         canvas.draw()
-        image = np.asarray(canvas.buffer_rgba())
+        image = np.frombuffer(canvas.buffer_rgba(), dtype="uint8")
+        image = image.reshape(f.canvas.get_width_height()[::-1] + (4,))
+        image = cv2.cvtColor(image, cv2.COLOR_RGBA2RGB)
+
         print(image.shape)
-        cv2.imshow("2D_env", image)
-        cv2.waitKey(10)
+        if display:
+            cv2.imshow("2D_env", image)
+            cv2.waitKey(10)
