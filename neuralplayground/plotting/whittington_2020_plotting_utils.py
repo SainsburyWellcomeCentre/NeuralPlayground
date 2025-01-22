@@ -82,6 +82,7 @@ class PlotSim(object):
         save_path : str
             The path where the results of the simulation will be saved
         """
+        n_walks = self.plotting_loop_params["n_walk"]
         # Initializing models
         print("---> Initializing models")
         agent, env = self._init_models()
@@ -119,8 +120,6 @@ class PlotSim(object):
         # Run around environment
         observation, state = env.reset(random_state=random_state, custom_state=custom_state)
         while agent.n_walk < n_walks:
-            if agent.n_walk % 1000 == 0 and agent.n_walk > 0:
-                print(agent.n_walk)
             action = agent.batch_act(observation)
             observation, state, reward = env.step(action, normalize_step=True)
         return agent, env

@@ -81,7 +81,7 @@ class AgentCore(object):
             action = np.random.normal(scale=self.agent_step_size, size=(2,))
 
         self.obs_history.append(obs)
-        if len(self.obs_history) >= 1000:  # reset every 1000
+        if len(self.obs_history) >= 1000:  # max length 1000
             self.obs_history.pop(0)
         if policy_func is not None:
             return policy_func(obs)
