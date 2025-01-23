@@ -415,7 +415,7 @@ class DiscreteObjectEnvironment(Environment):
         canvas.draw()
         image = np.frombuffer(canvas.buffer_rgba(), dtype="uint8")
         image = image.reshape(f.canvas.get_width_height()[::-1] + (4,))
-        image = cv2.cvtColor(image, cv2.COLOR_RGBA2RGB)
+        image = cv2.cvtColor(image, cv2.COLOR_RGBA2BGR)
 
         print(image.shape)
         if display:
