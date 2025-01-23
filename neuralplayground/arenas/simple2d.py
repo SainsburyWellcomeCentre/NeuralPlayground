@@ -107,8 +107,8 @@ class Simple2D(Environment):
                 [self.arena_y_limits[0], self.arena_y_limits[1]],
             ]
         )
-        self.room_width = np.diff(self.arena_x_limits)[0]
-        self.room_depth = np.diff(self.arena_y_limits)[0]
+        self.room_width = np.diff(self.arena_x_limits)[0].item()
+        self.room_depth = np.diff(self.arena_y_limits)[0].item()
         self.observation_space = Box(
             low=np.array([self.arena_x_limits[0], self.arena_y_limits[0]]),
             high=np.array([self.arena_x_limits[1], self.arena_y_limits[1]]),
@@ -356,7 +356,7 @@ class Simple2D(Environment):
         canvas.draw()
         image = np.frombuffer(canvas.buffer_rgba(), dtype="uint8")
         image = image.reshape(f.canvas.get_width_height()[::-1] + (4,))
-        image = cv2.cvtColor(image, cv2.COLOR_RGBA2RGB)
+        image = cv2.cvtColor(image, cv2.COLOR_RGBA2BGR)
 
         print(image.shape)
         if display:
