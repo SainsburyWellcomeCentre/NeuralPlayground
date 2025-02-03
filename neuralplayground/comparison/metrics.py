@@ -22,8 +22,7 @@
 # SOFTWARE.
 # ==============================================================================
 
-"""Grid score calculations.
-"""
+"""Grid score calculations."""
 from __future__ import absolute_import, division, print_function
 
 import copy

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-""" This code is from another repository, please visit their repository for more information:
+"""This code is from another repository, please visit their repository for more information:
 https://github.com/ganguli-lab/grid-pattern-formation/blob/master/trajectory_generator.py
 
 It is under Apache Licence 2.0
