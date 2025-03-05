@@ -85,7 +85,9 @@ class Whittington2020(AgentCore):
         super().__init__()
         self.mod_kwargs = mod_kwargs.copy()
         params = mod_kwargs["params"]
-        self.save_name = mod_kwargs["save_name"]
+        if "save_name" not in params:
+            params["save_name"] = "default_save_TEM"
+        self.save_name = params["save_name"]
         self.room_widths = mod_kwargs["room_widths"]
         self.room_depths = mod_kwargs["room_depths"]
         self.state_densities = mod_kwargs["state_densities"]
@@ -589,7 +591,7 @@ class Whittington2020(AgentCore):
 
         if save_path:
             plt.savefig(save_path)
-        else:
-            plt.show()
+        # else:
+        #     plt.show()
 
         plt.close()

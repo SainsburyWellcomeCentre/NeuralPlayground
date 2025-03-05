@@ -1,3 +1,5 @@
+import random
+
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
@@ -48,24 +50,23 @@ class DiscreteObjectEnvironment(Environment):
             recording_index=recording_index,
             verbose=verbose,
         )
-        if self.use_behavioural_data:
+        if self.use_behavioral_data:
             self.state_dims_labels = ["x_pos", "y_pos", "head_direction_x", "head_direction_y"]
             self.arena_limits = self.experiment.arena_limits
             self.arena_x_limits = self.arena_limits[0].astype(int)
             self.arena_y_limits = self.arena_limits[1].astype(int)
-            self.state_density = 0.25
         else:
             self.state_dims_labels = ["x_pos", "y_pos"]
             self.arena_x_limits = env_kwargs["arena_x_limits"]
             self.arena_y_limits = env_kwargs["arena_y_limits"]
-            self.state_density = env_kwargs["state_density"]
 
         self.n_objects = env_kwargs["n_objects"]
+        self.state_density = env_kwargs["state_density"]
         self.arena_limits = np.array(
             [[self.arena_x_limits[0], self.arena_x_limits[1]], [self.arena_y_limits[0], self.arena_y_limits[1]]]
         )
-        self.room_width = self.arena_x_limits[1] - self.arena_x_limits[0]
-        self.room_depth = self.arena_y_limits[1] - self.arena_y_limits[0]
+        self.room_width = np.diff(self.arena_x_limits)[0]
+        self.room_depth = np.diff(self.arena_y_limits)[0]
         self.agent_step_size = env_kwargs["agent_step_size"]
         self._create_default_walls()      # <--- Will pick square or hex below
         self._create_custom_walls()
@@ -338,8 +339,10 @@ class DiscreteObjectEnvironment(Environment):
         history = self.history[-history_length:]
         ax = self.plot_trajectory(history_data=history, ax=ax)
         canvas.draw()
-        image = np.frombuffer(canvas.tostring_rgb(), dtype="uint8")
-        image = image.reshape(f.canvas.get_width_height()[::-1] + (3,))
+        image = np.frombuffer(canvas.buffer_rgba(), dtype="uint8")
+        image = image.reshape(f.canvas.get_width_height()[::-1] + (4,))
+        image = cv2.cvtColor(image, cv2.COLOR_RGBA2RGB)
+
         print(image.shape)
         cv2.imshow("2D_env", image)
         cv2.waitKey(10)

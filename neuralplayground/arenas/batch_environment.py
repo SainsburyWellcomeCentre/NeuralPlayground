@@ -216,7 +216,7 @@ class BatchEnvironment(Environment):
 
         # Adjust spacing between subplots
         plt.tight_layout()
-        plt.show()
+        # plt.show()
         return fig, axs
 
     def collect_environment_info(self, model_input, history, environments):
