@@ -1,3 +1,5 @@
+import numpy as np
+
 from neuralplayground.agents import AgentCore
 from neuralplayground.arenas import Environment
 
@@ -100,7 +102,6 @@ def tem_training_loop(
     dict_training : dict
         Dictionary containing the training history from the training loop and update method.
     """
-    import numpy as np
 
     training_dict = [agent.mod_kwargs, env.env_kwargs, agent.tem.hyper]
 

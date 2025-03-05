@@ -3,9 +3,7 @@ from .agent_core import AgentCore
 
 class SimpleDiscreteAgent(AgentCore):
     """
-    A simplified single-environment discrete agent, loosely mirroring TEM’s
-    approach to picking actions and checking whether the environment
-    actually moved.
+    A simplified single-environment discrete agent, with optional square or hex action sets.
     """
 
     def __init__(
@@ -16,12 +14,9 @@ class SimpleDiscreteAgent(AgentCore):
         """
         Parameters
         ----------
-        room_width : int
-            Width (in discrete states) of the environment
-        room_depth : int
-            Depth (in discrete states) of the environment
-        state_density : float
-            Number of discrete states per unit distance (usually 1 / step_size)
+        grid_type : {'square', 'hex'}
+            Determines the action set. 'square' uses [stay, up, down, left, right].
+            'hex' uses [stay] plus six hexagonal directions.
         agent_name : str
             Agent's name
         """
@@ -29,8 +24,26 @@ class SimpleDiscreteAgent(AgentCore):
         self.room_width = model_kwargs["room_width"]
         self.room_depth = model_kwargs["room_depth"]
         self.state_density = model_kwargs["state_density"]
-        # Discrete actions: stay, up, down, right, left
-        self.poss_actions = [[0, 0], [0, 1], [0, -1], [1, 0], [-1, 0]]
+        self.grid_type = model_kwargs["grid_type"]
+
+        # Configure possible actions
+        if self.grid_type == "square":
+            # Discrete actions: stay, up, down, right, left
+            self.poss_actions = [[0, 0], [0, 1], [0, -1], [1, 0], [-1, 0]]
+        else:
+            # For hex, we can define six directions in 2D plus stay.
+            # Below is one common set for a pointy-topped hex layout,
+            # but you can adjust as desired.
+            sqrt3_2 = np.sqrt(3) / 2
+            self.poss_actions = [
+                [0, 0],                 # stay still
+                [1.0, 0.0],            # east
+                [0.5,  sqrt3_2],       # northeast
+                [-0.5,  sqrt3_2],      # northwest
+                [-1.0, 0.0],           # west
+                [-0.5, -sqrt3_2],      # southwest
+                [0.5, -sqrt3_2],       # southeast
+            ]
 
         # For storing trajectory
         self.walk_actions = []
@@ -72,8 +85,8 @@ class SimpleDiscreteAgent(AgentCore):
         action : list
             Chosen discrete action [dx, dy]
         """
-        # If this is our first time calling act, initialise
         if self.prev_observation is None:
+            # First time: just pick an action and store current observation
             self.prev_observation = observation
             self.prev_action = self.action_policy()
             return self.prev_action
@@ -86,7 +99,7 @@ class SimpleDiscreteAgent(AgentCore):
             # The environment didn't move from last action, so pick a new random action
             new_action = self.action_policy()
         else:
-            # The environment did move, so record old obs/action before picking the next action
+            # The environment did move, so record old obs/action before picking the next
             self.walk_actions.append(self.prev_action)
             self.obs_history.append(self.prev_observation)
             self.n_walk += 1
@@ -98,14 +111,14 @@ class SimpleDiscreteAgent(AgentCore):
 
     def action_policy(self):
         """
-        Random action policy that selects an action from [stay, up, down, right, left].
+        Random action policy that selects among the pre-defined action set.
         """
         idx = np.random.choice(len(self.poss_actions))
         return self.poss_actions[idx]
 
     def update(self):
         """
-        Update the agent's internal state after a walk is completed.
+        No-op update in this simplified agent.
         """
         self.n_walk = 0
         return None

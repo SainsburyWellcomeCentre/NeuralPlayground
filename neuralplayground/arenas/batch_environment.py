@@ -40,7 +40,6 @@ class BatchEnvironment(Environment):
             arg_env_params["arena_x_limits"] = self.batch_x_limits[i]
             arg_env_params["arena_y_limits"] = self.batch_y_limits[i]
             self.environments.append(env_class(**arg_env_params))
-            # env_class(**arg_env_params).visualize_environment()
 
         self.room_widths = [np.diff(self.environments[i].arena_x_limits)[0] for i in range(self.batch_size)]
         self.room_depths = [np.diff(self.environments[i].arena_y_limits)[0] for i in range(self.batch_size)]
