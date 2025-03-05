@@ -1,5 +1,3 @@
-import random
-
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
@@ -68,7 +66,7 @@ class DiscreteObjectEnvironment(Environment):
         self.room_width = np.diff(self.arena_x_limits)[0]
         self.room_depth = np.diff(self.arena_y_limits)[0]
         self.agent_step_size = env_kwargs["agent_step_size"]
-        self._create_default_walls()      # <--- Will pick square or hex below
+        self._create_default_walls()  # <--- Will pick square or hex below
         self._create_custom_walls()
         self.wall_list = self.default_walls + self.custom_walls
 
@@ -80,8 +78,7 @@ class DiscreteObjectEnvironment(Environment):
         self.objects = self.generate_objects()
 
         # Keep the occupancy grid with the same shape for consistency
-        self.occupancy_grid = np.zeros((int(self.room_depth * self.state_density), 
-                                        int(self.room_width * self.state_density)))
+        self.occupancy_grid = np.zeros((int(self.room_depth * self.state_density), int(self.room_width * self.state_density)))
 
         self.steps_in_curr_env = 0
         self.max_steps_per_env = 5000
@@ -170,13 +167,13 @@ class DiscreteObjectEnvironment(Environment):
             # We assume arena_x_limits = [-5, 5], arena_y_limits = [-5, 5].
             # Centre is therefore (0,0), and we want radius ~5 so that it takes
             # exactly 5 steps (size=1) to reach the wall from the centre.
-            
+
             self.default_walls = []
-            
+
             # Tiny epsilon so floating-point rounding doesn't let the agent slip outside.
             # You can tweak e.g. 1e-4, 1e-3, etc. as needed.
             r = 5.3
-            
+
             # For a 'pointy-topped' orientation, corners at angles: 0, 60, 120, ..., 300
             angles_deg = [0, 60, 120, 180, 240, 300]
             corners = []
@@ -218,8 +215,7 @@ class DiscreteObjectEnvironment(Environment):
             custom_state = np.concatenate([pos, head_dir])
 
         self.objects = self.generate_objects()
-        self.occupancy_grid = np.zeros((int(self.room_depth * self.state_density), 
-                                        int(self.room_width * self.state_density)))
+        self.occupancy_grid = np.zeros((int(self.room_depth * self.state_density), int(self.room_width * self.state_density)))
 
         nearest_idx = np.argmin(np.sum((self.xy_combination - pos) ** 2, axis=1))
         snapped_pos = self.xy_combination[nearest_idx]
@@ -288,10 +284,7 @@ class DiscreteObjectEnvironment(Environment):
         crossed_wall = False
         for wall in self.wall_list:
             new_state, crossed = check_crossing_wall(
-                pre_state=pre_state, 
-                new_state=np.asarray(new_state), 
-                wall=wall,
-                wall_closenes=0.0
+                pre_state=pre_state, new_state=np.asarray(new_state), wall=wall, wall_closenes=0.0
             )
             crossed_wall = crossed or crossed_wall
 

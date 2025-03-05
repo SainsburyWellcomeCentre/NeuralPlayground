@@ -38,13 +38,13 @@ class SimpleDiscreteAgent(AgentCore):
             # but you can adjust as desired.
             sqrt3_2 = np.sqrt(3) / 2
             self.poss_actions = [
-                [0, 0],                 # stay still
-                [1.0, 0.0],            # east
-                [0.5,  sqrt3_2],       # northeast
-                [-0.5,  sqrt3_2],      # northwest
-                [-1.0, 0.0],           # west
-                [-0.5, -sqrt3_2],      # southwest
-                [0.5, -sqrt3_2],       # southeast
+                [0, 0],  # stay still
+                [1.0, 0.0],  # east
+                [0.5, sqrt3_2],  # northeast
+                [-0.5, sqrt3_2],  # northwest
+                [-1.0, 0.0],  # west
+                [-0.5, -sqrt3_2],  # southwest
+                [0.5, -sqrt3_2],  # southeast
             ]
 
         # For storing trajectory
