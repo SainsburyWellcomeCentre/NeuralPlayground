@@ -10,13 +10,21 @@ from neuralplayground.utils import check_crossing_wall
 
 class DiscreteObjectEnvironment(Environment):
     """
-    Arena class which accounts for discrete sensory objects, inherits from the Simple2D class.
+    This class handles discretised environments, where each state includes an object. Steps in the environment
+    moe between states and can be in either a square or hexagonal grid.
 
-    Now allows two grid layouts:
-        1) 'square' (original behaviour)
-        2) 'hex' (hexagonal tiling)
-
-    The parameter grid_type='square' or 'hex' can be passed in env_kwargs.
+    Parameters
+    ----------
+    recording_index : int
+        Index of the recording to use.
+    environment_name : str
+        Name of the environment.
+    verbose : bool
+        Whether to print information.
+    experiment_class : str
+        Class of the experiment.
+    env_kwargs : dict
+        Dictionary with the environment parameters.
     """
 
     def __init__(
@@ -27,16 +35,6 @@ class DiscreteObjectEnvironment(Environment):
         experiment_class: str = None,
         **env_kwargs,
     ):
-        """
-        Initialize the class. env_kwargs arguments are specific for each of the child environments and
-        described in their respective class.
-
-        Parameters
-        ----------
-        grid_type : str in {'square', 'hex'}, optional
-            If 'hex', positions are arranged in a hex tiling and the default walls are also a large hex.
-            Otherwise 'square' is used.
-        """
         super().__init__(environment_name, **env_kwargs)
         self.environment_name = environment_name
         self.use_behavioural_data = env_kwargs["use_behavioural_data"]
@@ -85,9 +83,9 @@ class DiscreteObjectEnvironment(Environment):
 
     def _create_grid(self):
         """
-        Create the coordinate grid of discrete states, depending on self.grid_type.
-        If 'square': create the same x_array, y_array as before.
-        If 'hex': create a hex tiling in the same bounding box.
+        Create the grid for the environment. If grid_type='square', create a square grid. If grid_type='hex', create a
+        hexagonal grid. The grid is created by creating a meshgrid of x and y coordinates, and then stacking them
+        together to create a list of all possible combinations of x and y coordinates.
         """
         self.resolution_w = int(self.room_width * self.state_density)
         self.resolution_d = int(self.room_depth * self.state_density)
@@ -123,9 +121,9 @@ class DiscreteObjectEnvironment(Environment):
 
     def _create_default_walls(self):
         """
-        If grid_type='square', keep the original rectangular walls.
-        If grid_type='hex', create a perfectly symmetrical hex about (0,0)
-        so that it takes exactly 5 unit steps from (0,0) to the boundary.
+        Create the default walls for the environment. If grid_type='square', create a square boundary. If grid_type='hex',
+        create a hexagonal boundary. The walls are created by defining the corners of the boundary and then connecting
+        them to create the walls.
         """
         if self.grid_type == "square":
             # Original rectangular boundary
@@ -163,18 +161,9 @@ class DiscreteObjectEnvironment(Environment):
                 )
             )
         else:
-            # Hexagonal boundary
-            # We assume arena_x_limits = [-5, 5], arena_y_limits = [-5, 5].
-            # Centre is therefore (0,0), and we want radius ~5 so that it takes
-            # exactly 5 steps (size=1) to reach the wall from the centre.
-
             self.default_walls = []
-
-            # Tiny epsilon so floating-point rounding doesn't let the agent slip outside.
-            # You can tweak e.g. 1e-4, 1e-3, etc. as needed.
             r = 5.3
 
-            # For a 'pointy-topped' orientation, corners at angles: 0, 60, 120, ..., 300
             angles_deg = [0, 60, 120, 180, 240, 300]
             corners = []
             for deg in angles_deg:
@@ -195,6 +184,17 @@ class DiscreteObjectEnvironment(Environment):
         self.custom_walls = []
 
     def reset(self, random_state=True, custom_state=None):
+        """
+        Reset the environment to the initial state. If random_state is True, the agent is placed in a random position
+        within the arena.
+
+        Parameters
+        ----------
+        random_state : bool
+            Whether to place the agent in a random position.
+        custom_state : list
+            Custom state to place the agent in.
+        """
         self.global_steps = 0
         self.global_time = 0
         self.history = []
@@ -224,6 +224,19 @@ class DiscreteObjectEnvironment(Environment):
         return observation, self.state
 
     def step(self, action: np.ndarray, normalize_step: bool = True, skip_every: int = 10):
+        """
+        Step function for the environment. The agent takes an action in the environment and makes an observation of the
+        object in that state. This observation and the resulting state are returned, along with any reward.
+
+        Parameters
+        ----------
+        action : np.ndarray
+            Action to take in the environment.
+        normalize_step : bool
+            Whether to normalize the step size.
+        skip_every : int
+            Number of steps to skip.
+        """
         self.old_state = self.state.copy()
         if not self.use_behavioural_data:
             if normalize_step:
@@ -258,12 +271,25 @@ class DiscreteObjectEnvironment(Environment):
         return observation, self.state, reward
 
     def generate_objects(self):
+        """
+        Randomly generate objects in the environment. The objects are generated by randomly selecting an object from a
+        list of objects and then creating a one-hot encoding of the object.
+        """
         n_states = len(self.xy_combination)
         object_indices = np.random.randint(0, self.n_objects, size=n_states)
         objects = np.eye(self.n_objects)[object_indices]
         return objects
 
     def make_object_observation(self, pos):
+        """
+        Make an observation of the object in the environment. The observation is made by finding the object at the
+        current position and returning the object index, object, and position.
+
+        Parameters
+        ----------
+        pos : list
+            Position to make the observation at.
+        """
         index = self.pos_to_state(np.array(pos))
         obj = self.objects[index]
         return [index, obj, pos]
@@ -281,6 +307,19 @@ class DiscreteObjectEnvironment(Environment):
         return idx
 
     def validate_action(self, pre_state, action, new_state):
+        """
+        Validate the action taken by the agent. If the agent is trying to move through a wall, the agent is moved to the
+        nearest state that is not beyond that wall.
+
+        Parameters
+        ----------
+        pre_state : list
+            Previous state of the agent.
+        action : list
+            Action taken by the agent.
+        new_state : list
+            New state of the agent.
+        """
         crossed_wall = False
         for wall in self.wall_list:
             new_state, crossed = check_crossing_wall(
@@ -301,6 +340,23 @@ class DiscreteObjectEnvironment(Environment):
         save_path: str = None,
         plot_every: int = 1,
     ):
+        """
+        Plot the trajectory of the agent in the environment. The trajectory is plotted by taking the x and y positions
+        of the agent at each state and plotting them on a 2D grid.
+
+        Parameters
+        ----------
+        history_data : list
+            History of the agent's trajectory.
+        ax : plt.axis
+            Axis to plot the trajectory on.
+        return_figure : bool
+            Whether to return the figure.
+        save_path : str
+            Path to save the plot to.
+        plot_every : int
+            Number of steps to skip in plot.
+        """
         if history_data is None:
             history_data = self.history
 
@@ -327,6 +383,9 @@ class DiscreteObjectEnvironment(Environment):
             return ax
 
     def render(self, history_length=30, display=True):
+        """
+        Render the environment. The environment is rendered by plotting the trajectory of the agent in the environment.
+        """
         f, ax = plt.subplots(1, 1, figsize=(8, 6))
         canvas = FigureCanvas(f)
         history = self.history[-history_length:]
