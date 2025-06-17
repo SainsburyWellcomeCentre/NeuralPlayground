@@ -36,9 +36,8 @@ class AgentCore(object):
     -------
     reset(self):
         Erase all memory from the model, initialize all relevant parameters and build from scratch
-    act(self, obs, policy_func=None):
-        Given an observation, return an action following a specific policy, if policy_func is None, then
-        return a random action
+    act(self, obs):
+        Given an observation, return an action following the policy written in this function
     update(self):
         Update model parameters, depends on the specific model
     save_agent(self, save_path: str, raw_object: bool = True):
@@ -47,9 +46,12 @@ class AgentCore(object):
         Restore saved agent
     """
 
-    def __init__(self, agent_name: str = "default_model", agent_step_size: float = 1.0, **mod_kwargs):
+    def __init__(
+        self, agent_name: str = "default_model", agent_step_size: float = 1.0, obs_hist_length: int = 1000, **mod_kwargs
+    ):
         self.agent_name = agent_name
         self.mod_kwargs = mod_kwargs
+        self.obs_hist_length = obs_hist_length
         self.agent_step_size = agent_step_size
         self.metadata = {"mod_kwargs": mod_kwargs}
         self.obs_history = []
@@ -60,7 +62,7 @@ class AgentCore(object):
         self.obs_history = []
         self.global_steps = 0
 
-    def act(self, obs, policy_func=None):
+    def act(self, obs):
         """
         The base model executes a random action from a normal distribution
         Parameters
@@ -81,10 +83,8 @@ class AgentCore(object):
             action = np.random.normal(scale=self.agent_step_size, size=(2,))
 
         self.obs_history.append(obs)
-        if len(self.obs_history) >= 1000:  # reset every 1000
+        if len(self.obs_history) >= self.obs_hist_length:
             self.obs_history.pop(0)
-        if policy_func is not None:
-            return policy_func(obs)
 
         return action
 
@@ -134,30 +134,13 @@ class AgentCore(object):
 class RandomAgent(AgentCore):
     """Simple agent with random trajectories"""
 
-    def __init__(self, step_size: float = 1.0):
-        """Initialization
-
-        Parameters
-        ----------
-        step_size: float
-            Standard deviation of normal distribution where the step in x, y coordinates is sampled
+    def __init__(
+        self, agent_name: str = "random_agent", agent_step_size: float = 1.0, obs_hist_length: int = 1000, **mod_kwargs
+    ):
+        """Initialize random agent
+        Same class as AgentCore, defined for legacy reasons
         """
-        super().__init__()
-        self.step_size = step_size
-
-    def act(self, obs):
-        """The base model executes a random action from a normal distribution
-        Parameters
-        ----------
-        obs:
-            Whatever observation from the environment class needed to choose the right action
-        Returns
-        -------
-        d_pos: nd.array (2,)
-            position variation to compute next position
-        """
-        d_pos = np.random.normal(scale=self.step_size, size=(2,))
-        return d_pos
+        super().__init__(agent_name=agent_name, agent_step_size=agent_step_size, obs_hist_length=obs_hist_length, **mod_kwargs)
 
 
 class LevyFlightAgent(RandomAgent):
@@ -167,13 +150,16 @@ class LevyFlightAgent(RandomAgent):
 
     def __init__(
         self,
+        agent_name: str = "LevyFlightAgent",
         alpha: float = 0.3,
         beta: float = 1,
         loc: float = 1.0,
         scale: float = 0.8,
-        step_size: float = 0.3,
+        agent_step_size: float = 0.3,
         max_action_size: float = 50,
         max_step_size: float = 10,
+        obs_hist_length: int = 1000,
+        **mod_kwargs,
     ):
         """Initializing levy flight agent
         From original documentation:
@@ -198,7 +184,7 @@ class LevyFlightAgent(RandomAgent):
         max_step_size: float
             maximum step size when multiplying max_action_size and step_size
         """
-        super().__init__(step_size=step_size)
+        super().__init__(agent_name=agent_name, agent_step_size=agent_step_size, obs_hist_length=obs_hist_length, **mod_kwargs)
         self.levy = levy_stable(alpha, beta, loc=loc, scale=scale)
         self.alpha = alpha
         self.beta = beta
@@ -222,7 +208,7 @@ class LevyFlightAgent(RandomAgent):
         # Pick direction
         direction = super().act(obs)
         # Normalize direction to step size
-        direction = direction / np.sqrt(np.sum(direction**2)) * self.step_size
+        direction = direction / np.sqrt(np.sum(direction**2)) * self.agent_step_size
         # Sample step size
         r = np.clip(self.levy.rvs(), a_min=0, a_max=self.max_action_size)
         # Return step size from levy in a random direction
@@ -275,13 +261,16 @@ class RatMovementAgent(RandomAgent):
         self,
         room_width: float,
         room_depth: float,
-        step_size: float = 1.0,
+        agent_name: str = "RatMovementAgent",
+        agent_step_size: float = 1.0,
         auto_scale: bool = True,
         forward_velocity: float = None,
         turn_angle_bias: float = None,
         turn_angle_stdev: float = None,
         border_region: float = None,
         time_step_size: float = None,
+        obs_hist_length: int = 1000,
+        **mod_kwargs,
     ):
         """Agent that follows a trajectory generator
 
@@ -306,8 +295,8 @@ class RatMovementAgent(RandomAgent):
         time_step_size: float
             Time step size
         """
-        super().__init__(step_size=step_size)
-        self.step_size = step_size
+        super().__init__(agent_name=agent_name, agent_step_size=agent_step_size, obs_hist_length=obs_hist_length, **mod_kwargs)
+        self.agent_step_size = agent_step_size
         self.room_width = room_width
         self.room_depth = room_depth
         self.auto_scale = auto_scale
@@ -328,7 +317,7 @@ class RatMovementAgent(RandomAgent):
         )
         self.initial_head_dir = np.random.uniform(0, 2 * np.pi)
         self.current_head_dir = self.initial_head_dir
-        self.traj_generator.forward_velocity = self.traj_generator.forward_velocity * step_size
+        self.traj_generator.forward_velocity = self.traj_generator.forward_velocity * agent_step_size
 
     def act(self, obs):
         current_pos = obs

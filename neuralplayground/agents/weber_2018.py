@@ -80,7 +80,7 @@ class Weber2018(AgentCore):
 
     def __init__(
         self,
-        model_name: str = "ExcitInhibitoryplastic",
+        model_name: str = "ExcInhibPlastic",
         agent_step_size: float = 0.1,
         etaexc: float = 2e-4,
         etainh: float = 8e-4,
@@ -99,6 +99,7 @@ class Weber2018(AgentCore):
         room_depth: float = 20.0,
         resolution: int = 100,
         disable_tqdm: bool = False,
+        obs_hist_length: int = 1000,
         **mod_kwargs,
     ):
         """
@@ -145,7 +146,7 @@ class Weber2018(AgentCore):
 
         """
         mod_kwargs["agent_step_size"] = agent_step_size
-        super().__init__(model_name, **mod_kwargs)
+        super().__init__(model_name=model_name, obs_hist_length=obs_hist_length, **mod_kwargs)
         self.agent_step_size = agent_step_size
         self.metadata = {"mod_kwargs": mod_kwargs}
         self.etaexc = etaexc
