@@ -383,7 +383,7 @@ class Wernle2018Data(Hafting2008Data):
 
         # Recall recorded data
 
-        h, binx, biny = self.recording_tetr()
+        h, binx, biny = self.tetrode_ratemap()
 
         # Adding merging status to plot title
 
@@ -401,10 +401,10 @@ class Wernle2018Data(Hafting2008Data):
         # Return ratemap values, x bin limits and y bin limits
         return ax
 
-    def recording_tetr(self, recording_index: Union[int, tuple, list] = None,
-                            save_path: Union[str, tuple, list] = None,
-                            tetrode_id: Union[str, tuple, list] = None,
-                            bin_size: float = 2.0):
+    def tetrode_ratemap(self, recording_index: Union[int, tuple, list] = None,
+                        save_path: Union[str, tuple, list] = None,
+                        tetrode_id: Union[str, tuple, list] = None,
+                        bin_size: float = 2.0):
 
 
         # Recall recorded data

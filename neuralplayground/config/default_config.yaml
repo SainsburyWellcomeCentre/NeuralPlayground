@@ -1,4 +1,15 @@
 plot_config:
+  default_plot:
+    fontsize: 8
+    axes_title: 12
+    axes_label: 10
+    xtick_label: 8
+    ytick_label: 8
+    legend_fontsize: 8
+    figure_title: 12
+    axis_ticksize: 2
+    labelpad: 5
+
   trajectory_plot:
     trajectory_colormap: "plasma"
     trajectory_alpha: 0.6

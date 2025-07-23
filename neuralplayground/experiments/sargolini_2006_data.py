@@ -190,7 +190,7 @@ class Sargolini2006Data(Hafting2008Data):
                     else:
                         self.data_per_animal[m_id][sess][session_info] = cleaned_data
 
-    def get_tetrode_data(self, session_data: str = None, tetrode_id: str = None):
+    def get_tetrode_data(self, recording_index: int = None, tetrode_id: str = None):
         """Return time stamp, position and spikes for a given session and tetrode
 
         Parameters
@@ -211,8 +211,11 @@ class Sargolini2006Data(Hafting2008Data):
         y: ndarray (n_samples,)
             y position throughout recording of the given session
         """
-        if session_data is None:
+        if recording_index is None:
             session_data, rev_vars, rat_info = self.get_recording_data(recording_index=0)
+            tetrode_id = self._find_tetrode(rev_vars)
+        else:
+            session_data, rev_vars, rat_info = self.get_recording_data(recording_index=recording_index)
             tetrode_id = self._find_tetrode(rev_vars)
         position_data = session_data["position"]
         x1, y1 = position_data["posx"][:, 0], position_data["posy"][:, 0]

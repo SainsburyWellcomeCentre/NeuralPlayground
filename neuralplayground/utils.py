@@ -360,3 +360,7 @@ def load_json(path):
     with open(path, "r") as infile:
         dict = json.load(infile)
     return dict
+
+
+def gaussian_function(x, mu, std):
+    return np.exp(-((x - mu) ** 2) / (2 * std**2)) / (std * np.sqrt(2 * np.pi))

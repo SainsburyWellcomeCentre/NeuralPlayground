@@ -3,6 +3,68 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from neuralplayground.config import PLOT_CONFIG
+from neuralplayground.utils import gaussian_function
+
+config_vars = PLOT_CONFIG.DEFAULT
+plt.rc("font", size=config_vars.FONTSIZE)  # controls default text sizes
+plt.rc("axes", titlesize=config_vars.AXES_TITLE)  # fontsize of the axes title
+plt.rc("axes", labelsize=config_vars.AXES_LABEL)  # fontsize of the x and y labels
+plt.rc("xtick", labelsize=config_vars.XTICK_LABEL)  # fontsize of the tick labels
+plt.rc("ytick", labelsize=config_vars.YTICK_LABEL)  # fontsize of the tick labels
+plt.rc("legend", fontsize=config_vars.LEGEND_FONTSIZE)  # legend fontsize
+plt.rc("figure", titlesize=config_vars.FIGURE_TITLE)  # fontsize of the figure title
+plt.rc("xtick", direction="out")
+plt.rc("ytick", direction="out")
+plt.rc("axes", labelpad=config_vars.LABELPAD)
+plt.rc("patch", facecolor="None")
+plt.rc("axes", facecolor="None")
+plt.rc("axes", linewidth=1)
+plt.rc("ytick.major", size=config_vars.AXIS_TICKSIZE)
+plt.rc("xtick.major", width=1)
+plt.rc("xtick.major", size=config_vars.AXIS_TICKSIZE)
+plt.rc("ytick.major", width=1)
+
+
+def make_plot_spike_train(time_array, spike_times, smoothness, ax):
+    # put a gaussian kernel on the spike train
+    """
+    Plot a spike train with a gaussian kernel smoothing
+
+    Parameters
+    ----------
+    time_array: ndarray (n_samples,)
+        Time array of the spike train, n_samples number of time steps recorded
+    spike_times: ndarray (n_samples,)
+        Spike times throughout the recording of the given session, n_samples number of time steps recorded
+    smoothness: float
+        Smoothness of the gaussian kernel to apply to the spike train
+    ax: mpl.axes._subplots.AxesSubplot (matplotlib axis from subplots)
+        axis from subplot from matplotlib where the spike train will be plotted.
+
+    Returns
+    -------
+    ax: mpl.axes._subplots.AxesSubplot (matplotlib axis from subplots)
+        Modified axis where the spike train is plotted
+    """
+    # Put a gaussian kernel on the spike train
+    spike_train = np.zeros_like(time_array)
+    for spike in spike_times:
+        spike_train += gaussian_function(time_array, spike, smoothness)
+    spike_train /= np.max(spike_train)  # Normalize the spike train
+    # Plot the spike train
+    config_vars = PLOT_CONFIG.DEFAULT
+    ax.plot(time_array, spike_train, color="C0", lw=3)
+    ax.set_xlabel("time (s)", fontsize=config_vars.AXES_LABEL)
+    ax.set_ylabel("spike rate", fontsize=config_vars.AXES_LABEL)
+    # Add a shaded region below the spike train
+    ax.fill_between(
+        time_array,
+        0,
+        spike_train,
+        color="C0",
+        alpha=0.4,
+    )
+    return ax
 
 
 def make_plot_trajectories(arena_limits, x, y, ax, plot_every):
@@ -289,7 +351,7 @@ def make_agent_comparison(
                 ax=ax[2, k],
             )
             env.plot_recording_tetr(recording_index=recording_index, tetrode_id=tetrode_id, ax=ax[3][k])
-            r_out_im, x_bin, y_bin = env.recording_tetr()
+            r_out_im, x_bin, y_bin = env.tetrode_ratemap()
             GridScorer_SR = GridScorer(x_bin - 1)
             GridScorer_SR.plot_grid_score(r_out_im=r_out_im, plot=config_vars.PLOT_SAC_EXP, ax=ax[4][k])
 
@@ -335,7 +397,7 @@ def make_agent_comparison(
                 ax[0, i + k + m + 2].text(0, 1.1, exp.experiment_name, fontsize=config_vars.FONTSIZE)
                 render_mpl_table(exp.recording_list, ax=ax[0, i + k + m + 2])
                 exp.plot_recording_tetr(recording_index=recording_index, tetrode_id=tetrode_id, ax=ax[1][i + k + m + 2])
-                r_out_im, x_bin, y_bin = exp.recording_tetr()
+                r_out_im, x_bin, y_bin = exp.tetrode_ratemap()
                 GridScorer_SR = GridScorer(x_bin - 1)
                 GridScorer_SR.plot_grid_score(r_out_im=r_out_im, plot=config_vars.PLOT_SAC_EXP, ax=ax[2][i + k + m + 2])
                 if exp_data:
