@@ -38,11 +38,11 @@ dependencies = [
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/ClementineDomine/NeuralPlayground"
-"Bug tracker" = "https://github.com/ClementineDomine/NeuralPlayground/issues"
-"Documentation" = "https://github.com/ClementineDomine/NeuralPlayground"
-"Source code" = "https://github.com/ClementineDomine/NeuralPlayground"
-"User support" = "https://github.com/ClementineDomine/NeuralPlayground/issues"
+"Homepage" = "https://github.com/SainsburyWellcomeCentre/NeuralPlayground"
+"Bug tracker" = "https://github.com/SainsburyWellcomeCentre/NeuralPlayground/issues"
+"Documentation" = "https://github.com/SainsburyWellcomeCentre/NeuralPlayground"
+"Source code" = "https://github.com/SainsburyWellcomeCentre/NeuralPlayground"
+"User support" = "https://github.com/SainsburyWellcomeCentre/NeuralPlayground/issues"
 
 [project.optional-dependencies]
 dev = [

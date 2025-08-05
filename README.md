@@ -1,8 +1,10 @@
 [![License](https://img.shields.io/badge/License-MIT-orange.svg)](https://opensource.org/licenses/MIT)
 ![CI](https://img.shields.io/github/actions/workflow/status/SainsburyWellcomeCentre/NeuralPlayground/test_and_deploy.yml?label=CI)
-[![codecov](https://codecov.io/gh/SainsburyWellcomeCentre/NeuralPlayground/branch/main/graph/badge.svg?token=P8CCH3TI8K)](https://codecov.io/gh/SainsburyWellcomeCentre/NeuralPlayground)
-[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/charliermarsh/ruff/main/assets/badge/v0.json)](https://github.com/charliermarsh/ruff)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/python/black)
+[![codecov](https://codecov.io/gh/SainsburyWellcomeCentre/NeuralPlayground
+/branch/main/graph/badge.svg?token=P8CCH3TI8K)](https://app.codecov.io/gh/SainsburyWellcomeCentre/NeuralPlayground)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v0.json)](https://github.com/astral-sh/ruff)
+[![Code style: black](https://img.shields.
+io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-9-orange.svg?style=flat-square)](#contributors)
@@ -98,7 +100,7 @@ pip install NeuralPlayground==0.0.5
 ```
 > **Note**
 > 
-> If you wish to run our implementation of the Tolman-Eichenbaum machine, there are additional dependencies to install. These can be found in the [TEM_README.md](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples/agent_examples/TEM_README.md) file.
+> If you wish to run our implementation of the Tolman-Eichenbaum machine, there are additional dependencies to install. These can be found in the [TEM_README.md](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/agent_examples/TEM_README.md) file.
 
 ### Install for development
 
@@ -123,7 +125,7 @@ so if you tell us what you would like to have, we might just implement it 😊.
 This open-source software was built to be collaborative and lasting. We hope that the framework will be simple 
 enough to be adopted by a great number of neuroscientists, eventually guiding the path to the computational 
 understanding of the HEC mechanisms. We follow reproducible, inclusive, and collaborative project design guidelines. 
-All relevant documents can be found in [Documents](https://github.com/ClementineDomine/NeuralPlayground/blob/main/documents/).
+All relevant documents can be found in [Documents](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/tree/main/documents).
 
 ### Agent Arena interaction
 You can pick an Agent and an Arena of your choice to run a simulation. Arenas and simulations have a simple interface to interact with each other as in [OpenAI gymnasium](https://gymnasium.farama.org/).
@@ -150,7 +152,7 @@ for j in range(iterations):
     update_output = agent.update()
 ```
 This process is the base of our package. We provide a more detailed example in <a href="https://githubtocolab.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/colab_example.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>.
-Also, specific examples of how to use each module can be found in [agent](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples/agent_examples),
+Also, specific examples of how to use each module can be found in [agent](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/tree/main/examples/agent_examples),
 [arena](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/arena_examples/arena_examples.ipynb) 
 and [experiment](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/experimental_examples/experimental_data_examples.ipynb) jupyter notebooks.
 > **Note**
@@ -194,7 +196,7 @@ for j in range(iterations):
     update_output = agent.update()
 ```
 This process is the base of our package. We provide a more detailed example in <a href="https://githubtocolab.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/colab_example.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>.
-Also, specific examples of how to use each module can be found in [agent](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples/agent_examples),
+Also, specific examples of how to use each module can be found in [agent](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/tree/main/examples/agent_examples),
 [arena](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/arena_examples/arena_examples.ipynb) 
 and [experiment](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/experimental_examples/experimental_data_examples.ipynb) jupyter notebooks.
 > **Note**
@@ -247,13 +249,13 @@ notebook. With time, we will build an interface for easy model comparison and vi
 
 There are many ways to contribute to our project.
 
-1. Implement a hippocampal and entorhinal cortex [Agent](https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground/agents) of your choice.
+1. Implement a hippocampal and entorhinal cortex [Agent](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/tree/main/neuralplayground/agents) of your choice.
 
-2. Work on improving the [Arena](https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground/arenas).
+2. Work on improving the [Arena](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/tree/main/neuralplayground/arenas).
 
-3. Add an [Experimental](https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground/experiments) data set.
+3. Add an [Experimental](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/tree/main/neuralplayground/experiments) data set.
 
-4. Implementing [metrics](https://github.com/ClementineDomine/NeuralPlayground/tree/main/neuralplayground/comparison/metrics.py) to compare the output of the Agent with the experimental data.
+4. Implementing [metrics](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/neuralplayground/comparison/metrics.py) to compare the output of the Agent with the experimental data.
 
 5. Refactor the code to improve the readability and efficiency.
 
@@ -264,28 +266,29 @@ Before sending a pull request, make sure you have the done following:
 
 2. Used the [right development environment](#install-for-development). Make sure to initialise the pre-commit hooks with ```pre-commit install``` and run ```pre-commit run -a``` to format the code and check for errors.
 
-3. Followed the [PEP8](https://www.python.org/dev/peps/pep-0008/) and [numpy docstring](https://numpydoc.readthedocs.io/en/latest/format.html) style convention. More details found in [Style Guide](https://github.com/ClementineDomine/NeuralPlayground/tree/main/documents/style_guide.md).
+3. Followed the [PEP8](https://peps.python.org/pep-0008) and [numpy docstring](https://numpydoc.readthedocs.io/en/latest/format.html) style convention. More details found in [Style Guide](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/documents/style_guide.md).
 
 4. Implemented and ran [tests](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/tree/main/tests).
 
 5. Comment your work.
 
 **All contributions to the repository are acknowledged through the all-contributors bot.**
-Refer to the README.md files found in each of the modules for further details on how to contribute to them.
+Refer to the `README.md` files found in each of the modules for further 
+details on how to contribute to them.
 
 
 ## Cite
 
-See [Citation](https://github.com/ClementineDomine/NeuralPlayground/blob/main/documents/citation.cff) for the correct citation of this framework.
+See [Citation](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/documents/citation.cff) for the correct citation of this framework.
 
 ## License
 
-⚖️ [MIT](https://github.com/ClementineDomine/NeuralPlayground/blob/main/LICENSE)
+⚖️ [MIT](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/LICENSE)
 
 
 ## Contributors
 
-Thanks go to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
+Thanks go to these wonderful people:
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->
