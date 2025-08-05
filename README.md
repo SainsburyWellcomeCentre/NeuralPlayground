@@ -1,10 +1,7 @@
 [![License](https://img.shields.io/badge/License-MIT-orange.svg)](https://opensource.org/licenses/MIT)
-![CI](https://img.shields.io/github/actions/workflow/status/SainsburyWellcomeCentre/NeuralPlayground/test_and_deploy.yml?label=CI)
-[![codecov](https://codecov.io/gh/SainsburyWellcomeCentre/NeuralPlayground
-/branch/main/graph/badge.svg?token=P8CCH3TI8K)](https://app.codecov.io/gh/SainsburyWellcomeCentre/NeuralPlayground)
+![CI](https://img.shields.io/github/actions/workflow/status/SainsburyWellcomeCentre/NeuralPlayground/test_and_deploy.yml?label=CI)[![codecov](https://codecov.io/gh/SainsburyWellcomeCentre/NeuralPlayground/branch/main/graph/badge.svg?token=P8CCH3TI8K)](https://app.codecov.io/gh/SainsburyWellcomeCentre/NeuralPlayground)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v0.json)](https://github.com/astral-sh/ruff)
-[![Code style: black](https://img.shields.
-io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-9-orange.svg?style=flat-square)](#contributors)
