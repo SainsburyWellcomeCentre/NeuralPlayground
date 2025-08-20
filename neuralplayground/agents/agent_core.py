@@ -325,4 +325,5 @@ class RatMovementAgent(RandomAgent):
             current_pos, self.current_head_dir
         )
         self.current_head_dir = new_head_dir
+        self.obs_history.append(new_pos)
         return pos_update

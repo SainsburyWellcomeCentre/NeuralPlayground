@@ -146,7 +146,9 @@ class Weber2018(RatMovementAgent):
 
         """
         mod_kwargs["agent_step_size"] = agent_step_size
-        super().__init__(model_name=model_name, obs_hist_length=obs_hist_length, **mod_kwargs)
+        super().__init__(
+            model_name=model_name, obs_hist_length=obs_hist_length, room_width=room_width, room_depth=room_depth, **mod_kwargs
+        )
         self.agent_step_size = agent_step_size
         self.metadata = {"mod_kwargs": mod_kwargs}
         self.etaexc = etaexc
@@ -206,7 +208,7 @@ class Weber2018(RatMovementAgent):
             n_curves=self.Ne, cov_scale=self.sigma_exc, Nf=self.Nef, alpha=self.alpha_e
         )
 
-        self.init_we_sum = np.sqrt(np.sum(self.we**2))  # Keep track of normalization constant
+        self.init_we_sum = np.sqrt(np.sum(self.we**2) + 1e-8)  # Keep track of normalization constant
 
     def generate_tuning_curves(self, n_curves: int, cov_scale: float, Nf: int, alpha: float):
         """
@@ -243,7 +245,7 @@ class Weber2018(RatMovementAgent):
                 mean1 = np.random.uniform(-width_limit * (1 + 0.2), width_limit * (1 + 0.2))  # Sample means
                 mean2 = np.random.uniform(-depth_limit * (1 + 0.2), depth_limit * (1 + 0.2))
                 room_scale = np.max(np.array([self.room_width, self.room_width]))
-                cov = np.diag(np.multiply(cov_scale, np.array([room_scale, room_scale])) ** 2)
+                cov = np.diag(np.multiply(cov_scale, np.array([room_scale, room_scale])) ** 2 + 1e-8)
                 mean = np.array([mean1, mean2])
                 rv = multivariate_normal(mean, cov)  # Generate gaussian
                 gauss_list.append([mean, cov])
@@ -346,7 +348,7 @@ class Weber2018(RatMovementAgent):
             self.wi = self.wi + delta_wi
 
             if exc_normalization:
-                self.we = self.init_we_sum / np.sqrt(np.sum(self.we**2)) * self.we
+                self.we = self.init_we_sum / np.sqrt(np.sum(self.we**2) + 1e-8) * self.we
 
             self.we = np.clip(self.we, a_min=0, a_max=np.amax(self.we))  # Negative weights to zero
             self.wi = np.clip(self.wi, a_min=0, a_max=np.amax(self.wi))
@@ -374,7 +376,7 @@ class Weber2018(RatMovementAgent):
         self.wi = self.wi + delta_wi[:, 0]
 
         if exc_normalization:
-            self.we = self.init_we_sum / np.sqrt(np.sum(self.we**2)) * self.we
+            self.we = self.init_we_sum / np.sqrt(np.sum(self.we**2) + 1e-8) * self.we
 
         self.we = np.clip(self.we, a_min=0, a_max=np.amax(self.we))  # Negative weights to zero
         self.wi = np.clip(self.wi, a_min=0, a_max=np.amax(self.wi))
