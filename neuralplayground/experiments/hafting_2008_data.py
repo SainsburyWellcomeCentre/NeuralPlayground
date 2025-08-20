@@ -91,7 +91,8 @@ class Hafting2008Data(Experiment):
         self,
         data_path: str = None,
         recording_index: int = None,
-        experiment_name: str = "FullHaftingData",
+        experiment_name: str = "HaftingData",
+        fetch_subset: bool = True,
         verbose: bool = False,
         data_url: str = None,
         paper_url: str = None,
@@ -107,6 +108,8 @@ class Hafting2008Data(Experiment):
             if None, load data from default recording index
         experiment_name: str
             string to identify object in case of multiple instances
+        fetch_subset: bool
+            if True, it will fetch the subset of the data, if False, it will fetch the full dataset
         verbose:
             if True, it will print original readme and data structure when initializing this object
         data_url: str
@@ -120,7 +123,7 @@ class Hafting2008Data(Experiment):
         if paper_url is None:
             paper_url = "https://www.nature.com/articles/nature06957"
         super().__init__(experiment_name, data_url, paper_url)
-
+        self.fetch_subset = fetch_subset
         self._find_data_path(data_path)
         self._load_data()
         self._create_dataframe()
@@ -146,7 +149,7 @@ class Hafting2008Data(Experiment):
         """Fetch data from NeuralPlayground data repository 
         if no data path is supplied by the user"""
         if data_path is None:
-            self.data_path = fetch_data_path("hafting_2008")
+            self.data_path = fetch_data_path("hafting_2008", subset=self.fetch_subset, progressbar=True)
         else:
             self.data_path = data_path
 

@@ -22,6 +22,7 @@ class SargoliniDataTrajectory(Experiment):
         data_path: str = None,
         data_url: str = None,
         paper_url: str = None,
+        fetch_subset: bool = True,
         **kwargs,
     ):
         """SargoliniData Class Init
@@ -41,9 +42,10 @@ class SargoliniDataTrajectory(Experiment):
         super().__init__(experiment_name=experiment_name, data_url=data_url, paper_url=paper_url)
 
         self.recording_list = []
+        self.fetch_subset = fetch_subset
         if data_path is None:
             # Set data_path to the data directory within the package
-            self.data_path = fetch_data_path("sargolini_2006")
+            self.data_path = fetch_data_path("sargolini_2006", subset=self.fetch_subset)
         else:
             self.data_path = data_path
         # Sort the data in data_path
@@ -109,7 +111,8 @@ class Sargolini2006Data(Hafting2008Data):
         self,
         data_path: str = None,
         recording_index: int = None,
-        experiment_name: str = "FullSargoliniData",
+        experiment_name: str = "SargoliniData",
+        fetch_subset: bool = True,
         verbose: bool = False,
         data_url: str = None,
         paper_url: str = None,
@@ -142,6 +145,7 @@ class Sargolini2006Data(Hafting2008Data):
             recording_index=recording_index,
             experiment_name=experiment_name,
             verbose=verbose,
+            fetch_subset=fetch_subset,
             data_url=data_url,
             paper_url=paper_url,
         )
@@ -150,7 +154,7 @@ class Sargolini2006Data(Hafting2008Data):
         """Fetch data from NeuralPlayground data repository 
         if no data path is supplied by the user"""
         if data_path is None:
-            self.data_path = fetch_data_path("sargolini_2006") + "raw_data_sample/"
+            self.data_path = fetch_data_path("sargolini_2006", subset=self.fetch_subset) + "raw_data_sample/"
         else:
             self.data_path = data_path + "raw_data_sample/"
 

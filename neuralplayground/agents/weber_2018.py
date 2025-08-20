@@ -15,10 +15,10 @@ from tqdm import tqdm
 
 from neuralplayground.plotting.plot_utils import make_plot_rate_map
 
-from .agent_core import AgentCore
+from .agent_core import RatMovementAgent
 
 
-class Weber2018(AgentCore):
+class Weber2018(RatMovementAgent):
     """
     Implementation for Weber and Sprekeler 2018
     Learning place cells, grid cells and invariances with excitatory and inhibitory plasticity
