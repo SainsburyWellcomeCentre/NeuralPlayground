@@ -216,11 +216,13 @@ class Sargolini2006Data(Hafting2008Data):
             y position throughout recording of the given session
         """
         if recording_index is None:
-            session_data, rev_vars, rat_info = self.get_recording_data(recording_index=0)
+            session_data, rev_vars, rat_info = self.get_recording_data(recording_index=self.best_recording_index)
+            tetrode_id = self._find_tetrode(rev_vars)
+        elif tetrode_id is None:
+            session_data, rev_vars, rat_info = self.get_recording_data(recording_index=recording_index)
             tetrode_id = self._find_tetrode(rev_vars)
         else:
             session_data, rev_vars, rat_info = self.get_recording_data(recording_index=recording_index)
-            tetrode_id = self._find_tetrode(rev_vars)
         position_data = session_data["position"]
         x1, y1 = position_data["posx"][:, 0], position_data["posy"][:, 0]
         x2, y2 = x1, y1
@@ -236,6 +238,24 @@ class Sargolini2006Data(Hafting2008Data):
 
 
 if __name__ == "__main__":
+    hafting_data = Sargolini2006Data(verbose=False)
+    hafting_data.show_data()
+
+    h1, _, _ = hafting_data.tetrode_ratemap(
+        recording_index=4,
+        tetrode_id="T5C2",
+        bin_size=5,
+    )
+
+    h2, _, _ = hafting_data.tetrode_ratemap(
+        recording_index=4,
+        tetrode_id="T8C2",
+        bin_size=5,
+    )
+    print(h1 == h2)
+    print("Debug")
+
+
     # print("initializing hafting")
     # data = FullHaftingData(verbose=True)
     # print("plotting_tragectory")

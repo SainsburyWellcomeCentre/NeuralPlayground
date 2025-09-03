@@ -14,7 +14,7 @@ from neuralplayground.utils import clean_data, get_2D_ratemap
 from neuralplayground.plotting.plot_utils import make_plot_trajectories , make_plot_rate_map, make_plot_spike_train
 
 
-from .experiment_core import Experiment
+from neuralplayground.experiments import Experiment
 
 
 class Hafting2008Data(Experiment):
@@ -333,9 +333,11 @@ class Hafting2008Data(Experiment):
         if recording_index is None:
             session_data, rev_vars, rat_info = self.get_recording_data(recording_index=self.best_recording_index)
             tetrode_id = self._find_tetrode(rev_vars)
-        else:
+        elif tetrode_id is None:
             session_data, rev_vars, rat_info = self.get_recording_data(recording_index=recording_index)
             tetrode_id = self._find_tetrode(rev_vars)
+        else:
+            session_data, rev_vars, rat_info = self.get_recording_data(recording_index=recording_index)
 
         position_data = session_data["position"]
         x1, y1 = position_data["posx"][:, 0], position_data["posy"][:, 0]
@@ -414,8 +416,14 @@ class Hafting2008Data(Experiment):
         if ax is None:
             f, ax = plt.subplots(1, 1, figsize=(8, 6))
 
-        session_data, rev_vars, rat_info = self.get_recording_data(recording_index)
-        tetrode_id = self._find_tetrode(rev_vars)
+        if recording_index is None:
+            session_data, rev_vars, rat_info = self.get_recording_data(recording_index=self.best_recording_index)
+            tetrode_id = self._find_tetrode(rev_vars)
+        elif tetrode_id is None:
+            session_data, rev_vars, rat_info = self.get_recording_data(recording_index=recording_index)
+            tetrode_id = self._find_tetrode(rev_vars)
+        else:
+            session_data, rev_vars, rat_info = self.get_recording_data(recording_index=recording_index)
 
         time_array, test_spikes, x, y = self.get_tetrode_data(recording_index, tetrode_id)
         # Helper function to format the trajectory plot
@@ -632,4 +640,18 @@ class Hafting2008Data(Experiment):
 
 if __name__ == "__main__":
     hafting_data = Hafting2008Data(verbose=False)
-    hafting_data.show_readme()
+    hafting_data.show_data()
+
+    h1, _, _ = hafting_data.tetrode_ratemap(
+        recording_index=3,
+        tetrode_id="t4c1",
+        bin_size=5,
+    )
+
+    h2, _, _ = hafting_data.tetrode_ratemap(
+        recording_index=3,
+        tetrode_id="t4c2",
+        bin_size=5,
+    )
+    print(h1 == h2)
+    print("Debug")
