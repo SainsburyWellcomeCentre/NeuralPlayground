@@ -22,6 +22,7 @@ class SargoliniDataTrajectory(Experiment):
         data_path: str = None,
         data_url: str = None,
         paper_url: str = None,
+        fetch_subset: bool = True,
         **kwargs,
     ):
         """SargoliniData Class Init
@@ -41,9 +42,10 @@ class SargoliniDataTrajectory(Experiment):
         super().__init__(experiment_name=experiment_name, data_url=data_url, paper_url=paper_url)
 
         self.recording_list = []
+        self.fetch_subset = fetch_subset
         if data_path is None:
             # Set data_path to the data directory within the package
-            self.data_path = fetch_data_path("sargolini_2006")
+            self.data_path = fetch_data_path("sargolini_2006", subset=self.fetch_subset)
         else:
             self.data_path = data_path
         # Sort the data in data_path
@@ -109,7 +111,8 @@ class Sargolini2006Data(Hafting2008Data):
         self,
         data_path: str = None,
         recording_index: int = None,
-        experiment_name: str = "FullSargoliniData",
+        experiment_name: str = "SargoliniData",
+        fetch_subset: bool = True,
         verbose: bool = False,
         data_url: str = None,
         paper_url: str = None,
@@ -142,6 +145,7 @@ class Sargolini2006Data(Hafting2008Data):
             recording_index=recording_index,
             experiment_name=experiment_name,
             verbose=verbose,
+            fetch_subset=fetch_subset,
             data_url=data_url,
             paper_url=paper_url,
         )
@@ -150,7 +154,7 @@ class Sargolini2006Data(Hafting2008Data):
         """Fetch data from NeuralPlayground data repository 
         if no data path is supplied by the user"""
         if data_path is None:
-            self.data_path = fetch_data_path("sargolini_2006") + "raw_data_sample/"
+            self.data_path = fetch_data_path("sargolini_2006", subset=self.fetch_subset) + "raw_data_sample/"
         else:
             self.data_path = data_path + "raw_data_sample/"
 
@@ -190,7 +194,7 @@ class Sargolini2006Data(Hafting2008Data):
                     else:
                         self.data_per_animal[m_id][sess][session_info] = cleaned_data
 
-    def get_tetrode_data(self, session_data: str = None, tetrode_id: str = None):
+    def get_tetrode_data(self, recording_index: int = None, tetrode_id: str = None):
         """Return time stamp, position and spikes for a given session and tetrode
 
         Parameters
@@ -211,9 +215,14 @@ class Sargolini2006Data(Hafting2008Data):
         y: ndarray (n_samples,)
             y position throughout recording of the given session
         """
-        if session_data is None:
-            session_data, rev_vars, rat_info = self.get_recording_data(recording_index=0)
+        if recording_index is None:
+            session_data, rev_vars, rat_info = self.get_recording_data(recording_index=self.best_recording_index)
             tetrode_id = self._find_tetrode(rev_vars)
+        elif tetrode_id is None:
+            session_data, rev_vars, rat_info = self.get_recording_data(recording_index=recording_index)
+            tetrode_id = self._find_tetrode(rev_vars)
+        else:
+            session_data, rev_vars, rat_info = self.get_recording_data(recording_index=recording_index)
         position_data = session_data["position"]
         x1, y1 = position_data["posx"][:, 0], position_data["posy"][:, 0]
         x2, y2 = x1, y1
@@ -229,6 +238,24 @@ class Sargolini2006Data(Hafting2008Data):
 
 
 if __name__ == "__main__":
+    hafting_data = Sargolini2006Data(verbose=False)
+    hafting_data.show_data()
+
+    h1, _, _ = hafting_data.tetrode_ratemap(
+        recording_index=4,
+        tetrode_id="T5C2",
+        bin_size=5,
+    )
+
+    h2, _, _ = hafting_data.tetrode_ratemap(
+        recording_index=4,
+        tetrode_id="T8C2",
+        bin_size=5,
+    )
+    print(h1 == h2)
+    print("Debug")
+
+
     # print("initializing hafting")
     # data = FullHaftingData(verbose=True)
     # print("plotting_tragectory")

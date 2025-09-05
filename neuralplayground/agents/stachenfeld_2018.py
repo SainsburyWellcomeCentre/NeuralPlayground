@@ -91,6 +91,7 @@ class Stachenfeld2018(AgentCore):
         room_depth: float = 12,
         state_density: float = 1.0,
         twoD: bool = True,
+        obs_hist_length: int = 1000,
         **mod_kwargs,
     ):
         """
@@ -114,7 +115,7 @@ class Stachenfeld2018(AgentCore):
             state_density: float
                 density of SR-agent states (should be proportional to the step-size)
         """
-        super().__init__(agent_name, **mod_kwargs)
+        super().__init__(agent_name=agent_name, obs_hist_length=obs_hist_length, **mod_kwargs)
         self.metadata = {"mod_kwargs": mod_kwargs}
         self.obs_history = []  # Initialize observation history to update weights later
         self.grad_history = []
@@ -194,7 +195,7 @@ class Stachenfeld2018(AgentCore):
             four action (up-down-right-left) with equal probability.
         """
         self.obs_history.append(obs)
-        if len(self.obs_history) >= 1000:
+        if len(self.obs_history) >= self.obs_hist_length:
             self.obs_history = [
                 obs,
             ]

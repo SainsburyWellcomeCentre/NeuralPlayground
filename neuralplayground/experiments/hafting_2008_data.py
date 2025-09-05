@@ -11,10 +11,10 @@ from IPython.display import display
 
 from neuralplayground.datasets import fetch_data_path
 from neuralplayground.utils import clean_data, get_2D_ratemap
-from neuralplayground.plotting.plot_utils import make_plot_trajectories , make_plot_rate_map
+from neuralplayground.plotting.plot_utils import make_plot_trajectories , make_plot_rate_map, make_plot_spike_train
 
 
-from .experiment_core import Experiment
+from neuralplayground.experiments import Experiment
 
 
 class Hafting2008Data(Experiment):
@@ -59,7 +59,7 @@ class Hafting2008Data(Experiment):
         Get identifiers to sort the experimental data
     get_recording_data(recording_index: int = None)
         Get experimental data for a given recordin index
-    get_tetrode_data(session_data: str = None, tetrode_id: str = None)
+    get_tetrode_data(recording_index: int = None, tetrode_id: str = None)
         Return time stamp, position and spikes for a given session and tetrode
     plot_recording_tetr(recording_index: Union[int, tuple, list] = None,
                         save_path: Union[str, tuple, list] = None,
@@ -91,7 +91,8 @@ class Hafting2008Data(Experiment):
         self,
         data_path: str = None,
         recording_index: int = None,
-        experiment_name: str = "FullHaftingData",
+        experiment_name: str = "HaftingData",
+        fetch_subset: bool = True,
         verbose: bool = False,
         data_url: str = None,
         paper_url: str = None,
@@ -107,6 +108,8 @@ class Hafting2008Data(Experiment):
             if None, load data from default recording index
         experiment_name: str
             string to identify object in case of multiple instances
+        fetch_subset: bool
+            if True, it will fetch the subset of the data, if False, it will fetch the full dataset
         verbose:
             if True, it will print original readme and data structure when initializing this object
         data_url: str
@@ -120,7 +123,7 @@ class Hafting2008Data(Experiment):
         if paper_url is None:
             paper_url = "https://www.nature.com/articles/nature06957"
         super().__init__(experiment_name, data_url, paper_url)
-
+        self.fetch_subset = fetch_subset
         self._find_data_path(data_path)
         self._load_data()
         self._create_dataframe()
@@ -134,7 +137,7 @@ class Hafting2008Data(Experiment):
         """Set position and head direction to be used by the Arena Class later"""
         session_data, rev_vars, rat_info = self.get_recording_data(recording_index)
         tetrode_id = self._find_tetrode(rev_vars)
-        time_array, test_spikes, x, y = self.get_tetrode_data(session_data, tetrode_id)
+        time_array, test_spikes, x, y = self.get_tetrode_data(recording_index, tetrode_id)
 
         self.position = np.stack([x, y], axis=1)
         head_direction = np.diff(self.position, axis=0)
@@ -146,7 +149,7 @@ class Hafting2008Data(Experiment):
         """Fetch data from NeuralPlayground data repository 
         if no data path is supplied by the user"""
         if data_path is None:
-            self.data_path = fetch_data_path("hafting_2008")
+            self.data_path = fetch_data_path("hafting_2008", subset=self.fetch_subset, progressbar=True)
         else:
             self.data_path = data_path
 
@@ -159,7 +162,7 @@ class Hafting2008Data(Experiment):
 
         data_path_list = glob.glob(self.data_path + "*.mat")
         mice_ids = np.unique([dp.split("/")[-1][:5] for dp in data_path_list])
-        # Initialize data dictionary, later handled by this object itself (so don't worry about this)
+        # Initialize data dictionary, later handled by the object itself (so don't worry about this)
         self.data_per_animal = {}
         for m_id in mice_ids:
             m_paths_list = glob.glob(self.data_path + m_id + "*.mat")
@@ -301,9 +304,11 @@ class Hafting2008Data(Experiment):
         tetrode_id = next(
             var_name for var_name in rev_vars if (var_name != "position") and (("t" in var_name) or ("T" in var_name))
         )
+        if tetrode_id is None:
+            raise ValueError("No tetrode id found in the recorded variables list. Check the data structure.")
         return tetrode_id
 
-    def get_tetrode_data(self, session_data: str = None, tetrode_id: str = None):
+    def get_tetrode_data(self, recording_index: int = None, tetrode_id: str = None):
         """Return time stamp, position and spikes for a given session and tetrode
 
         Parameters
@@ -325,9 +330,14 @@ class Hafting2008Data(Experiment):
             y position throughout recording of the given session
         """
         # Use default recording index when session is not given
-        if session_data is None:
+        if recording_index is None:
             session_data, rev_vars, rat_info = self.get_recording_data(recording_index=self.best_recording_index)
             tetrode_id = self._find_tetrode(rev_vars)
+        elif tetrode_id is None:
+            session_data, rev_vars, rat_info = self.get_recording_data(recording_index=recording_index)
+            tetrode_id = self._find_tetrode(rev_vars)
+        else:
+            session_data, rev_vars, rat_info = self.get_recording_data(recording_index=recording_index)
 
         position_data = session_data["position"]
         x1, y1 = position_data["posx"][:, 0], position_data["posy"][:, 0]
@@ -342,6 +352,90 @@ class Hafting2008Data(Experiment):
         time_array = time_array[:, 0]
 
         return time_array, test_spikes, x, y
+
+    def plot_spike_train(
+        self,
+        recording_index: Union[int, tuple, list] = None,
+        save_path: Union[str, tuple, list] = None,
+        ax: Union[mpl.axes.Axes, tuple, list] = None,
+        tetrode_id: Union[str, tuple, list] = None,
+        smoothness: float = 0.1,
+    ):
+        """ Plot tetrode spike train from spike data for a given recording index or a list of recording index.
+        If given a list or tuple as argument, all arguments must be list, tuple, or None.
+
+        Parameters
+        ----------
+        recording_index: int, tuple of ints, list of ints
+            recording index to plot spike ratemap, if list or tuple, it will recursively call this function
+            to make a plot per recording index. If this argument is list or tuple, the rest of variables must
+            be list or tuple with their respective types, or keep the default None value.
+        save_path: str, list of str, tuple of str
+            saving path of the generated figure, if None, no figure is saved
+        ax: mpl.axes._subplots.AxesSubplot (matplotlib axis from subplots), list of ax, or tuple of ax
+            axis or list of axis from subplot from matplotlib where the ratemap will be plotted.
+            If None, ax is generated with default options.
+        tetrode_id: str, list of str, or tuple of str
+            tetrode id in the corresponding session
+        smoothness: float
+            smoothing factor for the spike train plot, higher values will produce smoother plots
+
+        Returns
+        -------
+        x: ndarray (n_samples,)
+            x position throughout recording of the given session
+        y: ndarray (n_samples,)
+            y position throughout recording of the given session
+        time_array: ndarray (n_samples,)
+            array with the timestamps in seconds per position of the given session
+        spike_times: ndarray (n_spikes,)
+            spike times in seconds of the given session
+        """
+        # Recursive call of this function in case of list or tuple
+        if type(recording_index) is list or type(recording_index) is tuple:
+            axis_list = []
+            for i, ind in enumerate(recording_index):
+                # Checking if rest of variables are default or list values
+                if save_path is not None:
+                    save_path_i = save_path[i]
+                else:
+                    save_path_i = None
+                if ax is not None:
+                    ax_i = ax[0]
+                else:
+                    ax_i = None
+                if tetrode_id is not None:
+                    tetrode_id_i = tetrode_id[i]
+                else:
+                    tetrode_id_i = None
+                ind_axis = self.plot_spike_train(ind, save_path=save_path_i, ax=ax_i, tetrode_id=tetrode_id_i)
+                axis_list.append(ind_axis)
+            return axis_list
+
+        # Generate axis in case ax is None
+        if ax is None:
+            f, ax = plt.subplots(1, 1, figsize=(8, 6))
+
+        if recording_index is None:
+            session_data, rev_vars, rat_info = self.get_recording_data(recording_index=self.best_recording_index)
+            tetrode_id = self._find_tetrode(rev_vars)
+        elif tetrode_id is None:
+            session_data, rev_vars, rat_info = self.get_recording_data(recording_index=recording_index)
+            tetrode_id = self._find_tetrode(rev_vars)
+        else:
+            session_data, rev_vars, rat_info = self.get_recording_data(recording_index=recording_index)
+
+        time_array, test_spikes, x, y = self.get_tetrode_data(recording_index, tetrode_id)
+        # Helper function to format the trajectory plot
+
+        ax = make_plot_spike_train(time_array, test_spikes, smoothness, ax)
+
+        # Save if save_path is not None
+        if save_path is None:
+            pass
+        else:
+            plt.savefig(save_path, bbox_inches="tight")
+        return x, y, time_array, test_spikes
 
 
     def plot_recording_tetr(
@@ -414,7 +508,7 @@ class Hafting2008Data(Experiment):
             tetrode_id = self._find_tetrode(rev_vars)
 
 
-        h, binx, biny = self.recording_tetr(recording_index, save_path, tetrode_id, bin_size)
+        h, binx, biny = self.tetrode_ratemap(recording_index, save_path, tetrode_id, bin_size)
 
         # Use auxiliary function to make the plot
         ax = make_plot_rate_map(h, ax, 'rat: '+str(rat_info['rat_id'])+' sess: '+str(rat_info['sess'])+' tetrode: '+tetrode_id,"width","depth","Firing rate")
@@ -481,7 +575,7 @@ class Hafting2008Data(Experiment):
         session_data, rev_vars, rat_info = self.get_recording_data(recording_index)
         tetrode_id = self._find_tetrode(rev_vars)
 
-        time_array, test_spikes, x, y = self.get_tetrode_data(session_data, tetrode_id)
+        time_array, test_spikes, x, y = self.get_tetrode_data(recording_index, tetrode_id)
         # Helper function to format the trajectory plot
 
         ax = make_plot_trajectories(self.arena_limits, x, y, ax, plot_every)
@@ -494,10 +588,10 @@ class Hafting2008Data(Experiment):
         return x, y, time_array
 
 
-    def recording_tetr(self, recording_index: Union[int, tuple, list] = None,
-                            save_path: Union[str, tuple, list] = None,
-                            tetrode_id: Union[str, tuple, list] = None,
-                            bin_size: float = 2.0):
+    def tetrode_ratemap(self, recording_index: Union[int, tuple, list] = None,
+                        save_path: Union[str, tuple, list] = None,
+                        tetrode_id: Union[str, tuple, list] = None,
+                        bin_size: float = 2.0):
         """ tetrode ratemap from spike data for a given recording index or a list of recording index.
         If given a list or tuple as argument, all arguments must be list, tuple, or None.
 
@@ -535,7 +629,7 @@ class Hafting2008Data(Experiment):
         arena_depth = self.arena_limits[1, 1] - self.arena_limits[1, 0]
 
         # Recall spike data
-        time_array, test_spikes, x, y = self.get_tetrode_data(session_data, tetrode_id)
+        time_array, test_spikes, x, y = self.get_tetrode_data(recording_index, tetrode_id)
 
         # Compute ratemap matrices from data
         h, binx, biny = get_2D_ratemap(time_array, test_spikes, x, y, x_size=int(arena_width / bin_size),
@@ -546,4 +640,18 @@ class Hafting2008Data(Experiment):
 
 if __name__ == "__main__":
     hafting_data = Hafting2008Data(verbose=False)
-    hafting_data.show_readme()
+    hafting_data.show_data()
+
+    h1, _, _ = hafting_data.tetrode_ratemap(
+        recording_index=3,
+        tetrode_id="t4c1",
+        bin_size=5,
+    )
+
+    h2, _, _ = hafting_data.tetrode_ratemap(
+        recording_index=3,
+        tetrode_id="t4c2",
+        bin_size=5,
+    )
+    print(h1 == h2)
+    print("Debug")

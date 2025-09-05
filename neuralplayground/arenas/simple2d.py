@@ -89,12 +89,12 @@ class Simple2D(Environment):
         time_step_size: float
             time_step_size * global_steps will give a measure of the time in the experimental setting
         agent_step_size: float
-            Step size used when the action is a direction in x,y coordinate (normalize false in step())
+            Step size used when the action is a direction in x, y coordinate (normalize false in step())
             Agent_step_size * global_step_number will give a measure of the distance in the experimental setting
-        arena_x_limits: float
-            Size of the environment in the x direction
-        arena_y_limits: float
-            Size of the environment in the y direction
+        arena_x_limits: tuple or list
+            lower and upper limit of the environment in the x-axis
+        arena_y_limits: tuple or list
+            lower and upper limit of the environment in the y-axis
         """
         super().__init__(environment_name, **env_kwargs)
         self.metadata = {"env_kwargs": env_kwargs}
@@ -215,7 +215,7 @@ class Simple2D(Environment):
         observation = self.make_observation()
         return observation, self.state
 
-    def step(self, action: None, normalize_step: bool = False):
+    def step(self, action=None, normalize_step: bool = False):
         """Runs the environment dynamics. Increasing global counters.
         Given some action, return observation, new state and reward.
 

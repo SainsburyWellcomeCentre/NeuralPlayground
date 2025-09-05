@@ -262,7 +262,7 @@ Before sending a pull request, make sure you have the done following:
 
 1. Checked the Licensing frameworks.
 
-2. Used the [right development environment](#install-for-development). Make sure to initialise the pre-commit hooks with ```pre-commit install``` and run ```pre-commit run -a``` to format the code and check for errors.
+2. Used the [right development environment](#install-for-development). Install ```pip install pre-commit```, then initialise the pre-commit hooks with ```pre-commit install``` and run ```pre-commit run -a``` to format the code and check for errors before commit.
 
 3. Followed the [PEP8](https://www.python.org/dev/peps/pep-0008/) and [numpy docstring](https://numpydoc.readthedocs.io/en/latest/format.html) style convention. More details found in [Style Guide](https://github.com/ClementineDomine/NeuralPlayground/tree/main/documents/style_guide.md).
 

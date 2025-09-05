@@ -1,6 +1,43 @@
 from .main_config import NPGConfig
 
 
+class DefaultConfig(NPGConfig):
+    """Default config object for plots
+
+    Attributes
+    ----------
+    FONTSIZE: float
+        Font size for the plot
+    AXES_TITLE: float
+        Font size for the axes title
+    AXES_LABEL: float
+        Font size for the axes label
+    XTICK_LABEL: float
+        Font size for the x-tick labels
+    YTICK_LABEL: float
+        Font size for the y-tick labels
+    LEGEND_FONTSIZE: float
+        Font size for the legend
+    FIGURE_TITLE: float
+        Font size for the figure title
+    AXIS_TICKSIZE: float
+        Size of the axis ticks
+    LABELPAD: float
+        Padding for the labels
+    """
+
+    def __init__(self, **kwargs):
+        self.FONTSIZE = kwargs["fontsize"]
+        self.AXES_TITLE = kwargs["axes_title"]
+        self.AXES_LABEL = kwargs["axes_label"]
+        self.XTICK_LABEL = kwargs["xtick_label"]
+        self.YTICK_LABEL = kwargs["ytick_label"]
+        self.LEGEND_FONTSIZE = kwargs["legend_fontsize"]
+        self.FIGURE_TITLE = kwargs["figure_title"]
+        self.AXIS_TICKSIZE = kwargs["axis_ticksize"]
+        self.LABELPAD = kwargs["labelpad"]
+
+
 class TrajectoryConfig(NPGConfig):
     """Config object for trajectory plots
 
@@ -156,6 +193,7 @@ class PlotsConfig(NPGConfig):
     """
 
     def __init__(self, plot_config: dict):
+        self.DEFAULT = DefaultConfig(**plot_config["default_plot"])
         self.TRAJECTORY = TrajectoryConfig(**plot_config["trajectory_plot"])
         self.RATEMAP = RateMapConfig(**plot_config["ratemap_plot"])
         self.AGENT_COMPARISON = AgentComparisonConfig(**plot_config["agent_comparison_plot"])
