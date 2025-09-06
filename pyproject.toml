@@ -35,7 +35,7 @@ dependencies = [
   "scikit-image",
   "pooch",
   "colorama",
-    "scikit-learn"
+  "scikit-learn"
 ]
 
 [project.urls]
