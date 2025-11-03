@@ -4,7 +4,7 @@ ci:
     autoupdate_schedule: monthly
 repos:
     - repo: https://github.com/pre-commit/pre-commit-hooks
-      rev: v5.0.0
+      rev: v6.0.0
       hooks:
           - id: check-docstring-first
           - id: check-executables-have-shebangs
@@ -17,11 +17,11 @@ repos:
           - id: trailing-whitespace
             exclude: 'README.md'
     - repo: https://github.com/astral-sh/ruff-pre-commit
-      rev: v0.11.12
+      rev: v0.14.3
       hooks:
         - id: ruff
           exclude: ^examples/hackathon.ipynb$
-    - repo: https://github.com/psf/black
-      rev: 25.1.0
+    - repo: https://github.com/psf/black-pre-commit-mirror
+      rev: 25.9.0
       hooks:
           - id: black
