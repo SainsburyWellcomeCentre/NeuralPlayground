@@ -14,7 +14,7 @@
 
 
 
-<img src="../../images/NPG_GH-social-preview_white-bg.jpg" alt="NeuralPlayground Logo" width="500"/>
+<img src="./images/NPG_GH-social-preview_white-bg.jpg" alt="NeuralPlayground Logo" width="500"/>
 
 
 <!-- TOC -->
@@ -242,7 +242,7 @@ my_manager.check_run_status()
 To compare the results, use the comparison board described in [Comparison Board](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/comparisons_examples/comparison_from_manager.ipynb) jupyter
 notebook. With time, we will build an interface for easy model comparison and visualisation of the results!
 
-<img src="../../images/board_diagram.jpeg" alt="NeuralPlayground Logo" width="500"/>
+<img src="./images/board_diagram.jpeg" alt="NeuralPlayground Logo" width="500"/>
 
 ## I want to contribute
 
