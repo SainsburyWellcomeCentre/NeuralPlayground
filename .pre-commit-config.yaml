@@ -27,3 +27,9 @@ repos:
       hooks:
         - id: ruff
         - id: ruff-format
+    - repo: https://github.com/mgedmin/check-manifest
+      rev: "0.51"
+      hooks:
+        - id: check-manifest
+          args: [--no-build-isolation]
+          additional_dependencies: [setuptools-scm, wheel]

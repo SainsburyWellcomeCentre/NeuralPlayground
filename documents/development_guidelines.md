@@ -5,7 +5,6 @@
 Running `pre-commit install` will set up [pre-commit hooks](https://pre-commit.com/) to ensure a consistent formatting style. Currently, these include:
 
 * [ruff](https://github.com/astral-sh/ruff) does a number of jobs, including code linting and auto-formatting.
-* [mypy](https://mypy.readthedocs.io/en/stable/index.html) as a static type checker. 
 * [check-manifest](https://github.com/mgedmin/check-manifest) to ensure that the right files are included in the pip package.
 
 These will prevent code from being committed if any of these hooks fail.
