@@ -30,6 +30,8 @@ For docstrings, we adhere to the [numpydoc](https://numpydoc.readthedocs.io/en/l
 ## Testing
 We use [pytest](https://docs.pytest.org/en/latest/) for testing and aim for ~100% test coverage (as far as is reasonable). All new features should be tested. Write your test methods and classes in the tests folder.
 
+You can run the tests locally by executing `pytest` in the repository root, while in an active [development environment](../README.md#install-for-development).
+
 For some tests, you will need to use real experimental data. Do not include these data in the repository, especially if they are large. We store several sample datasets in an [external data repository](https://gin.g-node.org/SainsburyWellcomeCentre/NeuralPlayground).
 
 ## Continuous Integration
@@ -40,21 +42,47 @@ A GitHub actions workflow (`.github/workflows/test_and_deploy.yml`) has been set
 * Testing (only if linting checks pass)
 * Release to PyPI (only if a git tag is present and if tests pass).
 
-## Versioning and Releases
+## Versioning
 We use [semantic versioning](https://semver.org/), which includes `MAJOR`.`MINOR`.`PATCH` version numbers:
 * PATCH = small bugfix
 * MINOR = new feature
 * MAJOR = breaking change
 
-We use [setuptools_scm](https://github.com/pypa/setuptools_scm) to automatically version movement. It has been pre-configured in the `pyproject.toml` file. `setuptools_scm` will automatically [infer the version using git](https://github.com/pypa/setuptools_scm#default-versioning-scheme). To manually set a new semantic version, create a tag and make sure the tag is pushed to GitHub. Make sure you commit any changes you wish to be included in this version. E.g. to bump the version to `1.0.0`:
+> [!note]
+> Currently, we only apply [semantic versioning](https://semver.org/) to MINOR and PATCH versions. Until we reach our first stable `v1` release we leave the MAJOR version as 0, even for breaking changes.
 
-```bash
-git add .
-git commit -m "Add new changes"
-git tag -a v1.0.0 -m "Bump to version 1.0.0"
-git push --follow-tags
-```
+We use [setuptools_scm](https://github.com/pypa/setuptools_scm) to automatically version NeuralPlayground. It has been pre-configured in the `pyproject.toml` file. `setuptools_scm` will automatically [infer the version using git](https://github.com/pypa/setuptools_scm#default-versioning-scheme). 
 
-Alternatively, you can also use the GitHub web interface to create a new release and tag.
 
-The addition of a GitHub tag triggers the package's deployment to PyPI. The version number is automatically determined from the latest tag on the main branch.
+## Releasing a new version
+
+The addition of a GitHub tag triggers the package's deployment to PyPI.
+The version number is automatically determined from the latest tag on the main branch.
+Below you will find the **steps to create a new release** using GitHub's release interface.
+
+1. Start a draft release
+    - Go to <https://github.com/SainsburyWellcomeCentre/NeuralPlayground/releases/new>, which is equivalent to going on GitHub [Releases](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/releases) and clicking **Draft a new release**.
+
+        
+2. Set the tag and title
+    - In the **Tag** dropdown, create a new tag following [semantic versioning](https://semver.org/). Don't forget to include the `v` prefix, e.g. `v0.3.0`.
+    - Leave **Target** set to `main`.
+    - Use the tag name as the release title, e.g. `v0.3.0`.
+        
+3. Generate release notes
+    - Leave _previous tag_ set to **Auto** and click **Generate release notes**.
+    - Optionally, organise the PR list under **What's Changed** into meaningful subsections (`###` headers).
+    
+    > [!tip]
+    >    - Acknowledge first-time or external contributors.
+    >    - For breaking changes, include code snippets showing old vs new syntax.
+
+4. Publish the release
+    - Leave _Set as the latest release_ checked (default).
+    - After publishing, check the **Actions** tab to ensure both workflows finish successfully.
+
+5. Verify on PyPI
+    - Confirm the new version appears on [PyPI](https://pypi.org/project/NeuralPlayground/).
+
+6. Optional: announce the release on social media.
+
