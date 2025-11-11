@@ -97,7 +97,7 @@ pip install -U NeuralPlayground
 pip install NeuralPlayground==0.0.5
 ```
 > [!Note]
-> 
+>
 > If you wish to run our implementation of the Tolman-Eichenbaum machine, there are additional dependencies to install. These can be found in the [TEM_README.md](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples/agent_examples/TEM_README.md) file.
 
 ### Install for development
