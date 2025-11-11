@@ -79,9 +79,8 @@ We advise you to install the package in a virtual environment,
 to avoid conflicts with other packages. For example, using `conda`:
 
 ```python
-conda create --name NPG-env python=3.12
+conda create --name NPG-env python=3.13 pip
 conda activate NPG-env
-conda install pip
 ```
 
 ### Pip install
@@ -97,8 +96,8 @@ pip install -U NeuralPlayground
 # install a particular release
 pip install NeuralPlayground==0.0.5
 ```
-> **Note**
->
+> [!Note]
+> 
 > If you wish to run our implementation of the Tolman-Eichenbaum machine, there are additional dependencies to install. These can be found in the [TEM_README.md](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples/agent_examples/TEM_README.md) file.
 
 ### Install for development
@@ -109,14 +108,8 @@ from GitHub, and install it in editable mode, including the "dev" dependencies:
 ```bash
 git clone https://github.com/SainsburyWellcomeCentre/NeuralPlayground/ --single-branch
 cd NeuralPlayground
-pip install -e .[dev]
+pip install -e ".[dev]"
 ```
-> **Note**
->
-> if you are using the `zsh` shell (default on macOS), replace the last command with:
-> ```bash
-> pip install -e '.[dev]'
-> ```
 
 ## Usage
 Try our package! We are gathering opinions to focus our efforts on improving aspects of the code or adding new features,
