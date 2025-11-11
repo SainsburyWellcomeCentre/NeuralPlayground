@@ -9,7 +9,6 @@ Changes to the original code consist of removing place cells object usage from t
 to numpy, no periodic environment support and the addition of online trajectory generation.
 """
 
-
 import numpy as np
 
 # import torch

@@ -20,8 +20,4 @@ repos:
       rev: v0.11.12
       hooks:
         - id: ruff
-          exclude: ^examples/hackathon.ipynb$
-    - repo: https://github.com/psf/black
-      rev: 25.1.0
-      hooks:
-          - id: black
+        - id: ruff-format

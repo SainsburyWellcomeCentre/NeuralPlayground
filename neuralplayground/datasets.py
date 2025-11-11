@@ -55,9 +55,9 @@ def find_datasets(download_manager: pooch.Pooch = dataset_manager) -> dict:
         file_name = key.split(".")[0]
         # Check that the file name ends with one of the expected suffixes
         size_suffixes = ["_full", "_subset"]
-        assert any(
-            [file_name.endswith(suffix) for suffix in size_suffixes]
-        ), f"Dataset name {file_name} must end with one of the expected suffixes {size_suffixes}."
+        assert any([file_name.endswith(suffix) for suffix in size_suffixes]), (
+            f"Dataset name {file_name} must end with one of the expected suffixes {size_suffixes}."
+        )
         # Extract the dataset name and the size suffix
         size_suffix = file_name.split("_")[-1]
         dataset_name = file_name.replace(f"_{size_suffix}", "")
