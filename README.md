@@ -1,14 +1,13 @@
 [![License](https://img.shields.io/badge/License-MIT-orange.svg)](https://opensource.org/licenses/MIT)
 ![CI](https://img.shields.io/github/actions/workflow/status/SainsburyWellcomeCentre/NeuralPlayground/test_and_deploy.yml?label=CI)
 [![codecov](https://codecov.io/gh/SainsburyWellcomeCentre/NeuralPlayground/branch/main/graph/badge.svg?token=P8CCH3TI8K)](https://codecov.io/gh/SainsburyWellcomeCentre/NeuralPlayground)
-[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/charliermarsh/ruff/main/assets/badge/v0.json)](https://github.com/charliermarsh/ruff)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/python/black)
+[![Code style: Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/format.json)](https://github.com/astral-sh/ruff)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-9-orange.svg?style=flat-square)](#contributors)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
-# NeuralPlayground 
+# NeuralPlayground
 
 
 ## *A standardised environment for the hippocampus and entorhinal cortex models.* <a href="https://githubtocolab.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/colab_example.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
@@ -19,6 +18,7 @@
 
 
 <!-- TOC -->
+- [*A standardised environment for the hippocampus and entorhinal cortex models.* ](#a-standardised-environment-for-the-hippocampus-and-entorhinal-cortex-models-)
 - [Introduction](#introduction)
 - [Installation](#installation)
   - [Create a conda environment](#create-a-conda-environment)
@@ -27,6 +27,7 @@
 - [Usage](#usage)
   - [Agent Arena interaction](#agent-arena-interaction)
   - [Simulation Manager](#simulation-manager)
+  - [Simulation Manager](#simulation-manager-1)
 - [I want to contribute](#i-want-to-contribute)
 - [Cite](#cite)
 - [License](#license)
@@ -34,12 +35,12 @@
 <!-- /TOC -->
 
 ## Introduction
-The abstract representation of space has been extensively studied in the hippocampus and entorhinal cortex. 
+The abstract representation of space has been extensively studied in the hippocampus and entorhinal cortex.
 A growing variety of theoretical models have been proposed
-to capture the rich neural and behavioral phenomena associated with these circuits. However, objective comparison 
+to capture the rich neural and behavioral phenomena associated with these circuits. However, objective comparison
 of these theories against each other and against empirical data is challenging.
 
-Although the significance of virtuous interaction between experiments and theory is widely recognized, the tools 
+Although the significance of virtuous interaction between experiments and theory is widely recognized, the tools
 available to facilitate comparison are limited. Some important challenge we aim to solve are:
 
    1. Lack availability and accessibility of data in a standardized, labeled format.
@@ -48,21 +49,21 @@ available to facilitate comparison are limited. Some important challenge we aim 
 
    3. A repository of models and data sets that are relevant for the field of hippocampus and entorhinal cortex.
 
-To address this gap, we present an open-source standardised software framework - NeuralPlayground - to enable 
-comparison between the hippocampus and entorhinal cortex models. This Python software package offers a reproducible 
-way to compare models against a centralised library of published experimental results, including neural recordings 
-and animal behavior. The framework currently contains implementations of three Agents, as well as three Experiments 
-providing simple interfaces to publicly available neural and behavioral data. It also contains a customizable 
-2-dimensional Arena (continuous and discrete) able to produce common experimental environments in which the agents can 
+To address this gap, we present an open-source standardised software framework - NeuralPlayground - to enable
+comparison between the hippocampus and entorhinal cortex models. This Python software package offers a reproducible
+way to compare models against a centralised library of published experimental results, including neural recordings
+and animal behavior. The framework currently contains implementations of three Agents, as well as three Experiments
+providing simple interfaces to publicly available neural and behavioral data. It also contains a customizable
+2-dimensional Arena (continuous and discrete) able to produce common experimental environments in which the agents can
 move in and interact with. Each module can also be used separately, allowing flexible access to influential
 models and data sets.
 
-We currently rely on visual comparison of a hand-selected number of outputs of the model with neural recordings as 
-shown in [github.com/NeuralPlayground/examples/comparison](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/comparisons_examples/comparison_from_manager.ipynb). 
-In the future, a set of quantitative and 
-qualitative measures will be added for systematic comparisons across Agents, Arenas, and Experiments. 
-We want to restate that this won't constitute a definitive judgment on the ability of an Agent to replicate the brain 
-mechanism. Instead, this allows an objective and complete comparison to the current evidence in the field, as is 
+We currently rely on visual comparison of a hand-selected number of outputs of the model with neural recordings as
+shown in [github.com/NeuralPlayground/examples/comparison](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/comparisons_examples/comparison_from_manager.ipynb).
+In the future, a set of quantitative and
+qualitative measures will be added for systematic comparisons across Agents, Arenas, and Experiments.
+We want to restate that this won't constitute a definitive judgment on the ability of an Agent to replicate the brain
+mechanism. Instead, this allows an objective and complete comparison to the current evidence in the field, as is
 typically done in publications, which can be used to guide model design and development.
 
 Altogether, we hope our framework, offers
@@ -97,7 +98,7 @@ pip install -U NeuralPlayground
 pip install NeuralPlayground==0.0.5
 ```
 > **Note**
-> 
+>
 > If you wish to run our implementation of the Tolman-Eichenbaum machine, there are additional dependencies to install. These can be found in the [TEM_README.md](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples/agent_examples/TEM_README.md) file.
 
 ### Install for development
@@ -111,7 +112,7 @@ cd NeuralPlayground
 pip install -e .[dev]
 ```
 > **Note**
-> 
+>
 > if you are using the `zsh` shell (default on macOS), replace the last command with:
 > ```bash
 > pip install -e '.[dev]'
@@ -119,10 +120,10 @@ pip install -e .[dev]
 
 ## Usage
 Try our package! We are gathering opinions to focus our efforts on improving aspects of the code or adding new features,
-so if you tell us what you would like to have, we might just implement it 😊. 
-This open-source software was built to be collaborative and lasting. We hope that the framework will be simple 
-enough to be adopted by a great number of neuroscientists, eventually guiding the path to the computational 
-understanding of the HEC mechanisms. We follow reproducible, inclusive, and collaborative project design guidelines. 
+so if you tell us what you would like to have, we might just implement it 😊.
+This open-source software was built to be collaborative and lasting. We hope that the framework will be simple
+enough to be adopted by a great number of neuroscientists, eventually guiding the path to the computational
+understanding of the HEC mechanisms. We follow reproducible, inclusive, and collaborative project design guidelines.
 All relevant documents can be found in [Documents](https://github.com/ClementineDomine/NeuralPlayground/blob/main/documents/).
 
 ### Agent Arena interaction
@@ -151,10 +152,10 @@ for j in range(iterations):
 ```
 This process is the base of our package. We provide a more detailed example in <a href="https://githubtocolab.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/colab_example.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>.
 Also, specific examples of how to use each module can be found in [agent](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples/agent_examples),
-[arena](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/arena_examples/arena_examples.ipynb) 
+[arena](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/arena_examples/arena_examples.ipynb)
 and [experiment](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/experimental_examples/experimental_data_examples.ipynb) jupyter notebooks.
 > **Note**
-> 
+>
 > Check our Tolman-Eichenbaum Machine Implementation in
 [this branch](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/neuralplayground/agents/whittington_2020.py) (work in progress), you will also need to install [pytorch](https://pytorch.org/) ro run it.</strong>
 
@@ -170,13 +171,13 @@ implemented using a SingleSim
 class. For example
 
 ```python
-# Import default simulation, which is a SingleSim 
+# Import default simulation, which is a SingleSim
 from neuralplayground.backend.default_simulation import stachenfeld_in_2d
 from neuralplayground.backend.default_simulation import weber_in_2d
 stachenfeld_in_2d.run_sim(save_path="my_results")
 ```
 This class allows you to run a simulation with a single line of code, and it will automatically save the results in a
-folder with the name you provide, keeping track of any errors and logs. You can also use our 
+folder with the name you provide, keeping track of any errors and logs. You can also use our
 [Simulation Manager](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/comparisons_examples/simulation_manager.ipynb)
 to run multiple simulations at once, save the results, keep run of each run and possible errors for easy debugging, and other functions.
 
@@ -195,10 +196,10 @@ for j in range(iterations):
 ```
 This process is the base of our package. We provide a more detailed example in <a href="https://githubtocolab.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/colab_example.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>.
 Also, specific examples of how to use each module can be found in [agent](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples/agent_examples),
-[arena](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/arena_examples/arena_examples.ipynb) 
+[arena](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/arena_examples/arena_examples.ipynb)
 and [experiment](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/experimental_examples/experimental_data_examples.ipynb) jupyter notebooks.
 > **Note**
-> 
+>
 > Check our Tolman-Eichenbaum Machine Implementation in
 [this branch](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/neuralplayground/agents/whittington_2020.py) (work in progress), you will also need to install [pytorch](https://pytorch.org/) ro run it.</strong>
 
@@ -213,13 +214,13 @@ you can try out, for which you don't need to write much code, since they are
 implemented using a SingleSim class. For example
 
 ```python
-# Import default simulation, which is a SingleSim 
+# Import default simulation, which is a SingleSim
 from neuralplayground.backend.default_simulation import stachenfeld_in_2d
 from neuralplayground.backend.default_simulation import weber_in_2d
 stachenfeld_in_2d.run_sim(save_path="my_results")
 ```
 This class allows you to run a simulation with a single line of code, and it will automatically save the results in a
-folder with the name you provide, keeping track of any errors and logs. You can also use our 
+folder with the name you provide, keeping track of any errors and logs. You can also use our
 [Simulation Manager](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/comparisons_examples/simulation_manager.ipynb)
 to run multiple simulations at once, save the results, keep run of each run and possible errors for easy debugging, and other functions.
 

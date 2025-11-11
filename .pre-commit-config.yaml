@@ -4,24 +4,32 @@ ci:
     autoupdate_schedule: monthly
 repos:
     - repo: https://github.com/pre-commit/pre-commit-hooks
-      rev: v5.0.0
+      rev: v6.0.0
       hooks:
-          - id: check-docstring-first
-          - id: check-executables-have-shebangs
-          - id: check-merge-conflict
-          - id: check-toml
-          - id: end-of-file-fixer
-          - id: mixed-line-ending
-            args: [--fix=lf]
-          - id: requirements-txt-fixer
-          - id: trailing-whitespace
-            exclude: 'README.md'
+        - id: check-added-large-files
+        - id: check-docstring-first
+        - id: check-executables-have-shebangs
+        - id: check-case-conflict
+        - id: check-merge-conflict
+        - id: check-symlinks
+        - id: check-yaml
+        - id: check-toml
+        - id: debug-statements
+        - id: end-of-file-fixer
+        - id: mixed-line-ending
+          args: [--fix=lf]
+        - id: name-tests-test
+          args: ["--pytest-test-first"]
+        - id: requirements-txt-fixer
+        - id: trailing-whitespace
     - repo: https://github.com/astral-sh/ruff-pre-commit
       rev: v0.11.12
       hooks:
         - id: ruff
-          exclude: ^examples/hackathon.ipynb$
-    - repo: https://github.com/psf/black
-      rev: 25.1.0
+        - id: ruff-format
+    - repo: https://github.com/mgedmin/check-manifest
+      rev: "0.51"
       hooks:
-          - id: black
+        - id: check-manifest
+          args: [--no-build-isolation]
+          additional_dependencies: [setuptools-scm, wheel]

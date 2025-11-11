@@ -22,9 +22,9 @@ with their surroundings (i.e., the environment). An agent receives observations 
 
 Each of the these models are implemented in a jupyter notebook in [Examples](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/tree/main/examples) to facilitate the interaction.
 
-Pre-trained version of some of these model are hosted on a separate data repository on GIN. GIN offers an interface almost identical to GitHub. 
+Pre-trained version of some of these model are hosted on a separate data repository on GIN. GIN offers an interface almost identical to GitHub.
 To contribute a new trainned model, you need to fork the repository and open a pull request, just like on GitHub.
-Place your model trained in a selected arena folder named as "author_date_in_arena", zip the folder, and place "author_date_in_arena.zip" under the "data" directory of the Forked repository, for example, "data/smith_2023_in_Simple2D.zip". 
+Place your model trained in a selected arena folder named as "author_date_in_arena", zip the folder, and place "author_date_in_arena.zip" under the "data" directory of the Forked repository, for example, "data/smith_2023_in_Simple2D.zip".
 If you encounter any problems with this procedure, do not hesitate to contact us.
 
 ## 3. How-to-Contribute

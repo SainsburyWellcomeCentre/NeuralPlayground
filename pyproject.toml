@@ -51,7 +51,6 @@ dev = [
   "pytest-cov",
   "coverage",
   "tox",
-  "black",
   "mypy",
   "pre-commit",
   "ruff",
@@ -78,11 +77,6 @@ exclude = ["tests*"]
 [tool.pytest.ini_options]
 addopts = "--cov=neuralplayground"
 
-[tool.black]
-target-version = ['py311', 'py312', 'py313']
-skip-string-normalization = false
-line-length = 127
-
 [tool.setuptools_scm]
 version_scheme = "release-branch-semver"
 local_scheme = "no-local-version"
@@ -97,11 +91,18 @@ ignore = [
 
 [tool.ruff]
 line-length = 127
-exclude = ["__init__.py","build",".eggs"]
+exclude = ["__init__.py", "build", ".eggs"]
 fix = true
 
 [tool.ruff.lint]
-select = ["I", "E", "F", "NPY201"]
+# See https://docs.astral.sh/ruff/rules/
+select = [
+  "E",      # pycodestyle errors
+  "F",      # Pyflakes
+  "I",      # isort
+  "NPY201", # checks for syntax that was deprecated in numpy2.0
+]
+per-file-ignores = {"*.ipynb" = ["E501", "E402"], "examples/hackathon.ipynb" = ["F821"]}
 
-[tool.ruff.lint.per-file-ignores]
-"*.ipynb" = ["E501", "E402"]
+[tool.ruff.format]
+docstring-code-format = true # Also format code in docstrings
