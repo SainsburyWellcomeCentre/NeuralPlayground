@@ -65,3 +65,7 @@ dist/
 
 # Sphinx documentation
 docs/build/
+
+# results
+results_sim/
+george_test_results/
