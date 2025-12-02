@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def parameters():
     """
     Set all parameters for the Cloned HMM (CHMM) model. This is a function so that it can be called from other scripts,
@@ -24,7 +25,7 @@ def parameters():
     # Can be 'EM' or 'Viterbi'. Set as EM by default.
     params["learning_algo"] = "EM"
     # Number of iterations for the EM or Viterbi algorithm to run during each update().
-    params["n_iterations"] = 100 
+    params["n_iterations"] = 100
     # Flag for EM to terminate early if log-likelihood doesn't improve.
     params["term_early"] = True
 
@@ -33,7 +34,7 @@ def parameters():
     # object, as it requires info about the data shape.
     # Number of distinct observations (e.g., colors, textures) in the environment.
     params["n_observations"] = 50  # Placeholder: Change this value
-    
+
     # Number of actions (e.g., 0:left, 1:right, 2:up, 3:down).
     params["n_actions"] = 4
 

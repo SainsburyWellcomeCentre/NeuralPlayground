@@ -1,9 +1,11 @@
 from __future__ import print_function
-from builtins import range
-import numpy as np
-import numba as nb
-from tqdm import trange
+
 import sys
+from builtins import range
+
+import numba as nb
+import numpy as np
+from tqdm import trange
 
 
 def validate_seq(x, a, n_clones=None):
@@ -15,13 +17,9 @@ def validate_seq(x, a, n_clones=None):
     if n_clones is not None:
         assert len(n_clones.shape) == 1, "Flatten your array first"
         assert n_clones.dtype == np.int64
-        assert all(
-            [c > 0 for c in n_clones]
-        ), "You can't provide zero clones for any emission"
+        assert all([c > 0 for c in n_clones]), "You can't provide zero clones for any emission"
         n_emissions = n_clones.shape[0]
-        assert (
-            x.max() < n_emissions
-        ), "Number of emissions inconsistent with training sequence"
+        assert x.max() < n_emissions, "Number of emissions inconsistent with training sequence"
 
 
 def datagen_structured_obs_room(
@@ -156,16 +154,12 @@ class CHMM(object):
     def bpsE(self, E, x, a):
         """Compute the log likelihood using an alternate emission matrix."""
         validate_seq(x, a, self.n_clones)
-        log2_lik = forwardE(
-            self.T.transpose(0, 2, 1), E, self.Pi_x, self.n_clones, x, a
-        )
+        log2_lik = forwardE(self.T.transpose(0, 2, 1), E, self.Pi_x, self.n_clones, x, a)
         return -log2_lik
 
     def bpsV(self, x, a):
         validate_seq(x, a, self.n_clones)
-        log2_lik = forward_mp(
-            self.T.transpose(0, 2, 1), self.Pi_x, self.n_clones, x, a
-        )[0]
+        log2_lik = forward_mp(self.T.transpose(0, 2, 1), self.Pi_x, self.n_clones, x, a)[0]
         return -log2_lik
 
     def decode(self, x, a):
@@ -320,9 +314,7 @@ class CHMM(object):
             obs_tm1 = seq[-1]
             T_weighted = self.T.sum(0)
 
-            long_alpha = np.dot(
-                alpha, T_weighted[state_loc[obs_tm1] : state_loc[obs_tm1 + 1], :]
-            )
+            long_alpha = np.dot(alpha, T_weighted[state_loc[obs_tm1] : state_loc[obs_tm1 + 1], :])
             long_alpha /= long_alpha.sum()
             idx = np.random.choice(np.arange(self.n_clones.sum()), p=long_alpha)
 
@@ -338,9 +330,7 @@ class CHMM(object):
     def bridge(self, state1, state2, max_steps=100):
         Pi_x = np.zeros(self.n_clones.sum(), dtype=self.dtype)
         Pi_x[state1] = 1
-        log2_lik, mess_fwd = forward_mp_all(
-            self.T.transpose(0, 2, 1), Pi_x, self.Pi_a, self.n_clones, state2, max_steps
-        )
+        log2_lik, mess_fwd = forward_mp_all(self.T.transpose(0, 2, 1), Pi_x, self.Pi_a, self.n_clones, state2, max_steps)
         s_a = backtrace_all(self.T, self.Pi_a, self.n_clones, mess_fwd, state2)
         return s_a
 
@@ -460,9 +450,7 @@ def forward(T_tr, Pi, n_clones, x, a, store_messages=False):
     message /= p_obs
     log2_lik[0] = np.log2(p_obs)
     if store_messages:
-        mess_loc = np.hstack(
-            (np.array([0], dtype=n_clones.dtype), n_clones[x])
-        ).cumsum()
+        mess_loc = np.hstack((np.array([0], dtype=n_clones.dtype), n_clones[x])).cumsum()
         mess_fwd = np.empty(mess_loc[-1], dtype=dtype)
         t_start, t_stop = mess_loc[t : t + 2]
         mess_fwd[t_start:t_stop] = message
@@ -479,9 +467,7 @@ def forward(T_tr, Pi, n_clones, x, a, store_messages=False):
             state_loc[i : i + 2],
             state_loc[j : j + 2],
         )
-        message = np.ascontiguousarray(T_tr[aij, j_start:j_stop, i_start:i_stop]).dot(
-            message
-        )
+        message = np.ascontiguousarray(T_tr[aij, j_start:j_stop, i_start:i_stop]).dot(message)
         p_obs = message.sum()
         assert p_obs > 0
         message /= p_obs
@@ -517,9 +503,7 @@ def backward(T, n_clones, x, a):
             state_loc[i : i + 2],
             state_loc[j : j + 2],
         )
-        message = np.ascontiguousarray(T[aij, i_start:i_stop, j_start:j_stop]).dot(
-            message
-        )
+        message = np.ascontiguousarray(T[aij, i_start:i_stop, j_start:j_stop]).dot(message)
         p_obs = message.sum()
         assert p_obs > 0
         message /= p_obs
@@ -544,9 +528,7 @@ def forward_mp(T_tr, Pi, n_clones, x, a, store_messages=False):
     message /= p_obs
     log2_lik[0] = np.log2(p_obs)
     if store_messages:
-        mess_loc = np.hstack(
-            (np.array([0], dtype=n_clones.dtype), n_clones[x])
-        ).cumsum()
+        mess_loc = np.hstack((np.array([0], dtype=n_clones.dtype), n_clones[x])).cumsum()
         mess_fwd = np.empty(mess_loc[-1], dtype=dtype)
         t_start, t_stop = mess_loc[t : t + 2]
         mess_fwd[t_start:t_stop] = message
@@ -604,9 +586,7 @@ def backtrace(T, n_clones, x, a, mess_fwd):
         )  # at time t -> t+1 we go from observation i to observation j
         (i_start, i_stop), j_start = state_loc[i : i + 2], state_loc[j]
         t_start, t_stop = mess_loc[t : t + 2]
-        belief = (
-            mess_fwd[t_start:t_stop] * T[aij, i_start:i_stop, j_start + code[t + 1]]
-        )
+        belief = mess_fwd[t_start:t_stop] * T[aij, i_start:i_stop, j_start + code[t + 1]]
         code[t] = rargmax(belief)
     states = state_loc[x] + code
     return states
@@ -701,9 +681,7 @@ def backtrace_all(T, Pi_a, n_clones, mess_fwd, target_state):
         target_state,
     )  # last actions is irrelevant, use an invalid value
     for t in range(mess_fwd.shape[0] - 2, -1, -1):
-        belief = (
-            mess_fwd[t].reshape(1, -1) * T[:, :, states[t + 1]] * Pi_a.reshape(-1, 1)
-        )
+        belief = mess_fwd[t].reshape(1, -1) * T[:, :, states[t + 1]] * Pi_a.reshape(-1, 1)
         a_s = rargmax(belief.flatten())
         actions[t], states[t] = a_s // n_states, a_s % n_states
     return actions, states
