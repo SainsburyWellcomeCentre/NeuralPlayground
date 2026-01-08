@@ -5,7 +5,7 @@ import sys
 
 import numpy as np
 
-from neuralplayground.agents.george_2021_extras.george_2021_model import CHMM
+from neuralplayground.agents.george_2021_extras.george_2021_model import CHMM, forwardE
 
 from .agent_core import AgentCore
 
@@ -50,19 +50,7 @@ class George2021(AgentCore):
 
     # initialises hyperparameters such as n_clones, batch_size etc
     def __init__(self, agent_name: str = "CSCG", **mod_kwargs):
-        """
-        Parameters
-        ----------
-        model_name : str
-           Name of the specific instantiation of the ExcInhPlasticity class
-        mod_kwargs : dict
-            params: dict
-                contains the majority of parameters used by the model and environment
-            n_observations: int
-                total number of unique states in the environment
-            n_actions: int
-                total number of unique actions agent can perform
-        """
+
         super().__init__(agent_name=agent_name, **mod_kwargs)
         self.mod_kwargs = mod_kwargs.copy()
         # params = mod_kwargs["params"]
@@ -89,6 +77,29 @@ class George2021(AgentCore):
 
         return self.action_map[discrete_action]
 
+    def get_mess_fwd(self):
+        """
+        Calculates the belief state (forward messages) for the entire history of the agent.
+        This maps directly to the 'mess_fwd' variable in the original chmm_colab.ipynb.
+        It represents alpha_t(z): The probability of being in clone z at time t.
+
+        Returns
+        -------
+        mess_fwd : np.array
+            Shape (T, n_clones). The belief state at every time step.
+        """
+        x = np.array(self.obs_history, dtype=np.int64)
+        a = np.array(self.action_history, dtype=np.int64)
+
+        T = self.chmm.T  # Transition matrix
+        Pi_x = self.chmm.Pi_x  # Emission probs (or initial state probs depending on implementation)
+        Pi_a = self.chmm.Pi_a  # Action probs
+        n_clones = self.chmm.n_clones
+
+        log_lik, mess_fwd = forwardE(T, Pi_x, Pi_a, x, a, n_clones)
+
+        return mess_fwd
+
     def reset(self):
         """
         initialise model and associated variables for training
@@ -98,6 +109,7 @@ class George2021(AgentCore):
         # this is because it needs an array of obs, actions (x, a)
         self.obs_history = []
         self.action_history = []
+        self.pos_history - []
         self.global_steps = 0
 
         self.n_clones_array = np.array([self.params["n_clones_per_obs"]] * self.n_observations, dtype=np.int64)
@@ -107,6 +119,9 @@ class George2021(AgentCore):
         # so the object can be instantiated without crashing.
         dummy_x = np.zeros(2, dtype=np.int64)
         dummy_a = np.zeros(2, dtype=np.int64)
+        dummy_a[-1] = self.n_actions - 1
+
+        print("x:", dummy_x.shape, "a:", dummy_a.shape)
 
         self.chmm = CHMM(
             n_clones=self.n_clones_array,  # Use the array we made in __init__
@@ -121,6 +136,7 @@ class George2021(AgentCore):
         """
         processes an observation and returns an action vector
         """
+
         if len(obs) == 0:
             return None
         discrete_obs = int(obs[0])
@@ -145,6 +161,10 @@ class George2021(AgentCore):
 
         x_train = np.array(self.obs_history, dtype=np.int64)
         a_train = np.array(self.action_history, dtype=np.int64)
+
+        # debugging
+        print(self.chmm.T.shape)
+        print(self.chmm.T.dtype)
 
         learning_algo = self.params["learning_algo"]
         n_iter = self.params["n_iterations"]
@@ -172,9 +192,11 @@ class George2021(AgentCore):
         if not os.path.exists(save_dir):
             os.makedirs(save_dir)
 
-        # Save the CHMM object (contains learned T and E matrices)
+        # save the CHMM object + history
+        save_data = {"chmm": self.chmm, "obs_history": self.obs_history, "action_history": self.action_history}
+
         with open(save_path, "wb") as f:
-            pickle.dump(self.chmm, f, pickle.HIGHEST_PROTOCOL)
+            pickle.dump(save_data, f, pickle.HIGHEST_PROTOCOL)
 
         # Save the hyperparameters separately for easier inspection
         param_path = os.path.join(save_dir, "chmm_agent_params.pkl")

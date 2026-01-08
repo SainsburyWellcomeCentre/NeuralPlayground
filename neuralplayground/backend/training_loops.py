@@ -133,3 +133,44 @@ def process_training_hist(training_hist):
             for key in training_hist[i].keys():
                 dict_training[key].append(training_hist[i][key])
     return dict_training
+
+
+def cscg_training_loop(agent: AgentCore, env: Environment, n_steps: int):
+    """Default training loop for agents and environments that use a CSCG-based update.
+        Based on default_training_loop.
+
+    Parameters
+    ----------
+    agent : AgentCore
+        Agent to be trained.
+    env : Environment
+        Environment in which the agent is trained.
+    n_steps : int
+        Number of steps to train the agent for.
+
+    Returns
+    -------
+    agent : AgentCore
+        Trained agent.
+    env : Environment
+        Environment in which the agent was trained.
+    dict_training : dict
+        Dictionary containing the training history from the training loop and update method.
+    """
+
+    obs, state = env.reset()
+    # logs agent intial true position
+    agent.pos_history.append(state)
+
+    training_hist = []
+    for j in range(round(n_steps)):
+        # Observe to choose an action
+        action = agent.act(obs)
+        # Run environment for given action
+        obs, state, reward = env.step(action)
+        update_output = agent.update()
+        training_hist.append(update_output)
+        agent.pos_history.append(state)
+
+    dict_training = process_training_hist(training_hist)
+    return agent, env, dict_training

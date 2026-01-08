@@ -7,7 +7,7 @@ def parameters():
         e.g. to load parameters from a file.
     """
     params = {}
-    # -- Model parameters
+    # Model parameters
     # The number of 'clones' (hidden states) to assign to each observation[cite: 54, 840].
     params["n_clones_per_obs"] = 20  # [cite: 893, 901, 910]
     # The pseudocount for smoothing the transition matrix (T).
@@ -16,11 +16,11 @@ def parameters():
     # The 'extra' pseudocount used when learning the emission matrix (E).
     params["pseudocount_extra"] = 1e-20
     # Data type for numpy arrays in the model.
-    params["dtype"] = np.float32
+    params["dtype"] = np.float64
     # Random seed for reproducibility.
     params["seed"] = 42
 
-    # -- Training parameters
+    # Training parameters
     # Specify the learning algorithm to use in the update() step.
     # Can be 'EM' or 'Viterbi'. Set as EM by default.
     params["learning_algo"] = "EM"
@@ -29,7 +29,7 @@ def parameters():
     # Flag for EM to terminate early if log-likelihood doesn't improve.
     params["term_early"] = True
 
-    # -- Environment/Data parameters
+    # Environment/Data parameters
     # These are needed by the CHMMAgent to initialize the CHMM
     # object, as it requires info about the data shape.
     # Number of distinct observations (e.g., colors, textures) in the environment.

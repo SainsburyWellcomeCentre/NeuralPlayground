@@ -1,6 +1,9 @@
+# cscg
+import igraph
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib import cm
 
 from neuralplayground.config import PLOT_CONFIG
 from neuralplayground.utils import gaussian_function
@@ -404,3 +407,36 @@ def make_agent_comparison(
                     ax[3][i + k + m + 2].set_axis_off()
                     ax[4][i + k + m + 2].set_axis_off()
     return ax
+
+
+# CSCG: (FROM COLAB)
+def cscg_plot_graph(chmm, x, a, output_file, cmap=cm.Spectral, multiple_episodes=False, vertex_size=30):
+    states = chmm.decode(x, a)[1]
+
+    n_clones = chmm.n_clones
+
+    v = np.unique(states)
+    if multiple_episodes:
+        T = chmm.C[:, v][:, :, v][:-1, 1:, 1:]
+        v = v[1:]
+    else:
+        T = chmm.C[:, v][:, :, v]
+    A = T.sum(0)
+    A /= A.sum(1, keepdims=True)
+
+    g = igraph.Graph.Adjacency((A > 0).tolist())
+    node_labels = np.arange(x.max() + 1).repeat(n_clones)[v]
+    if multiple_episodes:
+        node_labels -= 1
+    colors = [cmap(nl)[:3] for nl in node_labels / node_labels.max()]
+    out = igraph.plot(
+        g,
+        output_file,
+        layout=g.layout("kamada_kawai"),
+        vertex_color=colors,
+        vertex_label=v,
+        vertex_size=vertex_size,
+        margin=50,
+    )
+
+    return out
