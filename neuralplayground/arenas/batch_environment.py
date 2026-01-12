@@ -194,7 +194,7 @@ class BatchEnvironment(Environment):
         # Iterate through each environment and plot its trajectory in a subplot
         for i, environment in enumerate(self.environments):
             axs[i] = environment.plot_trajectory(ax=axs[i])
-            axs[i].set_title(f"Environment {i+1}")
+            axs[i].set_title(f"Environment {i + 1}")
 
         # Adjust spacing between subplots
         plt.tight_layout()

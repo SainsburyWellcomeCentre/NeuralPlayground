@@ -7,15 +7,15 @@
 
 ## 1. Introduction
 
-This class provides functionality for displaying the results of experiments and summarizing metrics or collected data. 
+This class provides functionality for displaying the results of experiments and summarizing metrics or collected data.
 
 
 ## 2. Plotting Functions Implemented
 
   1. [make_plot_trajectories](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/style-guide/neuralplayground/plotting/plot_utils.py)
-      * Plots the position of an agent over time. 
+      * Plots the position of an agent over time.
   2. [make_plot_rate_map](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/style-guide/neuralplayground/plotting/plot_utils.py)
-      * Plots the number of spikes falling within each time bin during a recording session. 
+      * Plots the number of spikes falling within each time bin during a recording session.
   3. [render_pl_table](https://stackoverflow.com/questions/19726663/how-to-save-the-pandas-dataframe-series-data-as-a-figure)
       * Renders a Pandas Dataframe table as an image.
   4. [make_agent_comparison](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/style-guide/neuralplayground/plotting/plot_utils.py)

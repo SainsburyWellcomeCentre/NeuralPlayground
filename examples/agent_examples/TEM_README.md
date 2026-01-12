@@ -12,7 +12,7 @@ To run the TEM model, follow the steps below:
     ```
     conda activate NPG-env
     pip install torch tensorboard
-    ``` 
+    ```
 3. Open the running file ([running.py](../agent_examples/whittington_2020_run.py)) to set up basic model parameters and environment specifications. All TEM model parameters can be found and modified in the [whittington_2020_parameters.py](../../neuralplayground/agents/whittington_2020_extras/whittington_2020_parameters.py) file. Modifying both of these is discussed further below.
 4. Modify the parameters as desired, such as changing the shape or size of the environment and enabling the use of behavioral data.
 5. Run the model by executing the running file.
@@ -21,11 +21,11 @@ To run the TEM model, follow the steps below:
 
 - In order to generate the correct path for the saving of a trained TEM model, be sure to run the [whittington_2020_run.py](../agent_examples/whittington_2020_run.py) file from its location at `NeuralPlayground/examples/agent_examples/`.
 - Running the full TEM model may require significant computational resources and time.
-- Pretrained models are provided for convenience, allowing you to explore the results without training the model from scratch. 
-Pre-trained version of the model are hosted on a separate data repository on GIN. GIN offers an interface almost identical to GitHub. 
+- Pretrained models are provided for convenience, allowing you to explore the results without training the model from scratch.
+Pre-trained version of the model are hosted on a separate data repository on GIN. GIN offers an interface almost identical to GitHub.
 To contribute a new trainned model, you need to fork the repository and open a pull request, just like on GitHub.
-Place your model trained in a selected arena folder named as "author_date_in_arena", zip the folder, 
-and place "author_date_in_arena.zip" under the "data" directory of the Forked repository, for example,"data/smith_2023_in_Simple2D.zip". 
+Place your model trained in a selected arena folder named as "author_date_in_arena", zip the folder,
+and place "author_date_in_arena.zip" under the "data" directory of the Forked repository, for example,"data/smith_2023_in_Simple2D.zip".
 If you encounter any problems with this procedure, do not hesitate to contact us.
 
 ### Modifying Parameters

@@ -23,6 +23,7 @@
 # ==============================================================================
 
 """Grid score calculations."""
+
 from __future__ import absolute_import, division, print_function
 
 import copy
@@ -411,9 +412,7 @@ class GridScorer(object):
             theta = self.polar(peaks[:, 1], -peaks[:, 0], deg=1)[1]
             return np.sort(theta.compress(theta >= 0))[0]
 
-    def plot_sac(
-        self, sac, mask_params=None, ax=None, title=None, score="", *args, **kwargs
-    ):  # pylint: disable=keyword-arg-before-vararg
+    def plot_sac(self, sac, mask_params=None, ax=None, title=None, score="", *args, **kwargs):  # pylint: disable=keyword-arg-before-vararg
         """Plot spatial autocorrelogram.
         Parameters
 
