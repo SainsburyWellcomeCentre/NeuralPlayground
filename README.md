@@ -255,4 +255,3 @@ Before sending a pull request, make sure you have the done following:
 
 **All contributions to the repository are acknowledged through the all-contributors bot.**
 Refer to the README.md files found in each of the modules for further details on how to contribute to them.
-
