@@ -1,21 +1,7 @@
-[![License](https://img.shields.io/badge/License-MIT-orange.svg)](https://opensource.org/licenses/MIT)
-![CI](https://img.shields.io/github/actions/workflow/status/SainsburyWellcomeCentre/NeuralPlayground/test_and_deploy.yml?label=CI)
-[![codecov](https://codecov.io/gh/SainsburyWellcomeCentre/NeuralPlayground/branch/main/graph/badge.svg?token=P8CCH3TI8K)](https://codecov.io/gh/SainsburyWellcomeCentre/NeuralPlayground)
-[![Code style: Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/format.json)](https://github.com/astral-sh/ruff)
-[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
-<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-9-orange.svg?style=flat-square)](#contributors)
-<!-- ALL-CONTRIBUTORS-BADGE:END -->
-
-# NeuralPlayground
-
-
-## *A standardised environment for the hippocampus and entorhinal cortex models.* <a href="https://githubtocolab.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/colab_example.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
-
+# NeuralPlayground (anonymous version)
 
 
 <img src="../../images/NPG_GH-social-preview_white-bg.jpg" alt="NeuralPlayground Logo" width="500"/>
-
 
 <!-- TOC -->
 - [*A standardised environment for the hippocampus and entorhinal cortex models.* ](#a-standardised-environment-for-the-hippocampus-and-entorhinal-cortex-models-)
@@ -70,7 +56,7 @@ Altogether, we hope our framework, offers
 a foundation that the community will build upon, working toward a shared, standardized, open, and
 reproducible computational understanding of the hippocampus and entorhinal cortex.
 
-Try our short tutorial online in Colab. <a href="https://githubtocolab.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/colab_example.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
+Try our short tutorial online in Colab.
 
 ## Installation
 
@@ -99,7 +85,7 @@ pip install NeuralPlayground==0.0.5
 ```
 > **Note**
 >
-> If you wish to run our implementation of the Tolman-Eichenbaum machine, there are additional dependencies to install. These can be found in the [TEM_README.md](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples/agent_examples/TEM_README.md) file.
+> If you wish to run our implementation of the Tolman-Eichenbaum machine, there are additional dependencies to install.
 
 ### Install for development
 
@@ -124,7 +110,6 @@ so if you tell us what you would like to have, we might just implement it 😊.
 This open-source software was built to be collaborative and lasting. We hope that the framework will be simple
 enough to be adopted by a great number of neuroscientists, eventually guiding the path to the computational
 understanding of the HEC mechanisms. We follow reproducible, inclusive, and collaborative project design guidelines.
-All relevant documents can be found in [Documents](https://github.com/ClementineDomine/NeuralPlayground/blob/main/documents/).
 
 ### Agent Arena interaction
 You can pick an Agent and an Arena of your choice to run a simulation. Arenas and simulations have a simple interface to interact with each other as in [OpenAI gymnasium](https://gymnasium.farama.org/).
@@ -151,9 +136,6 @@ for j in range(iterations):
     update_output = agent.update()
 ```
 This process is the base of our package. We provide a more detailed example in <a href="https://githubtocolab.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/colab_example.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>.
-Also, specific examples of how to use each module can be found in [agent](https://github.com/ClementineDomine/NeuralPlayground/tree/main/examples/agent_examples),
-[arena](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/arena_examples/arena_examples.ipynb)
-and [experiment](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/experimental_examples/experimental_data_examples.ipynb) jupyter notebooks.
 > **Note**
 >
 > Check our Tolman-Eichenbaum Machine Implementation in
@@ -274,44 +256,3 @@ Before sending a pull request, make sure you have the done following:
 **All contributions to the repository are acknowledged through the all-contributors bot.**
 Refer to the README.md files found in each of the modules for further details on how to contribute to them.
 
-
-## Cite
-
-See [Citation](https://github.com/ClementineDomine/NeuralPlayground/blob/main/documents/citation.cff) for the correct citation of this framework.
-
-## License
-
-⚖️ [MIT](https://github.com/ClementineDomine/NeuralPlayground/blob/main/LICENSE)
-
-
-## Contributors
-
-Thanks go to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
-
-<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
-<!-- prettier-ignore-start -->
-<!-- markdownlint-disable -->
-<table>
-  <tbody>
-    <tr>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/ClementineDomine"><img src="https://avatars.githubusercontent.com/u/18595111?v=4?s=100" width="100px;" alt="Clementine Domine"/><br /><sub><b>Clementine Domine</b></sub></a><br /><a href="#design-ClementineDomine" title="Design">🎨</a> <a href="#mentoring-ClementineDomine" title="Mentoring">🧑‍🏫</a> <a href="https://github.com/SainsburyWellcomeCentre/NeuralPlayground/commits?author=ClementineDomine" title="Code">💻</a> <a href="#data-ClementineDomine" title="Data">🔣</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/rodrigcd"><img src="https://avatars.githubusercontent.com/u/22643681?v=4?s=100" width="100px;" alt="rodrigcd"/><br /><sub><b>rodrigcd</b></sub></a><br /><a href="#design-rodrigcd" title="Design">🎨</a> <a href="#mentoring-rodrigcd" title="Mentoring">🧑‍🏫</a> <a href="https://github.com/SainsburyWellcomeCentre/NeuralPlayground/commits?author=rodrigcd" title="Code">💻</a> <a href="#data-rodrigcd" title="Data">🔣</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/LukeHollingsworth"><img src="https://avatars.githubusercontent.com/u/93782020?v=4?s=100" width="100px;" alt="Luke Hollingsworth"/><br /><sub><b>Luke Hollingsworth</b></sub></a><br /><a href="https://github.com/SainsburyWellcomeCentre/NeuralPlayground/commits?author=LukeHollingsworth" title="Documentation">📖</a> <a href="https://github.com/SainsburyWellcomeCentre/NeuralPlayground/commits?author=LukeHollingsworth" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="http://saxelab.org"><img src="https://avatars.githubusercontent.com/u/4165949?v=4?s=100" width="100px;" alt="Andrew Saxe"/><br /><sub><b>Andrew Saxe</b></sub></a><br /><a href="#mentoring-asaxe" title="Mentoring">🧑‍🏫</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/DrCaswellBarry"><img src="https://avatars.githubusercontent.com/u/17472149?v=4?s=100" width="100px;" alt="DrCaswellBarry"/><br /><sub><b>DrCaswellBarry</b></sub></a><br /><a href="#mentoring-DrCaswellBarry" title="Mentoring">🧑‍🏫</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="http://nikosirmpilatze.com"><img src="https://avatars.githubusercontent.com/u/20923448?v=4?s=100" width="100px;" alt="Niko Sirmpilatze"/><br /><sub><b>Niko Sirmpilatze</b></sub></a><br /><a href="#infra-niksirbi" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#maintenance-niksirbi" title="Maintenance">🚧</a> <a href="#tool-niksirbi" title="Tools">🔧</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="http://adamltyson.com"><img src="https://avatars.githubusercontent.com/u/13147259?v=4?s=100" width="100px;" alt="Adam Tyson"/><br /><sub><b>Adam Tyson</b></sub></a><br /><a href="#maintenance-adamltyson" title="Maintenance">🚧</a> <a href="#infra-adamltyson" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
-    </tr>
-    <tr>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/rhayman"><img src="https://avatars.githubusercontent.com/u/5619644?v=4?s=100" width="100px;" alt="rhayman"/><br /><sub><b>rhayman</b></sub></a><br /><a href="https://github.com/SainsburyWellcomeCentre/NeuralPlayground/commits?author=rhayman" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/JarvisDevon"><img src="https://avatars.githubusercontent.com/u/30460455?v=4?s=100" width="100px;" alt="Devon Jarvis"/><br /><sub><b>Devon Jarvis</b></sub></a><br /><a href="https://github.com/SainsburyWellcomeCentre/NeuralPlayground/commits?author=JarvisDevon" title="Documentation">📖</a> <a href="https://github.com/SainsburyWellcomeCentre/NeuralPlayground/commits?author=JarvisDevon" title="Code">💻</a></td>
-    </tr>
-  </tbody>
-</table>
-
-<!-- markdownlint-restore -->
-<!-- prettier-ignore-end -->
-
-<!-- ALL-CONTRIBUTORS-LIST:END -->
-
-This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind are welcome!
