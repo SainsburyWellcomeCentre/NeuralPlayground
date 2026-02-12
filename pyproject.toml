@@ -1,8 +1,8 @@
 [project]
 name = "NeuralPlayground"
 authors = [
-  {name = "Clementine Domine"},
-  {name = "Rodrigo Carrasco-Davis", email = "rodrigo.carrasco.davis@gmail.com"},
+  {name = ""},
+  {name = ""},
 ]
 description = "The standardised environment for the hippocampus and entorhinal cortex models"
 readme = "README.md"
