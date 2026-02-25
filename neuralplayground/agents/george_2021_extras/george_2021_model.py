@@ -62,7 +62,6 @@ def datagen_structured_obs_room(
 
     count = 0
     while count < length - 1:
-
         act_list = [0, 1, 2, 3]  # 0: left, 1: right, 2: up, 3: down
         if (r, c) in no_left:
             act_list.remove(0)

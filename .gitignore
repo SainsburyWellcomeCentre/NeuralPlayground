@@ -75,3 +75,4 @@ george_test.ipynb
 *.sh
 *.err
 *.out
+run_george_test.py

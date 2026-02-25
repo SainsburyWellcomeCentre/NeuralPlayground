@@ -559,3 +559,5 @@ class GridScorer(object):
             ax.text(0, 0.7, "Grid_score: " + str(np.around(score[1]["gridscore"], decimals=4, out=None)), fontsize=10)
             ax.set_axis_off()
         return score
+
+    import numpy as np

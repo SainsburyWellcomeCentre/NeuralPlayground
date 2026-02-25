@@ -135,42 +135,39 @@ def process_training_hist(training_hist):
     return dict_training
 
 
-def cscg_training_loop(agent: AgentCore, env: Environment, n_steps: int):
-    """Default training loop for agents and environments that use a CSCG-based update.
-        Based on default_training_loop.
-
-    Parameters
-    ----------
-    agent : AgentCore
-        Agent to be trained.
-    env : Environment
-        Environment in which the agent is trained.
-    n_steps : int
-        Number of steps to train the agent for.
-
-    Returns
-    -------
-    agent : AgentCore
-        Trained agent.
-    env : Environment
-        Environment in which the agent was trained.
-    dict_training : dict
-        Dictionary containing the training history from the training loop and update method.
+def cscg_new_loop(agent, env, n_episodes, n_steps):
     """
-
-    obs, state = env.reset()
-    # logs agent intial true position
-    agent.pos_history.append(state)
-
+    Training loop specifically designed for CHMM/CSCG agents to handle
+    episode segmentation and avoid 'wormhole' transitions.
+    """
     training_hist = []
-    for j in range(round(n_steps)):
-        # Observe to choose an action
-        action = agent.act(obs)
-        # Run environment for given action
-        obs, state, reward = env.step(action)
-        update_output = agent.update()
-        training_hist.append(update_output)
+
+    for i in range(n_episodes):
+        obs, state = env.reset()
+        agent.new_episode()
+
+        # initial position
+        agent.current_episode["pos"].append(state)
         agent.pos_history.append(state)
+
+        for j in range(n_steps):
+            # Observe to choose an action
+            action = agent.act(obs)
+
+            # Run environment for given action
+            obs, state, reward = env.step(action)
+
+            print(f"Ep {i} | Step {j}: Action={action}, Resulting State={state}")
+
+            # Log
+            agent.current_episode["pos"].append(state)
+            agent.pos_history.append(state)
+
+            # Check batch size (set in simulation script) to accumulate episodes before update
+            update_output = agent.update()
+
+            if update_output is not None:
+                training_hist.append(update_output)
 
     dict_training = process_training_hist(training_hist)
     return agent, env, dict_training

@@ -57,6 +57,10 @@ class DiscreteObjectEnvironment(Environment):
         environment_name: str = "DiscreteObject",
         verbose: bool = False,
         experiment_class: str = None,
+        # cscg changes
+        custom_layout=None,  # custom room layout
+        random_shuffle=True,  # random shuffle optional between episodes
+        # one_hot_objects = True, #cscg needs integer observations (x)
         **env_kwargs,
     ):
         """
@@ -82,6 +86,7 @@ class DiscreteObjectEnvironment(Environment):
             recording_index=recording_index,
             verbose=verbose,
         )
+
         if self.use_behavioral_data:
             self.state_dims_labels = ["x_pos", "y_pos", "head_direction_x", "head_direction_y"]
             self.arena_limits = self.experiment.arena_limits
@@ -123,6 +128,14 @@ class DiscreteObjectEnvironment(Environment):
         self.hs = int(self.room_depth * self.state_density)
         self.n_states = self.resolution_w * self.resolution_d
         self.objects = np.empty(shape=(self.n_states, self.n_objects))
+        self.object_indices = np.zeros(self.n_states, dtype=int)  # Safe initialization
+
+        # cscg changes
+        self.custom_layout = custom_layout
+        self.random_shuffle = random_shuffle
+        # self.one_hot_objects = one_hot_objects
+
+        self.generate_objects()  # initilise objects immediately
 
     def reset(self, random_state=True, custom_state=None):
         """
@@ -164,7 +177,12 @@ class DiscreteObjectEnvironment(Environment):
             pos, head_dir = self.experiment.position[0, :], self.experiment.head_direction[0, :]
             custom_state = np.concatenate([pos, head_dir])
 
-        self.objects = self.generate_objects()
+        # cscg changes
+        # self.objects = self.generate_objects()
+
+        # only regenerates objects if random shuffle on (TEM)
+        if self.random_shuffle:
+            self.generate_objects()
 
         # Fully observable environment, make_observation returns the state
         observation = self.make_object_observation(pos)
@@ -221,6 +239,7 @@ class DiscreteObjectEnvironment(Environment):
                 new_pos_state = self.state[-1] + action_rev
             new_pos_state, valid_action = self.validate_action(self.state[-1], action_rev, new_pos_state[:2])
         reward = self.reward_function(action, self.state[-1])  # If you get reward, it should be coded here
+
         observation = self.make_object_observation(new_pos_state)
         self.state = observation
         self.transition = {
@@ -232,6 +251,7 @@ class DiscreteObjectEnvironment(Environment):
         }
         self.history.append(self.transition)
         self._increase_global_step()
+
         return observation, self.state, reward
 
     def generate_objects(self):
@@ -242,17 +262,29 @@ class DiscreteObjectEnvironment(Environment):
             objects: ndarray (n_states, n_objects)
                 Array of the objects in the environment, one-hot encoded
         """
-        poss_objects = np.zeros(shape=(self.n_objects, self.n_objects))
-        for i in range(self.n_objects):
-            for j in range(self.n_objects):
-                if j == i:
-                    poss_objects[i][j] = 1
-        # Generate landscape of objects in each environment
-        objects = np.zeros(shape=(self.n_states, self.n_objects))
-        for i in range(self.n_states):
-            rand = random.randint(0, self.n_objects - 1)
-            objects[i, :] = poss_objects[rand]
-        return objects
+        # cscg changes
+        if self.custom_layout is not None:
+            self.object_indices = self.custom_layout.flatten()
+            self.n_objects = self.object_indices.max() + 1
+            # generate vectors from indices
+            objects = np.eye(self.n_objects)[self.object_indices]
+            self.objects = objects
+            return objects
+
+        else:  # original method
+            poss_objects = np.zeros(shape=(self.n_objects, self.n_objects))
+            for i in range(self.n_objects):
+                for j in range(self.n_objects):
+                    if j == i:
+                        poss_objects[i][j] = 1
+            # Generate landscape of objects in each environment
+            objects = np.zeros(shape=(self.n_states, self.n_objects))
+
+            for i in range(self.n_states):
+                rand = random.randint(0, self.n_objects - 1)
+                objects[i, :] = poss_objects[rand]
+
+            return objects
 
     def make_object_observation(self, pos):
         """
@@ -268,7 +300,6 @@ class DiscreteObjectEnvironment(Environment):
         """
         index = self.pos_to_state(np.array(pos))
         object = self.objects[index]
-
         return [index, object, pos]
 
     def pos_to_state(self, pos):
