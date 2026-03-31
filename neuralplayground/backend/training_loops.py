@@ -92,8 +92,11 @@ def tem_training_loop(agent: AgentCore, env: Environment, n_episode: int, params
         Agent to be trained.
     env : Environment
         Environment in which the agent is trained.
-    n_steps : int
-        Number of steps to train the agent for.
+    n_episode : int
+        Number of episodes (outer loop iterations) to train for.
+    params : dict
+        Dictionary of TEM model parameters, e.g. ``params["n_rollout"]``
+        controls how many walk steps are collected before each update.
 
     Returns
     -------
@@ -101,9 +104,9 @@ def tem_training_loop(agent: AgentCore, env: Environment, n_episode: int, params
         Trained agent.
     env : Environment
         Environment in which the agent was trained.
-    dict_training : dict
-        Dictionary containing the training history from the training loop and update
-        method.
+    training_dict : list
+        List containing the agent kwargs, environment kwargs, and TEM
+        hyperparameters recorded at the end of training.
 
     """
     training_dict = [agent.mod_kwargs, env.env_kwargs, agent.tem.hyper]

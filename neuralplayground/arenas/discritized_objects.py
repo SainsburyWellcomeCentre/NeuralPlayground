@@ -219,14 +219,12 @@ class DiscreteObjectEnvironment(Environment):
 
         Returns
         -------
-        reward: float
-            The reward that the animal receives in this state
-        new_state: ndarray
-            Update the state with the updated vector of coordinate x and y of position
-            and head directions respectively
-        observation: ndarray
-            Array of the observation of the agent in the environment, in this case the
-            sensory object.
+        observation : ndarray
+            Sensory observation of the agent (object vector) at the new position.
+        new_state : ndarray
+            Updated state vector containing position coordinates and head direction.
+        reward : float
+            Reward received by the agent in the new state.
 
         """
         self.old_state = self.state.copy()

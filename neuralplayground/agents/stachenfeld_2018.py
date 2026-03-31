@@ -263,20 +263,18 @@ class Stachenfeld2018(AgentCore):
 
         Parameters
         ----------
-            state_density: float
-                density of SR-agent states (should be proportional to the step-size)
-            name_env: string
-                name of the environment to create
-                (There is only one environment type for now)
-                If a new state space type is added please update the action
-                function accordingly
-            plotting_variable: bool
-                If True: plots the normalised transition matrix
+        state_density : float
+            Density of SR-agent states (should be proportional to the step size).
+        name_env : str
+            Name of the environment type to create. Currently only ``'2D_env'``
+            is supported; add new types here if extending the state space.
+        plotting_variable : bool
+            If True, plot the normalised transition matrix.
 
         Returns
         -------
-            transmat_norm: array (n_state,n_state)
-                Normalised transition matrix
+        transmat_norm : np.ndarray of shape (n_state, n_state)
+            Normalised transition matrix.
 
         """
         if name_env == "2D_env":
@@ -448,10 +446,18 @@ class Stachenfeld2018(AgentCore):
 
         Parameters
         ----------
-        matrix: array
-            The matrix that will be plotted
-        save_path: string
-            Path to save the plot
+        T : array, optional
+            Transition matrix to plot alongside the environment's transition
+            matrix. If None, it is derived from ``self.srmat``.
+        save_path : str, optional
+            Path to save the figure. If None, the figure is not saved.
+        ax : mpl.axes.Axes, optional
+            Axes to plot into. If None, a new figure is created.
+
+        Returns
+        -------
+        ax : mpl.axes.Axes
+            Axes containing the plots.
 
         """
         if T is None:
@@ -486,6 +492,27 @@ class Stachenfeld2018(AgentCore):
         ax: mpl.axes.Axes = None,
         save_path: str = None,
     ):
+        """Plot the successor-representation rate map(s) for given eigenvectors.
+
+        Parameters
+        ----------
+        sr_matrix : np.ndarray, optional
+            Successor-representation matrix to use. If None, the stored SR
+            solution is used.
+        eigen_vectors : int or list or tuple, optional
+            Index (or indices) of the eigenvector(s) to plot. If None, a
+            random index between 5 and 19 is chosen.
+        ax : mpl.axes.Axes or array of Axes, optional
+            Axes to plot into. Created automatically if None.
+        save_path : str, optional
+            Path to save the figure. Figure is not saved if None.
+
+        Returns
+        -------
+        ax : mpl.axes.Axes or array of Axes
+            Axes containing the rate-map plot(s).
+
+        """
         if eigen_vectors is None:
             eigen_vectors = random.randint(5, 19)
 

@@ -149,12 +149,12 @@ class Whittington2020(AgentCore):
 
         Parameters
         ----------
-        positions: array (16,2)
-            Observation from the environment class needed to choose the right action
-            (Here the position).
-        policy_func: function
-            Inherited from AgentCore, not used in this model, to change the policy
-            modify action_policy method.
+        observation : array-like
+            Observation from the environment (e.g. position) used to decide
+            the next action.
+        policy_func : callable, optional
+            Inherited from AgentCore; not used in this model. To change the
+            policy, override ``action_policy`` instead.
 
         Returns
         -------
@@ -461,15 +461,14 @@ class Whittington2020(AgentCore):
 
         Parameters
         ----------
-        state_diff: int
-            The difference between the state indices.
-        environment_width: int
-            The width of the environment (number of states per row).
+        state_diffs : list of int, length batch_size
+            Difference between consecutive state indices for each environment
+            in the batch.
 
         Returns
         -------
-        action: str
-            The inferred action ('N', 'S', 'W', or 'E') based on the state difference.
+        actions : list of list of int, shape (batch_size, 2)
+            Inferred [dx, dy] action vectors for each environment.
 
         """
         actions = []
@@ -608,5 +607,23 @@ class Whittington2020(AgentCore):
         return figs, axes
 
     def get_rate_map_matrix(self, rate_maps, i, j):
+        """Return a 2-D rate-map matrix for a single cell and environment.
+
+        Parameters
+        ----------
+        rate_maps : list
+            Nested list of rate maps as returned by the model, indexed
+            ``[frequency][env_idx][cell_idx]``.
+        i : int
+            Environment index within ``rate_maps[0]``.
+        j : int
+            Cell index within the transposed rate-map array.
+
+        Returns
+        -------
+        rate_map : np.ndarray of shape (room_width, room_depth)
+            2-D rate-map for cell ``j`` in environment ``i``.
+
+        """
         rate_map = np.asarray(rate_maps[0][i]).T[j]
         return np.reshape(rate_map, (self.room_widths[0], self.room_depths[0]))

@@ -40,14 +40,12 @@ class GridScorer(object):
     """Class for scoring ratemaps given trajectories."""
 
     def __init__(self, nbins):
-        """Scoring ratemaps given trajectories.
+        """Score ratemaps given trajectories.
 
-        Args:
-          nbins: Number of bins per dimension in the ratemap.
-          coords_range: Environment coordinates range.
-          mask_parameters: parameters for the masks that analyze the angular
-            autocorrelation of the 2D autocorrelation.
-          min_max: Correction.
+        Parameters
+        ----------
+        nbins : int
+            Number of bins per dimension in the ratemap.
 
         """
         self._nbins = nbins

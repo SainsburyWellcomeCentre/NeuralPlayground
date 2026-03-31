@@ -380,10 +380,16 @@ class Weber2018(RatMovementAgent):
         Parameters
         ----------
         exc_normalization : bool
-            True if excitatory weights are normalized after each update
-        pos : float
-            Run update for a given position. Defaults to None, then it is replaced with
-            the last position in obs_history
+            If True, excitatory weights are L2-normalised after each update.
+        pos : np.ndarray, optional
+            Position at which to evaluate the update. Defaults to None, in
+            which case the last entry in ``obs_history`` is used.
+
+        Returns
+        -------
+        dict or None
+            Dictionary with keys ``'delta_we'`` and ``'delta_wi'`` containing
+            the weight updates, or None if ``pos`` is empty.
 
         """
         if pos is None:
@@ -482,16 +488,19 @@ class Weber2018(RatMovementAgent):
         return r_out_im
 
     def plot_rate_map(self, save_path: str = None, ax: mpl.axes.Axes = None):
-        """Plot current rates and an example of inhibitory and excitatory
-        neuron.
+        """Plot the output-cell rate map.
 
         Parameters
         ----------
-        save_path : str
-            Path to save the figure. Default None, it doesn't save the figure
-        ax : ndarray of matplotlib.axis
-            (3,) with 3 axis to make plots from matplotlib, if None it will create an
-            entire figure
+        save_path : str, optional
+            Path to save the figure. Figure is not saved if None.
+        ax : mpl.axes.Axes, optional
+            Single axes object to plot into. Created automatically if None.
+
+        Returns
+        -------
+        ax : mpl.axes.Axes or None
+            Axes with the rate-map plot, or None if ``save_path`` was given.
 
         """
         if ax is None:
@@ -507,16 +516,21 @@ class Weber2018(RatMovementAgent):
             return ax
 
     def plot_all_rates(self, save_path: str = None, ax: mpl.axes.Axes = None):
-        """Plot current rates and an example of inhibitory and excitatory
-        neuron.
+        """Plot excitatory, inhibitory and output rate maps side by side.
 
         Parameters
         ----------
-        save_path : str
-            Path to save the figure. Default None, it doesn't save the figure
-        ax : ndarray of matplotlib.axis
-            (3,) with 3 axis to make plots from matplotlib, if None it will create an
-            entire figure
+        save_path : str, optional
+            Path to save the figure. Figure is not saved if None.
+        ax : np.ndarray of mpl.axes.Axes, shape (3,), optional
+            Three axes to plot into (excitatory, inhibitory, output).
+            Created automatically in a 1×3 figure if None.
+
+        Returns
+        -------
+        ax : np.ndarray of mpl.axes.Axes or None
+            Axes with the three rate-map plots, or None if ``save_path`` was
+            given.
 
         """
         if ax is None:

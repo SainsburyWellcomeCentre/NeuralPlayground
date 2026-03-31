@@ -75,20 +75,18 @@ class AgentCore(object):
         self.global_steps = 0
 
     def act(self, obs):
-        """The base model executes a random action from a normal distribution.
+        """Execute a random action drawn from a normal distribution.
 
         Parameters
         ----------
-        obs
-            Observation from the environment class needed to choose the right action
-        policy_func
-            Arbitrary function that represents a custom policy that receives an
-            observation and gives an action
+        obs : array-like
+            Observation from the environment class needed to choose the right action.
 
         Returns
         -------
-        action: np.array(dtype=float)
-            action value which in this case is random number draw from a 2D-Gaussian
+        action : np.ndarray of shape (2,)
+            Action value drawn from a 2D Gaussian centred at zero with std
+            ``agent_step_size``.
 
         """
         if len(obs) == 0:
@@ -151,9 +149,7 @@ class AgentCore(object):
             return False
 
     def get_ratemap_matrix(self):
-        """Function that returns some representation that will be compared
-        against real experimental data.
-        """
+        """Return a representation to be compared against experimental data."""
         pass
 
 
@@ -212,18 +208,22 @@ class LevyFlightAgent(RandomAgent):
 
         Parameters
         ----------
-        alpha, beta: float
-            Levy flight distribution parameters
-        loc: float
-            bias of the standardized form
-        scale: float
-            scaling of the standardized form
-        step_size: float
-            direction scaling
-        max_action_size: float
-            maximum size of sampled step from levy distribution
-        max_step_size: float
-            maximum step size when multiplying max_action_size and step_size
+        agent_name : str
+            Name of the agent instance.
+        alpha : float
+            Stability index of the Lévy distribution.
+        beta : float
+            Skewness parameter of the Lévy distribution.
+        loc : float
+            Location parameter (shift) of the standardised form.
+        scale : float
+            Scale parameter of the standardised form.
+        agent_step_size : float
+            Multiplier applied to the sampled direction vector.
+        max_action_size : float
+            Maximum step magnitude sampled from the Lévy distribution.
+        max_step_size : float
+            Maximum allowed action magnitude; larger steps are subdivided.
 
         """
         super().__init__(
@@ -327,24 +327,29 @@ class RatMovementAgent(RandomAgent):
 
         Parameters
         ----------
-        room_width: float
-            Width of the room
-        room_depth: float
-            Depth of the room
-        step_size: float
-            Size of forward velocity
-        auto_scale: bool
-            If True, the parameters are scaled to the room size
-        forward_velocity: float
-            Forward velocity
-        turn_angle_bias: float
-            Turn angle bias
-        turn_angle_stdev: float
-            Turn angle standard deviation
-        border_region: float
-            Border region
-        time_step_size: float
-            Time step size
+        room_width : float
+            Width of the room.
+        room_depth : float
+            Depth of the room.
+        agent_name : str
+            Name of the agent instance.
+        agent_step_size : float
+            Multiplier applied to the trajectory generator's forward velocity.
+        auto_scale : bool
+            If True, trajectory parameters are scaled to the room dimensions.
+        forward_velocity : float, optional
+            Forward velocity of the agent; defaults to the generator's default.
+        turn_angle_bias : float, optional
+            Mean turning angle bias; defaults to the generator's default.
+        turn_angle_stdev : float, optional
+            Standard deviation of the turning angle; defaults to the
+            generator's default.
+        border_region : float, optional
+            Width of the wall-repulsion border region; defaults to the
+            generator's default.
+        time_step_size : float, optional
+            Duration of a single time step in seconds; defaults to the
+            generator's default.
 
         """
         super().__init__(
