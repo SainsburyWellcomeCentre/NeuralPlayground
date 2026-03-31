@@ -3,7 +3,8 @@ from neuralplayground.arenas import Environment
 
 
 def default_training_loop(agent: AgentCore, env: Environment, n_steps: int):
-    """Default training loop for agents and environments that use a step-based update.
+    """Default training loop for agents and environments that use a step-based
+    update.
 
     Parameters
     ----------
@@ -21,9 +22,10 @@ def default_training_loop(agent: AgentCore, env: Environment, n_steps: int):
     env : Environment
         Environment in which the agent was trained.
     dict_training : dict
-        Dictionary containing the training history from the training loop and update method.
-    """
+        Dictionary containing the training history from the training loop and update
+        method.
 
+    """
     obs, state = env.reset()
     training_hist = []
     obs = obs[:2]
@@ -39,8 +41,11 @@ def default_training_loop(agent: AgentCore, env: Environment, n_steps: int):
     return agent, env, dict_training
 
 
-def episode_based_training_loop(agent: AgentCore, env: Environment, t_episode: int, n_episode: int):
-    """Training loop for agents and environments that use an episode-based update.
+def episode_based_training_loop(
+    agent: AgentCore, env: Environment, t_episode: int, n_episode: int
+):
+    """Training loop for agents and environments that use an episode-based
+    update.
 
     Parameters
     ----------
@@ -60,9 +65,10 @@ def episode_based_training_loop(agent: AgentCore, env: Environment, t_episode: i
     env : Environment
         Environment in which the agent was trained.
     dict_training : dict
-        Dictionary containing the training history from the training loop and update method.
-    """
+        Dictionary containing the training history from the training loop and update
+        method.
 
+    """
     obs, state = env.reset()
     obs = obs[:2]
     training_hist = []
@@ -96,7 +102,9 @@ def tem_training_loop(agent: AgentCore, env: Environment, n_episode: int, params
     env : Environment
         Environment in which the agent was trained.
     dict_training : dict
-        Dictionary containing the training history from the training loop and update method.
+        Dictionary containing the training history from the training loop and update
+        method.
+
     """
     training_dict = [agent.mod_kwargs, env.env_kwargs, agent.tem.hyper]
     obs, state = env.reset(random_state=True, custom_state=None)
@@ -114,15 +122,17 @@ def process_training_hist(training_hist):
     Parameters
     ----------
     training_hist : list
-        List of dictionaries containing the training history from the training loop and update method.
+        List of dictionaries containing the training history from the training loop and
+        update method.
 
     Returns
     -------
     dict_training : dict
-        Dictionary containing the one list per key in the training_hist. The list contains the values for
+        Dictionary containing the one list per key in the training_hist. The list
+        contains the values for
         that key for each step in the training loop.
-    """
 
+    """
     dict_training = {}
     if training_hist[0] is None:
         dict_training = None

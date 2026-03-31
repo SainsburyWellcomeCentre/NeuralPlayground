@@ -1,9 +1,10 @@
-"""
-Implementation for 2017 by Kimberly L. Stachenfeld1,2,*, Matthew M. Botvinick1,3, and Samuel J. Gershman
+"""Implementation for 2017 by Kimberly L. Stachenfeld1,2,*, Matthew M.
+Botvinick1,3,and Samuel J. Gershman
 The hippocampus as a predictive map
 https://doi.org/10.1101/097170;
 
-This implementation can interact with environments from the package as shown in the examples jupyter notebook.
+This implementation can interact with environments from the package as shown in the
+examples jupyter notebook.
 Check examples/Stachenfeld_2018_example.ipynb
 """
 
@@ -23,16 +24,18 @@ sys.path.append("../")
 
 
 class Stachenfeld2018(AgentCore):
-    """
-    Implementation for SR 2017 by Kimberly L. Stachenfeld1,2,*, Matthew M. Botvinick1,3, and Samuel J. Gershman4
+    """Implementation for SR 2017 by Kimberly L. Stachenfeld1,2,*, Matthew M.
+    Botvinick1,3, and Samuel J. Gershman4
     The hippocampus as a predictive map
     https://doi.org/10.1101/097170;
 
-    This implementation can interact with environments from the package as shown in the examples jupyter notebook.
+    This implementation can interact with environments from the package as shown in
+    the examples jupyter notebook.
     Check examples/SRexample.ipynb
     ----
+
     Attributes
-    ---------
+    ----------
      mod_kwargs : dict
         Model parameters
         gamma: scalar,
@@ -44,26 +47,33 @@ class Stachenfeld2018(AgentCore):
         transmat: (n_state, n_state)
             numpy array, transition matrix
         room_width: float
-                    room width specified by the environment (see examples/examples/SRexample.ipynb)
+                    room width specified by the environment
+                    (see examples/examples/SRexample.ipynb)
         room_depth: float
-                    room depth specified by the environment (see examples/examples/SRexample.ipynb)
+                    room depth specified by the environment
+                    (see examples/examples/SRexample.ipynb)
         state_density: float
             density of SR-agent states (should be proportional to the step-size)
         twoD: bool
-                When true creates a (n_state, n_state) transition array for a rectangular 2D state space.
+                When true creates a (n_state, n_state) transition array for a
+                rectangular 2D state space.
 
 
     Methods
-    ---------
+    -------
     reset(self):
-        Initialize the successor matrices, normalized transition matrix and observation variables ( history and initialisation)
+        Initialize the successor matrices, normalized transition matrix and observation
+        variables ( history and initialisation)
     obs_to_state(self, pos):
-        Converts the agent's position in the environment to the agent's position in the SR-agent state space.
+        Converts the agent's position in the environment to the agent's position in the
+        SR-agent state space.
     act: float
-        The base model executes one of four action (up-down-right-left) with equal probability.
-        This is used to move on the rectangular environment states space (transmat).
+        The base model executes one of four action (up-down-right-left) with equal
+        probability.This is used to move on the rectangular environment states space
+         (transmat).
     get_T_from_M(self, M):
-        Compute the transition matrix from the computationally simulated successor representation matrix M
+        Compute the transition matrix from the computationally simulated successor
+        representation matrix M
     create_transmat(self, state_density, name_env, plotting_varible=True):
         Creates the normalised transition matrix for a rectangular environment '2D_env'
     update_successor_rep(self):
@@ -73,12 +83,14 @@ class Stachenfeld2018(AgentCore):
     update_successor_rep_td_full(self):
         Compute the successor representation matrix using TD learning
     update(self):
-        Compute the successor representation matrix using TD learning while interacting with the environement
+        Compute the successor representation matrix using TD learning while interacting
+        with the environement
     plot_transition(self, matrix, save_path=None, ax=None):
         Plot the input matrix and compare it to the transition matrix from the
         rectangular environment states space (rectangular- transmat).
     plot_eigen(self,matrix, save_path, ax=None):
         Plot the matrix and the 4 largest modes of its eigen-decomposition
+
     """
 
     def __init__(
@@ -94,8 +106,7 @@ class Stachenfeld2018(AgentCore):
         obs_hist_length: int = 1000,
         **mod_kwargs,
     ):
-        """
-        Parameters
+        """Parameters
         ----------
         agent_name : str
             Name of the specific instantiation of the ExcInhPlasticity class
@@ -107,15 +118,21 @@ class Stachenfeld2018(AgentCore):
             threshold: scalar,
                upper bound for the update size
             twoD: bool
-                When true creates a (n_state, n_state) transition array for a rectangular 2D state space.
+                When true creates a (n_state, n_state) transition array for a
+                rectangular 2D state space.
             room_width: float
-                room width specified by the environment (see examples/examples/SRexample.ipynb)
+                room width specified by the environment
+                (see examples/examples/SRexample.ipynb)
             room_depth: float
-                room depth specified by the environment (see examples/examples/SRexample.ipynb)
+                room depth specified by the environment
+                (see examples/examples/SRexample.ipynb)
             state_density: float
                 density of SR-agent states (should be proportional to the step-size)
+
         """
-        super().__init__(agent_name=agent_name, obs_hist_length=obs_hist_length, **mod_kwargs)
+        super().__init__(
+            agent_name=agent_name, obs_hist_length=obs_hist_length, **mod_kwargs
+        )
         self.metadata = {"mod_kwargs": mod_kwargs}
         self.obs_history = []  # Initialize observation history to update weights later
         self.grad_history = []
@@ -132,8 +149,12 @@ class Stachenfeld2018(AgentCore):
         # Variables for the SR-agent state space
         self.resolution_depth = int(self.state_density * self.room_depth)
         self.resolution_width = int(self.state_density * self.room_width)
-        self.x_array = np.linspace(-self.room_width / 2, self.room_width / 2, num=self.resolution_width)
-        self.y_array = np.linspace(self.room_depth / 2, -self.room_depth / 2, num=self.resolution_depth)
+        self.x_array = np.linspace(
+            -self.room_width / 2, self.room_width / 2, num=self.resolution_width
+        )
+        self.y_array = np.linspace(
+            self.room_depth / 2, -self.room_depth / 2, num=self.resolution_depth
+        )
         self.mesh = np.array(np.meshgrid(self.x_array, self.y_array))
         self.xy_combinations = self.mesh.T.reshape(-1, 2)
         self.width = int(self.room_width * self.state_density)
@@ -144,10 +165,9 @@ class Stachenfeld2018(AgentCore):
             self.create_transmat(self.state_density, "2D_env")
 
     def reset(self):
+        """Initialize the successor matrices, normalized transition matrix and
+        observation variables (history and initialisation)
         """
-        Initialize the successor matrices, normalized transition matrix and observation variables (history and initialisation)
-        """
-
         self.srmat = []
         self.srmat_sum = []
         self.srmat_ground = []
@@ -157,8 +177,8 @@ class Stachenfeld2018(AgentCore):
         self.obs_history = []  # Reset observation history
 
     def obs_to_state(self, pos: np.ndarray):
-        """
-        Converts the agent's position in the environment to the agent's position in the SR-agent state space.
+        """Converts the agent's position in the environment to the agent's
+        position in the SR-agent state space.
 
         Parameters
         ----------
@@ -170,7 +190,6 @@ class Stachenfeld2018(AgentCore):
         curr_state: int
             integer corresponding to the position in the SR-agent state space
 
-
         """
         np.arange(self.n_state).reshape(self.depth, self.width)
 
@@ -181,18 +200,22 @@ class Stachenfeld2018(AgentCore):
         return curr_state
 
     def act(self, obs):
-        """
-        The base model executes one of four action (up-down-right-left) with equal probability.
-        This is used to move on the rectangular environment states space (transmat).
+        """The base model executes one of four action (up-down-right-left) with
+        equal probability. This is used to move on the rectangular environment
+        states space (transmat).
+
         Parameters
         ----------
         obs: array (2,1)
-            Observation from the environment class needed to choose the right action (Here the position).
+            Observation from the environment class needed to choose the right action
+            (Here the position).
+
         Returns
         -------
         action : array (2,1)
             Action value (Direction of the agent step) in this case executes one of
             four action (up-down-right-left) with equal probability.
+
         """
         self.obs_history.append(obs)
         if len(self.obs_history) >= self.obs_hist_length:
@@ -215,8 +238,9 @@ class Stachenfeld2018(AgentCore):
         return action
 
     def get_T_from_M(self, M: np.ndarray):
-        """
-        Compute the transition matrix from the computationally simulated successor matrix M
+        """Compute the transition matrix from the computationally simulated
+        successor matrix M.
+
         Parameters
         ----------
         M: array (n_state,n_state)
@@ -226,30 +250,35 @@ class Stachenfeld2018(AgentCore):
         -------
         T: array (n_state,n_state)
              The computed transition matrix from the successor representation matrix M
+
         """
         T = (1 / self.gamma) * np.linalg.inv(M) @ (M - np.eye(self.n_state))
         return T
 
-    def create_transmat(self, state_density: float, name_env: str, plotting_variable: bool = False):
-        """
-        Creates the normalised transition matrix for a rectangular environment '2D_env'
+    def create_transmat(
+        self, state_density: float, name_env: str, plotting_variable: bool = False
+    ):
+        """Creates the normalised transition matrix for a rectangular
+        environment '2D_env'.
 
         Parameters
         ----------
             state_density: float
                 density of SR-agent states (should be proportional to the step-size)
             name_env: string
-                name of the environment to create ( There is only one environment type for now)
-                If a new state space type is added please update the action function accordingly
+                name of the environment to create
+                (There is only one environment type for now)
+                If a new state space type is added please update the action
+                function accordingly
             plotting_variable: bool
                 If True: plots the normalised transition matrix
-        Returns:
+
+        Returns
         -------
             transmat_norm: array (n_state,n_state)
                 Normalised transition matrix
 
         """
-
         if name_env == "2D_env":
             adjmat_triu = np.zeros((self.n_state, self.n_state))
             node_layout = np.arange(self.n_state).reshape(self.depth, self.width)
@@ -287,32 +316,37 @@ class Stachenfeld2018(AgentCore):
         return self.transmat_norm
 
     def successor_rep_solution(self):
-        """
-        Compute closed form solution of successor representation matrix using geometric sums.
+        """Compute closed form solution of successor representation matrix
+        using geometric sums.
 
-        Returns:
+        Returns
         -------
             srmat_ground: (n_state, n_state) numpy array,
                 Successor representation matrix
+
         """
         transmat_type = np.array(self.transmat_norm, dtype=np.float64)
 
-        self.srmat_ground = np.linalg.inv(np.eye(self.n_state) - self.gamma * transmat_type)
+        self.srmat_ground = np.linalg.inv(
+            np.eye(self.n_state) - self.gamma * transmat_type
+        )
         return self.srmat_ground
 
     def successor_rep_sum(self):
-        """
-        Compute the successor representation using successive additive update
+        """Compute the successor representation using successive additive
+        update.
 
-        Returns:
+        Returns
         -------
             srmat_sum: (n_state, n_state) numpy array, successor representation matrix
-        """
 
+        """
         self.srmat_sum = np.zeros_like(self.transmat_norm)
         keep_going = True
         while keep_going:
-            new_srmat = self.gamma * self.transmat_norm.dot(self.srmat_sum) + np.eye(self.n_state)
+            new_srmat = self.gamma * self.transmat_norm.dot(self.srmat_sum) + np.eye(
+                self.n_state
+            )
             update = new_srmat - self.srmat_sum
             self.srmat_sum = new_srmat
             if np.max(np.abs(update)) < self.threshold:
@@ -321,14 +355,14 @@ class Stachenfeld2018(AgentCore):
         return self.srmat_sum
 
     def update(self):
-        """
-        Compute the successor representation matrix using TD learning while interacting with the environment
+        """Compute the successor representation matrix using TD learning while
+        interacting with the environment.
 
-        Returns:
+        Returns
         -------
             srmat: (n_state, n_state) successor representation matrix
-        """
 
+        """
         if hasattr(self, "next_state"):
             if self.initial_obs_variable is None:
                 self.curr_state = self.next_state
@@ -341,19 +375,24 @@ class Stachenfeld2018(AgentCore):
             L = b.reshape(a.shape + (self.n_state,))
             curr_state_vec = L
 
-            td_error = curr_state_vec + self.gamma * self.srmat[:, next_state] - self.srmat[:, self.curr_state]
-            self.srmat[:, self.curr_state] = self.srmat[:, self.curr_state] + self.learning_rate * td_error
+            td_error = (
+                curr_state_vec
+                + self.gamma * self.srmat[:, next_state]
+                - self.srmat[:, self.curr_state]
+            )
+            self.srmat[:, self.curr_state] = (
+                self.srmat[:, self.curr_state] + self.learning_rate * td_error
+            )
 
             self.grad_history.append(np.sqrt(np.sum(td_error**2)))
             self.curr_state = next_state
             return {"state_td_error": td_error}
 
     def update_successor_rep_td_full(self, n_episode: int = 100, t_episode: int = 100):
-        """
-        Compute the successor representation matrix using TD learning
+        """Compute the successor representation matrix using TD learning.
 
-        Returns:
-        ----------
+        Returns
+        -------
             srmat_full: (n_state, n_state)
                 successor representation matrix
 
@@ -371,10 +410,16 @@ class Stachenfeld2018(AgentCore):
                 L = b.reshape(a.shape + (self.n_state,))
                 curr_state_vec = L
                 random_state.multinomial(1, self.transmat_norm[curr_state, :])
-                next_state = np.where(random_state.multinomial(1, self.transmat_norm[curr_state, :]))[0][0]
+                next_state = np.where(
+                    random_state.multinomial(1, self.transmat_norm[curr_state, :])
+                )[0][0]
 
-                srmat_full[:, curr_state] = srmat_full[:, curr_state] + self.learning_rate * (
-                    curr_state_vec + self.gamma * srmat_full[:, next_state] - srmat_full[:, curr_state]
+                srmat_full[:, curr_state] = srmat_full[
+                    :, curr_state
+                ] + self.learning_rate * (
+                    curr_state_vec
+                    + self.gamma * srmat_full[:, next_state]
+                    - srmat_full[:, curr_state]
                 )
                 curr_state = next_state
                 t_elapsed += 1
@@ -389,27 +434,46 @@ class Stachenfeld2018(AgentCore):
         if sr_matrix is None:
             sr_matrix = self.successor_rep_solution()
         evals, evecs = np.linalg.eig(sr_matrix)
-        r_out_im = evecs[:, eigen_vector].reshape((self.resolution_width, self.resolution_depth)).real
+        r_out_im = (
+            evecs[:, eigen_vector]
+            .reshape((self.resolution_width, self.resolution_depth))
+            .real
+        )
         return r_out_im
 
     def plot_transition(self, T=None, save_path: str = None, ax: mpl.axes.Axes = None):
-        """
-        Plot the input matrix and compare it to the transition matrix from the rectangular
-        environment states space (rectangular- transmat).
-        (If a new state space type is added please update this function)
+        """Plot the input matrix and compare it to the transition matrix from
+        the rectangular environment states space (rectangular- transmat). (If a
+        new state space type is added please update this function)
+
         Parameters
         ----------
         matrix: array
             The matrix that will be plotted
         save_path: string
             Path to save the plot
+
         """
         if T is None:
             T = self.get_T_from_M(self.srmat)
         if ax is None:
             f, ax = plt.subplots(1, 2, figsize=(14, 5))
-            make_plot_rate_map(self.transmat_norm, ax[0], "Transition matrix", "states", "states", "State occupency")
-            make_plot_rate_map(T, ax[1], "Transition calculated from SR matrix", "states", "states", "State occupency")
+            make_plot_rate_map(
+                self.transmat_norm,
+                ax[0],
+                "Transition matrix",
+                "states",
+                "states",
+                "State occupency",
+            )
+            make_plot_rate_map(
+                T,
+                ax[1],
+                "Transition calculated from SR matrix",
+                "states",
+                "states",
+                "State occupency",
+            )
         if save_path is not None:
             plt.savefig(save_path, bbox_inches="tight")
             plt.close("all")
@@ -426,21 +490,39 @@ class Stachenfeld2018(AgentCore):
             eigen_vectors = random.randint(5, 19)
 
         if isinstance(eigen_vectors, int):
-            rate_map_mat = self.get_rate_map_matrix(sr_matrix, eigen_vector=eigen_vectors)
+            rate_map_mat = self.get_rate_map_matrix(
+                sr_matrix, eigen_vector=eigen_vectors
+            )
 
             if ax is None:
                 f, ax = plt.subplots(1, 1, figsize=(4, 5))
-            make_plot_rate_map(rate_map_mat, ax, "Rate map: Eig" + str(eigen_vectors), "width", "depth", "Firing rate")
+            make_plot_rate_map(
+                rate_map_mat,
+                ax,
+                "Rate map: Eig" + str(eigen_vectors),
+                "width",
+                "depth",
+                "Firing rate",
+            )
         else:
             if ax is None:
-                f, ax = plt.subplots(1, len(eigen_vectors), figsize=(4 * len(eigen_vectors), 5))
+                f, ax = plt.subplots(
+                    1, len(eigen_vectors), figsize=(4 * len(eigen_vectors), 5)
+                )
             if isinstance(ax, mpl.axes.Axes):
                 ax = [
                     ax,
                 ]
             for i, eig in enumerate(eigen_vectors):
                 rate_map_mat = self.get_rate_map_matrix(sr_matrix, eigen_vector=eig)
-                make_plot_rate_map(rate_map_mat, ax[i], "Rate map: " + "Eig" + str(eig), "width", "depth", "Firing rate")
+                make_plot_rate_map(
+                    rate_map_mat,
+                    ax[i],
+                    "Rate map: " + "Eig" + str(eig),
+                    "width",
+                    "depth",
+                    "Firing rate",
+                )
         if save_path is None:
             pass
         else:

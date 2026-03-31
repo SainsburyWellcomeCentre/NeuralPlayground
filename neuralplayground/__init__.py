@@ -2,7 +2,6 @@ name = "neuralplayground"
 import os
 import glob
 
-
 dir_files = glob.glob("./*")
 for files in dir_files:
     if files == "./config_params.yaml":

@@ -1,6 +1,9 @@
-"""
-This file runs a training simulation for the Whittington et al. 2020 agent, the Tolman-Eichenbaum Machine (TEM).
-The TEM is a model of the hippocampus that learns to navigate a series of environments and solve a series of tasks.
+"""Training simulation for the Whittington et al.
+
+2020 agent, the Tolman-Eichenbaum Machine (TEM). The TEM is a model of
+the hippocampus that learns to navigate a series of environments and
+solve a series of tasks.
+
 """
 
 import os
@@ -8,7 +11,9 @@ import os
 import numpy as np
 
 from neuralplayground.agents.whittington_2020 import Whittington2020
-from neuralplayground.agents.whittington_2020_extras import whittington_2020_parameters as parameters
+from neuralplayground.agents.whittington_2020_extras import (
+    whittington_2020_parameters as parameters,
+)
 from neuralplayground.arenas import BatchEnvironment, DiscreteObjectEnvironment
 from neuralplayground.backend import SingleSim, tem_training_loop
 from neuralplayground.experiments import Sargolini2006Data
@@ -87,7 +92,8 @@ agent_params = {
     "batch_size": env_params["batch_size"],
     "room_widths": room_widths,
     "room_depths": room_depths,
-    "state_densities": [discrete_env_params["state_density"]] * env_params["batch_size"],
+    "state_densities": [discrete_env_params["state_density"]]
+    * env_params["batch_size"],
     "use_behavioural_data": False,
 }
 

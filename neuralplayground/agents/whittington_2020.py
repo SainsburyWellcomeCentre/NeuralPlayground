@@ -9,10 +9,18 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch
 
-import neuralplayground.agents.whittington_2020_extras.whittington_2020_analyse as analyse
-import neuralplayground.agents.whittington_2020_extras.whittington_2020_model as model
-import neuralplayground.agents.whittington_2020_extras.whittington_2020_parameters as parameters
-import neuralplayground.agents.whittington_2020_extras.whittington_2020_utils as utils
+from neuralplayground.agents.whittington_2020_extras import (
+    whittington_2020_analyse as analyse,
+)
+from neuralplayground.agents.whittington_2020_extras import (
+    whittington_2020_model as model,
+)
+from neuralplayground.agents.whittington_2020_extras import (
+    whittington_2020_parameters as parameters,
+)
+from neuralplayground.agents.whittington_2020_extras import (
+    whittington_2020_utils as utils,
+)
 
 # Custom modules
 from neuralplayground.plotting.plot_utils import make_plot_rate_map
@@ -23,35 +31,42 @@ sys.path.append("../")
 
 
 class Whittington2020(AgentCore):
-    """
-    Implementation of TEM 2020 by James C.R. Whittington, Timothy H. Muller, Shirley Mark, Guifen Chen, Caswell Barry,
-    Neil Burgess, Timothy E.J. Behrens. The Tolman-Eichenbaum Machine: Unifying Space and Relational Memory through
-    Generalization in the Hippocampal Formation https://doi.org/10.1016/j.cell.2020.10.024.
+    """Implementation of TEM 2020 by James C.R. Whittington, Timothy H. Muller,
+    Shirley Mark, Guifen Chen, Caswell Barry, Neil Burgess, Timothy E.J.
+    Behrens. The Tolman-Eichenbaum Machine: Unifying Space and Relational
+    Memory through.
+
+    Generalization in the Hippocampal Formation
+    https://doi.org/10.1016/j.cell.2020.10.024.
     ----
+
     Attributes
-    ---------
+    ----------
     mod_kwargs : dict
         Model parameters
         params: dict
             contains the majority of parameters used by the model and environment
         room_width: float
-            room width specified by the environment (see examples/examples/whittington_2020_example.ipynb)
+            room width specified by the environment
+            (see examples/examples/whittington_2020_example.ipynb)
         room_depth: float
-            room depth specified by the environment (see examples/examples/whittington_2020_example.ipynb)
+            room depth specified by the environment
+            (see examples/examples/whittington_2020_example.ipynb)
         state_density: float
             density of agent states (should be proportional to the step-size)
         tem: class
             TEM model
 
     Methods
-    ---------
+    -------
     reset(self):
         initialise model and associated variables for training
     def initialise(self):
-        generate random distribution of objects and intialise optimiser, logger and relevant variables
+        generate random distribution of objects and intialise optimiser,
+        logger and relevant variables
     act(self, positions, policy_func):
-        generates batch of random actions to be passed into the environment. If the returned positions are allowed,
-        they are saved along with corresponding actions
+        generates batch of random actions to be passed into the environment. If the
+        returned positions are allowed, they are saved along with corresponding actions
     update(self):
         Perform forward pass of model and calculate losses and accuracies
     action_policy(self):
@@ -64,11 +79,11 @@ class Whittington2020(AgentCore):
         observe what randomly distributed object is located at each position of a walk
     step_to_actions(self, actions):
         convert (x,y) action information into an integer value
+
     """
 
     def __init__(self, model_name: str = "TEM", **mod_kwargs):
-        """
-        Parameters
+        """Parameters
         ----------
         model_name : str
            Name of the specific instantiation of the ExcInhPlasticity class
@@ -76,11 +91,14 @@ class Whittington2020(AgentCore):
             params: dict
                 contains the majority of parameters used by the model and environment
             room_width: float
-                room width specified by the environment (see examples/examples/whittington_2020_example.ipynb)
+                room width specified by the environment
+                (see examples/examples/whittington_2020_example.ipynb)
             room_depth: float
-                room depth specified by the environment (see examples/examples/whittington_2020_example.ipynb)
+                room depth specified by the environment
+                (see examples/examples/whittington_2020_example.ipynb)
             state_density: float
                 density of agent states (should be proportional to the step-size)
+
         """
         super().__init__()
         self.mod_kwargs = mod_kwargs.copy()
@@ -95,7 +113,8 @@ class Whittington2020(AgentCore):
         self.use_behavioural_data = mod_kwargs["use_behavioural_data"]
         self.n_envs_save = 4
         self.n_states = [
-            int(self.room_widths[i] * self.room_depths[i] * self.state_densities[i]) for i in range(self.batch_size)
+            int(self.room_widths[i] * self.room_depths[i] * self.state_densities[i])
+            for i in range(self.batch_size)
         ]
         self.poss_actions = [[0, 0], [0, -1], [1, 0], [0, 1], [-1, 0]]
         self.n_actions = len(self.poss_actions)
@@ -105,9 +124,9 @@ class Whittington2020(AgentCore):
         self.reset()
 
     def reset(self):
-        """
-        initialise model and associated variables for training, set n_walk=-1 initially to account for the lack of
-        actions at initialisation
+        """Initialise model and associated variables for training, set
+        n_walk=-1 initially to account for the lack of actions at
+        initialisation.
         """
         self.tem = model.Model(self.pars)
         self.initialise()
@@ -119,26 +138,30 @@ class Whittington2020(AgentCore):
         self.prev_action = None
         self.prev_observation = None
         self.prev_actions = [[None, None] for _ in range(self.batch_size)]
-        self.prev_observations = [[-1, -1, [float("inf"), float("inf")]] for _ in range(self.batch_size)]
+        self.prev_observations = [
+            [-1, -1, [float("inf"), float("inf")]] for _ in range(self.batch_size)
+        ]
 
     def act(self, observation, policy_func=None):
-        """
-        The base model executes one of four action (up-down-right-left) with equal probability.
-        This is used to move on the rectangular environment states space (transmat).
-        This is done for a single environment.
+        """The base model executes one of four action (up-down-right-left) with
+        equal probability. This is used to move on the rectangular environment
+        states space (transmat). This is done for a single environment.
 
         Parameters
         ----------
         positions: array (16,2)
-            Observation from the environment class needed to choose the right action (Here the position).
+            Observation from the environment class needed to choose the right action
+            (Here the position).
         policy_func: function
-            Inherited from AgentCore, not used in this model, to change the policy modify action_policy method.
+            Inherited from AgentCore, not used in this model, to change the policy
+            modify action_policy method.
 
         Returns
         -------
         action : array (16,2)
-            Action values (Direction of the agent step) in this case executes one of four action
-            (up-down-right-left) with equal probability.
+            Action values (Direction of the agent step) in this case executes one of
+            four action
+
         """
         new_action = self.action_policy()
         if observation[0] == self.prev_observation[0]:
@@ -153,24 +176,29 @@ class Whittington2020(AgentCore):
         return new_action
 
     def batch_act(self, observations, policy_func=None):
-        """
-        The base model executes one of four action (up-down-right-left) with equal probability.
-        This is used to move on the rectangular environment states space (transmat).
-        This is done for a batch of 16 environments.
+        """The base model executes one of four action (up-down-right-left) with
+        equal probability. This is used to move on the rectangular environment
+        states space (transmat). This is done for a batch of 16 environments.
+
         Parameters
         ----------
         observations: array (16,3/4)
             Observation from the environment class needed to choose the right action
-            (here the state ID and position). If behavioural data is used, the observation includes head direction.
+            (here the state ID and position). If behavioural data is used, the
+            observation includes head direction.
+
         Returns
         -------
         new_actions : array (16,2)
-            Action values (direction of the agent step) in this case executes one of four action
-            (up-down-right-left) with equal probability.
-        """
+            Action values (direction of the agent step) in this case executes one of
+            four action (up-down-right-left) with equal probability.
 
+        """
         if self.use_behavioural_data:
-            state_diffs = [observations[i][0] - self.prev_observations[i][0] for i in range(self.batch_size)]
+            state_diffs = [
+                observations[i][0] - self.prev_observations[i][0]
+                for i in range(self.batch_size)
+            ]
             new_actions = self.infer_action(state_diffs)
             self.walk_actions.append(new_actions)
             self.obs_history.append(self.prev_observations.copy())
@@ -182,7 +210,10 @@ class Whittington2020(AgentCore):
             all_allowed = True
             new_actions = []
             for i, loc in enumerate(locations):
-                if loc == self.prev_observations[i][0] and self.prev_actions[i] != [0, 0]:
+                if loc == self.prev_observations[i][0] and self.prev_actions[i] != [
+                    0,
+                    0,
+                ]:
                     all_allowed = False
                     break
 
@@ -206,14 +237,16 @@ class Whittington2020(AgentCore):
         return new_actions
 
     def update(self):
-        """
-        Compute forward pass through model, updating weights, calculating TEM variables and collecting
-        losses / accuracies
+        """Compute forward pass through model, updating weights, calculating
+        TEM variables and collecting losses / accuracies.
         """
         self.iter = int((len(self.obs_history) / 20) - 1)
         self.global_steps += 1
         history = self.obs_history[-self.pars["n_rollout"] :]
-        locations = [[{"id": env_step[0], "shiny": None} for env_step in step] for step in history]
+        locations = [
+            [{"id": env_step[0], "shiny": None} for env_step in step]
+            for step in history
+        ]
         observations = [[env_step[1] for env_step in step] for step in history]
         actions = self.walk_actions[-self.pars["n_rollout"] :]
         self.n_walk = 0
@@ -236,7 +269,8 @@ class Whittington2020(AgentCore):
         self.tem.hyper["lambda"] = self.lambda_new
         # Update scaling of offset for variance of inferred grounded position
         self.tem.hyper["p2g_scale_offset"] = self.p2g_scale_offset
-        # Update learning rate (the neater torch-way of doing this would be a scheduler, but this is quick and easy)
+        # Update learning rate (the neater torch-way of doing this would be a scheduler,
+        # but this is quick and easy)
         for param_group in self.adam.param_groups:
             param_group["lr"] = self.lr
 
@@ -244,7 +278,9 @@ class Whittington2020(AgentCore):
         model_input = [
             [
                 locations[i],
-                torch.from_numpy(np.reshape(observations, (20, 16, 45))[i]).type(torch.float32),
+                torch.from_numpy(np.reshape(observations, (20, 16, 45))[i]).type(
+                    torch.float32
+                ),
                 np.reshape(action_values, (20, 16))[i].tolist(),
             ]
             for i in range(self.pars["n_rollout"])
@@ -264,10 +300,16 @@ class Whittington2020(AgentCore):
             # Only include loss for locations that have been visited before
             for env_i, env_visited in enumerate(self.visited):
                 if env_visited[step.g[env_i]["id"]]:
-                    step_loss.append(loss_weights * torch.stack([i[env_i] for i in step.L]))
+                    step_loss.append(
+                        loss_weights * torch.stack([i[env_i] for i in step.L])
+                    )
                 else:
                     env_visited[step.g[env_i]["id"]] = True
-            step_loss = torch.tensor(0) if not step_loss else torch.mean(torch.stack(step_loss, dim=0), dim=0)
+            step_loss = (
+                torch.tensor(0)
+                if not step_loss
+                else torch.mean(torch.stack(step_loss, dim=0), dim=0)
+            )
             # Save all separate components of loss for monitoring
             plot_loss = plot_loss + step_loss.detach().numpy()
             # And sum all components, then add them to total loss of this step
@@ -275,66 +317,25 @@ class Whittington2020(AgentCore):
 
         # Reset gradients
         self.adam.zero_grad()
-        # Do backward pass to calculate gradients with respect to total loss of this chunk
+        # Do backward pass to calculate gradients with respect to total loss of this
+        # chunk
         loss.backward(retain_graph=True)
         # Then do optimiser step to update parameters of model
         self.adam.step()
-        # Update the previous iteration for the next chunk with the final step of this chunk, removing all operation history
+        # Update the previous iteration for the next chunk with the final step of
+        # this chunk, removing all operation history
         self.prev_iter = [forward[-1].detach()]
 
         # Compute model accuracies
-        acc_p, acc_g, acc_gt = np.mean([[np.mean(a) for a in step.correct()] for step in forward], axis=0)
+        acc_p, acc_g, acc_gt = np.mean(
+            [[np.mean(a) for a in step.correct()] for step in forward], axis=0
+        )
         acc_p, acc_g, acc_gt = [a * 100 for a in (acc_p, acc_g, acc_gt)]
-        # # Log progress
-        # if self.iter % 10 == 0:
-        #     # Write series of messages to logger from this backprop iteration
-        #     self.logger.info("Finished backprop iter {:d} in {:.2f} seconds.".format(self.iter, time.time() - start_time))
-        #     self.logger.info(
-        #         "Loss: {:.2f}. <p_g> {:.2f} <p_x> {:.2f} <x_gen> {:.2f} <x_g> {:.2f} <x_p> {:.2f} <g> {:.2f} \
-        #             <reg_g> {:.2f} <reg_p> {:.2f}".format(
-        #             loss.detach().numpy(), *plot_loss
-        #         )
-        #     )
-        #     self.logger.info("Accuracy: <p> {:.2f}% <g> {:.2f}% <gt> {:.2f}%".format(acc_p, acc_g, acc_gt))
-        #     self.logger.info(
-        #         "Parameters: <max_hebb> {:.2f} <eta> {:.2f} <lambda> {:.2f} <p2g_scale_offset> {:.2f}".format(
-        #             np.max(np.abs(self.prev_iter[0].M[0].numpy())),
-        #             self.tem.hyper["eta"],
-        #             self.tem.hyper["lambda"],
-        #             self.tem.hyper["p2g_scale_offset"],
-        #         )
-        #     )
-        #     self.logger.info("Weights:" + str([w for w in loss_weights.numpy()]))
-        #     self.logger.info(" ")
-        # # Also store the internal state (all learnable parameters) and the hyperparameters periodically
-        # if self.iter % self.pars["save_interval"] == 0:
-        #     torch.save(self.tem.state_dict(), self.model_path + "/tem_" + str(self.iter) + ".pt")
-        #     torch.save(self.tem.hyper, self.model_path + "/params_" + str(self.iter) + ".pt")
-
-        # # Save the final state of the model after training has finished
-        # if self.iter == self.pars["train_it"] - 1:
-        #     torch.save(self.tem.state_dict(), self.model_path + "/tem_" + str(self.iter) + ".pt")
-        #     torch.save(self.tem.hyper, self.model_path + "/params_" + str(self.iter) + ".pt")
 
     def initialise(self):
+        """Generate random distribution of objects and intialise optimiser,
+        logger and relevant variables.
         """
-        Generate random distribution of objects and intialise optimiser, logger and relevant variables
-        """
-        # Create directories for storing all information about the current run
-        # (
-        #     self.run_path,
-        #     self.train_path,
-        #     self.model_path,
-        #     self.save_path,
-        #     self.script_path,
-        #     self.envs_path,
-        # ) = utils.make_directories()
-        # # Save all python files in current directory to script directory
-        # self.save_files()
-        # # Save parameters
-        # np.save(os.path.join(self.save_path, "params"), self.pars)
-        # # Create a tensor board to stay updated on training progress. Start tensorboard with tensorboard --logdir=runs
-        # self.writer = SummaryWriter(self.train_path)
         # Create a logger to write log output to file
         current_dir = os.path.dirname(os.getcwd())
         run_path = os.path.join(current_dir, "agent_examples", "results_sim")
@@ -343,60 +344,87 @@ class Whittington2020(AgentCore):
         # Make an ADAM optimizer for TEM
         self.adam = torch.optim.Adam(self.tem.parameters(), lr=self.pars["lr_max"])
         # Initialise whether a state has been visited for each world
-        self.visited = [[False for _ in range(self.n_states[env])] for env in range(self.pars["batch_size"])]
+        self.visited = [
+            [False for _ in range(self.n_states[env])]
+            for env in range(self.pars["batch_size"])
+        ]
         self.prev_iter = None
 
     def save_agent(self, save_path: str):
-        """Save current state and information in general to re-instantiate the agent
+        """Save current state and information in general to re-instantiate the
+        agent.
 
         Parameters
         ----------
         save_path: str
             Path to save the agent
+
         """
-        pickle.dump(self.tem.state_dict(), open(os.path.join(save_path), "wb"), pickle.HIGHEST_PROTOCOL)
+        pickle.dump(
+            self.tem.state_dict(),
+            open(os.path.join(save_path), "wb"),
+            pickle.HIGHEST_PROTOCOL,
+        )
         with open(os.path.join(os.path.dirname(save_path), "agent_hyper"), "wb") as fp:
             pickle.dump(self.tem.hyper, fp, pickle.HIGHEST_PROTOCOL)
 
         script_dir = os.path.dirname(os.path.abspath(__file__))
         source_file_path = os.path.join(
-            script_dir, "../../neuralplayground/agents/whittington_2020_extras/whittington_2020_model.py"
+            script_dir,
+            """../../neuralplayground/agents/whittington_2020_extras/
+            whittington_2020_model.py""",
         )
         destination_folder = os.path.join(os.path.dirname(save_path))
         os.makedirs(destination_folder, exist_ok=True)
-        destination_file_path = os.path.join(destination_folder, "whittington_2020_model.py")
+        destination_file_path = os.path.join(
+            destination_folder, "whittington_2020_model.py"
+        )
         shutil.copy(source_file_path, destination_file_path)
 
     def save_files(self):
-        """
-        Save all python files in current directory to script directory
-        """
+        """Save all python files in current directory to script directory."""
         curr_path = os.path.dirname(os.path.abspath(__file__))
         shutil.copy2(
-            os.path.abspath(os.path.join(os.getcwd(), os.path.abspath(os.path.join(curr_path, os.pardir))))
+            os.path.abspath(
+                os.path.join(
+                    os.getcwd(), os.path.abspath(os.path.join(curr_path, os.pardir))
+                )
+            )
             + "/agents/whittington_2020_extras/whittington_2020_model.py",
             os.path.join(self.script_path, "whittington_2020_model.py"),
         )
         shutil.copy2(
-            os.path.abspath(os.path.join(os.getcwd(), os.path.abspath(os.path.join(curr_path, os.pardir))))
+            os.path.abspath(
+                os.path.join(
+                    os.getcwd(), os.path.abspath(os.path.join(curr_path, os.pardir))
+                )
+            )
             + "/agents/whittington_2020_extras/whittington_2020_parameters.py",
             os.path.join(self.script_path, "whittington_2020_parameters.py"),
         )
         shutil.copy2(
-            os.path.abspath(os.path.join(os.getcwd(), os.path.abspath(os.path.join(curr_path, os.pardir))))
+            os.path.abspath(
+                os.path.join(
+                    os.getcwd(), os.path.abspath(os.path.join(curr_path, os.pardir))
+                )
+            )
             + "/agents/whittington_2020_extras/whittington_2020_analyse.py",
             os.path.join(self.script_path, "whittington_2020_analyse.py"),
         )
         shutil.copy2(
-            os.path.abspath(os.path.join(os.getcwd(), os.path.abspath(os.path.join(curr_path, os.pardir))))
+            os.path.abspath(
+                os.path.join(
+                    os.getcwd(), os.path.abspath(os.path.join(curr_path, os.pardir))
+                )
+            )
             + "/agents/whittington_2020_extras/whittington_2020_utils.py",
             os.path.join(self.script_path, "whittington_2020_utils.py"),
         )
         return
 
     def action_policy(self):
-        """
-        Random action policy that selects an action to take from [stay, up, down, left, right]
+        """Random action policy that selects an action to take from [stay, up,
+        down, left, right]
         """
         arrow = self.poss_actions
         index = np.random.choice(len(arrow))
@@ -404,18 +432,19 @@ class Whittington2020(AgentCore):
         return action
 
     def step_to_actions(self, actions):
-        """
-        Convert trajectory of (x,y) actions into integer values (i.e. from [[0,0],[0,-1],[1,0],[0,1],[-1,0]] to [0,1,2,3,4])
+        """Convert trajectory of (x,y) actions into integer values (i.e. from
+        [[0,0],[0,-1],[1,0],[0,1],[-1,0]] to [0,1,2,3,4])
 
-        Parameters:
-        ------
+        Parameters
+        ----------
             actions: (16,20,2)
                 batch of 16 actions for each step in a walk of length 20
 
-        Returns:
-        ------
+        Returns
+        -------
             action_values: (16,20,1)
                 batch of 16 action values for each step in walk of length 20
+
         """
         action_values = []
         # actions = np.reshape(actions, (pars['n_rollout'], pars['batch_size'], 2))
@@ -427,8 +456,8 @@ class Whittington2020(AgentCore):
         return action_values
 
     def infer_action(self, state_diffs):
-        """
-        Infers the action taken between state indices based on the difference between states.
+        """Infers the action taken between state indices based on the
+        difference between states.
 
         Parameters
         ----------
@@ -441,6 +470,7 @@ class Whittington2020(AgentCore):
         -------
         action: str
             The inferred action ('N', 'S', 'W', or 'E') based on the state difference.
+
         """
         actions = []
         for i in range(self.batch_size):
@@ -458,13 +488,21 @@ class Whittington2020(AgentCore):
         return actions
 
     def collect_final_trajectory(self):
-        """
-        Collect the final trajectory of the agent, including the locations, observations and actions taken.
+        """Collect the final trajectory of the agent, including the locations,
+        observations and actions taken.
         """
         final_model_input = []
-        environments = [[], self.n_actions, self.n_states[0], len(self.obs_history[-1][0][1])]
+        environments = [
+            [],
+            self.n_actions,
+            self.n_states[0],
+            len(self.obs_history[-1][0][1]),
+        ]
         history = self.obs_history[-self.n_walk :]
-        locations = [[{"id": env_step[0], "shiny": None} for env_step in step] for step in history]
+        locations = [
+            [{"id": env_step[0], "shiny": None} for env_step in step]
+            for step in history
+        ]
         observations = [[env_step[1] for env_step in step] for step in history]
         actions = self.walk_actions[-self.n_walk :]
         action_values = self.step_to_actions(actions)
@@ -472,16 +510,24 @@ class Whittington2020(AgentCore):
         model_input = [
             [
                 locations[i],
-                torch.from_numpy(np.reshape(observations, (self.n_walk, 16, 45))[i]).type(torch.float32),
+                torch.from_numpy(
+                    np.reshape(observations, (self.n_walk, 16, 45))[i]
+                ).type(torch.float32),
                 np.reshape(action_values, (self.n_walk, 16))[i].tolist(),
             ]
             for i in range(self.n_walk)
         ]
 
         single_index = [[model_input[step][0][0]] for step in range(len(model_input))]
-        single_obs = [torch.unsqueeze(model_input[step][1][0], dim=0) for step in range(len(model_input))]
+        single_obs = [
+            torch.unsqueeze(model_input[step][1][0], dim=0)
+            for step in range(len(model_input))
+        ]
         single_action = [[model_input[step][2][0]] for step in range(len(model_input))]
-        single_model_input = [[single_index[step], single_obs[step], single_action[step]] for step in range(len(model_input))]
+        single_model_input = [
+            [single_index[step], single_obs[step], single_action[step]]
+            for step in range(len(model_input))
+        ]
         final_model_input.extend(single_model_input)
 
         return final_model_input, history, environments
@@ -492,30 +538,30 @@ class Whittington2020(AgentCore):
         include_stay_still = False
         shiny_envs = [False, False, False, False]
         env_to_plot = 0
-        shiny_envs if shiny_envs[env_to_plot] else [not shiny_env for shiny_env in shiny_envs]
+        (
+            shiny_envs
+            if shiny_envs[env_to_plot]
+            else [not shiny_env for shiny_env in shiny_envs]
+        )
         correct_model, correct_node, correct_edge = analyse.compare_to_agents(
             forward, tem, environments, include_stay_still=include_stay_still
         )
-        analyse.zero_shot(forward, tem, environments, include_stay_still=include_stay_still)
+        analyse.zero_shot(
+            forward, tem, environments, include_stay_still=include_stay_still
+        )
         analyse.location_occupation(forward, tem, environments)
         self.g_rates, self.p_rates = analyse.rate_map(forward, tem, environments)
         from_acc, to_acc = analyse.location_accuracy(forward, tem, environments)
         return
 
     def plot_rate_map(
-        self, rate_map_type=None, frequencies=["Theta", "Delta", "Beta", "Gamma", "High Gamma"], max_cells=30, num_cols=6
+        self,
+        rate_map_type=None,
+        frequencies=["Theta", "Delta", "Beta", "Gamma", "High Gamma"],
+        max_cells=30,
+        num_cols=6,
     ):
-        """
-        Plot the TEM rate maps.
-
-        Parameters
-        ----------
-
-        Returns
-        -------
-
-        """
-
+        """Plot the TEM rate maps."""
         figs = []
         axes = []
 
@@ -547,7 +593,9 @@ class Whittington2020(AgentCore):
                 rate_map_mat = self.get_rate_map_matrix(rate_maps, i, j)
 
                 # Plot the rate map in the corresponding subplot
-                make_plot_rate_map(rate_map_mat, axs[ax_row, ax_col], f"Cell {j + 1}", "", "", "")
+                make_plot_rate_map(
+                    rate_map_mat, axs[ax_row, ax_col], f"Cell {j + 1}", "", "", ""
+                )
 
             # Hide unused subplots for the current frequency
             for j in range(n_cells, num_rows * num_cols):

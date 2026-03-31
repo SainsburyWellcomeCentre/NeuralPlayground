@@ -1,8 +1,10 @@
 """Module for fetching and loading saved and pre-trained models.
 
-This module provides functions for fetching and loading pre-trained models used in tests,
-examples, and tutorials. The pre-trained models are stored in a remote repository on GIN
-and are downloaded to the user's local machine the first time they are used.
+This module provides functions for fetching and loading pre-trained
+models used in tests, examples, and tutorials. The pre-trained models
+are stored in a remote repository on GIN and are downloaded to the
+user's local machine the first time they are used.
+
 """
 
 import pooch
@@ -44,8 +46,11 @@ def find_saved_models(download_manager: pooch.Pooch = model_manager) -> list:
     -------
     list
         A list of available model names.
+
     """
-    available_models = [model_name.split(".")[0] for model_name in download_manager.registry.keys()]
+    available_models = [
+        model_name.split(".")[0] for model_name in download_manager.registry.keys()
+    ]
     return available_models
 
 
@@ -67,10 +72,17 @@ def fetch_model_path(
     -------
     str
         Path to the downloaded model
+
     """
     available_models = find_saved_models(model_manager)
     if model_name not in available_models:
-        raise ValueError(f"Model {model_name} not found. Available models: {available_models}")
-    model_manager.fetch(f"{model_name}.zip", processor=pooch.Unzip(extract_dir=LOCAL_DATA_DIR), progressbar=progressbar)
+        raise ValueError(
+            f"Model {model_name} not found. Available models: {available_models}"
+        )
+    model_manager.fetch(
+        f"{model_name}.zip",
+        processor=pooch.Unzip(extract_dir=LOCAL_DATA_DIR),
+        progressbar=progressbar,
+    )
     model_path = LOCAL_DATA_DIR / model_name
     return model_path.as_posix() + "/"

@@ -1,5 +1,5 @@
 class NPGConfig(object):
-    """Base class for config objects
+    """Base class for config objects.
 
     Methods
     -------
@@ -11,10 +11,12 @@ class NPGConfig(object):
         Return values of the config object
     items(self)
         Return items of the config object
+
     """
 
     def __str__(self, indent=0):
-        """Print the config object in a readable way
+        """Print the config object in a readable way.
+
         Parameters
         ----------
         indent: int
@@ -24,6 +26,7 @@ class NPGConfig(object):
         -------
         show_str: str
             String containing the config object in a readable way
+
         """
         show_str = ""
         for key, value in self.__dict__.items():
@@ -35,13 +38,13 @@ class NPGConfig(object):
         return show_str
 
     def keys(self):
-        """Return keys of the config object"""
+        """Return keys of the config object."""
         return self.__dict__.keys()
 
     def values(self):
-        """Return values of the config object"""
+        """Return values of the config object."""
         return self.__dict__.values()
 
     def items(self):
-        """Return items of the config object"""
+        """Return items of the config object."""
         return self.__dict__.items()

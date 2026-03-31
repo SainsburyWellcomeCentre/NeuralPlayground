@@ -1,7 +1,14 @@
 import numpy as np
 
 from neuralplayground.agents import AgentCore, Stachenfeld2018, Weber2018
-from neuralplayground.arenas import Environment, Hafting2008, MergingRoom, Sargolini2006, Simple2D, Wernle2018
+from neuralplayground.arenas import (
+    Environment,
+    Hafting2008,
+    MergingRoom,
+    Sargolini2006,
+    Simple2D,
+    Wernle2018,
+)
 from neuralplayground.backend import default_training_loop, episode_based_training_loop
 
 from .simulation_manager import SingleSim
@@ -192,7 +199,12 @@ stachenfeld_in_wernle_params_1 = {
         "twoD": True,
     },
     "env_class": Wernle2018,
-    "env_params": {"merge_time": 20, "switch_time": 10, "time_step_size": 0.2, "agent_step_size": 3},
+    "env_params": {
+        "merge_time": 20,
+        "switch_time": 10,
+        "time_step_size": 0.2,
+        "agent_step_size": 3,
+    },
     "training_loop": episode_based_training_loop,
     "training_loop_params": {"t_episode": 1000, "n_episode": 100},
 }
@@ -210,7 +222,12 @@ stachenfeld_in_wernle_params_2 = {
         "twoD": True,
     },
     "env_class": Wernle2018,
-    "env_params": {"merge_time": 20, "switch_time": 10, "time_step_size": 0.2, "agent_step_size": 3},
+    "env_params": {
+        "merge_time": 20,
+        "switch_time": 10,
+        "time_step_size": 0.2,
+        "agent_step_size": 3,
+    },
     "training_loop": default_training_loop,
     "training_loop_params": {"n_steps": 10000},
 }
@@ -241,7 +258,12 @@ weber_in_wernle_params = {
         "disable_tqdm": True,
     },
     "env_class": Wernle2018,
-    "env_params": {"merge_time": 20, "switch_time": 10, "time_step_size": 0.2, "agent_step_size": 3},
+    "env_params": {
+        "merge_time": 20,
+        "switch_time": 10,
+        "time_step_size": 0.2,
+        "agent_step_size": 3,
+    },
     "training_loop": default_training_loop,
     "training_loop_params": {"n_steps": 10000},
 }
@@ -537,7 +559,12 @@ coreAgent_test_4 = {
         "model_name": "agent_test",
     },
     "env_class": Wernle2018,
-    "env_params": {"merge_time": 20, "switch_time": 10, "time_step_size": 0.2, "agent_step_size": 3},
+    "env_params": {
+        "merge_time": 20,
+        "switch_time": 10,
+        "time_step_size": 0.2,
+        "agent_step_size": 3,
+    },
     "training_loop": default_training_loop,
     "training_loop_params": {"n_steps": 10000},
 }

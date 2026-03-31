@@ -7,9 +7,16 @@ from neuralplayground.arenas.simple2d import Simple2D
 
 
 class BatchEnvironment(Environment):
-    def __init__(self, environment_name: str = "BatchEnv", env_class: object = Simple2D, batch_size: int = 1, **env_kwargs):
-        """
-        Initialise a batch of environments. This is useful for training a single agent on multiple environments simultaneously.
+    def __init__(
+        self,
+        environment_name: str = "BatchEnv",
+        env_class: object = Simple2D,
+        batch_size: int = 1,
+        **env_kwargs,
+    ):
+        """Initialise a batch of environments. This is useful for training a
+        single agent on multiple environments simultaneously.
+
         Parameters
         ----------
             environment_name: str
@@ -20,6 +27,7 @@ class BatchEnvironment(Environment):
                 Number of environments in the batch
             **env_kwargs: dict
                 Keyword arguments for the environment
+
         """
         super().__init__(environment_name, **env_kwargs)
         self.env_kwargs = env_kwargs.copy()
@@ -34,25 +42,36 @@ class BatchEnvironment(Environment):
             arg_env_params["arena_y_limits"] = self.batch_y_limits[i]
             self.environments.append(env_class(**arg_env_params))
 
-        self.room_widths = [np.diff(self.environments[i].arena_x_limits)[0] for i in range(self.batch_size)]
-        self.room_depths = [np.diff(self.environments[i].arena_y_limits)[0] for i in range(self.batch_size)]
-        self.state_densities = [arg_env_params["state_density"] for i in range(self.batch_size)]
+        self.room_widths = [
+            np.diff(self.environments[i].arena_x_limits)[0]
+            for i in range(self.batch_size)
+        ]
+        self.room_depths = [
+            np.diff(self.environments[i].arena_y_limits)[0]
+            for i in range(self.batch_size)
+        ]
+        self.state_densities = [
+            arg_env_params["state_density"] for i in range(self.batch_size)
+        ]
 
     def reset(self, random_state: bool = True, custom_state: np.ndarray = None):
-        """
-        Reset the environment
+        """Reset the environment.
+
         Parameters
         ----------
             random_state: bool
                 If True, the agent will be placed in a random state
             custom_state: np.ndarray
-                If not None, the agent will be placed in the state specified by custom_state
+                If not None, the agent will be placed in the state specified by
+                custom_state
+
         Returns
         -------
             all_observations: list of np.ndarray
                 List of observations for each environment in the batch
             all_states: list of np.ndarray
                 List of states for each environment in the batch
+
         """
         self.global_steps = 0
         self.global_time = 0
@@ -61,27 +80,31 @@ class BatchEnvironment(Environment):
         all_observations = []
         all_states = []
         for i, env in enumerate(self.environments):
-            env_obs, env_state = env.reset(random_state=random_state, custom_state=custom_state)
+            env_obs, env_state = env.reset(
+                random_state=random_state, custom_state=custom_state
+            )
             all_states.append(env_state)
             all_observations.append(env_obs)
 
         return all_observations, all_states
 
     def step(self, actions: np.ndarray, normalize_step: bool = False):
-        """
-        Step the environment
+        """Step the environment.
+
         Parameters
         ----------
             actions: np.ndarray
                 Array of actions for each environment in the batch
             normalize_step: bool
                 If True, the agent will be placed in the state specified by custom_state
+
         Returns
         -------
             all_observations: list of np.ndarray
                 List of observations for each environment in the batch
             all_states: list of np.ndarray
                 List of states for each environment in the batch
+
         """
         all_observations = []
         all_states = []
@@ -90,7 +113,10 @@ class BatchEnvironment(Environment):
         for batch, env in enumerate(self.environments):
             action = actions[batch]
             env_obs, env_state, env_reward = env.step(action, normalize_step)
-            if self.use_behavioural_data and self.environments[0].environment_name == "DiscreteObject":
+            if (
+                self.use_behavioural_data
+                and self.environments[0].environment_name == "DiscreteObject"
+            ):
                 if env.state[0] == env.old_state[0]:
                     all_allowed = False
             elif self.environments[0].environment_name == "DiscreteObject":
@@ -100,7 +126,10 @@ class BatchEnvironment(Environment):
             all_states.append(env_state)
             all_rewards.append(env_reward)
 
-        if not all_allowed and self.environments[0].environment_name == "DiscreteObject":
+        if (
+            not all_allowed
+            and self.environments[0].environment_name == "DiscreteObject"
+        ):
             for env in self.environments:
                 env.state = env.old_state
         elif all_allowed and self.environments[0].environment_name == "DiscreteObject":
@@ -109,25 +138,34 @@ class BatchEnvironment(Environment):
         return all_observations, all_states, all_rewards
 
     def plot_trajectory(
-        self, history_data: list = None, ax=None, return_figure: bool = False, save_path: str = None, plot_every: int = 1
+        self,
+        history_data: list = None,
+        ax=None,
+        return_figure: bool = False,
+        save_path: str = None,
+        plot_every: int = 1,
     ):
-        """Plot the Trajectory of the agent in the environment
+        """Plot the Trajectory of the agent in the environment.
+
         Parameters
         ----------
         history_data: list of interactions
-            if None, use history data saved as attribute of the arena, use custom otherwise
+            if None, use history data saved as attribute of the arena, use custom
+            otherwise
         ax: mpl.axes._subplots.AxesSubplot (matplotlib axis from subplots)
             axis from subplot from matplotlib where the trajectory will be plotted.
         return_figure: bool
             If true, it will return the figure variable generated to make the plot
         save_path: str, list of str, tuple of str
             saving path of the generated figure, if None, no figure is saved
+
         Returns
         -------
         ax: mpl.axes._subplots.AxesSubplot (matplotlib axis from subplots)
             Modified axis where the trajectory is plotted
         f: matplotlib.figure
             if return_figure parameters is True
+
         """
         env = self.environments[0]
         # Use or not saved history
@@ -146,7 +184,8 @@ class BatchEnvironment(Environment):
         for wall in env.custom_walls:
             ax.plot(wall[:, 0], wall[:, 1], "C0", lw=3)
 
-        # Making the trajectory plot roughly square to show structure of the arena better
+        # Making the trajectory plot roughly square to show structure of the arena
+        # better
         lower_lim, upper_lim = np.amin(env.arena_limits), np.amax(env.arena_limits)
         ax.set_xlim([lower_lim, upper_lim])
         ax.set_ylim([lower_lim, upper_lim])
@@ -174,7 +213,16 @@ class BatchEnvironment(Environment):
                     aux_y.append(s[1])
                     sc = ax.plot(x_, y_, "-", color=cmap(norm(i)), alpha=0.6)
 
-            sc = ax.scatter(aux_x, aux_y, c=np.arange(len(aux_x)), vmin=0, vmax=len(aux_x), cmap="plasma", alpha=0.6, s=0.1)
+            sc = ax.scatter(
+                aux_x,
+                aux_y,
+                c=np.arange(len(aux_x)),
+                vmin=0,
+                vmax=len(aux_x),
+                cmap="plasma",
+                alpha=0.6,
+                s=0.1,
+            )
             cbar = plt.colorbar(sc, ax=ax, ticks=[0, len(state_history)])
             cbar.ax.set_ylabel("N steps", rotation=270, fontsize=16)
             cbar.ax.set_yticklabels([0, len(state_history)], fontsize=16)
@@ -202,8 +250,9 @@ class BatchEnvironment(Environment):
         return fig, axs
 
     def collect_environment_info(self, model_input, history, environments):
-        """
-        Collect information about the environment for each step of the trajectory.
+        """Collect information about the environment for each step of the
+        trajectory.
+
         Parameters
         ----------
             model_input: list of np.ndarray
@@ -212,10 +261,12 @@ class BatchEnvironment(Environment):
                 List of histories for each step of the trajectory
             environments: list of dict
                 List of environments for each step of the trajectory
+
         Returns
         -------
             environments: list of dict
                 List of environments for each step of the trajectory
+
         """
         for step in range(len(model_input)):
             id = model_input[step][0][0]["id"]
@@ -226,7 +277,9 @@ class BatchEnvironment(Environment):
                 rounded_x, rounded_y = self.round_to_nearest_state_center(x, y)
 
                 # Normalize the rounded coordinates
-                normalized_x, normalized_y = self.normalize_coordinates(rounded_x, rounded_y)
+                normalized_x, normalized_y = self.normalize_coordinates(
+                    rounded_x, rounded_y
+                )
 
                 loc_dict = {
                     "id": id,
@@ -242,20 +295,22 @@ class BatchEnvironment(Environment):
         return environments
 
     def round_to_nearest_state_center(self, x, y):
-        """
-        Round the (x, y) coordinates to the center of the nearest state.
+        """Round the (x, y) coordinates to the center of the nearest state.
+
         Parameters
         ----------
             x: float
                 x coordinate
             y: float
                 y coordinate
+
         Returns
         -------
             rounded_x: float
                 x coordinate rounded to the center of the nearest state
             rounded_y: float
                 y coordinate rounded to the center of the nearest state
+
         """
         state_width = 1 / self.state_densities[0]
         state_depth = 1 / self.state_densities[1]
@@ -263,26 +318,32 @@ class BatchEnvironment(Environment):
         half_state_width = state_width / 2
         half_state_depth = state_depth / 2
 
-        rounded_x = round((x + half_state_width) / state_width) * state_width - half_state_width
-        rounded_y = round((y + half_state_depth) / state_depth) * state_depth - half_state_depth
+        rounded_x = (
+            round((x + half_state_width) / state_width) * state_width - half_state_width
+        )
+        rounded_y = (
+            round((y + half_state_depth) / state_depth) * state_depth - half_state_depth
+        )
 
         return rounded_x, rounded_y
 
     def normalize_coordinates(self, x, y):
-        """
-        Normalize the (x, y) coordinates to the range [0, 1].
+        """Normalize the (x, y) coordinates to the range [0, 1].
+
         Parameters
         ----------
             x: float
                 x coordinate
             y: float
                 y coordinate
+
         Returns
         -------
             normalized_x: float
                 x coordinate normalized to the range [0, 1]
             normalized_y: float
                 y coordinate normalized to the range [0, 1]
+
         """
         x_min, x_max = self.batch_x_limits[0][0], self.batch_x_limits[0][1]
         y_min, y_max = self.batch_y_limits[0][0], self.batch_y_limits[0][1]

@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
-"""This code is from another repository, please visit their repository for more information:
+"""Code from another repository, please visit their repository for more information:
 https://github.com/ganguli-lab/grid-pattern-formation/blob/master/trajectory_generator.py
 
 It is under Apache Licence 2.0
 https://github.com/ganguli-lab/grid-pattern-formation/blob/master/LICENSE
 
-Changes to the original code consist of removing place cells object usage from the original code, torch functions
-to numpy, no periodic environment support and the addition of online trajectory generation.
+Changes to the original code consist of removing place cells object usage from the
+original code, torch functions
+to numpy, no periodic environment support and the addition of online trajectory
+generation.
 """
 
 import numpy as np
@@ -32,7 +34,14 @@ class TrajectoryGenerator(object):
         self.batch_size = batch_size
         self.room_width = room_width
         self.room_depth = room_depth
-        self.set_parameters(forward_velocity, turn_angle_bias, turn_angle_stdev, time_step_size, border_region, auto_scale)
+        self.set_parameters(
+            forward_velocity,
+            turn_angle_bias,
+            turn_angle_stdev,
+            time_step_size,
+            border_region,
+            auto_scale,
+        )
         if self.auto_scale:
             # This is from the original room size for these parameters
             scale_factor = ((room_width + room_depth) / 2.0) / 2.2
@@ -74,12 +83,15 @@ class TrajectoryGenerator(object):
             self.auto_scale = True
 
     def avoid_wall(self, position, hd, room_width, room_depth):
-        """
-        Compute distance and angle to nearest wall
-        """
+        """Compute distance and angle to nearest wall."""
         x = position[:, 0]
         y = position[:, 1]
-        dists = [room_width / 2 - x, room_depth / 2 - y, room_width / 2 + x, room_depth / 2 + y]
+        dists = [
+            room_width / 2 - x,
+            room_depth / 2 - y,
+            room_width / 2 + x,
+            room_depth / 2 + y,
+        ]
         d_wall = np.min(dists, axis=0)
         angles = np.arange(4) * np.pi / 2
         theta = angles[np.argmin(dists, axis=0)]
@@ -89,11 +101,13 @@ class TrajectoryGenerator(object):
 
         is_near_wall = (d_wall < self.border_region) * (np.abs(a_wall) < np.pi / 2)
         turn_angle = np.zeros_like(hd)
-        turn_angle[is_near_wall] = np.sign(a_wall[is_near_wall]) * (np.pi / 2 - np.abs(a_wall[is_near_wall]))
+        turn_angle[is_near_wall] = np.sign(a_wall[is_near_wall]) * (
+            np.pi / 2 - np.abs(a_wall[is_near_wall])
+        )
         return is_near_wall, turn_angle
 
     def generate_trajectory(self, room_width, room_depth, batch_size):
-        """Generate a random walk in a rectangular box"""
+        """Generate a random walk in a rectangular box."""
         samples = self.sequence_length
         dt = self.dt  # time step increment (seconds)
         sigma = self.turn_angle_stdev  # stdev rotation velocity (rads/sec)
@@ -103,8 +117,12 @@ class TrajectoryGenerator(object):
         # Initialize variables
         position = np.zeros([batch_size, samples + 2, 2])
         head_dir = np.zeros([batch_size, samples + 2])
-        position[:, 0, 0] = np.random.uniform(-room_width / 2, room_width / 2, batch_size)
-        position[:, 0, 1] = np.random.uniform(-room_depth / 2, room_depth / 2, batch_size)
+        position[:, 0, 0] = np.random.uniform(
+            -room_width / 2, room_width / 2, batch_size
+        )
+        position[:, 0, 1] = np.random.uniform(
+            -room_depth / 2, room_depth / 2, batch_size
+        )
         head_dir[:, 0] = np.random.uniform(0, 2 * np.pi, batch_size)
         velocity = np.zeros([batch_size, samples + 2])
 
@@ -120,7 +138,9 @@ class TrajectoryGenerator(object):
 
             if not self.periodic:
                 # If in border region, turn and slow down
-                is_near_wall, turn_angle = self.avoid_wall(position[:, t], head_dir[:, t], room_width, room_depth)
+                is_near_wall, turn_angle = self.avoid_wall(
+                    position[:, t], head_dir[:, t], room_width, room_depth
+                )
                 v[is_near_wall] *= 0.25
 
             # Update turn angle
@@ -128,7 +148,9 @@ class TrajectoryGenerator(object):
 
             # Take a step
             velocity[:, t] = v * dt
-            update = velocity[:, t, None] * np.stack([np.cos(head_dir[:, t]), np.sin(head_dir[:, t])], axis=-1)
+            update = velocity[:, t, None] * np.stack(
+                [np.cos(head_dir[:, t]), np.sin(head_dir[:, t])], axis=-1
+            )
             position[:, t + 1] = position[:, t] + update
 
             # Rotate head direction
@@ -154,9 +176,7 @@ class TrajectoryGenerator(object):
         return traj
 
     def get_batch_generator(self, batch_size=None, room_width=None, room_depth=None):
-        """
-        Returns a generator that yields batches of trajectories
-        """
+        """Returns a generator that yields batches of trajectories."""
         if not batch_size:
             batch_size = self.batch_size
         if not room_width:
@@ -168,7 +188,13 @@ class TrajectoryGenerator(object):
             traj = self.generate_trajectory(room_width, room_depth, batch_size)
 
             # Velocity vector
-            v = np.stack([traj["ego_v"] * np.cos(traj["target_hd"]), traj["ego_v"] * np.sin(traj["target_hd"])], axis=-1)
+            v = np.stack(
+                [
+                    traj["ego_v"] * np.cos(traj["target_hd"]),
+                    traj["ego_v"] * np.sin(traj["target_hd"]),
+                ],
+                axis=-1,
+            )
             # v = torch.tensor(v, dtype=torch.float32).transpose(0, 1)
 
             # Target position
@@ -191,8 +217,10 @@ class TrajectoryGenerator(object):
 
             yield pos, v
 
-    def get_test_batch(self, traj=None, batch_size=None, room_width=None, room_depth=None):
-        """For testing performance, returns a batch of sampled trajectories"""
+    def get_test_batch(
+        self, traj=None, batch_size=None, room_width=None, room_depth=None
+    ):
+        """For testing performance, returns a batch of sampled trajectories."""
         if not batch_size:
             batch_size = self.batch_size
         if not room_width:
@@ -202,7 +230,13 @@ class TrajectoryGenerator(object):
         if not traj:
             traj = self.generate_trajectory(room_width, room_depth, batch_size)
 
-        v = np.stack([traj["ego_v"] * np.cos(traj["target_hd"]), traj["ego_v"] * np.sin(traj["target_hd"])], axis=-1)
+        v = np.stack(
+            [
+                traj["ego_v"] * np.cos(traj["target_hd"]),
+                traj["ego_v"] * np.sin(traj["target_hd"]),
+            ],
+            axis=-1,
+        )
         # v = torch.tensor(v, dtype=torch.float32).transpose(0, 1)
 
         pos = np.stack([traj["target_x"], traj["target_y"]], axis=-1)
@@ -222,7 +256,7 @@ class TrajectoryGenerator(object):
         # return (inputs, pos, place_outputs)
 
     def single_step(self, position, head_dir):
-        """Generate a single step of a random walk in a rectangular box"""
+        """Generate a single step of a random walk in a rectangular box."""
         dt = self.dt
         random_turn = np.random.normal(self.turn_angle_bias, self.turn_angle_stdev)
         v = np.random.rayleigh(self.forward_velocity)

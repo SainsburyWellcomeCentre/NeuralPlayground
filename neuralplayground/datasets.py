@@ -1,8 +1,10 @@
 """Module for fetching and loading datasets.
 
-This module provides functions for fetching and loading data used in tests,
-examples, and tutorials. The data are stored in a remote repository on GIN
-and are downloaded to the user's local machine the first time they are used.
+This module provides functions for fetching and loading data used in
+tests, examples, and tutorials. The data are stored in a remote
+repository on GIN and are downloaded to the user's local machine the
+first time they are used.
+
 """
 
 from pathlib import Path
@@ -17,7 +19,8 @@ LOCAL_DATA_DIR = Path("~", ".NeuralPlayground", "data").expanduser()
 LOCAL_DATA_DIR.mkdir(parents=True, exist_ok=True)
 
 # A pooch download manager object
-# Datasets are in the "data" subfolder as zip files, named as {dataset_name}_{suffix}.zip
+# Datasets are in the "data" subfolder as zip files, named as
+# {dataset_name}_{suffix}.zip
 # If the suffix is "_full", the zip file contains the full experimental dataset.
 # For some of the larger datasets, a subset of the data is also available, which
 # is stored in a zip file with the suffix "_subset".
@@ -48,6 +51,7 @@ def find_datasets(download_manager: pooch.Pooch = dataset_manager) -> dict:
     dict
         A dictionary with dataset names as keys a list of available sizes as
         values.
+
     """
     sizes_per_dataset = {}
 
@@ -56,7 +60,8 @@ def find_datasets(download_manager: pooch.Pooch = dataset_manager) -> dict:
         # Check that the file name ends with one of the expected suffixes
         size_suffixes = ["_full", "_subset"]
         assert any([file_name.endswith(suffix) for suffix in size_suffixes]), (
-            f"Dataset name {file_name} must end with one of the expected suffixes {size_suffixes}."
+            f"Dataset name {file_name} must end with one of the expected "
+            f"suffixes {size_suffixes}."
         )
         # Extract the dataset name and the size suffix
         size_suffix = file_name.split("_")[-1]
@@ -94,18 +99,29 @@ def fetch_data_path(
     -------
     str
         Path to the downloaded dataset
+
     """
     sizes_per_dataset = find_datasets(dataset_manager)
     if dataset_name not in sizes_per_dataset:
-        raise ValueError(f"Dataset {dataset_name} not found. Available datasets: {list(sizes_per_dataset.keys())}")
+        raise ValueError(
+            f"Dataset {dataset_name} not found. Available datasets: "
+            f"{list(sizes_per_dataset.keys())}"
+        )
 
     file_name = f"{dataset_name}_full.zip"
     if subset:
         if "subset" in sizes_per_dataset[dataset_name]:
             file_name = f"{dataset_name}_subset.zip"
         else:
-            print(f"Subset of dataset {dataset_name} not available. Downloading the full dataset instead.")
+            print(
+                f"Subset of dataset {dataset_name} not available. "
+                f"Downloading the full dataset instead."
+            )
 
-    dataset_manager.fetch(file_name, processor=pooch.Unzip(extract_dir=LOCAL_DATA_DIR), progressbar=progressbar)
+    dataset_manager.fetch(
+        file_name,
+        processor=pooch.Unzip(extract_dir=LOCAL_DATA_DIR),
+        progressbar=progressbar,
+    )
     data_path = LOCAL_DATA_DIR / file_name.replace(".zip", "")
     return data_path.as_posix() + "/"

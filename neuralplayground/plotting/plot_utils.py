@@ -27,15 +27,15 @@ plt.rc("ytick.major", width=1)
 
 def make_plot_spike_train(time_array, spike_times, smoothness, ax):
     # put a gaussian kernel on the spike train
-    """
-    Plot a spike train with a gaussian kernel smoothing
+    """Plot a spike train with a gaussian kernel smoothing.
 
     Parameters
     ----------
     time_array: ndarray (n_samples,)
         Time array of the spike train, n_samples number of time steps recorded
     spike_times: ndarray (n_samples,)
-        Spike times throughout the recording of the given session, n_samples number of time steps recorded
+        Spike times throughout the recording of the given session, n_samples number of
+        time steps recorded
     smoothness: float
         Smoothness of the gaussian kernel to apply to the spike train
     ax: mpl.axes._subplots.AxesSubplot (matplotlib axis from subplots)
@@ -45,6 +45,7 @@ def make_plot_spike_train(time_array, spike_times, smoothness, ax):
     -------
     ax: mpl.axes._subplots.AxesSubplot (matplotlib axis from subplots)
         Modified axis where the spike train is plotted
+
     """
     # Put a gaussian kernel on the spike train
     spike_train = np.zeros_like(time_array)
@@ -68,8 +69,7 @@ def make_plot_spike_train(time_array, spike_times, smoothness, ax):
 
 
 def make_plot_trajectories(arena_limits, x, y, ax, plot_every):
-    """
-    Parameters
+    """Parameters
     ----------
     x: ndarray (n_samples,)
         x position throughout recording of the given session
@@ -84,8 +84,8 @@ def make_plot_trajectories(arena_limits, x, y, ax, plot_every):
     -------
     ax: mpl.axes._subplots.AxesSubplot (matplotlib axis from subplots)
         Modified axis where the trajectory is plotted
-    """
 
+    """
     # Plotting borders of the arena
     # PLOT_CONFIG.TRAJECTORY.TRAJECTORY_COLORMAP = "bla"
     config_vars = PLOT_CONFIG.TRAJECTORY
@@ -136,7 +136,14 @@ def make_plot_trajectories(arena_limits, x, y, ax, plot_every):
     ax.grid(config_vars.GRID)
 
     sc = ax.scatter(
-        aux_x, aux_y, c=np.arange(len(aux_x)), vmin=0, vmax=len(x), cmap=config_vars.TRAJECTORY_COLORMAP, alpha=0.6, s=0.1
+        aux_x,
+        aux_y,
+        c=np.arange(len(aux_x)),
+        vmin=0,
+        vmax=len(x),
+        cmap=config_vars.TRAJECTORY_COLORMAP,
+        alpha=0.6,
+        s=0.1,
     )
 
     # Setting colorbar to show number of sampled (time steps) recorded
@@ -150,12 +157,13 @@ def make_plot_trajectories(arena_limits, x, y, ax, plot_every):
 
 
 def make_plot_rate_map(h, ax, title, title_x, title_y, title_cbar):
-    """plot function with formating of ratemap plot
+    """Plot function with formating of ratemap plot.
 
     Parameters
     ----------
     h: ndarray (nybins, nxbins)
-        Number of spikes falling on each bin through the recorded session, nybins number of bins in y axis,
+        Number of spikes falling on each bin through the recorded session, nybins number
+        of bins in y axis,
         nxbins number of bins in x axis
     ax: mpl.axes._subplots.AxesSubplot (matplotlib axis from subplots)
         axis from subplot from matplotlib where the ratemap will be plotted.
@@ -172,15 +180,22 @@ def make_plot_rate_map(h, ax, title, title_x, title_y, title_cbar):
     -------
     ax: mpl.axes._subplots.AxesSubplot (matplotlib axis from subplots)
         Modified axis where ratemap is plotted
-    """
 
+    """
     # Formating ratemap plot
     config_vars = PLOT_CONFIG.RATEMAP
     sc = ax.imshow(h, cmap=config_vars.RATEMAP_COLORMAP)
-    cbar = plt.colorbar(sc, ax=ax, ticks=[np.min(h), np.max(h)], orientation="horizontal", fraction=0.046)
+    cbar = plt.colorbar(
+        sc,
+        ax=ax,
+        ticks=[np.min(h), np.max(h)],
+        orientation="horizontal",
+        fraction=0.046,
+    )
     cbar.ax.set_xlabel(title_cbar, fontsize=config_vars.COLORBAR_LABEL_FONTSIZE)
     cbar.ax.set_xticklabels(
-        [np.round(np.min(h), decimals=2), np.round(np.max(h), decimals=2)], fontsize=config_vars.TICK_LABEL_FONTSIZE
+        [np.round(np.min(h), decimals=2), np.round(np.max(h), decimals=2)],
+        fontsize=config_vars.TICK_LABEL_FONTSIZE,
     )
     ax.set_title(title, fontsize=config_vars.TITLE_FONTSIZE)
     ax.set_ylabel(title_y, fontsize=config_vars.LABEL_FONTSIZE)
@@ -227,15 +242,23 @@ def render_mpl_table(data, ax=None, **kwargs):
 
     ax : matplotlib.axes._subplots.AxesSubplot
         Axis the table was rendered in.
-    """
 
+    """
     config_vars = PLOT_CONFIG.TABLE
     if ax is None:
-        size = (np.array(data.shape[::-1]) + np.array([0, 1])) * np.array([config_vars.col_width, config_vars.row_height])
+        size = (np.array(data.shape[::-1]) + np.array([0, 1])) * np.array(
+            [config_vars.col_width, config_vars.row_height]
+        )
         fig, ax = plt.subplots(figsize=size)
         ax.axis("off")
     ax.set_axis_off()
-    mpl_table = ax.table(cellText=data.values, bbox=config_vars.BBOX, colLabels=data.columns, **kwargs, cellLoc="center")
+    mpl_table = ax.table(
+        cellText=data.values,
+        bbox=config_vars.BBOX,
+        colLabels=data.columns,
+        **kwargs,
+        cellLoc="center",
+    )
     mpl_table.auto_set_font_size(False)
     mpl_table.auto_set_column_width(col=list(range(len(data.columns))))
     mpl_table.set_fontsize(config_vars.TABLE_FONTSIZE)
@@ -262,7 +285,7 @@ def make_agent_comparison(
     horizontal_axis_spacing=None,
     vertical_axis_spacing=None,
 ):
-    """Plot function to compare agents in a given environment
+    """Plot function to compare agents in a given environment.
 
     Parameters
     ----------
@@ -280,12 +303,14 @@ def make_agent_comparison(
     tetrode_id:
         Tetrode id to plot, as in Hafting and Sargolini experiment classes
     GridScorer:
-        Object of the class Gridscore (or custom gridscore routine) to compute the grid scores
+        Object of the class Gridscore (or custom gridscore routine) to compute the grid
+        scores
 
     Returns
     -------
     ax: mpl.axes._subplots.AxesSubplot (matplotlib axis from subplots)
         Modified axis where the comparison is plotted
+
     """
     from neuralplayground.config import PLOT_CONFIG
 
@@ -307,22 +332,38 @@ def make_agent_comparison(
             f, ax = plt.subplots(
                 5,
                 len(agents) + len(envs) + len(exps),
-                figsize=(config_vars.FIGSIZE[0] * (len(agents) + 2), config_vars.FIGSIZE[1]),
+                figsize=(
+                    config_vars.FIGSIZE[0] * (len(agents) + 2),
+                    config_vars.FIGSIZE[1],
+                ),
             )
         else:
             f, ax = plt.subplots(
                 3,
                 len(agents) + len(envs) + len(exps),
-                figsize=(config_vars.FIGSIZE[0] * (len(agents) + 1), config_vars.FIGSIZE[1]),
+                figsize=(
+                    config_vars.FIGSIZE[0] * (len(agents) + 1),
+                    config_vars.FIGSIZE[1],
+                ),
             )
     else:
         if exp_data:
             f, ax = plt.subplots(
-                5, len(agents) + len(envs), figsize=(config_vars.FIGSIZE[0] * (len(agents) + 1), config_vars.FIGSIZE[1])
+                5,
+                len(agents) + len(envs),
+                figsize=(
+                    config_vars.FIGSIZE[0] * (len(agents) + 1),
+                    config_vars.FIGSIZE[1],
+                ),
             )
         else:
             f, ax = plt.subplots(
-                3, len(agents) + len(envs), figsize=(config_vars.FIGSIZE[0] * (len(agents) + 1), config_vars.FIGSIZE[1])
+                3,
+                len(agents) + len(envs),
+                figsize=(
+                    config_vars.FIGSIZE[0] * (len(agents) + 1),
+                    config_vars.FIGSIZE[1],
+                ),
             )
 
     plt.subplots_adjust(wspace=config_vars.HORIZONTAL_AXIS_SPACING)
@@ -335,7 +376,12 @@ def make_agent_comparison(
         for p, text in enumerate(parameters[k]["env_params"]):
             ax[0, k].text(0, 1, "Env param", fontsize=config_vars.TEXT_FONTSIZE)
             variable = parameters[k]["env_params"][text]
-            ax[0, k].text(0, 0.9 - ((p) * 0.1), text + ": " + str(variable), fontsize=config_vars.TEXT_FONTSIZE)
+            ax[0, k].text(
+                0,
+                0.9 - ((p) * 0.1),
+                text + ": " + str(variable),
+                fontsize=config_vars.TEXT_FONTSIZE,
+            )
             ax[0, k].set_axis_off()
 
         if hasattr(env, "plot_trajectory"):
@@ -350,10 +396,14 @@ def make_agent_comparison(
                 data=env.recording_list,
                 ax=ax[2, k],
             )
-            env.plot_recording_tetr(recording_index=recording_index, tetrode_id=tetrode_id, ax=ax[3][k])
+            env.plot_recording_tetr(
+                recording_index=recording_index, tetrode_id=tetrode_id, ax=ax[3][k]
+            )
             r_out_im, x_bin, y_bin = env.tetrode_ratemap()
             GridScorer_SR = GridScorer(x_bin - 1)
-            GridScorer_SR.plot_grid_score(r_out_im=r_out_im, plot=config_vars.PLOT_SAC_EXP, ax=ax[4][k])
+            GridScorer_SR.plot_grid_score(
+                r_out_im=r_out_im, plot=config_vars.PLOT_SAC_EXP, ax=ax[4][k]
+            )
 
         if exp_data:
             ax[2][k].set_axis_off()
@@ -368,25 +418,40 @@ def make_agent_comparison(
             if j > 9:
                 variable = parameters[i]["agent_params"][text]
                 ax[0, i + k + 1].text(
-                    0.6, 1 - ((j - 9) * 0.1), text + ": " + str(variable), fontsize=config_vars.TEXT_FONTSIZE
+                    0.6,
+                    1 - ((j - 9) * 0.1),
+                    text + ": " + str(variable),
+                    fontsize=config_vars.TEXT_FONTSIZE,
                 )
                 ax[0, i + k + 1].set_axis_off()
             else:
-                ax[0, i + k + 1].text(0, 1, "Agent param", fontsize=config_vars.TEXT_FONTSIZE)
+                ax[0, i + k + 1].text(
+                    0, 1, "Agent param", fontsize=config_vars.TEXT_FONTSIZE
+                )
                 variable = parameters[i]["agent_params"][text]
-                ax[0, i + k + 1].text(0, 0.9 - ((j) * 0.1), text + ": " + str(variable), fontsize=config_vars.TEXT_FONTSIZE)
+                ax[0, i + k + 1].text(
+                    0,
+                    0.9 - ((j) * 0.1),
+                    text + ": " + str(variable),
+                    fontsize=config_vars.TEXT_FONTSIZE,
+                )
                 ax[0, i + k + 1].set_axis_off()
         if hasattr(agent, "plot_rate_map"):
             agent.plot_rate_map(ax=ax[1][1 + i + k])
             GridScorer_SR = GridScorer(agent.resolution_width)
             GridScorer_SR.plot_grid_score(
-                r_out_im=agent.get_rate_map_matrix(), plot=config_vars.PLOT_SAC_AGT, ax=ax[2, 1 + i + k]
+                r_out_im=agent.get_rate_map_matrix(),
+                plot=config_vars.PLOT_SAC_AGT,
+                ax=ax[2, 1 + i + k],
             )
         else:
-            ax[1, i + k + 1].text(0, 1, "No Rate map", fontsize=config_vars.TEXT_FONTSIZE)
+            ax[1, i + k + 1].text(
+                0, 1, "No Rate map", fontsize=config_vars.TEXT_FONTSIZE
+            )
             ax[1][i + k + 1].set_axis_off()
             ax[2][i + k + 1].set_axis_off()
-            # render_mpl_table(data=pd.DataFrame([parameters[i]["agent_params"]]), ax=ax[0, 1 + i + k])
+            # render_mpl_table(data=pd.DataFrame([parameters[i]["agent_params"]]),
+            # ax=ax[0, 1 + i + k])
         if exp_data:
             ax[3][1 + i + k].set_axis_off()
             ax[4][1 + i + k].set_axis_off()
@@ -394,12 +459,22 @@ def make_agent_comparison(
     if exps is not None:
         for m, exp in enumerate(exps):
             if exp is not None:
-                ax[0, i + k + m + 2].text(0, 1.1, exp.experiment_name, fontsize=config_vars.FONTSIZE)
+                ax[0, i + k + m + 2].text(
+                    0, 1.1, exp.experiment_name, fontsize=config_vars.FONTSIZE
+                )
                 render_mpl_table(exp.recording_list, ax=ax[0, i + k + m + 2])
-                exp.plot_recording_tetr(recording_index=recording_index, tetrode_id=tetrode_id, ax=ax[1][i + k + m + 2])
+                exp.plot_recording_tetr(
+                    recording_index=recording_index,
+                    tetrode_id=tetrode_id,
+                    ax=ax[1][i + k + m + 2],
+                )
                 r_out_im, x_bin, y_bin = exp.tetrode_ratemap()
                 GridScorer_SR = GridScorer(x_bin - 1)
-                GridScorer_SR.plot_grid_score(r_out_im=r_out_im, plot=config_vars.PLOT_SAC_EXP, ax=ax[2][i + k + m + 2])
+                GridScorer_SR.plot_grid_score(
+                    r_out_im=r_out_im,
+                    plot=config_vars.PLOT_SAC_EXP,
+                    ax=ax[2][i + k + m + 2],
+                )
                 if exp_data:
                     ax[3][i + k + m + 2].set_axis_off()
                     ax[4][i + k + m + 2].set_axis_off()

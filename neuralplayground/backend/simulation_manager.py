@@ -13,7 +13,8 @@ from neuralplayground.utils import check_dir, get_date_time
 
 
 class SimulationManager(object):
-    """Class to manage the runs of multiple combinations of agents, environments, parameters and training loops
+    """Class to manage the runs of multiple combinations of agents,
+    environments, parameters and training loops.
 
     Attributes
     ----------
@@ -40,6 +41,7 @@ class SimulationManager(object):
         Show the logs of a simulation
     rerun_simulation(simulation_index: int = 0)
         Rerun a simulation, deleting the previous results
+
     """
 
     def __init__(
@@ -50,7 +52,7 @@ class SimulationManager(object):
         verbose: bool = False,
         existing_simulation: str = None,
     ):
-        """Initialize the simulation manager
+        """Initialize the simulation manager.
 
         Parameters
         ----------
@@ -63,7 +65,9 @@ class SimulationManager(object):
         verbose: bool
             If True, print information about the simulation manager
         existing_simulation: str
-            Path to an existing simulation manager, it will load the parameters from the existing simulation if provided
+            Path to an existing simulation manager, it will load the parameters from the
+            existing simulation if provided
+
         """
         if existing_simulation is not None:
             self._init_existing_sim(existing_simulation)
@@ -78,12 +82,12 @@ class SimulationManager(object):
             print(self)
 
     def _init_existing_sim(self, existing_simulation: str):
-        """Initialize the simulation manager with existing simulations"""
+        """Initialize the simulation manager with existing simulations."""
         param_sims = os.path.join(existing_simulation, "simulation.params")
         self.__dict__ = pickle.load(open(param_sims, "rb"))
 
     def generate_sim_paths(self):
-        """Generate the paths for the simulations"""
+        """Generate the paths for the simulations."""
         self.full_results_path = self.results_path
         self.simulation_paths = []
         self.run_paths = []
@@ -110,7 +114,7 @@ class SimulationManager(object):
             print(str_path)
 
     def __str__(self):
-        """Print the simulation manager information"""
+        """Print the simulation manager information."""
         sim_list = [sim.simulation_id for sim in self.simulation_list]
         mssg_str = (
             f'SimulationManager "{self.manager_id}" \nwith {sim_list} simulations'
@@ -119,7 +123,9 @@ class SimulationManager(object):
         return mssg_str
 
     def run_all(self):
-        """Run all the SingleSim in the simulation manager list, runs_per_sim times"""
+        """Run all the SingleSim in the simulation manager list, runs_per_sim
+        times.
+        """
         # running all the simulations
         for sim_index, sim in enumerate(self.simulation_list):
             # running all the runs for each simulation
@@ -130,12 +136,16 @@ class SimulationManager(object):
                 self._logged_run(sim, sim_path)
 
     def save_params(self, save_path: str):
-        """Save the parameters of the simulation manager"""
+        """Save the parameters of the simulation manager."""
         save_path_params = os.path.join(save_path, "simulation.params")
-        pickle.dump(self.__dict__, open(save_path_params, "wb"), protocol=pickle.HIGHEST_PROTOCOL)
+        pickle.dump(
+            self.__dict__,
+            open(save_path_params, "wb"),
+            protocol=pickle.HIGHEST_PROTOCOL,
+        )
 
     def check_run_status(self):
-        """Check the status of all the simulations"""
+        """Check the status of all the simulations."""
         print("Checking status of simulations")
         str_path = self.full_results_path
         for i, sim in enumerate(self.simulation_list):
@@ -151,7 +161,7 @@ class SimulationManager(object):
         print(str_path)
 
     def show_logs(self, simulation_index: int = 0, log_type: str = "error"):
-        """Show the logs of a simulation"""
+        """Show the logs of a simulation."""
         sim_path = self.simulation_paths[simulation_index]
         sim_object = self.simulation_list[simulation_index]
         print(f"Showing logs for simulation at path: {sim_path}")
@@ -186,7 +196,7 @@ class SimulationManager(object):
             self._logged_run(sim, sim_path)
 
     def _get_state(self, state_path):
-        """Get the state of the simulation from the state log"""
+        """Get the state of the simulation from the state log."""
         with open(state_path, "r") as f:
             state_str = f.readline().split("\n")[0]
         return state_str
@@ -199,7 +209,9 @@ class SimulationManager(object):
             sim.run_sim(save_path=sim_path)
         except Exception:
             # Logging the error
-            sim._update_log_state(message="error", save_path=os.path.join(sim_path, "state.log"))
+            sim._update_log_state(
+                message="error", save_path=os.path.join(sim_path, "state.log")
+            )
             sys.stdout = open(os.path.join(sim_path, "error.log"), "a")
             print(traceback.format_exc())
             sys.stdout.close()
@@ -209,7 +221,7 @@ class SimulationManager(object):
 
 
 class SingleSim(object):
-    """Single simulation object
+    """Single simulation object.
 
     Attributes
     ----------
@@ -240,6 +252,7 @@ class SingleSim(object):
         Save the parameters of the simulation
     _update_log_state(message: str, save_path: str)
         Update the state log of the simulation
+
     """
 
     def __init__(
@@ -252,7 +265,7 @@ class SingleSim(object):
         training_loop_params=None,
         simulation_id: str = None,
     ):
-        """Initialize the SingleSim object
+        """Initialize the SingleSim object.
 
         Parameters
         ----------
@@ -271,6 +284,7 @@ class SingleSim(object):
             The parameters of the training loop (neither the agent nor the environment)
         simulation_id : str
             The id of the simulation
+
         """
         self.agent_class = agent_class
         self.agent_params = agent_params
@@ -281,14 +295,14 @@ class SingleSim(object):
         self.simulation_id = simulation_id
 
     def run_sim(self, save_path: str = None):
-        """Run the simulation and save the results in save_path
+        """Run the simulation and save the results in save_path.
 
         Parameters
         ----------
         save_path : str
             The path where the results of the simulation will be saved
-        """
 
+        """
         # Setting the save path and logs
         if save_path is None:
             save_path = os.path.join(os.getcwd(), "results_sim")
@@ -316,7 +330,9 @@ class SingleSim(object):
 
         # Training loop
         print("---> Training loop")
-        trained_agent, trained_env, training_hist = self.training_loop(agent, env, **self.training_loop_params)
+        trained_agent, trained_env, training_hist = self.training_loop(
+            agent, env, **self.training_loop_params
+        )
 
         # Saving models
         print("---> Saving models")
@@ -332,24 +348,34 @@ class SingleSim(object):
         sys.stderr = original_stderr
 
     def _init_models(self):
-        """Initialize the models"""
+        """Initialize the models."""
         agent = self.agent_class(**self.agent_params)
         env = self.env_class(**self.env_params)
         return agent, env
 
-    def _save_models(self, save_path: str, agent: AgentCore, env: Environment, training_hist: dict):
-        """Save the models and the training history"""
+    def _save_models(
+        self, save_path: str, agent: AgentCore, env: Environment, training_hist: dict
+    ):
+        """Save the models and the training history."""
         agent.save_agent(os.path.join(save_path, "agent"))
         env.save_environment(os.path.join(save_path, "arena"))
-        pickle.dump(training_hist, open(os.path.join(save_path, "training_hist.dict"), "wb"), protocol=pickle.HIGHEST_PROTOCOL)
+        pickle.dump(
+            training_hist,
+            open(os.path.join(save_path, "training_hist.dict"), "wb"),
+            protocol=pickle.HIGHEST_PROTOCOL,
+        )
 
     def save_params(self, save_path: str):
-        """Save the parameters of the simulation for reproducibility"""
+        """Save the parameters of the simulation for reproducibility."""
         save_path_params = os.path.join(save_path, "params.dict")
-        pickle.dump(self.__dict__, open(save_path_params, "wb"), protocol=pickle.HIGHEST_PROTOCOL)
+        pickle.dump(
+            self.__dict__,
+            open(save_path_params, "wb"),
+            protocol=pickle.HIGHEST_PROTOCOL,
+        )
 
     def load_params(self, load_path: str = None):
-        """Load the parameters of the simulation for reproducibility"""
+        """Load the parameters of the simulation for reproducibility."""
         if load_path is None:
             param_path = os.path.join(os.getcwd(), "results_sim", "params.dict")
         else:
@@ -357,7 +383,7 @@ class SingleSim(object):
         self.__dict__ = pd.read_pickle(param_path)
 
     def _update_log_state(self, message: str, save_path: str):
-        """Update the state log of the simulation"""
+        """Update the state log of the simulation."""
         state_log = open(save_path, "w")
         state_log.write(message)
         state_log.close()
@@ -373,7 +399,7 @@ class SingleSim(object):
         return str_rep
 
     def load_results(self, results_path: str = None):
-        """Load the results of a simulation from a path"""
+        """Load the results of a simulation from a path."""
         if results_path is None:
             results_path = os.path.join(os.getcwd(), "results_sim")
         self.load_params(os.path.join(results_path))
@@ -383,7 +409,7 @@ class SingleSim(object):
         return trained_agent, trained_env, training_hist
 
     def show_logs(self, results_path: str = None, log_type: str = "error"):
-        """Show the logs of the simulation"""
+        """Show the logs of the simulation."""
         if results_path is None:
             results_path = os.path.join(os.getcwd(), "results_sim")
         if log_type == "error":

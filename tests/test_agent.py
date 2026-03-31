@@ -4,8 +4,14 @@ from tqdm import tqdm
 
 from neuralplayground.agents import AgentCore, Stachenfeld2018, Weber2018
 from neuralplayground.agents.whittington_2020 import Whittington2020
-from neuralplayground.agents.whittington_2020_extras import whittington_2020_parameters as parameters
-from neuralplayground.arenas import BasicSargolini2006, BatchEnvironment, DiscreteObjectEnvironment
+from neuralplayground.agents.whittington_2020_extras import (
+    whittington_2020_parameters as parameters,
+)
+from neuralplayground.arenas import (
+    BasicSargolini2006,
+    BatchEnvironment,
+    DiscreteObjectEnvironment,
+)
 from neuralplayground.experiments import Sargolini2006Data
 
 
@@ -149,7 +155,9 @@ class TestStachenfeld2018(Testmodelcore):
         init_model[0].plot_rate_map(sr, eigen_vectors=(0, 1), save_path=None)
 
     def test_plot_sr_td(self, init_model):
-        sr_td = init_model[0].update_successor_rep_td_full()  # Choose your type of Update
+        sr_td = init_model[
+            0
+        ].update_successor_rep_td_full()  # Choose your type of Update
         init_model[0].plot_rate_map(sr_td, eigen_vectors=(0,), save_path=None)
 
     def test_plot_sr_sum(self, init_model):

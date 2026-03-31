@@ -2,7 +2,7 @@ from .main_config import NPGConfig
 
 
 class DefaultConfig(NPGConfig):
-    """Default config object for plots
+    """Default config object for plots.
 
     Attributes
     ----------
@@ -24,6 +24,7 @@ class DefaultConfig(NPGConfig):
         Size of the axis ticks
     LABELPAD: float
         Padding for the labels
+
     """
 
     def __init__(self, **kwargs):
@@ -39,7 +40,7 @@ class DefaultConfig(NPGConfig):
 
 
 class TrajectoryConfig(NPGConfig):
-    """Config object for trajectory plots
+    """Config object for trajectory plots.
 
     Attributes
     ----------
@@ -73,6 +74,7 @@ class TrajectoryConfig(NPGConfig):
         Fontsize of the title in the plot
     COLORBAR_LABEL_FONTSIZE: float
         Fontsize of the colorbar label in the plot
+
     """
 
     def __init__(self, **kwargs):
@@ -93,7 +95,7 @@ class TrajectoryConfig(NPGConfig):
 
 
 class RateMapConfig(NPGConfig):
-    """Config object for ratemap plots
+    """Config object for ratemap plots.
 
     Attributes
     ----------
@@ -109,6 +111,7 @@ class RateMapConfig(NPGConfig):
         Fontsize of tick labels in the plot
     COLORBAR_LABEL_FONTSIZE: float
         Fontsize of colorbar labels in the plot
+
     """
 
     def __init__(self, **kwargs):
@@ -122,14 +125,12 @@ class RateMapConfig(NPGConfig):
 
 
 class AgentComparisonConfig(NPGConfig):
-    """Config object for ratemap plots
+    """Config object for ratemap plots.
 
     Attributes
     ----------
-
     TABLE_FONTSIZE: float
         Fontsize of table
-
 
     """
 
@@ -144,7 +145,7 @@ class AgentComparisonConfig(NPGConfig):
 
 
 class TableConfig(NPGConfig):
-    """Config object for ratemap plots
+    """Config object for ratemap plots.
 
     Attributes
     ----------
@@ -164,6 +165,7 @@ class TableConfig(NPGConfig):
         List of header columns in the table
     BBOX: tuple
         Bounding box of the table
+
     """
 
     def __init__(self, **kwargs):
@@ -179,7 +181,8 @@ class TableConfig(NPGConfig):
 
 
 class PlotsConfig(NPGConfig):
-    """Config object for plots, all plots are config are stored in this object
+    """Config object for plots, all plots are config are stored in this object.
+
     Attributes
     ----------
     TRAJECTORY: TrajectoryConfig
@@ -190,11 +193,14 @@ class PlotsConfig(NPGConfig):
         Config object for agent comparison plots
     TABLE: TableConfig
         Config object for table plots
+
     """
 
     def __init__(self, plot_config: dict):
         self.DEFAULT = DefaultConfig(**plot_config["default_plot"])
         self.TRAJECTORY = TrajectoryConfig(**plot_config["trajectory_plot"])
         self.RATEMAP = RateMapConfig(**plot_config["ratemap_plot"])
-        self.AGENT_COMPARISON = AgentComparisonConfig(**plot_config["agent_comparison_plot"])
+        self.AGENT_COMPARISON = AgentComparisonConfig(
+            **plot_config["agent_comparison_plot"]
+        )
         self.TABLE = TableConfig(**plot_config["table_plot"])
