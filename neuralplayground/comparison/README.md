@@ -7,12 +7,13 @@
 
 ## 1. Introduction
 
-This class includes a set of functions that will help when comparing various models against experimental data. More specifically these metrics will compare an agent's neural representations of the environment against other agents or experimental data. For the moment GridScore is the only metric implemented through the `GridScorer` class.
+This class includes a set of functions that will help when comparing various models against experimental data. More specifically these metrics will compare an agent's neural representations of the environment against other agents or experimental data.
 
 
 ## 2. Metrics-Implemented
 
-  1. [GridScore](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/style-guide/neuralplayground/comparison/metrics.py)
+  1. [GridScore](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/neuralplayground/comparison/metrics.py)
+  2. [PlaceCellScore](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/neuralplayground/comparison/place_cell_metrics.py)
 
 
 For an example of the use of the `GridScorer` class see [the Jupyter Notebook](https://github.com/SainsburyWellcomeCentre/NeuralPlayground/blob/main/examples/comparisons_examples/comparison_examples_score.ipynb).
