@@ -131,8 +131,10 @@ You can pick an Agent and an Arena of your choice to run a simulation. Arenas an
 ```python
 # import an agent based on a plasticity model of grid cells
 from neuralplayground.agents import Weber2018
+
 # import a square 2D arena
 from neuralplayground.arenas import Simple2D
+
 # Initialize the agent
 agent = Weber2018()
 # Initialize the arena
@@ -174,6 +176,7 @@ class. For example
 # Import default simulation, which is a SingleSim
 from neuralplayground.backend.default_simulation import stachenfeld_in_2d
 from neuralplayground.backend.default_simulation import weber_in_2d
+
 stachenfeld_in_2d.run_sim(save_path="my_results")
 ```
 This class allows you to run a simulation with a single line of code, and it will automatically save the results in a
@@ -217,6 +220,7 @@ implemented using a SingleSim class. For example
 # Import default simulation, which is a SingleSim
 from neuralplayground.backend.default_simulation import stachenfeld_in_2d
 from neuralplayground.backend.default_simulation import weber_in_2d
+
 stachenfeld_in_2d.run_sim(save_path="my_results")
 ```
 This class allows you to run a simulation with a single line of code, and it will automatically save the results in a
@@ -225,16 +229,17 @@ folder with the name you provide, keeping track of any errors and logs. You can 
 to run multiple simulations at once, save the results, keep run of each run and possible errors for easy debugging, and other functions.
 
 ```python
-
 # Import Simulation Manager
 from neuralplayground.backend import SimulationManager
 
 # Initialise simulation manager
 my_sims = [weber_in_2d, stachenfeld_in_2d]
-my_manager = SimulationManager(simulation_list = my_sims,
-                               runs_per_sim = 5,  # Run 5 instances per simulation
-                               manager_id = "example_simulation",
-                               verbose = True)
+my_manager = SimulationManager(
+    simulation_list=my_sims,
+    runs_per_sim=5,  # Run 5 instances per simulation
+    manager_id="example_simulation",
+    verbose=True,
+)
 my_manager.generate_sim_paths()
 my_manager.run_all()
 my_manager.check_run_status()
