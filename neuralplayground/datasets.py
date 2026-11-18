@@ -118,10 +118,12 @@ def fetch_data_path(
                 f"Downloading the full dataset instead."
             )
 
+    headers = {"User-Agent": "my-data-fetcher/1.0"}
+    downloader = pooch.HTTPDownloader(headers=headers, progressbar=progressbar)
     dataset_manager.fetch(
         file_name,
         processor=pooch.Unzip(extract_dir=LOCAL_DATA_DIR),
-        progressbar=progressbar,
+        downloader=downloader,
     )
     data_path = LOCAL_DATA_DIR / file_name.replace(".zip", "")
     return data_path.as_posix() + "/"
